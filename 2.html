@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teachable Machine Upload Model</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.20.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
+</head>
+
+<body>
+
+<h2>Teachable Machine Image Classifier</h2>
+
+<input type="file" accept="image/*" onchange="predictImage(event)">
+<br><br>
+
+<img id="uploaded-image" width="250">
+<br><br>
+
+<div id="label-container"></div>
+
+<script>
+
+    const MODEL_PATH = "./my_model/"; 
+    // If model files are in same folder as index.html use "./"
+
+    let model, maxPredictions;
+
+    window.onload = async function () {
+        const modelURL = MODEL_PATH + "model.json";
+        const metadataURL = MODEL_PATH + "metadata.json";
+
+        model = await tmImage.load(modelURL, metadataURL);
+        maxPredictions = model.getTotalClasses();
+    }
+
+    async function predictImage(event) {
+
+        const file = event.target.files[0];
+        const image = document.getElementById("uploaded-image");
+        const labelContainer = document.getElementById("label-container");
+
+        const reader = new FileReader();
+
+        reader.onload = async function (e) {
+
+            image.src = e.target.result;
+
+            image.onload = async function () {
+
+                const prediction = await model.predict(image);
+
+                labelContainer.innerHTML = "";
+
+                for (let i = 0; i < maxPredictions; i++) {
+                    const classPrediction =
+                        prediction[i].className + ": " +
+                        (prediction[i].probability * 100).toFixed(2) + "%";
+
+                    labelContainer.innerHTML += classPrediction + "<br>";
+                }
+            };
+        };
+
+        reader.readAsDataURL(file);
+    }
+
+</script>
+
+</body>
+</html>

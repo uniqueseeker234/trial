@@ -1,211 +1,277 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Algae Pond Identification</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    /* Body & Ripple effect */
-    body {
-      margin: 0;
-      overflow-x: hidden;
-      background: linear-gradient(to bottom, #1b3a4b, #4fa8c4); /* pond background */
-      font-family: sans-serif;
-      position: relative;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Algae Identifier 🌿</title>
 
-    /* Ripple overlay */
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle, rgba(255,255,255,0.05) 10%, transparent 10%) repeat;
-      background-size: 100px 100px;
-      animation: ripple 20s linear infinite;
-      z-index: 0;
-      pointer-events: none;
-    }
-    @keyframes ripple {
-      0% { background-position: 0 0; }
-      100% { background-position: 100px 100px; }
-    }
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    /* Bubbles container */
-    #bubbles {
-      position: fixed;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-      pointer-events: none;
-    }
-    .bubble {
-      position: absolute;
-      bottom: 0;
-      width: 10px;
-      height: 10px;
-      background: rgba(255,255,255,0.6);
-      border-radius: 50%;
-      animation: rise 6s linear infinite;
-    }
-    @keyframes rise {
-      0% { transform: translateY(0) scale(1); }
-      50% { transform: translateY(-200px) scale(1.2); }
-      100% { transform: translateY(-400px) scale(1); }
-    }
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
 
-    /* Fish */
-    .fish {
-      position: absolute;
-      width: 80px;
-      z-index: 2;
-      pointer-events: none;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-    }
-    .fish1 { bottom:20%; animation: swim1 15s linear infinite alternate; }
-    .fish2 { bottom:40%; animation: swim2 20s linear infinite alternate-reverse; }
-    .fish3 { bottom:10%; animation: swim3 12s linear infinite alternate; }
-    .fish4 { bottom:30%; animation: swim4 18s linear infinite alternate-reverse; }
-    .fish5 { bottom:50%; animation: swim5 22s linear infinite alternate; }
+<style>
+body {
+  margin:0;
+  font-family: 'Montserrat', sans-serif;
+  background: linear-gradient(to bottom, #a0e9fd, #75c6a0);
+  overflow-x: hidden;
+}
 
-    @keyframes swim1 {0%{left:-100px; transform:scaleX(1);}100%{left:110%; transform:scaleX(1);}}
-    @keyframes swim2 {0%{left:110%; transform:scaleX(-1);}100%{left:-100px; transform:scaleX(-1);}}
-    @keyframes swim3 {0%{left:-100px; transform:scaleX(1);}100%{left:110%; transform:scaleX(1);}}
-    @keyframes swim4 {0%{left:110%; transform:scaleX(-1);}100%{left:-100px; transform:scaleX(-1);}}
-    @keyframes swim5 {0%{left:-100px; transform:scaleX(1);}100%{left:110%; transform:scaleX(1);}}
+/* Cards */
+.card { 
+  border-radius: 15px; 
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+  margin-bottom: 20px; 
+  transition: transform 0.3s, opacity 0.5s; 
+  opacity:0; 
+}
+.card.show { opacity:1; }
+.card:hover { transform: translateY(-5px); }
 
-    /* Algae */
-    .algae {
-      position: absolute;
-      bottom: 0;
-      width: 60px;
-      max-width: 10%;
-      z-index: 1;
-      pointer-events: none;
-      transform-origin: bottom center;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-    }
-    .algae1 { left:5%; animation: sway 3s ease-in-out infinite alternate; }
-    .algae2 { left:25%; animation: sway 4s ease-in-out infinite alternate; }
-    .algae3 { left:50%; animation: sway 5s ease-in-out infinite alternate; }
-    .algae4 { left:70%; animation: sway 3.5s ease-in-out infinite alternate; }
-    .algae5 { left:90%; animation: sway 4.5s ease-in-out infinite alternate; }
+button.btn-success { 
+  background-color: #2E7D32; 
+  border: none; 
+  transition: background 0.3s; 
+}
+button.btn-success:hover { background-color: #1B5E20; }
 
-    @keyframes sway {
-      0% { transform: rotate(0deg); }
-      50% { transform: rotate(5deg); }
-      100% { transform: rotate(-5deg); }
-    }
+img.example { border-radius:10px; width:100%; height:auto; }
 
-    /* Prediction images */
-    .predicted-algae {
-      width: 120px;
-      max-width: 20%;
-      height: auto;
-      display: block;
-      margin-top: 10px;
-    }
+#stars span { cursor:pointer; font-size:26px; margin:0 3px; transition: transform 0.2s; }
+#stars span:hover { transform: scale(1.3); }
 
-    /* Text styles */
-    #prediction p {
-      font-size: 1.1rem;
-      margin-top: 10px;
-    }
-  </style>
+#message { font-weight: 500; }
+#spinner { animation: spin 1s linear infinite; display:inline-block; margin-left:5px; }
+@keyframes spin { 0%{transform:rotate(0deg);}100%{transform:rotate(360deg);} }
+
+/* Pond decorations */
+.fish, .algae, .bubble { position:absolute; z-index:1; }
+
+/* Fish swimming */
+.fish { width:50px; height:auto; top:10%; animation: swim 12s linear infinite, bob 3s ease-in-out infinite alternate; }
+.fish2 { top:40%; animation-duration:15s; }
+.fish3 { top:70%; animation-duration:18s; }
+
+@keyframes swim {
+  0% { left:-60px; transform: scaleX(1); }
+  50% { left:50%; transform: scaleX(-1); }
+  100% { left:100%; transform: scaleX(1); }
+}
+
+@keyframes bob { 0%{transform:translateY(0);} 100%{transform:translateY(-10px);} }
+
+/* Algae swaying */
+.algae { bottom:0; width:40px; height:auto; animation:sway 3s ease-in-out infinite alternate; }
+.algae2 { left:100px; animation-duration:3.5s; }
+.algae3 { left:200px; animation-duration:4s; }
+.algae4 { left:300px; animation-duration:3.2s; }
+@keyframes sway { 0%{transform:rotate(-5deg);} 100%{transform:rotate(5deg);} }
+
+/* Water bubbles */
+.bubble { background: rgba(255,255,255,0.7); border-radius:50%; width:10px; height:10px; animation: rise linear infinite; }
+@keyframes rise { 0%{bottom:0; transform:translateX(0);} 100%{bottom:100%; transform:translateX(30px);} }
+</style>
 </head>
 <body>
 
-  <!-- Bubbles container -->
-  <div id="bubbles"></div>
+<!-- Pond decorations -->
+<img src="images/fish1.png" class="fish">
+<img src="images/fish2.png" class="fish fish2">
+<img src="images/fish3.png" class="fish fish3">
+<img src="images/algae1.png" class="algae">
+<img src="images/algae2.png" class="algae algae2">
+<img src="images/algae3.png" class="algae algae3">
+<img src="images/algae4.png" class="algae algae4">
 
-  <!-- Fish -->
-  <img src="images/fish_orange.png" class="fish fish1">
-  <img src="images/fish_blue.png" class="fish fish2">
-  <img src="images/fish_gold.png" class="fish fish3">
-  <img src="images/fish_clown.png" class="fish fish4">
-  <img src="images/fish_school.png" class="fish fish5">
+<!-- Bubbles -->
+<div id="bubbles"></div>
 
-  <!-- Algae / Plants -->
-  <img src="images/algae1.png" class="algae algae1">
-  <img src="images/algae2.png" class="algae algae2">
-  <img src="images/algae3.png" class="algae algae3">
-  <img src="images/algae4.png" class="algae algae4">
-  <img src="images/algae5.png" class="algae algae5">
+<div class="container mt-5 text-center" style="position:relative; z-index:2;">
+<h1 class="mb-4">Algae Identifier 🌿</h1>
 
-  <!-- Prediction UI -->
-  <div class="container mt-5" style="position:relative; z-index:10;">
-    <h1 class="text-center text-white">Algae Pond Identification</h1>
-    <div class="mb-3">
-      <input type="file" id="imageUpload" class="form-control">
-    </div>
-    <div id="prediction" class="text-white"></div>
-    <button id="contributeBtn" class="btn btn-warning mt-3">Contribute Your Algae</button>
+<div class="card p-4 show">
+  <input type="file" class="form-control" id="imageUpload" accept="image/*">
+  <div id="message" class="text-success mt-2">
+    <span id="scanText">Upload your algae photo to start!</span>
+    <span id="spinner" class="d-none">🌀</span>
   </div>
+</div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    // Bubble creation
-    const bubblesContainer = document.getElementById('bubbles');
-    for(let i=0; i<20; i++){
-      let bubble = document.createElement('div');
-      bubble.classList.add('bubble');
-      bubble.style.left = Math.random()*100 + '%';
-      bubble.style.width = (5 + Math.random()*10)+'px';
-      bubble.style.height = bubble.style.width;
-      bubble.style.animationDuration = (4 + Math.random()*4)+'s';
-      bubblesContainer.appendChild(bubble);
-    }
+<div id="result" class="card p-3">
+  <h3 id="predictedName"></h3>
+  <p id="confidence"></p>
+  <p id="description"></p>
+  <div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner" id="carouselInner"></div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+      <span class="carousel-control-next-icon"></span>
+    </button>
+  </div>
+</div>
 
-    // Prediction simulation
-    const imageUpload = document.getElementById('imageUpload');
-    const predictionDiv = document.getElementById('prediction');
-    const contributeBtn = document.getElementById('contributeBtn');
+<div id="stars" class="my-3">
+  <span onclick="rate(1)">⭐</span>
+  <span onclick="rate(2)">⭐</span>
+  <span onclick="rate(3)">⭐</span>
+  <span onclick="rate(4)">⭐</span>
+  <span onclick="rate(5)">⭐</span>
+</div>
 
-    imageUpload.addEventListener('change', async (e)=>{
-      predictionDiv.innerHTML = '';
-      let file = e.target.files[0];
-      if(!file) return;
+<button class="btn btn-success mb-2" onclick="contribute()">Contribute 📨</button>
+<a href="gallery.html" class="btn btn-outline-success">Explore Algae Around the World 🌏</a>
+</div>
 
-      let img = document.createElement('img');
-      img.src = URL.createObjectURL(file);
-      img.style.width = '150px';
-      predictionDiv.appendChild(img);
+<!-- TensorFlow & Teachable Machine JS -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
 
-      // Simulated AI prediction
-      setTimeout(()=>{
-        let confidence = Math.floor(Math.random()*100); // simulate confidence
-        let algaeNames = ['Oedogonium','Spirogyra','Cladophora','Cosmarium'];
-        let predicted = algaeNames[Math.floor(Math.random()*algaeNames.length)];
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
-        predictionDiv.innerHTML = ''; // clear previous image
-        if(confidence < 60){
-          predictionDiv.innerHTML = `<p class="text-warning">Algae not yet in our pond. You can kindly <strong>contribute</strong> to help us!</p>`;
-        } else {
-          let predImg = document.createElement('img');
-          predImg.src = `images/${predicted.toLowerCase()}1.jpg`;
-          predImg.classList.add('predicted-algae');
-          predictionDiv.appendChild(predImg);
-          let info = document.createElement('p');
-          info.innerHTML = `<strong>${predicted}</strong><br>
-                            Habitat: Freshwater ponds<br>
-                            Economic Importance: Research, Education`;
-          predictionDiv.appendChild(info);
-        }
-      }, 1000);
-    });
+<script>
+const MODEL_URL = "my_model/";
+let model, maxPredictions;
 
-    // Contribute button
-    contributeBtn.addEventListener('click', ()=>{
-      let email = "uniqueseekers123@gmail.com";
-      if(window.innerWidth < 768){ // mobile
-        window.location.href = `mailto:${email}?subject=Algae Contribution`;
-      } else { // desktop
-        alert(`Please email your algae data to: ${email}`);
+// Algae info
+const algaeInfo = {
+  "Cladophora": {
+    description: `• Filamentous green algae forming dense mats.
+• Branching filaments with coarse texture.
+• Commonly grows in clean freshwater.
+Economic importance:
+• Wastewater treatment.
+• Source of bioactive compounds.
+Location: Freshwater ponds and rivers, Kerala.`,
+    images: ["images/cladophora1.jpg","images/cladophora2.jpg"]
+  },
+  "Oedogonium": {
+    description: `• Filamentous green algae with unbranched filaments.
+• Grows attached to submerged plants or stones.
+Economic importance:
+• Fish feed in aquaculture.
+• Produces oxygen improving water quality.
+Location: Ponds, lakes, slow streams, Kerala.`,
+    images: ["images/oedogonium1.jpg","images/oedogonium2.jpg"]
+  },
+  "Spirogyra": {
+    description: `• Filamentous green algae with spiral chloroplasts.
+• Forms floating green mats in freshwater.
+Economic importance:
+• Used in labs for study.
+• Produces oxygen.
+Location: Stagnant ponds and ditches, Kerala.`,
+    images: ["images/spirogyra1.jpg","images/spirogyra2.jpg"]
+  },
+  "Cosmarium": {
+    description: `• Green desmid with symmetrical cells and constriction in the middle.
+Economic importance:
+• Bioindicator for ecology.
+• Source of pigments.
+Location: Freshwater ponds and marshes, Kerala.`,
+    images: ["images/cosmarium1.jpg","images/cosmarium2.jpg"]
+  }
+};
+
+// Load model
+async function init(){
+  model = await tmImage.load(MODEL_URL+"model.json", MODEL_URL+"metadata.json");
+  maxPredictions = model.getTotalClasses();
+  console.log("Model loaded!");
+}
+init();
+
+// Star rating
+function rate(star){ alert("Thanks for giving "+star+" stars!"); localStorage.setItem("rating",star); }
+
+// Mobile check
+function isMobileDevice(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent); }
+
+// Contribute button
+function contribute(){
+  if(isMobileDevice()){
+    window.location.href='mailto:uniqueseekers123@gmail.com?subject=Algae Contribution';
+  }else{
+    alert("Please email your algae photos to: uniqueseekers123@gmail.com");
+  }
+}
+
+// Image upload & prediction
+document.getElementById("imageUpload").addEventListener("change", async function(){
+  const file = this.files[0]; if(!file) return;
+  const confidenceThreshold = 0.6; 
+  document.getElementById("spinner").classList.remove("d-none");
+  let dots = 0;
+  const msgInterval = setInterval(()=>{
+    dots = (dots+1)%4;
+    document.getElementById("scanText").innerText = "Looking under pond leaves 🌿"+ ".".repeat(dots);
+  },500);
+
+  const resultCard = document.getElementById("result");
+  resultCard.classList.remove("show"); resultCard.classList.add("d-none");
+
+  const img = new Image(); img.src = URL.createObjectURL(file);
+  img.onload = async () => {
+    try{
+      const prediction = await model.predict(img);
+      const topPred = prediction.reduce((a,b)=>a.probability>b.probability?a:b);
+
+      let algaeKey = null;
+      if(topPred.probability>=confidenceThreshold){
+        algaeKey = Object.keys(algaeInfo).find(
+          key => topPred.className.toLowerCase().includes(key.toLowerCase())
+        );
       }
-    });
-  </script>
+
+      clearInterval(msgInterval);
+      document.getElementById("spinner").classList.add("d-none");
+
+      if(algaeKey){
+        document.getElementById("predictedName").innerText = topPred.className;
+        document.getElementById("confidence").innerText = "Confidence: "+(topPred.probability*100).toFixed(2)+"%";
+        document.getElementById("description").innerText = algaeInfo[algaeKey].description;
+        const carouselInner = document.getElementById("carouselInner"); carouselInner.innerHTML="";
+        algaeInfo[algaeKey].images.forEach((src,i)=>{
+          carouselInner.innerHTML+=`<div class="carousel-item ${i===0?'active':''}"><img src="${src}" class="d-block w-100 example"></div>`;
+        });
+      }else{
+        document.getElementById("predictedName").innerText="";
+        document.getElementById("confidence").innerText = "Confidence: "+(topPred.probability*100).toFixed(2)+"%";
+        document.getElementById("description").innerText = "This algae is not yet recognized in our pond 🌱. If you know it, please contribute photos!";
+        document.getElementById("carouselInner").innerHTML="";
+      }
+
+      resultCard.classList.remove("d-none");
+      setTimeout(()=>{resultCard.classList.add("show");},50);
+      document.getElementById("scanText").innerText = "Prediction complete! 🌿";
+    }catch(err){
+      clearInterval(msgInterval);
+      document.getElementById("spinner").classList.add("d-none");
+      console.error("Prediction error:",err);
+      document.getElementById("scanText").innerText = "Failed to predict. Check console.";
+    }
+  }
+});
+
+// Generate bubbles
+function createBubbles(){
+  const bubblesContainer = document.getElementById("bubbles");
+  for(let i=0;i<20;i++){
+    const bubble=document.createElement("div"); bubble.className="bubble";
+    bubble.style.left = Math.random()*window.innerWidth+"px";
+    bubble.style.width = (5+Math.random()*10)+"px";
+    bubble.style.height = bubble.style.width;
+    bubble.style.animationDuration = (3+Math.random()*5)+"s";
+    bubble.style.opacity = 0.5 + Math.random()*0.5;
+    bubblesContainer.appendChild(bubble);
+  }
+}
+createBubbles();
+</script>
 </body>
 </html>

@@ -85,8 +85,8 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-// Model folder
-const MODEL_URL = "my_model/"; // ✅ renamed to avoid conflict with browser URL
+// ✅ Model folder
+const MODEL_URL = "my_model/"; 
 
 let model, maxPredictions;
 
@@ -158,7 +158,7 @@ document.getElementById("imageUpload").addEventListener("change", async function
   document.getElementById("result").classList.add("d-none");
 
   const img = new Image();
-  img.src = URL.createObjectURL(file); // ✅ fixed typo
+  img.src = URL.createObjectURL(file); // ✅ uses browser's URL object
   img.onload = async () => {
     try {
       const prediction = await model.predict(img);

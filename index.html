@@ -158,27 +158,40 @@ document.getElementById("imageUpload").addEventListener("change", async function
   document.getElementById("result").classList.add("d-none");
 
   const img = new Image();
-  img.src = URL.createObjectURL(file); // ✅ uses browser's URL object
+  img.src = URL.createObjectURL(file); 
   img.onload = async () => {
     try {
       const prediction = await model.predict(img);
       const topPred = prediction.reduce((a,b)=>a.probability>b.probability?a:b);
 
-      document.getElementById("predictedName").innerText = topPred.className;
-      document.getElementById("confidence").innerText = "Confidence: "+(topPred.probability*100).toFixed(2)+"%";
-      document.getElementById("description").innerText = algaeInfo[topPred.className].description;
+      // Safe check: if prediction class exists in algaeInfo
+      if (algaeInfo[topPred.className]) {
+        document.getElementById("predictedName").innerText = topPred.className;
+        document.getElementById("confidence").innerText = "Confidence: "+(topPred.probability*100).toFixed(2)+"%";
+        document.getElementById("description").innerText = algaeInfo[topPred.className].description;
 
-      // Carousel images
-      const carouselInner = document.getElementById("carouselInner");
-      carouselInner.innerHTML = "";
-      algaeInfo[topPred.className].images.forEach((src, i)=>{
-        carouselInner.innerHTML += `<div class="carousel-item ${i===0?'active':''}">
-          <img src="${src}" class="d-block w-100 example">
-        </div>`;
-      });
+        // Carousel images
+        const carouselInner = document.getElementById("carouselInner");
+        carouselInner.innerHTML = "";
+        algaeInfo[topPred.className].images.forEach((src, i)=>{
+          carouselInner.innerHTML += `<div class="carousel-item ${i===0?'active':''}">
+            <img src="${src}" class="d-block w-100 example">
+          </div>`;
+        });
 
-      document.getElementById("result").classList.remove("d-none");
-      document.getElementById("message").innerText = "Thanks for checking your algae! 🌿 We hope this helps 🙂";
+        document.getElementById("result").classList.remove("d-none");
+        document.getElementById("message").innerText = "Thanks for checking your algae! 🌿 We hope this helps 🙂";
+
+      } else {
+        // Fallback if class not in algaeInfo
+        document.getElementById("predictedName").innerText = topPred.className;
+        document.getElementById("confidence").innerText = "Confidence: "+(topPred.probability*100).toFixed(2)+"%";
+        document.getElementById("description").innerText = "Description not available for this algae.";
+        document.getElementById("carouselInner").innerHTML = "";
+        document.getElementById("result").classList.remove("d-none");
+        document.getElementById("message").innerText = "Prediction done, but we don’t have info for this algae yet 🙂";
+      }
+
     } catch(err){
       console.error("Prediction error:", err);
       document.getElementById("message").innerText = "Failed to predict. Check console for errors.";

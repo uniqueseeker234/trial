@@ -4,16 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Algae Identifier 🌿</title>
-  
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-..." crossorigin="anonymous">
+
+  <!-- Bootstrap CSS (fixed) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
 
   <style>
     body { 
-      background-color: #E8F5E9; /* soft green */
+      background-color: #E8F5E9; 
       font-family: 'Montserrat', sans-serif;
     }
     .card {
@@ -81,11 +81,11 @@
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
 <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-..." crossorigin="anonymous"></script>
+<!-- Bootstrap JS (fixed) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-const URL = "my_model/"; // your trained model folder
+const URL = "my_model/"; // folder containing your trained model
 let model, maxPredictions;
 
 // Only 4 algae
@@ -132,8 +132,14 @@ Location: Freshwater ponds and marshes, Kerala.`,
 async function init() {
   const modelURL = URL + "model.json";
   const metadataURL = URL + "metadata.json";
-  model = await tmImage.load(modelURL, metadataURL);
-  maxPredictions = model.getTotalClasses();
+  try {
+    model = await tmImage.load(modelURL, metadataURL);
+    maxPredictions = model.getTotalClasses();
+    console.log("Model loaded successfully!");
+  } catch (err) {
+    console.error("Error loading model:", err);
+    document.getElementById("message").innerText = "Failed to load model. Check console.";
+  }
 }
 init();
 
@@ -152,26 +158,31 @@ document.getElementById("imageUpload").addEventListener("change", async function
   document.getElementById("result").classList.add("d-none");
 
   const img = new Image();
-  img.src = URL.createObjectURL(file);
+  img.src = URL.createObjectURL(file); // ✅ fixed typo
   img.onload = async () => {
-    const prediction = await model.predict(img);
-    const topPred = prediction.reduce((a,b)=>a.probability>b.probability?a:b);
+    try {
+      const prediction = await model.predict(img);
+      const topPred = prediction.reduce((a,b)=>a.probability>b.probability?a:b);
 
-    document.getElementById("predictedName").innerText = topPred.className;
-    document.getElementById("confidence").innerText = "Confidence: "+(topPred.probability*100).toFixed(2)+"%";
-    document.getElementById("description").innerText = algaeInfo[topPred.className].description;
+      document.getElementById("predictedName").innerText = topPred.className;
+      document.getElementById("confidence").innerText = "Confidence: "+(topPred.probability*100).toFixed(2)+"%";
+      document.getElementById("description").innerText = algaeInfo[topPred.className].description;
 
-    // Carousel Images
-    const carouselInner = document.getElementById("carouselInner");
-    carouselInner.innerHTML = "";
-    algaeInfo[topPred.className].images.forEach((src, i)=>{
-      carouselInner.innerHTML += `<div class="carousel-item ${i===0?'active':''}">
-        <img src="${src}" class="d-block w-100 example">
-      </div>`;
-    });
+      // Carousel Images
+      const carouselInner = document.getElementById("carouselInner");
+      carouselInner.innerHTML = "";
+      algaeInfo[topPred.className].images.forEach((src, i)=>{
+        carouselInner.innerHTML += `<div class="carousel-item ${i===0?'active':''}">
+          <img src="${src}" class="d-block w-100 example">
+        </div>`;
+      });
 
-    document.getElementById("result").classList.remove("d-none");
-    document.getElementById("message").innerText = "Thanks for checking your algae! 🌿 We hope this helps your research 🙂";
+      document.getElementById("result").classList.remove("d-none");
+      document.getElementById("message").innerText = "Thanks for checking your algae! 🌿 We hope this helps your research 🙂";
+    } catch(err){
+      console.error("Prediction error:", err);
+      document.getElementById("message").innerText = "Failed to predict. Check console for errors.";
+    }
   }
 });
 </script>

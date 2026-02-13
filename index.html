@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Algae Identifier 🌿</title>
 
-  <!-- Bootstrap CSS (fixed) -->
+  <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <!-- Google Font -->
@@ -77,18 +77,20 @@
   <a href="gallery.html" class="btn btn-outline-success">Explore Algae Around the World 🌏</a>
 </div>
 
-<!-- Teachable Machine JS -->
+<!-- TensorFlow & Teachable Machine JS -->
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
 <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
 
-<!-- Bootstrap JS (fixed) -->
+<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-const URL = "my_model/"; // folder containing your trained model
+// Model folder
+const MODEL_URL = "my_model/"; // ✅ renamed to avoid conflict with browser URL
+
 let model, maxPredictions;
 
-// Only 4 algae
+// 4-algae info
 const algaeInfo = {
   "Cladophora": {
     description: `• Filamentous green algae forming dense mats.
@@ -128,12 +130,10 @@ Location: Freshwater ponds and marshes, Kerala.`,
   }
 };
 
-// Load Model
+// Load Teachable Machine model
 async function init() {
-  const modelURL = URL + "model.json";
-  const metadataURL = URL + "metadata.json";
   try {
-    model = await tmImage.load(modelURL, metadataURL);
+    model = await tmImage.load(MODEL_URL + "model.json", MODEL_URL + "metadata.json");
     maxPredictions = model.getTotalClasses();
     console.log("Model loaded successfully!");
   } catch (err) {
@@ -143,7 +143,7 @@ async function init() {
 }
 init();
 
-// Star Rating
+// Star rating
 function rate(star){
   alert("Thanks for giving " + star + " stars!");
   localStorage.setItem("rating", star);
@@ -168,7 +168,7 @@ document.getElementById("imageUpload").addEventListener("change", async function
       document.getElementById("confidence").innerText = "Confidence: "+(topPred.probability*100).toFixed(2)+"%";
       document.getElementById("description").innerText = algaeInfo[topPred.className].description;
 
-      // Carousel Images
+      // Carousel images
       const carouselInner = document.getElementById("carouselInner");
       carouselInner.innerHTML = "";
       algaeInfo[topPred.className].images.forEach((src, i)=>{
@@ -178,7 +178,7 @@ document.getElementById("imageUpload").addEventListener("change", async function
       });
 
       document.getElementById("result").classList.remove("d-none");
-      document.getElementById("message").innerText = "Thanks for checking your algae! 🌿 We hope this helps your research 🙂";
+      document.getElementById("message").innerText = "Thanks for checking your algae! 🌿 We hope this helps 🙂";
     } catch(err){
       console.error("Prediction error:", err);
       document.getElementById("message").innerText = "Failed to predict. Check console for errors.";

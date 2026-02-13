@@ -20,8 +20,10 @@
       border-radius: 15px;
       box-shadow: 0 6px 12px rgba(0,0,0,0.15);
       margin-bottom: 20px;
-      transition: transform 0.3s;
+      transition: transform 0.3s, opacity 0.5s;
+      opacity: 0;
     }
+    .card.show { opacity: 1; }
     .card:hover { transform: translateY(-5px); }
     button.btn-success { 
       background-color: #2E7D32; 
@@ -37,6 +39,8 @@
     #stars span { cursor: pointer; font-size: 26px; margin: 0 3px; transition: transform 0.2s; }
     #stars span:hover { transform: scale(1.3); }
     #message { font-weight: 500; }
+    #spinner { animation: spin 1s linear infinite; display: inline-block; margin-left:5px; }
+    @keyframes spin { 0% {transform: rotate(0deg);} 100% {transform: rotate(360deg);} }
   </style>
 </head>
 <body>
@@ -45,13 +49,16 @@
   <h1 class="mb-4">Algae Identifier 🌿</h1>
 
   <!-- Upload Card -->
-  <div class="card p-4">
+  <div class="card p-4 show">
     <input type="file" class="form-control" id="imageUpload" accept="image/*">
-    <div id="message" class="text-success mt-2">Upload your algae photo to start!</div>
+    <div id="message" class="text-success mt-2">
+      <span id="scanText">Upload your algae photo to start!</span>
+      <span id="spinner" class="d-none">🌀</span>
+    </div>
   </div>
 
   <!-- Prediction Card -->
-  <div id="result" class="card p-3 d-none">
+  <div id="result" class="card p-3">
     <h3 id="predictedName"></h3>
     <p id="confidence"></p>
     <p id="description"></p>
@@ -78,7 +85,7 @@
   </div>
 
   <!-- Contribute and Gallery Buttons -->
-  <button class="btn btn-success mb-2" onclick="window.location.href='mailto:uniqueseekers123@gmail.com?subject=Algae Contribution'">
+  <button class="btn btn-success mb-2" onclick="contribute()">
     Contribute 📨
   </button>
   <a href="gallery.html" class="btn btn-outline-success">Explore Algae Around the World 🌏</a>
@@ -156,18 +163,28 @@ function rate(star){
   localStorage.setItem("rating", star);
 }
 
+// Contribute function with mailto + popup
+function contribute() {
+  window.location.href = 'mailto:uniqueseekers123@gmail.com?subject=Algae Contribution';
+  alert("You can send algae photos to: uniqueseekers123@gmail.com");
+}
+
 // Handle Image Upload
 document.getElementById("imageUpload").addEventListener("change", async function(){
   const file = this.files[0];
   if(!file) return;
 
-  // Cute scanning message animation
+  const confidenceThreshold = 0.6; // 60%
+
+  // Show scanning animation
+  document.getElementById("spinner").classList.remove("d-none");
   let dots = 0;
   const msgInterval = setInterval(()=>{
     dots = (dots + 1) % 4;
-    document.getElementById("message").innerText = "Scanning the pond for your algae 🌿" + ".".repeat(dots);
+    document.getElementById("scanText").innerText = "Scanning the pond for your algae 🌿" + ".".repeat(dots);
   }, 500);
 
+  document.getElementById("result").classList.remove("show");
   document.getElementById("result").classList.add("d-none");
 
   const img = new Image();
@@ -176,16 +193,19 @@ document.getElementById("imageUpload").addEventListener("change", async function
     try {
       const prediction = await model.predict(img);
       const topPred = prediction.reduce((a,b)=>a.probability>b.probability?a:b);
-      console.log("Model predicted class:", topPred.className);
 
-      // ✅ Safe match using includes for extra text / lowercase
-      const algaeKey = Object.keys(algaeInfo).find(
-        key => topPred.className.toLowerCase().includes(key.toLowerCase())
-      );
+      let algaeKey = null;
+      if(topPred.probability >= confidenceThreshold){
+        algaeKey = Object.keys(algaeInfo).find(
+          key => topPred.className.toLowerCase().includes(key.toLowerCase())
+        );
+      }
 
-      clearInterval(msgInterval); // stop scanning animation
+      clearInterval(msgInterval);
+      document.getElementById("spinner").classList.add("d-none");
 
-      if (algaeKey) {
+      if(algaeKey){
+        // ✅ High confidence + info available
         document.getElementById("predictedName").innerText = topPred.className;
         document.getElementById("confidence").innerText = "Confidence: " + (topPred.probability*100).toFixed(2) + "%";
         document.getElementById("description").innerText = algaeInfo[algaeKey].description;
@@ -199,23 +219,26 @@ document.getElementById("imageUpload").addEventListener("change", async function
           </div>`;
         });
 
-        document.getElementById("result").classList.remove("d-none");
-        document.getElementById("message").innerText = "Thanks for checking your algae! 🌿 We hope this helps 🙂";
-
       } else {
-        // Fallback if class not in algaeInfo
+        // ✅ Low confidence or unknown algae
         document.getElementById("predictedName").innerText = topPred.className;
         document.getElementById("confidence").innerText = "Confidence: " + (topPred.probability*100).toFixed(2) + "%";
-        document.getElementById("description").innerText = "We don’t have information about this algae yet. 🌱 If you know it, please contribute to help us expand our dataset!";
+        document.getElementById("description").innerText = "This algae is not yet recognized in our pond 🌱. If you know it, please contribute photos to help us expand our dataset!";
         document.getElementById("carouselInner").innerHTML = "";
-        document.getElementById("result").classList.remove("d-none");
-        document.getElementById("message").innerText = "Prediction done, but this algae is new to our dataset 🙂";
       }
+
+      // Show result card with fade-in
+      const resultCard = document.getElementById("result");
+      resultCard.classList.remove("d-none");
+      setTimeout(()=>{resultCard.classList.add("show");}, 50);
+
+      document.getElementById("scanText").innerText = "Prediction complete! 🌿";
 
     } catch(err){
       clearInterval(msgInterval);
+      document.getElementById("spinner").classList.add("d-none");
       console.error("Prediction error:", err);
-      document.getElementById("message").innerText = "Failed to predict. Check console for errors.";
+      document.getElementById("scanText").innerText = "Failed to predict. Check console.";
     }
   }
 });

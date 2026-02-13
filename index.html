@@ -1,70 +1,179 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Teachable Machine Upload Model</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Algae Identifier 🌿</title>
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-..." crossorigin="anonymous">
 
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.20.0/dist/tf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+
+  <style>
+    body { 
+      background-color: #E8F5E9; /* soft green */
+      font-family: 'Montserrat', sans-serif;
+    }
+    .card {
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    button.btn-success { 
+      background-color: #2E7D32; 
+      border: none; 
+    }
+    img.example { 
+      border-radius: 10px; 
+      width: 100%; 
+    }
+    #stars span { cursor: pointer; font-size: 24px; margin: 0 2px; }
+  </style>
 </head>
-
 <body>
 
-<h2>Teachable Machine Image Classifier</h2>
+<div class="container mt-5 text-center">
+  <h1 class="mb-4">Algae Identifier 🌿</h1>
 
-<input type="file" accept="image/*" onchange="predictImage(event)">
-<br><br>
+  <!-- Upload Card -->
+  <div class="card p-4">
+    <input type="file" class="form-control" id="imageUpload" accept="image/*">
+    <div id="message" class="text-success mt-2">Upload your algae photo to start!</div>
+  </div>
 
-<img id="uploaded-image" width="250">
-<br><br>
+  <!-- Prediction Card -->
+  <div id="result" class="card p-3 d-none">
+    <h3 id="predictedName"></h3>
+    <p id="confidence"></p>
+    <p id="description"></p>
 
-<div id="label-container"></div>
+    <!-- Carousel for example images -->
+    <div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
+      <div class="carousel-inner" id="carouselInner"></div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Star Rating -->
+  <div id="stars" class="my-3">
+    <span onclick="rate(1)">⭐</span>
+    <span onclick="rate(2)">⭐</span>
+    <span onclick="rate(3)">⭐</span>
+    <span onclick="rate(4)">⭐</span>
+    <span onclick="rate(5)">⭐</span>
+  </div>
+
+  <!-- Contribute and Gallery Buttons -->
+  <button class="btn btn-success mb-2" onclick="window.location.href='mailto:your_email@example.com?subject=Algae Contribution'">
+    Contribute 📨
+  </button>
+  <a href="gallery.html" class="btn btn-outline-success">Explore Algae Around the World 🌏</a>
+</div>
+
+<!-- Teachable Machine JS -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-..." crossorigin="anonymous"></script>
 
 <script>
+const URL = "my_model/"; // your trained model folder
+let model, maxPredictions;
 
-    const MODEL_PATH = "./my_model/"; 
-    // If model files are in same folder as index.html use "./"
+// Only 4 algae
+const algaeInfo = {
+  "Cladophora": {
+    description: `• Filamentous green algae forming dense mats.
+• Branching filaments with coarse texture.
+• Commonly grows in clean freshwater.
+Economic importance:
+• Used in wastewater treatment.
+• Source of bioactive compounds.
+Location: Freshwater ponds and rivers, Kerala.`,
+    images: ["images/cladophora1.jpg","images/cladophora2.jpg"]
+  },
+  "Oedogonium": {
+    description: `• Filamentous green algae with unbranched filaments.
+• Grows attached to submerged plants or stones.
+Economic importance:
+• Fish feed in aquaculture.
+• Produces oxygen improving water quality.
+Location: Ponds, lakes, slow streams, Kerala.`,
+    images: ["images/oedogonium1.jpg","images/oedogonium2.jpg"]
+  },
+  "Spirogyra": {
+    description: `• Filamentous green algae with spiral chloroplasts.
+• Forms floating green mats in freshwater.
+Economic importance:
+• Used in labs for study.
+• Produces oxygen.
+Location: Stagnant ponds and ditches, Kerala.`,
+    images: ["images/spirogyra1.jpg","images/spirogyra2.jpg"]
+  },
+  "Cosmarium": {
+    description: `• Green desmid with symmetrical cells and constriction in the middle.
+Economic importance:
+• Bioindicator for ecology.
+• Source of pigments.
+Location: Freshwater ponds and marshes, Kerala.`,
+    images: ["images/cosmarium1.jpg","images/cosmarium2.jpg"]
+  }
+};
 
-    let model, maxPredictions;
+// Load Model
+async function init() {
+  const modelURL = URL + "model.json";
+  const metadataURL = URL + "metadata.json";
+  model = await tmImage.load(modelURL, metadataURL);
+  maxPredictions = model.getTotalClasses();
+}
+init();
 
-    window.onload = async function () {
-        const modelURL = MODEL_PATH + "model.json";
-        const metadataURL = MODEL_PATH + "metadata.json";
+// Star Rating
+function rate(star){
+  alert("Thanks for giving " + star + " stars!");
+  localStorage.setItem("rating", star);
+}
 
-        model = await tmImage.load(modelURL, metadataURL);
-        maxPredictions = model.getTotalClasses();
-    }
+// Handle Image Upload
+document.getElementById("imageUpload").addEventListener("change", async function(){
+  const file = this.files[0];
+  if(!file) return;
 
-    async function predictImage(event) {
+  document.getElementById("message").innerText = "Scanning the pond for your algae 🌿💧 … almost done!";
+  document.getElementById("result").classList.add("d-none");
 
-        const file = event.target.files[0];
-        const image = document.getElementById("uploaded-image");
-        const labelContainer = document.getElementById("label-container");
+  const img = new Image();
+  img.src = URL.createObjectURL(file);
+  img.onload = async () => {
+    const prediction = await model.predict(img);
+    const topPred = prediction.reduce((a,b)=>a.probability>b.probability?a:b);
 
-        const reader = new FileReader();
+    document.getElementById("predictedName").innerText = topPred.className;
+    document.getElementById("confidence").innerText = "Confidence: "+(topPred.probability*100).toFixed(2)+"%";
+    document.getElementById("description").innerText = algaeInfo[topPred.className].description;
 
-        reader.onload = async function (e) {
+    // Carousel Images
+    const carouselInner = document.getElementById("carouselInner");
+    carouselInner.innerHTML = "";
+    algaeInfo[topPred.className].images.forEach((src, i)=>{
+      carouselInner.innerHTML += `<div class="carousel-item ${i===0?'active':''}">
+        <img src="${src}" class="d-block w-100 example">
+      </div>`;
+    });
 
-            image.src = e.target.result;
-
-            image.onload = async function () {
-
-                const prediction = await model.predict(image);
-
-                labelContainer.innerHTML = "";
-
-                for (let i = 0; i < maxPredictions; i++) {
-                    const classPrediction =
-                        prediction[i].className + ": " +
-                        (prediction[i].probability * 100).toFixed(2) + "%";
-
-                    labelContainer.innerHTML += classPrediction + "<br>";
-                }
-            };
-        };
-
-        reader.readAsDataURL(file);
-    }
-
+    document.getElementById("result").classList.remove("d-none");
+    document.getElementById("message").innerText = "Thanks for checking your algae! 🌿 We hope this helps your research 🙂";
+  }
+});
 </script>
 
 </body>

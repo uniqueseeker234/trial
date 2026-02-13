@@ -155,7 +155,6 @@ async function init() {
     document.getElementById("message").innerText = "Failed to load model. Check console.";
   }
 }
-init();
 
 // Star rating
 function rate(star){
@@ -163,10 +162,18 @@ function rate(star){
   localStorage.setItem("rating", star);
 }
 
-// Contribute function with mailto + popup
+// Detect mobile
+function isMobileDevice() {
+  return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
+// Contribute function (mobile mailto, desktop popup)
 function contribute() {
-  window.location.href = 'mailto:uniqueseekers123@gmail.com?subject=Algae Contribution';
-  alert("You can send algae photos to: uniqueseekers123@gmail.com");
+  if(isMobileDevice()){
+    window.location.href = 'mailto:uniqueseekers123@gmail.com?subject=Algae Contribution';
+  } else {
+    alert("Please email your algae photos to: uniqueseekers123@gmail.com");
+  }
 }
 
 // Handle Image Upload
@@ -242,6 +249,8 @@ document.getElementById("imageUpload").addEventListener("change", async function
     }
   }
 });
+
+init();
 </script>
 
 </body>

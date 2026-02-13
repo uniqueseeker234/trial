@@ -163,10 +163,11 @@ document.getElementById("imageUpload").addEventListener("change", async function
     try {
       const prediction = await model.predict(img);
       const topPred = prediction.reduce((a,b)=>a.probability>b.probability?a:b);
+      console.log("Model predicted class:", topPred.className); // debug line
 
-      // ✅ Safe lowercase match to algaeInfo
+      // ✅ Safe match using includes for extra text / lowercase
       const algaeKey = Object.keys(algaeInfo).find(
-        key => key.toLowerCase() === topPred.className.toLowerCase().trim()
+        key => topPred.className.toLowerCase().includes(key.toLowerCase())
       );
 
       if (algaeKey) {

@@ -5,13 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Algae Pond 🌿</title>
 
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
 
 <style>
 body {
   margin:0;
   font-family: 'Montserrat', sans-serif;
-  background: linear-gradient(to top, #1c3e8a 0%, #f5e0a1 50%, #3b9d4c 100%); /* blue → sand → green */
+  background: linear-gradient(to top, #1c3e8a 0%, #f5e0a1 50%, #3b9d4c 100%); /* blue-bottom, sand-middle, green-top */
   overflow-x:hidden;
   position: relative;
 }
@@ -20,8 +22,9 @@ body {
 h1 {
   text-align:center;
   padding:30px 10px;
+  font-family:'Fredoka One', cursive;
   color:#ffffff;
-  font-size:48px;
+  font-size:50px;
   letter-spacing:2px;
   text-shadow: 0 0 15px #b0ff9d, 0 0 30px #4cbf66;
   animation: floatTitle 3s ease-in-out infinite alternate;
@@ -50,7 +53,7 @@ h1 {
 .upload-box:hover { background:#e0fff0; transform:scale(1.03); }
 
 /* Prediction image carousel */
-.carousel { margin-top:15px; position:relative; width:100%; max-width:220px; }
+.carousel { margin-top:15px; position:relative; width:100%; max-width:180px; }
 .carousel img { width:100%; border-radius:10px; display:none; }
 .carousel img.active { display:block; }
 .carousel button { position:absolute; top:50%; transform:translateY(-50%); background:rgba(0,0,0,0.3); border:none; color:white; font-size:20px; padding:5px 10px; cursor:pointer; border-radius:5px; }
@@ -91,15 +94,15 @@ button:hover { transform:scale(1.05); }
   bottom: -50px;
   width: 18px;
   height: 18px;
-  background: rgba(255,255,255,0.4);
+  background: rgba(200,255,180,0.5);
   border-radius: 50%;
-  box-shadow: 0 0 10px rgba(255,255,255,0.7);
+  box-shadow: 0 0 12px rgba(200,255,180,0.7);
   animation: rise linear infinite;
   pointer-events: auto;
   z-index: 0;
   transition: transform 0.3s, opacity 0.3s;
 }
-.bubble:hover {
+.bubble:hover, .bubble:active {
   transform: scale(2);
   opacity:0.6;
 }
@@ -139,7 +142,7 @@ let model;
 let classes = [];
 const CONFIDENCE_THRESHOLD = 0.65;
 
-// Algae info
+// Algae info (images & description)
 const algaeInfo = {
 "spirogyra": {images:["images/spirogyra1.jpg","images/spirogyra2.jpg"], habit:["Filamentous freshwater green algae","Forms floating slimy masses","Has spiral chloroplasts"], economic:["Produces oxygen in ponds","Used in biological research"], location:["Found in freshwater ponds","Common in slow-moving water bodies"]},
 "cladophora": {images:["images/cladophora1.jpg","images/cladophora2.jpg","images/cladophora3.jpg"], habit:["Branched filamentous green algae","Attaches to submerged surfaces","Forms dense green mats"], economic:["Provides shelter for aquatic organisms","Indicates nutrient pollution levels"], location:["Freshwater & marine habitats","Common in nutrient-rich environments"]},
@@ -158,7 +161,6 @@ async function loadModel(){
     model = await tf.loadLayersModel("my_model/model.json");
     const metadata = await fetch("my_model/metadata.json").then(res=>res.json());
     classes = metadata.labels.map(l => l.trim().toLowerCase());
-    console.log("Model loaded:", classes);
 }
 loadModel();
 
@@ -259,15 +261,18 @@ document.getElementById("imageUpload").addEventListener("change", async function
 
 // Buttons
 document.querySelector(".contribute").addEventListener("click",()=>{
-    const email="your_email@example.com"; // replace
-    if(window.innerWidth>768){ // desktop popup first
-        alert("💚 Thanks for contributing to our pond! Now we'll open your mail client.");
-    }
+    const email="uniqueseeekers123@gmail.com";
     const subject=encodeURIComponent("Algae Contribution 🌿");
     const body=encodeURIComponent("Hello! I want to contribute an algae image or info to your pond project.");
-    window.location.href=`mailto:${email}?subject=${subject}&body=${body}`;
+    if(window.innerWidth>768){ // desktop
+        alert(`💚 Thanks for contributing to our pond! You can send images or info to: ${email}`);
+    } else { // mobile
+        alert(`💚 Thanks! We'll open your mail client now!`);
+        window.location.href=`mailto:${email}?subject=${subject}&body=${body}`;
+    }
 });
 document.querySelector(".explore").addEventListener("click",()=>{ alert("🌎 Global algae exploration coming soon!"); });
+
 </script>
 
 </body>

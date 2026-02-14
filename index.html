@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Algae Pond 🌿</title>
+<title>Welcome to the Algae Pond 🌿</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
 
@@ -31,10 +31,7 @@ h1 {
   color:#ffffff;
   font-size:48px;
   letter-spacing:2px;
-  text-shadow: 0 0 8px #b0ff9d;
-  animation: floatTitle 3s ease-in-out infinite alternate;
 }
-@keyframes floatTitle { 0%{transform:translateY(0);} 100%{transform:translateY(-8px);} }
 
 /* Layout */
 .container { display:flex; justify-content:center; gap:40px; padding:20px; flex-wrap:wrap; }
@@ -75,7 +72,7 @@ h1 {
   transition: transform 0.3s, text-shadow 0.3s;
   display:inline-block;
 }
-.stars span:hover, .stars span.clicked {
+.stars span.clicked {
   animation: bounce 0.5s ease forwards;
 }
 @keyframes bounce { 0% { transform: scale(1.2); } 50% { transform: scale(1.5); } 100% { transform: scale(1.2); } }
@@ -95,17 +92,17 @@ button:hover { transform:scale(1.05); }
   bottom: -50px;
   width: 18px;
   height: 18px;
-  background: rgba(180,255,150,0.5);
+  background: white;
   border-radius: 50%;
-  box-shadow: 0 0 12px rgba(180,255,150,0.7);
+  box-shadow: 0 0 12px white;
   animation: rise linear infinite;
   pointer-events: auto;
   z-index: 0;
   transition: transform 0.3s, opacity 0.3s;
 }
-.bubble:hover, .bubble:active {
-  transform: scale(2);
-  opacity:0.6;
+.bubble:active {
+  transform: scale(2) !important;
+  opacity:0.6 !important;
 }
 @keyframes rise { 0% { transform: translateY(0); opacity:0.6; } 100% { transform: translateY(-110vh); opacity:0; } }
 
@@ -115,7 +112,7 @@ button:hover { transform:scale(1.05); }
 </head>
 <body>
 
-<h1>Algae Pond 🌿</h1>
+<h1>Welcome to the Algae Pond 🌿</h1>
 
 <div class="container">
 
@@ -141,7 +138,7 @@ button:hover { transform:scale(1.05); }
 // Model setup
 let model;
 let classes = [];
-const CONFIDENCE_THRESHOLD = 0.65;
+const CONFIDENCE_THRESHOLD = 0.60;
 
 // Algae info (images & description)
 const algaeInfo = {
@@ -171,10 +168,12 @@ function createBubbles() {
     const b=document.createElement("div");
     b.className="bubble";
     b.style.left=Math.random()*window.innerWidth+"px";
-    const size=12+Math.random()*20;
+    const size=15+Math.random()*15;
     b.style.width=size+"px";
     b.style.height=size+"px";
     b.style.animationDuration=(6+Math.random()*6)+"s";
+    // make touch responsive
+    b.addEventListener("touchstart",()=>{ b.style.transform="scale(2)"; });
     document.body.appendChild(b);
   }
 }
@@ -189,14 +188,24 @@ function renderStars(){
     for(let i=1;i<=5;i++){
         const star = document.createElement("span");
         star.innerHTML="★";
+        const animateStar=()=>{
+            star.classList.add("clicked");
+            setTimeout(()=>star.classList.remove("clicked"),500);
+        };
         star.onclick=()=>{
             rating=i;
             renderStars();
             const messages={1:"😢 We'll improve! Thanks!",2:"🙂 Thank you! We’ll grow!",3:"😊 Nice! Thanks!",4:"🌟 Awesome! You’re amazing!",5:"😍 WOW! You love our pond!"};
             thankMessage.innerText=messages[i];
-            star.classList.add("clicked");
-            setTimeout(()=>star.classList.remove("clicked"),500);
+            animateStar();
         };
+        star.addEventListener("touchstart",()=>{
+            rating=i;
+            renderStars();
+            const messages={1:"😢 We'll improve! Thanks!",2:"🙂 Thank you! We’ll grow!",3:"😊 Nice! Thanks!",4:"🌟 Awesome! You’re amazing!",5:"😍 WOW! You love our pond!"};
+            thankMessage.innerText=messages[i];
+            animateStar();
+        });
         starsContainer.appendChild(star);
     }
 }
@@ -268,11 +277,12 @@ document.querySelector(".contribute").addEventListener("click",()=>{
     if(window.innerWidth>768){ // desktop
         alert(`💚 Thanks for contributing to our pond!\nSend images/info to: ${email}`);
     } else { // mobile
-        alert(`💚 Thanks for contributing to our pond! We'll open your mail client now!`);
+        alert(`💚 Thanks for contributing tou= our pond! We'll open your mail client now!`);
         window.location.href=`mailto:${email}?subject=${subject}&body=${body}`;
     }
 });
 document.querySelector(".explore").addEventListener("click",()=>{ alert("🌎 Global algae exploration coming soon!"); });
+
 </script>
 
 </body>

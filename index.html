@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Algae Identifier 🌿</title>
+<title>Algae Pond 🌿</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
 
@@ -11,12 +11,12 @@
 body {
   margin:0;
   font-family: 'Montserrat', sans-serif;
-  background: linear-gradient(to bottom, #a8f0a0, #3b9d4c); /* green lagoon */
+  background: linear-gradient(to top, #1c3e8a 0%, #f5e0a1 50%, #3b9d4c 100%); /* blue → sand → green */
   overflow-x:hidden;
   position: relative;
 }
 
-/* Heading green glow */
+/* Heading */
 h1 {
   text-align:center;
   padding:30px 10px;
@@ -50,7 +50,7 @@ h1 {
 .upload-box:hover { background:#e0fff0; transform:scale(1.03); }
 
 /* Prediction image carousel */
-.carousel { margin-top:15px; position:relative; width:100%; max-width:250px; }
+.carousel { margin-top:15px; position:relative; width:100%; max-width:220px; }
 .carousel img { width:100%; border-radius:10px; display:none; }
 .carousel img.active { display:block; }
 .carousel button { position:absolute; top:50%; transform:translateY(-50%); background:rgba(0,0,0,0.3); border:none; color:white; font-size:20px; padding:5px 10px; cursor:pointer; border-radius:5px; }
@@ -111,7 +111,7 @@ button:hover { transform:scale(1.05); }
 </head>
 <body>
 
-<h1>🌿 Algae Identifier</h1>
+<h1>Algae Pond 🌿</h1>
 
 <div class="container">
 
@@ -260,6 +260,9 @@ document.getElementById("imageUpload").addEventListener("change", async function
 // Buttons
 document.querySelector(".contribute").addEventListener("click",()=>{
     const email="your_email@example.com"; // replace
+    if(window.innerWidth>768){ // desktop popup first
+        alert("💚 Thanks for contributing to our pond! Now we'll open your mail client.");
+    }
     const subject=encodeURIComponent("Algae Contribution 🌿");
     const body=encodeURIComponent("Hello! I want to contribute an algae image or info to your pond project.");
     window.location.href=`mailto:${email}?subject=${subject}&body=${body}`;

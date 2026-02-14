@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Welcome to the Algae Pond 🌿</title>
+<title>Welcome to Our Algae Pond</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
 
@@ -72,10 +72,14 @@ h1 {
   transition: transform 0.3s, text-shadow 0.3s;
   display:inline-block;
 }
-.stars span.clicked {
+.stars span.animated {
   animation: bounce 0.5s ease forwards;
 }
-@keyframes bounce { 0% { transform: scale(1.2); } 50% { transform: scale(1.5); } 100% { transform: scale(1.2); } }
+@keyframes bounce {
+  0% { transform: scale(1.2); }
+  50% { transform: scale(1.5); }
+  100% { transform: scale(1.2); }
+}
 
 /* Buttons */
 button { padding:10px 18px; margin:8px; border-radius:8px; border:none; cursor:pointer; font-size:14px; transition:0.3s; }
@@ -112,7 +116,7 @@ button:hover { transform:scale(1.05); }
 </head>
 <body>
 
-<h1>Welcome to the Algae Pond 🌿</h1>
+<h1>Welcome to Our Algae Pond 🌿</h1>
 
 <div class="container">
 
@@ -138,7 +142,7 @@ button:hover { transform:scale(1.05); }
 // Model setup
 let model;
 let classes = [];
-const CONFIDENCE_THRESHOLD = 0.60;
+const CONFIDENCE_THRESHOLD = 0.65;
 
 // Algae info (images & description)
 const algaeInfo = {
@@ -172,7 +176,6 @@ function createBubbles() {
     b.style.width=size+"px";
     b.style.height=size+"px";
     b.style.animationDuration=(6+Math.random()*6)+"s";
-    // make touch responsive
     b.addEventListener("touchstart",()=>{ b.style.transform="scale(2)"; });
     document.body.appendChild(b);
   }
@@ -188,26 +191,17 @@ function renderStars(){
     for(let i=1;i<=5;i++){
         const star = document.createElement("span");
         star.innerHTML="★";
-        const animateStar=()=>{
-            star.classList.add("clicked");
-            setTimeout(()=>star.classList.remove("clicked"),500);
-        };
-        star.onclick=()=>{
-            rating=i;
-            renderStars();
-            const messages={1:"😢 We'll improve! Thanks!",2:"🙂 Thank you! We’ll grow!",3:"😊 Nice! Thanks!",4:"🌟 Awesome! You’re amazing!",5:"😍 WOW! You love our pond!"};
-            thankMessage.innerText=messages[i];
-            animateStar();
-        };
-        star.addEventListener("touchstart",()=>{
-            rating=i;
-            renderStars();
-            const messages={1:"😢 We'll improve! Thanks!",2:"🙂 Thank you! We’ll grow!",3:"😊 Nice! Thanks!",4:"🌟 Awesome! You’re amazing!",5:"😍 WOW! You love our pond!"};
-            thankMessage.innerText=messages[i];
-            animateStar();
-        });
+        star.onclick=()=> rateStar(i);
+        star.addEventListener("touchstart",()=> rateStar(i));
+        if(i<=rating) star.classList.add("animated");
         starsContainer.appendChild(star);
     }
+}
+function rateStar(i){
+    rating=i;
+    renderStars();
+    const messages={1:"😢 We'll improve! Thanks!",2:"🙂 Thank you! We’ll grow!",3:"😊 Nice! Thanks!",4:"🌟 Awesome! You’re amazing!",5:"😍 WOW! You love our pond!"};
+    thankMessage.innerText=messages[i];
 }
 renderStars();
 
@@ -277,7 +271,7 @@ document.querySelector(".contribute").addEventListener("click",()=>{
     if(window.innerWidth>768){ // desktop
         alert(`💚 Thanks for contributing to our pond!\nSend images/info to: ${email}`);
     } else { // mobile
-        alert(`💚 Thanks for contributing tou= our pond! We'll open your mail client now!`);
+        alert(`💚 Thanks for contributing to our pond! We'll open your mail client now!`);
         window.location.href=`mailto:${email}?subject=${subject}&body=${body}`;
     }
 });

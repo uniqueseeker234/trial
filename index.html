@@ -1,154 +1,221 @@
-
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Algae Identifier 🌿</title>
+<meta charset="UTF-8">
+<title>Algae Identifier</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to bottom, #63cdda, #b8f1f1);
+}
 
-  <!-- Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+/* MAIN CONTAINER */
+.main-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px 20px;
+    gap: 40px;
+    flex-wrap: wrap;
+}
 
-  <style>
-    body { 
-      background: linear-gradient(to bottom, #a8edea, #6dd5ed, #2193b0);
-      font-family: 'Montserrat', sans-serif;
-      position: relative;
-      overflow-x: hidden;
+/* LEFT COLUMN */
+.left-column {
+    flex: 1;
+    min-width: 350px;
+    max-width: 600px;
+}
+
+/* RIGHT COLUMN */
+.right-column {
+    flex: 1;
+    min-width: 250px;
+    max-width: 350px;
+    text-align: center;
+}
+
+/* CARD STYLE */
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0px 6px 18px rgba(0,0,0,0.15);
+}
+
+/* BUTTONS */
+button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin: 8px 5px;
+    font-size: 14px;
+}
+
+.contribute-btn {
+    background-color: #27ae60;
+    color: white;
+}
+
+.explore-btn {
+    background-color: #2980b9;
+    color: white;
+}
+
+/* STAR SYSTEM */
+.stars {
+    margin-top: 15px;
+    font-size: 22px;
+    color: gold;
+}
+
+/* RESULT IMAGE (REDUCED SIZE) */
+.result-image {
+    max-width: 320px;      /* REDUCED SIZE */
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-top: 15px;
+    object-fit: contain;   /* prevents blur stretch */
+}
+
+/* DESCRIPTION */
+.description {
+    margin-top: 20px;
+    text-align: left;
+    font-size: 14px;
+}
+
+.description h3 {
+    margin-bottom: 5px;
+    color: #2c3e50;
+}
+
+ul {
+    padding-left: 18px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+    .main-container {
+        flex-direction: column;
+        align-items: center;
     }
-
-    /* Subtle Lagoon Bubbles */
-    .bubble {
-      position: fixed;
-      bottom: -50px;
-      width: 12px;
-      height: 12px;
-      background: rgba(255,255,255,0.35);
-      border-radius: 50%;
-      box-shadow: 0 0 8px rgba(255,255,255,0.6);
-      animation: rise linear infinite;
-      pointer-events: none;
-      z-index: 0;
+    .right-column {
+        margin-top: 20px;
     }
-
-    @keyframes rise {
-      0% {
-        transform: translateY(0);
-        opacity: 0.6;
-      }
-      100% {
-        transform: translateY(-110vh);
-        opacity: 0;
-      }
-    }
-
-    .card {
-      border-radius: 15px;
-      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-      margin-bottom: 20px;
-      transition: transform 0.3s, opacity 0.5s;
-      opacity: 0;
-      position: relative;
-      z-index: 2;
-    }
-    .card.show { opacity: 1; }
-    .card:hover { transform: translateY(-5px); }
-
-    button.btn-success { 
-      background-color: #2E7D32; 
-      border: none; 
-      transition: background 0.3s;
-    }
-    button.btn-success:hover { background-color: #1B5E20; }
-
-    img.example { 
-      border-radius: 10px; 
-      width: 100%; 
-      height: auto;
-    }
-
-    #stars span { cursor: pointer; font-size: 26px; margin: 0 3px; transition: transform 0.2s; }
-    #stars span:hover { transform: scale(1.3); }
-
-    #message { font-weight: 500; }
-    #spinner { animation: spin 1s linear infinite; display: inline-block; margin-left:5px; }
-    @keyframes spin { 0% {transform: rotate(0deg);} 100% {transform: rotate(360deg);} }
-  </style>
+}
+</style>
 </head>
+
 <body>
 
-<div class="container mt-5 text-center">
-  <h1 class="mb-4 text-white">Algae Identifier 🌿</h1>
+<h1 style="text-align:center; padding-top:20px; color:white;">
+🌿 Algae Identifier
+</h1>
 
-  <!-- Upload Card -->
-  <div class="card p-4 show">
-    <input type="file" class="form-control" id="imageUpload" accept="image/*">
-    <div id="message" class="text-success mt-2">
-      <span id="scanText">Upload your algae photo to start!</span>
-      <span id="spinner" class="d-none">🌀</span>
+<div class="main-container">
+
+    <!-- LEFT COLUMN -->
+    <div class="left-column">
+        <div class="card">
+
+            <input type="file" id="imageUpload">
+
+            <div id="resultArea">
+                <h2 id="predictionText"></h2>
+                <img id="resultImage" class="result-image" style="display:none;">
+                
+                <div id="descriptionBox" class="description"></div>
+            </div>
+
+        </div>
     </div>
-  </div>
 
-  <!-- Prediction Card -->
-  <div id="result" class="card p-3 d-none">
-    <h3 id="predictedName"></h3>
-    <p id="confidence"></p>
-    <p id="description"></p>
+    <!-- RIGHT COLUMN -->
+    <div class="right-column">
+        <div class="card">
 
-    <div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
-      <div class="carousel-inner" id="carouselInner"></div>
-      <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon"></span>
-      </button>
-      <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
-        <span class="carousel-control-next-icon"></span>
-      </button>
+            <!-- STARS -->
+            <div class="stars">
+                ⭐ ⭐ ⭐ ⭐ ⭐
+            </div>
+
+            <!-- BUTTONS -->
+            <button class="contribute-btn">Contribute</button>
+            <button class="explore-btn">Explore Algae Around the World</button>
+
+        </div>
     </div>
-  </div>
 
-  <!-- Star Rating -->
-  <div id="stars" class="my-3">
-    <span onclick="rate(1)">⭐</span>
-    <span onclick="rate(2)">⭐</span>
-    <span onclick="rate(3)">⭐</span>
-    <span onclick="rate(4)">⭐</span>
-    <span onclick="rate(5)">⭐</span>
-  </div>
-
-  <button class="btn btn-success mb-2" onclick="contribute()">
-    Contribute 📨
-  </button>
-
-  <a href="gallery.html" class="btn btn-outline-light">
-    Explore Algae Around the World 🌏
-  </a>
 </div>
 
-<!-- TensorFlow & Teachable Machine JS -->
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
-
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
-// Create lagoon bubbles
-function createBubbles() {
-  for (let i = 0; i < 18; i++) {
-    const bubble = document.createElement("div");
-    bubble.className = "bubble";
-    bubble.style.left = Math.random() * window.innerWidth + "px";
-    let size = 8 + Math.random() * 14;
-    bubble.style.width = size + "px";
-    bubble.style.height = size + "px";
-    bubble.style.animationDuration = (6 + Math.random() * 6) + "s";
-    document.body.appendChild(bubble);
-  }
+
+// Example function after prediction
+function showResult(className, imagePath) {
+
+    document.getElementById("predictionText").innerText = 
+        "Prediction: " + className;
+
+    let img = document.getElementById("resultImage");
+    img.src = imagePath;
+    img.style.display = "block";
+
+    let description = "";
+
+    if (className === "Spirogyra") {
+        description = `
+        <h3>Habit</h3>
+        <ul>
+            <li>Filamentous freshwater green algae</li>
+            <li>Forms slimy floating masses</li>
+            <li>Contains spiral chloroplasts</li>
+        </ul>
+
+        <h3>Economic Importance</h3>
+        <ul>
+            <li>Used in biological studies</li>
+            <li>Produces oxygen in aquatic ecosystems</li>
+        </ul>
+
+        <h3>Location</h3>
+        <ul>
+            <li>Found in ponds and lakes</li>
+            <li>Common in slow-moving freshwater</li>
+        </ul>
+        `;
+    }
+
+    if (className === "Cladophora") {
+        description = `
+        <h3>Habit</h3>
+        <ul>
+            <li>Branched filamentous green algae</li>
+            <li>Attaches to rocks or submerged surfaces</li>
+            <li>Forms dense green mats</li>
+        </ul>
+
+        <h3>Economic Importance</h3>
+        <ul>
+            <li>Provides habitat for aquatic organisms</li>
+            <li>Can indicate water pollution levels</li>
+        </ul>
+
+        <h3>Location</h3>
+        <ul>
+            <li>Found in freshwater and marine habitats</li>
+            <li>Common in nutrient-rich water bodies</li>
+        </ul>
+        `;
+    }
+
+    document.getElementById("descriptionBox").innerHTML = description;
 }
-createBubbles();
+
 </script>
 
 </body>

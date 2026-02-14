@@ -5,7 +5,6 @@
 <title>Algae Identifier</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- TensorFlow -->
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
 
 <style>
@@ -24,25 +23,30 @@ body::before {
     height: 200%;
     background-image: radial-gradient(rgba(255,255,255,0.15) 2px, transparent 2px);
     background-size: 60px 60px;
-    animation: bubbles 40s linear infinite;
+    animation: bubbles 35s linear infinite;
     z-index: -1;
 }
 
 @keyframes bubbles {
     from { transform: translateY(0); }
-    to { transform: translateY(-100px); }
+    to { transform: translateY(-120px); }
 }
 
-/* Heading */
+/* Heading animation */
 h1 {
     text-align: center;
     padding: 30px 10px;
     color: white;
-    font-size: 40px;
+    font-size: 42px;
     letter-spacing: 2px;
+    animation: floatTitle 3s ease-in-out infinite alternate;
 }
 
-/* Layout */
+@keyframes floatTitle {
+    from { transform: translateY(0px); }
+    to { transform: translateY(-8px); }
+}
+
 .container {
     display: flex;
     justify-content: center;
@@ -51,40 +55,41 @@ h1 {
     flex-wrap: wrap;
 }
 
-/* Cards */
 .card {
     background: white;
     padding: 25px;
     border-radius: 15px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    animation: fadeIn 1s ease;
 }
 
-/* Upload Box */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Upload box */
 .upload-box {
-    background: #f8f9fa;
+    background: #f1f1f1;
     padding: 25px;
-    border-radius: 10px;
+    border-radius: 12px;
     text-align: center;
     cursor: pointer;
     transition: 0.3s;
 }
 
 .upload-box:hover {
-    background: #e3fdfd;
+    background: #e0ffff;
+    transform: scale(1.03);
 }
 
-.upload-box p {
-    margin: 0;
-    font-size: 16px;
-    color: #333;
-}
-
-/* Result Image */
+/* Result image */
 .result-image {
-    max-width: 320px;
+    max-width: 250px;
     width: 100%;
     border-radius: 10px;
     margin-top: 15px;
+    display: none;
 }
 
 /* Description */
@@ -93,15 +98,23 @@ h1 {
     font-size: 14px;
 }
 
-.description h3 {
-    margin-bottom: 5px;
+/* Star rating */
+.stars span {
+    font-size: 30px;
+    cursor: pointer;
+    color: gold;
+    transition: transform 0.2s;
 }
 
-/* Stars */
-.stars {
-    font-size: 24px;
-    color: gold;
-    margin-bottom: 20px;
+.stars span:hover {
+    transform: scale(1.3);
+}
+
+.thank-message {
+    margin-top: 10px;
+    font-size: 14px;
+    min-height: 24px;
+    transition: 0.3s;
 }
 
 /* Buttons */
@@ -115,26 +128,16 @@ button {
     transition: 0.3s;
 }
 
-.contribute {
-    background: #27ae60;
-    color: white;
-}
-
-.explore {
-    background: #2980b9;
-    color: white;
-}
-
 button:hover {
     transform: scale(1.05);
 }
 
+.contribute { background: #27ae60; color: white; }
+.explore { background: #2980b9; color: white; }
+
 /* Responsive */
 @media (max-width: 900px) {
-    .container {
-        flex-direction: column;
-        align-items: center;
-    }
+    .container { flex-direction: column; align-items: center; }
 }
 </style>
 </head>
@@ -145,69 +148,141 @@ button:hover {
 
 <div class="container">
 
-    <!-- LEFT SIDE -->
-    <div class="card">
+<!-- LEFT -->
+<div class="card">
+<div class="upload-box" onclick="document.getElementById('imageUpload').click()">
+🌿 Select your algae photo to start!
+</div>
 
-        <div class="upload-box" onclick="document.getElementById('imageUpload').click()">
-            <p>🌿 Select your algae photo to start!</p>
-        </div>
+<input type="file" id="imageUpload" accept="image/*" style="display:none;">
 
-        <input type="file" id="imageUpload" accept="image/*" style="display:none;">
+<h2 id="prediction"></h2>
+<img id="resultImage" class="result-image">
+<div id="description" class="description"></div>
+</div>
 
-        <h2 id="prediction"></h2>
-        <img id="resultImage" class="result-image" style="display:none;">
-        <div id="description" class="description"></div>
-
-    </div>
-
-    <!-- RIGHT SIDE -->
-    <div class="card" style="text-align:center; min-width:250px;">
-
-        <div class="stars">⭐ ⭐ ⭐ ⭐ ⭐</div>
-
-        <button class="contribute" onclick="alert('Thank you for contributing!')">
-            Contribute
-        </button>
-
-        <button class="explore" onclick="alert('Explore feature coming soon!')">
-            Explore Algae Around the World
-        </button>
-
-    </div>
+<!-- RIGHT -->
+<div class="card" style="text-align:center; min-width:250px;">
+<div class="stars" id="stars"></div>
+<div class="thank-message" id="thankMessage"></div>
+<button class="contribute">Contribute</button>
+<button class="explore">Explore Algae Around the World</button>
+</div>
 
 </div>
 
 <script>
-
 let model;
+const CONFIDENCE_THRESHOLD = 0.65;
 
-// LOAD MODEL
+// Algae classes and info
+const algaeInfo = {
+  "Cladophora": {
+    image: "images/cladophora1.jpg",
+    habit: ["Branched filamentous green algae", "Attaches to submerged surfaces", "Forms dense green mats"],
+    economic: ["Provides shelter for aquatic organisms", "Indicates nutrient pollution levels"],
+    location: ["Freshwater & marine habitats", "Common in nutrient-rich environments"]
+  },
+  "Spirogyra": {
+    image: "images/spirogyra1.jpg",
+    habit: ["Filamentous freshwater green algae", "Forms floating slimy masses", "Has spiral chloroplasts"],
+    economic: ["Produces oxygen in ponds", "Used in biological research"],
+    location: ["Found in freshwater ponds", "Common in slow-moving water bodies"]
+  },
+  "Oedogonium": {
+    image: "images/oedogonium1.jpg",
+    habit: ["Filamentous green algae with basal holdfast", "Grows in mats or attached filaments", "Prefers calm water"],
+    economic: ["Used in research and water quality monitoring", "Oxygen producer in water bodies"],
+    location: ["Freshwater ponds and slow streams", "Common in nutrient-rich ponds"]
+  },
+  "Cosmarium": {
+    image: "images/cosmarium1.jpg",
+    habit: ["Single-celled green algae with semicells", "Desmids are symmetrical", "Often found in colonies"],
+    economic: ["Used in ecological studies", "Indicator of water quality"],
+    location: ["Freshwater habitats", "Ponds and lakes with clean water"]
+  },
+  "Desmidium": {
+    image: "images/desmidium1.jpg",
+    habit: ["Filamentous green algae", "Forms chains of cells", "Chloroplasts star-shaped"],
+    economic: ["Water quality monitoring", "Used in microalgae research"],
+    location: ["Freshwater habitats", "Acidic lakes and ponds"]
+  },
+  "Scenedesmus": {
+    image: "images/scenedesmus1.jpg",
+    habit: ["Colonial green algae", "Forms four-cell colonies", "Common planktonic algae"],
+    economic: ["Used in biofuel research", "Indicator of water quality"],
+    location: ["Freshwater ponds", "Often in nutrient-rich waters"]
+  },
+  "Chlorella": {
+    image: "images/chlorella1.jpg",
+    habit: ["Single-celled green algae", "Spherical shape", "Photosynthetic"],
+    economic: ["Used in food supplements", "Biofuel and research applications"],
+    location: ["Freshwater ponds", "Cultured in labs for biomass"]
+  },
+  "Ulothrix": {
+    image: "images/ulothrix1.jpg",
+    habit: ["Filamentous green algae", "Grows attached to rocks", "Forms tufts"],
+    economic: ["Oxygen producer", "Indicator of water quality"],
+    location: ["Streams and ponds", "Common in flowing freshwater"]
+  },
+  "Chara": {
+    image: "images/chara1.jpg",
+    habit: ["Macroscopic green algae", "Branched stems with nodes", "Forms dense mats"],
+    economic: ["Habitat for fish and invertebrates", "Indicator of clear water"],
+    location: ["Freshwater lakes and ponds", "Shallow, nutrient-rich areas"]
+  },
+  "Closterium": {
+    image: "images/closterium1.jpg",
+    habit: ["Single-celled desmid", "Elongated crescent shape", "Free-floating"],
+    economic: ["Used in water quality studies", "Indicator species"],
+    location: ["Freshwater ponds", "Clean, slow-moving waters"]
+  }
+};
+
+// Load model
 async function loadModel() {
-    try {
-        model = await tf.loadLayersModel("my_model/model.json");
-        console.log("Model Loaded Successfully");
-    } catch (error) {
-        console.error("Model failed to load:", error);
-        alert("Model not found. Check model/model.json path.");
-    }
+    model = await tf.loadLayersModel("my_model/model.json");
+    console.log("Model loaded");
 }
-
 loadModel();
 
-// PREDICTION
-document.getElementById("imageUpload").addEventListener("change", async function(event) {
-
-    if (!model) {
-        alert("Model is still loading!");
-        return;
+// Star rating system
+const starsContainer = document.getElementById("stars");
+const thankMessage = document.getElementById("thankMessage");
+let rating = 0;
+function renderStars() {
+    starsContainer.innerHTML = "";
+    for (let i = 1; i <= 5; i++) {
+        const star = document.createElement("span");
+        star.innerHTML = i <= rating ? "★" : "☆";
+        star.onclick = () => {
+            rating = i;
+            renderStars();
+            showThanks(i);
+        };
+        starsContainer.appendChild(star);
     }
+}
+renderStars();
 
+function showThanks(stars) {
+    const messages = {
+        1: "😢 We'll improve! Thanks for your honesty!",
+        2: "🙂 Thank you! We’ll grow better!",
+        3: "😊 Nice! Thanks for supporting!",
+        4: "🌟 Awesome! You’re amazing!",
+        5: "😍 WOW! You love our pond! Thank you!"
+    };
+    thankMessage.innerText = messages[stars];
+}
+
+// Image upload & prediction
+document.getElementById("imageUpload").addEventListener("change", async function(event) {
     const file = event.target.files[0];
     const img = new Image();
     img.src = URL.createObjectURL(file);
 
     img.onload = async function() {
-
         const tensor = tf.browser.fromPixels(img)
             .resizeNearestNeighbor([224,224])
             .toFloat()
@@ -216,77 +291,48 @@ document.getElementById("imageUpload").addEventListener("change", async function
 
         const prediction = model.predict(tensor);
         const data = await prediction.data();
-        const index = data.indexOf(Math.max(...data));
 
-        const classes = ["Cladophora", "Spirogyra"];
-        const result = classes[index];
+        const maxValue = Math.max(...data);
+        const index = data.indexOf(maxValue);
+        const classes = Object.keys(algaeInfo);
+        const predictedClass = classes[index];
+        const confidence = (maxValue*100).toFixed(2);
 
-        document.getElementById("prediction").innerText =
-            "Prediction: " + result;
-
+        const predictionText = document.getElementById("prediction");
+        const descriptionBox = document.getElementById("description");
         const imageDisplay = document.getElementById("resultImage");
-        imageDisplay.src = img.src;
-        imageDisplay.style.display = "block";
 
-        showDescription(result);
+        if(maxValue >= 0.65){
+            const info = algaeInfo[predictedClass];
+            predictionText.innerHTML = "Prediction: <b>"+predictedClass+"</b><br>Confidence: "+confidence+"%";
+            imageDisplay.src = info.image;
+            imageDisplay.style.display = "block";
+
+            descriptionBox.innerHTML = `
+                <h3>Habit</h3>
+                <ul>${info.habit.map(x=>"<li>"+x+"</li>").join("")}</ul>
+                <h3>Economic Importance</h3>
+                <ul>${info.economic.map(x=>"<li>"+x+"</li>").join("")}</ul>
+                <h3>Location</h3>
+                <ul>${info.location.map(x=>"<li>"+x+"</li>").join("")}</ul>
+            `;
+        } else {
+            predictionText.innerHTML = "Confidence: "+confidence+"%";
+            imageDisplay.style.display = "none";
+            descriptionBox.innerHTML = `
+            <h3>🐟🌿 Oops!</h3>
+            <p>Hmm… this algae is not yet in our pond! If you know it, please contribute 🌱💚</p>`;
+        }
     };
 });
 
-// DESCRIPTION FUNCTION
-function showDescription(type) {
-
-    let text = "";
-
-    if (type === "Spirogyra") {
-        text = `
-        <h3>Habit</h3>
-        <ul>
-        <li>Filamentous freshwater green algae</li>
-        <li>Forms floating slimy masses</li>
-        <li>Has spiral chloroplasts</li>
-        </ul>
-
-        <h3>Economic Importance</h3>
-        <ul>
-        <li>Produces oxygen in ponds</li>
-        <li>Used in biology studies</li>
-        </ul>
-
-        <h3>Location</h3>
-        <ul>
-        <li>Common in freshwater ponds</li>
-        <li>Found in slow-moving water</li>
-        </ul>
-        `;
-    }
-
-    if (type === "Cladophora") {
-        text = `
-        <h3>Habit</h3>
-        <ul>
-        <li>Branched filamentous green algae</li>
-        <li>Attaches to rocks</li>
-        <li>Forms dense mats</li>
-        </ul>
-
-        <h3>Economic Importance</h3>
-        <ul>
-        <li>Provides habitat to aquatic life</li>
-        <li>Indicates nutrient pollution</li>
-        </ul>
-
-        <h3>Location</h3>
-        <ul>
-        <li>Freshwater and marine habitats</li>
-        <li>Common in nutrient-rich waters</li>
-        </ul>
-        `;
-    }
-
-    document.getElementById("description").innerHTML = text;
-}
-
+// Buttons
+document.querySelector(".contribute").addEventListener("click", function() {
+    alert("🌿 Thank you for helping our algae ecosystem grow!");
+});
+document.querySelector(".explore").addEventListener("click", function() {
+    alert("🌎 Global algae exploration coming soon!");
+});
 </script>
-
 </body>
 </html>

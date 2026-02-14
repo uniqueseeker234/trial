@@ -256,6 +256,17 @@ function renderStars(){
 }
 
 createBubbles();
+  
+  function createFish(){
+  for(let i=0;i<2;i++){
+    const f=document.createElement("div");
+    f.className="fish";
+    f.style.top=(60+Math.random()*30)+"%";
+    f.style.animationDuration=(20+Math.random()*15)+"s";
+    document.body.appendChild(f);
+  }
+}
+createFish();
 
 function rateStar(i){
     rating=i;
@@ -340,6 +351,7 @@ document.querySelector(".explore").addEventListener("click",()=>{ alert("🌎 Gl
 
 </body>
 </html>
+
 
 
 

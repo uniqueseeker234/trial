@@ -17,7 +17,6 @@ h1 { text-align:center; padding:30px 10px; color:white; font-size:42px; letter-s
 @keyframes floatTitle { 0%{transform:translateY(0px);} 100%{transform:translateY(-8px);} }
 .container { display:flex; justify-content:center; gap:40px; padding:20px; flex-wrap:wrap; }
 .card { background:white; padding:25px; border-radius:15px; box-shadow:0 10px 25px rgba(0,0,0,0.2); animation:fadeIn 1s ease; }
-@keyframes fadeIn { from {opacity:0; transform:translateY(20px);} to{opacity:1; transform:translateY(0);} }
 /* Upload box */
 .upload-box { background:#f1f1f1; padding:25px; border-radius:12px; text-align:center; cursor:pointer; transition:0.3s; }
 .upload-box:hover { background:#e0ffff; transform:scale(1.03);}
@@ -70,49 +69,73 @@ let model;
 let classes = [];
 const CONFIDENCE_THRESHOLD = 0.65;
 
-// Algae info (keys must exactly match metadata.json labels)
+// Algae info (keys match your labels; lowercase)
 const algaeInfo = {
-"Spirogyra": {images:["images/spirogyra1.jpg","images/spirogyra2.jpg"], habit:["Filamentous freshwater green algae","Forms floating slimy masses","Has spiral chloroplasts"], economic:["Produces oxygen in ponds","Used in biological research"], location:["Found in freshwater ponds","Common in slow-moving water bodies"]},
-"Cladophora": {images:["images/cladophora1.jpg","images/cladophora2.jpg","images/cladophora3.jpg"], habit:["Branched filamentous green algae","Attaches to submerged surfaces","Forms dense green mats"], economic:["Provides shelter for aquatic organisms","Indicates nutrient pollution levels"], location:["Freshwater & marine habitats","Common in nutrient-rich environments"]},
-"Oedogonium": {images:["images/oedogonium1.jpg","images/oedogonium2.jpg"], habit:["Filamentous green algae with basal holdfast","Grows in mats or attached filaments","Prefers calm water"], economic:["Used in research and water quality monitoring","Oxygen producer in water bodies"], location:["Freshwater ponds and slow streams","Common in nutrient-rich ponds"]},
-"Volvox": {images:["images/volvox1.jpg","images/volvox2.jpg"], habit:["Spherical colonial green algae","Colonies with flagella","Forms motile spheres"], economic:["Used in biological experiments","Oxygen producer"], location:["Freshwater ponds and lakes","Common in nutrient-rich water"]},
-"Nostoc": {images:["images/nostoc1.jpg","images/nostoc2.jpg"], habit:["Cyanobacteria forming colonies","Gelatinous colonies","Filamentous structure"], economic:["Nitrogen fixation","Used in research"], location:["Freshwater and moist soils","Found on rocks and soil surfaces"]},
-"Pediastrum": {images:["images/pediastrum1.jpg","images/pediastrum2.jpg"], habit:["Colonial green algae","Flat star-like colonies","Planktonic in water"], economic:["Used in ecological studies","Indicator of water quality"], location:["Freshwater ponds","Common in nutrient-rich water"]},
-"Cosmarium": {images:["images/cosmarium1.jpg","images/cosmarium2.jpg"], habit:["Single-celled green algae with semicells","Desmids are symmetrical","Often found in colonies"], economic:["Used in ecological studies","Indicator of water quality"], location:["Freshwater habitats","Ponds and lakes with clean water"]},
-"Noctiluca": {images:["images/noctiluca1.jpg","images/noctiluca2.jpg"], habit:["Bioluminescent marine plankton","Single-celled","Motile with flagella"], economic:["Indicators of marine water health","Can cause red tides"], location:["Marine environments","Coastal waters worldwide"]},
-"Staurastrum": {images:["images/staurastrum1.jpg","images/staurastrum2.jpg"], habit:["Single-celled desmid","Star-shaped cells","Free-floating"], economic:["Used in water quality studies","Indicator species"], location:["Freshwater ponds","Clean, slow-moving waters"]},
-"Scenedesmus": {images:["images/scenedesmus1.jpg","images/scenedesmus2.jpg"], habit:["Colonial green algae","Forms four-cell colonies","Common planktonic algae"], economic:["Used in biofuel research","Indicator of water quality"], location:["Freshwater ponds","Often in nutrient-rich waters"]}
+"spirogyra": {images:["images/spirogyra1.jpg","images/spirogyra2.jpg"], habit:["Filamentous freshwater green algae","Forms floating slimy masses","Has spiral chloroplasts"], economic:["Produces oxygen in ponds","Used in biological research"], location:["Found in freshwater ponds","Common in slow-moving water bodies"]},
+"cladophora": {images:["images/cladophora1.jpg","images/cladophora2.jpg","images/cladophora3.jpg"], habit:["Branched filamentous green algae","Attaches to submerged surfaces","Forms dense green mats"], economic:["Provides shelter for aquatic organisms","Indicates nutrient pollution levels"], location:["Freshwater & marine habitats","Common in nutrient-rich environments"]},
+"oedogonium": {images:["images/oedogonium1.jpg","images/oedogonium2.jpg"], habit:["Filamentous green algae with basal holdfast","Grows in mats or attached filaments","Prefers calm water"], economic:["Used in research and water quality monitoring","Oxygen producer in water bodies"], location:["Freshwater ponds and slow streams","Common in nutrient-rich ponds"]},
+"volvox": {images:["images/volvox1.jpg","images/volvox2.jpg"], habit:["Spherical colonial green algae","Colonies with flagella","Forms motile spheres"], economic:["Used in biological experiments","Oxygen producer"], location:["Freshwater ponds and lakes","Common in nutrient-rich water"]},
+"nostoc": {images:["images/nostoc1.jpg","images/nostoc2.jpg"], habit:["Cyanobacteria forming colonies","Gelatinous colonies","Filamentous structure"], economic:["Nitrogen fixation","Used in research"], location:["Freshwater and moist soils","Found on rocks and soil surfaces"]},
+"pediastrum": {images:["images/pediastrum1.jpg","images/pediastrum2.jpg"], habit:["Colonial green algae","Flat star-like colonies","Planktonic in water"], economic:["Used in ecological studies","Indicator of water quality"], location:["Freshwater ponds","Common in nutrient-rich water"]},
+"cosmarium": {images:["images/cosmarium1.jpg","images/cosmarium2.jpg"], habit:["Single-celled green algae with semicells","Desmids are symmetrical","Often found in colonies"], economic:["Used in ecological studies","Indicator of water quality"], location:["Freshwater habitats","Ponds and lakes with clean water"]},
+"noctiluca": {images:["images/noctiluca1.jpg","images/noctiluca2.jpg"], habit:["Bioluminescent marine plankton","Single-celled","Motile with flagella"], economic:["Indicators of marine water health","Can cause red tides"], location:["Marine environments","Coastal waters worldwide"]},
+"staurastrum": {images:["images/staurastrum1.jpg","images/staurastrum2.jpg"], habit:["Single-celled desmid","Star-shaped cells","Free-floating"], economic:["Used in water quality studies","Indicator species"], location:["Freshwater ponds","Clean, slow-moving waters"]},
+"scenedesmus": {images:["images/scenedesmus1.jpg","images/scenedesmus2.jpg"], habit:["Colonial green algae","Forms four-cell colonies","Common planktonic algae"], economic:["Used in biofuel research","Indicator of water quality"], location:["Freshwater ponds","Often in nutrient-rich waters"]}
 };
 
-// Load model and metadata
+// Load model
 async function loadModel(){
     model = await tf.loadLayersModel("my_model/model.json");
     const metadata = await fetch("my_model/metadata.json").then(res=>res.json());
-    classes = metadata.labels.map(label => label.trim()); // trim whitespace
-    console.log("Model and classes loaded", classes);
+    classes = metadata.labels.map(l => l.trim().toLowerCase());
+    console.log("Model loaded with classes:", classes);
 }
 loadModel();
 
-// Star rating system
+// Star rating
 const starsContainer = document.getElementById("stars");
 const thankMessage = document.getElementById("thankMessage");
 let rating = 0;
-function renderStars(){ starsContainer.innerHTML=""; for(let i=1;i<=5;i++){ const star=document.createElement("span"); star.innerHTML=i<=rating?"★":"☆"; star.onclick=()=>{ rating=i; renderStars(); showThanks(i); }; starsContainer.appendChild(star); } }
+function renderStars(){
+    starsContainer.innerHTML="";
+    for(let i=1;i<=5;i++){
+        const star = document.createElement("span");
+        star.innerHTML = i<=rating?"★":"☆";
+        star.onclick = ()=>{ rating=i; renderStars(); showThanks(i); };
+        starsContainer.appendChild(star);
+    }
+}
+function showThanks(stars){
+    const messages = {1:"😢 We'll improve! Thanks!",2:"🙂 Thank you! We’ll grow!",3:"😊 Nice! Thanks!",4:"🌟 Awesome! You’re amazing!",5:"😍 WOW! You love our pond!"};
+    thankMessage.innerText = messages[stars];
+}
 renderStars();
-function showThanks(stars){ const messages={1:"😢 We'll improve! Thanks!",2:"🙂 Thank you! We’ll grow!",3:"😊 Nice! Thanks!",4:"🌟 Awesome! You’re amazing!",5:"😍 WOW! You love our pond!"}; thankMessage.innerText=messages[stars]; }
 
 // Carousel
 function createCarousel(images){
     const carouselDiv=document.getElementById("carousel");
     carouselDiv.innerHTML="";
     if(images.length===0) return;
-    images.forEach((src,i)=>{ const img=document.createElement("img"); img.src=src; if(i===0) img.classList.add("active"); carouselDiv.appendChild(img); });
-    const prevBtn=document.createElement("button"); prevBtn.className="prev"; prevBtn.innerHTML="&#10094;"; prevBtn.onclick=()=>{ moveSlide(-1); };
-    const nextBtn=document.createElement("button"); nextBtn.className="next"; nextBtn.innerHTML="&#10095;"; nextBtn.onclick=()=>{ moveSlide(1); };
+    images.forEach((src,i)=>{
+        const img=document.createElement("img");
+        img.src=src;
+        if(i===0) img.classList.add("active");
+        carouselDiv.appendChild(img);
+    });
+    const prevBtn=document.createElement("button");
+    prevBtn.className="prev"; prevBtn.innerHTML="&#10094;"; prevBtn.onclick=()=>{ moveSlide(-1); };
+    const nextBtn=document.createElement("button");
+    nextBtn.className="next"; nextBtn.innerHTML="&#10095;"; nextBtn.onclick=()=>{ moveSlide(1); };
     carouselDiv.appendChild(prevBtn); carouselDiv.appendChild(nextBtn);
     carouselDiv.currentIndex=0;
 }
-function moveSlide(dir){ const carouselDiv=document.getElementById("carousel"); const imgs=carouselDiv.querySelectorAll("img"); imgs[carouselDiv.currentIndex].classList.remove("active"); carouselDiv.currentIndex=(carouselDiv.currentIndex+dir+imgs.length)%imgs.length; imgs[carouselDiv.currentIndex].classList.add("active"); }
+function moveSlide(dir){
+    const carouselDiv=document.getElementById("carousel");
+    const imgs=carouselDiv.querySelectorAll("img");
+    imgs[carouselDiv.currentIndex].classList.remove("active");
+    carouselDiv.currentIndex=(carouselDiv.currentIndex+dir+imgs.length)%imgs.length;
+    imgs[carouselDiv.currentIndex].classList.add("active");
+}
 
 // Image upload & prediction
 document.getElementById("imageUpload").addEventListener("change", async function(event){
@@ -125,13 +148,14 @@ document.getElementById("imageUpload").addEventListener("change", async function
         const data=await prediction.data();
         const maxValue=Math.max(...data);
         const index=data.indexOf(maxValue);
-        const predictedClass=classes[index];
+        const predictedClass=classes[index]; // already lowercase
         const confidence=(maxValue*100).toFixed(2);
         const predictionText=document.getElementById("prediction");
         const descriptionBox=document.getElementById("description");
-        if(maxValue>=CONFIDENCE_THRESHOLD && algaeInfo[predictedClass]){
-            const info=algaeInfo[predictedClass];
-            predictionText.innerHTML="Prediction: <b>"+predictedClass+"</b><br>Confidence: "+confidence+"%";
+
+        const info=algaeInfo[predictedClass] || algaeInfo[predictedClass.toLowerCase()];
+        if(maxValue>=CONFIDENCE_THRESHOLD && info){
+            predictionText.innerHTML="Prediction: <b>"+predictedClass.charAt(0).toUpperCase() + predictedClass.slice(1)+"</b><br>Confidence: "+confidence+"%";
             createCarousel(info.images);
             descriptionBox.innerHTML=
                 "<h3>Habit</h3><ul>"+info.habit.map(x=>"<li>"+x+"</li>").join("")+"</ul>"+
@@ -149,5 +173,6 @@ document.getElementById("imageUpload").addEventListener("change", async function
 document.querySelector(".contribute").addEventListener("click",()=>{ alert("🌿 Thank you for helping our algae ecosystem grow!"); });
 document.querySelector(".explore").addEventListener("click",()=>{ alert("🌎 Global algae exploration coming soon!"); });
 </script>
+
 </body>
 </html>

@@ -70,7 +70,7 @@ let model;
 let classes = [];
 const CONFIDENCE_THRESHOLD = 0.65;
 
-// Algae info (same as before)
+// Algae info (keys must exactly match metadata.json labels)
 const algaeInfo = {
 "Spirogyra": {images:["images/spirogyra1.jpg","images/spirogyra2.jpg"], habit:["Filamentous freshwater green algae","Forms floating slimy masses","Has spiral chloroplasts"], economic:["Produces oxygen in ponds","Used in biological research"], location:["Found in freshwater ponds","Common in slow-moving water bodies"]},
 "Cladophora": {images:["images/cladophora1.jpg","images/cladophora2.jpg","images/cladophora3.jpg"], habit:["Branched filamentous green algae","Attaches to submerged surfaces","Forms dense green mats"], economic:["Provides shelter for aquatic organisms","Indicates nutrient pollution levels"], location:["Freshwater & marine habitats","Common in nutrient-rich environments"]},
@@ -88,7 +88,7 @@ const algaeInfo = {
 async function loadModel(){
     model = await tf.loadLayersModel("my_model/model.json");
     const metadata = await fetch("my_model/metadata.json").then(res=>res.json());
-    classes = metadata.labels;
+    classes = metadata.labels.map(label => label.trim()); // trim whitespace
     console.log("Model and classes loaded", classes);
 }
 loadModel();
@@ -129,7 +129,7 @@ document.getElementById("imageUpload").addEventListener("change", async function
         const confidence=(maxValue*100).toFixed(2);
         const predictionText=document.getElementById("prediction");
         const descriptionBox=document.getElementById("description");
-        if(maxValue>=CONFIDENCE_THRESHOLD){
+        if(maxValue>=CONFIDENCE_THRESHOLD && algaeInfo[predictedClass]){
             const info=algaeInfo[predictedClass];
             predictionText.innerHTML="Prediction: <b>"+predictedClass+"</b><br>Confidence: "+confidence+"%";
             createCarousel(info.images);

@@ -68,13 +68,12 @@ h1 {
 .stars span {
   font-size:30px;
   cursor:pointer;
-  color:gold;
-  transition: transform 0.3s, text-shadow 0.3s;
+  color:gray; /* empty color */
   display:inline-block;
+  transition: transform 0.3s, color 0.3s;
 }
-.stars span.animated {
-  animation: bounce 0.5s ease forwards;
-}
+.stars span.filled { color: gold; animation: bounce 0.5s ease forwards; }
+
 @keyframes bounce {
   0% { transform: scale(1.2); }
   50% { transform: scale(1.5); }
@@ -176,7 +175,14 @@ function createBubbles() {
     b.style.width=size+"px";
     b.style.height=size+"px";
     b.style.animationDuration=(6+Math.random()*6)+"s";
-    b.addEventListener("touchstart",()=>{ b.style.transform="scale(2)"; });
+    // make draggable
+    let isDragging=false,offsetX=0,offsetY=0;
+    b.addEventListener("mousedown",e=>{ isDragging=true; offsetX=e.clientX-b.offsetLeft; offsetY=e.clientY-b.offsetTop; b.style.transition="none"; });
+    document.addEventListener("mousemove",e=>{ if(isDragging){ b.style.left=(e.clientX-offsetX)+"px"; b.style.top=(e.clientY-offsetY)+"px"; }});
+    document.addEventListener("mouseup",()=>{ if(isDragging){ isDragging=false; b.style.transition=""; }});
+    b.addEventListener("touchstart",e=>{ isDragging=true; const t=e.touches[0]; offsetX=t.clientX-b.offsetLeft; offsetY=t.clientY-b.offsetTop; b.style.transition="none"; });
+    document.addEventListener("touchmove",e=>{ if(isDragging){ const t=e.touches[0]; b.style.left=(t.clientX-offsetX)+"px"; b.style.top=(t.clientY-offsetY)+"px"; }});
+    document.addEventListener("touchend",()=>{ if(isDragging){ isDragging=false; b.style.transition=""; }});
     document.body.appendChild(b);
   }
 }
@@ -190,10 +196,10 @@ function renderStars(){
     starsContainer.innerHTML="";
     for(let i=1;i<=5;i++){
         const star = document.createElement("span");
-        star.innerHTML="★";
+        star.innerHTML="☆"; // empty star
         star.onclick=()=> rateStar(i);
         star.addEventListener("touchstart",()=> rateStar(i));
-        if(i<=rating) star.classList.add("animated");
+        if(i<=rating){ star.innerHTML="★"; star.classList.add("filled"); }
         starsContainer.appendChild(star);
     }
 }
@@ -271,12 +277,11 @@ document.querySelector(".contribute").addEventListener("click",()=>{
     if(window.innerWidth>768){ // desktop
         alert(`💚 Thanks for contributing to our pond!\nSend images/info to: ${email}`);
     } else { // mobile
-        alert(`💚 Thanks for contributing to our pond! We'll open your mail client now!`);
+        alert(`💚 Thanks! We'll open your mail client now!`);
         window.location.href=`mailto:${email}?subject=${subject}&body=${body}`;
     }
 });
 document.querySelector(".explore").addEventListener("click",()=>{ alert("🌎 Global algae exploration coming soon!"); });
-
 </script>
 
 </body>

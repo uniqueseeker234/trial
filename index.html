@@ -277,7 +277,7 @@ document.querySelector(".contribute").addEventListener("click",()=>{
     if(window.innerWidth>768){ // desktop
         alert(`💚 Thanks for contributing to our pond!\nSend images/info to: ${email}`);
     } else { // mobile
-        alert(`💚 Thanks! We'll open your mail client now!`);
+        alert(`💚 Thanks for contributing to our pond! We'll open your mail client now!`);
         window.location.href=`mailto:${email}?subject=${subject}&body=${body}`;
     }
 });
@@ -286,3 +286,4 @@ document.querySelector(".explore").addEventListener("click",()=>{ alert("🌎 Gl
 
 </body>
 </html>
+

@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Algae Identifier 🌿</title>
 
-<!-- TensorFlow.js -->
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
 
 <style>
@@ -68,12 +67,10 @@ button:hover { transform:scale(1.05); }
 
 <script>
 let model;
+let classes = [];
 const CONFIDENCE_THRESHOLD = 0.65;
 
-// Exact class order from your model metadata.json
-const classes = ["Spirogyra","Cladophora","Oedogonium","Volvox","Nostoc","Pediastrum","Cosmarium","Noctiluca","Staurastrum","Scenedesmus"];
-
-// Algae info
+// Algae info (same as before)
 const algaeInfo = {
 "Spirogyra": {images:["images/spirogyra1.jpg","images/spirogyra2.jpg"], habit:["Filamentous freshwater green algae","Forms floating slimy masses","Has spiral chloroplasts"], economic:["Produces oxygen in ponds","Used in biological research"], location:["Found in freshwater ponds","Common in slow-moving water bodies"]},
 "Cladophora": {images:["images/cladophora1.jpg","images/cladophora2.jpg","images/cladophora3.jpg"], habit:["Branched filamentous green algae","Attaches to submerged surfaces","Forms dense green mats"], economic:["Provides shelter for aquatic organisms","Indicates nutrient pollution levels"], location:["Freshwater & marine habitats","Common in nutrient-rich environments"]},
@@ -87,8 +84,13 @@ const algaeInfo = {
 "Scenedesmus": {images:["images/scenedesmus1.jpg","images/scenedesmus2.jpg"], habit:["Colonial green algae","Forms four-cell colonies","Common planktonic algae"], economic:["Used in biofuel research","Indicator of water quality"], location:["Freshwater ponds","Often in nutrient-rich waters"]}
 };
 
-// Load model
-async function loadModel(){ model = await tf.loadLayersModel("my_model/model.json"); console.log("Model loaded"); }
+// Load model and metadata
+async function loadModel(){
+    model = await tf.loadLayersModel("my_model/model.json");
+    const metadata = await fetch("my_model/metadata.json").then(res=>res.json());
+    classes = metadata.labels;
+    console.log("Model and classes loaded", classes);
+}
 loadModel();
 
 // Star rating system
@@ -99,7 +101,7 @@ function renderStars(){ starsContainer.innerHTML=""; for(let i=1;i<=5;i++){ cons
 renderStars();
 function showThanks(stars){ const messages={1:"😢 We'll improve! Thanks!",2:"🙂 Thank you! We’ll grow!",3:"😊 Nice! Thanks!",4:"🌟 Awesome! You’re amazing!",5:"😍 WOW! You love our pond!"}; thankMessage.innerText=messages[stars]; }
 
-// Carousel helpers
+// Carousel
 function createCarousel(images){
     const carouselDiv=document.getElementById("carousel");
     carouselDiv.innerHTML="";

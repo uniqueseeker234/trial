@@ -11,37 +11,19 @@
 body {
   margin:0;
   font-family: 'Montserrat', sans-serif;
-  background: linear-gradient(to bottom, #00c6ff, #0072ff);
+  background: linear-gradient(to bottom, #a8f0a0, #3b9d4c); /* green lagoon */
   overflow-x:hidden;
   position: relative;
 }
 
-/* Underwater bubbles */
-.bubble {
-  position: fixed;
-  bottom: -50px;
-  width: 12px;
-  height: 12px;
-  background: rgba(255,255,255,0.35);
-  border-radius: 50%;
-  box-shadow: 0 0 8px rgba(255,255,255,0.6);
-  animation: rise linear infinite;
-  pointer-events: none;
-  z-index: 0;
-}
-@keyframes rise {
-  0% { transform: translateY(0); opacity:0.6; }
-  100% { transform: translateY(-110vh); opacity:0; }
-}
-
-/* Heading */
+/* Heading green glow */
 h1 {
   text-align:center;
   padding:30px 10px;
   color:#ffffff;
   font-size:48px;
   letter-spacing:2px;
-  text-shadow: 0 0 15px #00ffea, 0 0 30px #00bfff;
+  text-shadow: 0 0 15px #b0ff9d, 0 0 30px #4cbf66;
   animation: floatTitle 3s ease-in-out infinite alternate;
 }
 @keyframes floatTitle { 0%{transform:translateY(0);} 100%{transform:translateY(-10px);} }
@@ -65,7 +47,7 @@ h1 {
   cursor:pointer;
   transition:0.3s;
 }
-.upload-box:hover { background:#e0ffff; transform:scale(1.03); }
+.upload-box:hover { background:#e0fff0; transform:scale(1.03); }
 
 /* Prediction image carousel */
 .carousel { margin-top:15px; position:relative; width:100%; max-width:250px; }
@@ -92,11 +74,7 @@ h1 {
 .stars span.clicked {
   animation: bounce 0.5s ease forwards;
 }
-@keyframes bounce {
-  0% { transform: scale(1.5) rotate(-10deg); }
-  50% { transform: scale(1.8) rotate(10deg); }
-  100% { transform: scale(1.5) rotate(0deg); }
-}
+@keyframes bounce { 0% { transform: scale(1.5) rotate(-10deg); } 50% { transform: scale(1.8) rotate(10deg); } 100% { transform: scale(1.5) rotate(0deg); } }
 
 /* Buttons */
 button { padding:10px 18px; margin:8px; border-radius:8px; border:none; cursor:pointer; font-size:14px; transition:0.3s; }
@@ -106,6 +84,26 @@ button:hover { transform:scale(1.05); }
 
 /* Thank message */
 .thank-message { margin-top:10px; font-size:14px; min-height:24px; transition:0.3s; }
+
+/* Bubbles */
+.bubble {
+  position: fixed;
+  bottom: -50px;
+  width: 18px;
+  height: 18px;
+  background: rgba(255,255,255,0.4);
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(255,255,255,0.7);
+  animation: rise linear infinite;
+  pointer-events: auto;
+  z-index: 0;
+  transition: transform 0.3s, opacity 0.3s;
+}
+.bubble:hover {
+  transform: scale(2);
+  opacity:0.6;
+}
+@keyframes rise { 0% { transform: translateY(0); opacity:0.6; } 100% { transform: translateY(-110vh); opacity:0; } }
 
 /* Responsive */
 @media (max-width:900px){ .container{flex-direction:column; align-items:center;} }
@@ -136,6 +134,7 @@ button:hover { transform:scale(1.05); }
 </div>
 
 <script>
+// Model setup
 let model;
 let classes = [];
 const CONFIDENCE_THRESHOLD = 0.65;
@@ -159,17 +158,17 @@ async function loadModel(){
     model = await tf.loadLayersModel("my_model/model.json");
     const metadata = await fetch("my_model/metadata.json").then(res=>res.json());
     classes = metadata.labels.map(l => l.trim().toLowerCase());
-    console.log("Model loaded with classes:", classes);
+    console.log("Model loaded:", classes);
 }
 loadModel();
 
 // Bubbles
 function createBubbles() {
-  for(let i=0;i<25;i++){
+  for(let i=0;i<30;i++){
     const b=document.createElement("div");
     b.className="bubble";
     b.style.left=Math.random()*window.innerWidth+"px";
-    const size=8+Math.random()*20;
+    const size=12+Math.random()*20;
     b.style.width=size+"px";
     b.style.height=size+"px";
     b.style.animationDuration=(6+Math.random()*6)+"s";
@@ -190,16 +189,13 @@ function renderStars(){
         star.onclick=()=>{
             rating=i;
             renderStars();
-            showThanks(i);
+            const messages={1:"😢 We'll improve! Thanks!",2:"🙂 Thank you! We’ll grow!",3:"😊 Nice! Thanks!",4:"🌟 Awesome! You’re amazing!",5:"😍 WOW! You love our pond!"};
+            thankMessage.innerText=messages[i];
             star.classList.add("clicked");
             setTimeout(()=>star.classList.remove("clicked"),500);
         };
         starsContainer.appendChild(star);
     }
-}
-function showThanks(stars){
-    const messages={1:"😢 We'll improve! Thanks!",2:"🙂 Thank you! We’ll grow!",3:"😊 Nice! Thanks!",4:"🌟 Awesome! You’re amazing!",5:"😍 WOW! You love our pond!"};
-    thankMessage.innerText=messages[stars];
 }
 renderStars();
 
@@ -263,7 +259,7 @@ document.getElementById("imageUpload").addEventListener("change", async function
 
 // Buttons
 document.querySelector(".contribute").addEventListener("click",()=>{
-    const email="your_email@example.com"; // replace with your email
+    const email="your_email@example.com"; // replace
     const subject=encodeURIComponent("Algae Contribution 🌿");
     const body=encodeURIComponent("Hello! I want to contribute an algae image or info to your pond project.");
     window.location.href=`mailto:${email}?subject=${subject}&body=${body}`;

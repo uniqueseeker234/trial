@@ -6,7 +6,6 @@
 <title>Welcome to Our Algae Pond</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
-
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
 
 <style>
@@ -17,7 +16,7 @@ html, body {
   overflow-x:hidden;
 }
 
-/* 3 clean layers */
+/* Background */
 body {
   background: linear-gradient(to bottom, #3b9d4c 0%, #3b9d4c 33%, #f5e0a1 33%, #f5e0a1 66%, #1c3e8a 66%, #1c3e8a 100%);
   position: relative;
@@ -35,15 +34,18 @@ h1 {
 
 /* Layout */
 .container { display:flex; justify-content:center; gap:40px; padding:20px; flex-wrap:wrap; }
+
 .card {
   background:white;
   padding:25px;
   border-radius:15px;
   box-shadow:0 10px 25px rgba(0,0,0,0.2);
   animation:fadeIn 1s ease;
+  position:relative;
+  z-index:2;
 }
 
-/* Upload box */
+/* Upload */
 .upload-box {
   background:#f1f1f1;
   padding:25px;
@@ -58,8 +60,20 @@ h1 {
 .carousel { margin-top:15px; position:relative; width:100%; max-width:180px; }
 .carousel img { width:100%; border-radius:10px; display:none; }
 .carousel img.active { display:block; }
-.carousel button { position:absolute; top:50%; transform:translateY(-50%); background:rgba(0,0,0,0.3); border:none; color:white; font-size:20px; padding:5px 10px; cursor:pointer; border-radius:5px; }
-.prev { left:5px; } .next { right:5px; }
+.carousel button {
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  background:rgba(0,0,0,0.3);
+  border:none;
+  color:white;
+  font-size:20px;
+  padding:5px 10px;
+  cursor:pointer;
+  border-radius:5px;
+}
+.prev { left:5px; }
+.next { right:5px; }
 
 /* Description */
 .description { margin-top:20px; font-size:14px; line-height:1.5; }
@@ -68,7 +82,7 @@ h1 {
 .stars span {
   font-size:30px;
   cursor:pointer;
-  color:gray; /* empty color */
+  color:gray;
   display:inline-block;
   transition: transform 0.3s, color 0.3s;
 }
@@ -81,209 +95,144 @@ h1 {
 }
 
 /* Buttons */
-button { padding:10px 18px; margin:8px; border-radius:8px; border:none; cursor:pointer; font-size:14px; transition:0.3s; }
+button {
+  padding:10px 18px;
+  margin:8px;
+  border-radius:8px;
+  border:none;
+  cursor:pointer;
+  font-size:14px;
+  transition:0.3s;
+}
 button:hover { transform:scale(1.05); }
 .contribute { background:#27ae60; color:white; }
 .explore { background:#2980b9; color:white; }
 
-/* Thank message */
-.thank-message { margin-top:10px; font-size:14px; min-height:24px; transition:0.3s; }
+.thank-message { margin-top:10px; font-size:14px; min-height:24px; }
 
-/* Bubbles */
+/* Bubbles (Updated) */
 .bubble {
   position: fixed;
   bottom: -50px;
-  width: 18px;
-  height: 18px;
-  background: white;
   border-radius: 50%;
-  box-shadow: 0 0 12px white;
   animation: rise linear infinite;
   pointer-events: auto;
   z-index: 0;
-  transition: transform 0.3s, opacity 0.3s;
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
-.bubble:active {
-  transform: scale(2) !important;
-  opacity:0.6 !important;
-}
-@keyframes rise { 0% { transform: translateY(0); opacity:0.6; } 100% { transform: translateY(-110vh); opacity:0; } }
 
-/* Responsive */
-@media (max-width:900px){ .container{flex-direction:column; align-items:center;} }
+@keyframes rise {
+  0% { transform: translateY(0); opacity:0.6; }
+  100% { transform: translateY(-110vh); opacity:0; }
+}
+
+@media (max-width:900px){
+  .container{flex-direction:column; align-items:center;}
+}
 </style>
 </head>
+
 <body>
 
 <h1>Welcome to Our Algae Pond 🌿</h1>
 
 <div class="container">
 
-<!-- LEFT -->
 <div class="card">
-  <div class="upload-box" onclick="document.getElementById('imageUpload').click()">🌿 Select your algae photo to start!</div>
+  <div class="upload-box" onclick="document.getElementById('imageUpload').click()">
+    🌿 Select your algae photo to start!
+  </div>
   <input type="file" id="imageUpload" accept="image/*" style="display:none;">
   <h2 id="prediction"></h2>
   <div class="carousel" id="carousel"></div>
   <div id="description" class="description"></div>
 </div>
 
-<!-- RIGHT -->
 <div class="card" style="text-align:center; min-width:250px;">
   <div class="stars" id="stars"></div>
   <div class="thank-message" id="thankMessage"></div>
   <button class="contribute">Contribute 📨</button>
   <button class="explore">Explore Algae Around the World 🌏</button>
 </div>
+
 </div>
 
 <script>
-// Model setup
-let model;
-let classes = [];
-const CONFIDENCE_THRESHOLD = 0.65;
 
-// Algae info (images & description)
-const algaeInfo = {
-"spirogyra": {images:["images/spirogyra1.jpg","images/spirogyra2.jpg"], habit:["Filamentous freshwater green algae","Forms floating slimy masses","Has spiral chloroplasts"], economic:["Produces oxygen in ponds","Used in biological research"], location:["Found in freshwater ponds","Common in slow-moving water bodies"]},
-"cladophora": {images:["images/cladophora1.jpg","images/cladophora2.jpg","images/cladophora3.jpg"], habit:["Branched filamentous green algae","Attaches to submerged surfaces","Forms dense green mats"], economic:["Provides shelter for aquatic organisms","Indicates nutrient pollution levels"], location:["Freshwater & marine habitats","Common in nutrient-rich environments"]},
-"oedogonium": {images:["images/oedogonium1.jpg","images/oedogonium2.jpg"], habit:["Filamentous green algae with basal holdfast","Grows in mats or attached filaments","Prefers calm water"], economic:["Used in research and water quality monitoring","Oxygen producer in water bodies"], location:["Freshwater ponds and slow streams","Common in nutrient-rich ponds"]},
-"volvox": {images:["images/volvox1.jpg","images/volvox2.jpg"], habit:["Spherical colonial green algae","Colonies with flagella","Forms motile spheres"], economic:["Used in biological experiments","Oxygen producer"], location:["Freshwater ponds and lakes","Common in nutrient-rich water"]},
-"nostoc": {images:["images/nostoc1.jpg","images/nostoc2.jpg"], habit:["Cyanobacteria forming colonies","Gelatinous colonies","Filamentous structure"], economic:["Nitrogen fixation","Used in research"], location:["Freshwater and moist soils","Found on rocks and soil surfaces"]},
-"pediastrum": {images:["images/pediastrum1.jpg","images/pediastrum2.jpg"], habit:["Colonial green algae","Flat star-like colonies","Planktonic in water"], economic:["Used in ecological studies","Indicator of water quality"], location:["Freshwater ponds","Common in nutrient-rich water"]},
-"cosmarium": {images:["images/cosmarium1.jpg","images/cosmarium2.jpg"], habit:["Single-celled green algae with semicells","Desmids are symmetrical","Often found in colonies"], economic:["Used in ecological studies","Indicator of water quality"], location:["Freshwater habitats","Ponds and lakes with clean water"]},
-"noctiluca": {images:["images/noctiluca1.jpg","images/noctiluca2.jpg"], habit:["Bioluminescent marine plankton","Single-celled","Motile with flagella"], economic:["Indicators of marine water health","Can cause red tides"], location:["Marine environments","Coastal waters worldwide"]},
-"staurastrum": {images:["images/staurastrum1.jpg","images/staurastrum2.jpg"], habit:["Single-celled desmid","Star-shaped cells","Free-floating"], economic:["Used in water quality studies","Indicator species"], location:["Freshwater ponds","Clean, slow-moving waters"]},
-"scenedesmus": {images:["images/scenedesmus1.jpg","images/scenedesmus2.jpg"], habit:["Colonial green algae","Forms four-cell colonies","Common planktonic algae"], economic:["Used in biofuel research","Indicator of water quality"], location:["Freshwater ponds","Often in nutrient-rich waters"]}
-};
-
-// Load model
-async function loadModel(){
-    model = await tf.loadLayersModel("my_model/model.json");
-    const metadata = await fetch("my_model/metadata.json").then(res=>res.json());
-    classes = metadata.labels.map(l => l.trim().toLowerCase());
-}
-loadModel();
-
-// Bubbles
+/* ---------- COLORED BUBBLES ---------- */
 function createBubbles() {
+
+  const colors = [
+    "rgba(255,255,255,0.8)",
+    "rgba(120,255,180,0.7)",
+    "rgba(120,200,255,0.7)"
+  ];
+
   for(let i=0;i<30;i++){
-    const b=document.createElement("div");
-    b.className="bubble";
-    b.style.left=Math.random()*window.innerWidth+"px";
-    const size=15+Math.random()*15;
-    b.style.width=size+"px";
-    b.style.height=size+"px";
-    b.style.animationDuration=(6+Math.random()*6)+"s";
-    // make draggable
-    let isDragging=false,offsetX=0,offsetY=0;
-    b.addEventListener("mousedown",e=>{ isDragging=true; offsetX=e.clientX-b.offsetLeft; offsetY=e.clientY-b.offsetTop; b.style.transition="none"; });
-    document.addEventListener("mousemove",e=>{ if(isDragging){ b.style.left=(e.clientX-offsetX)+"px"; b.style.top=(e.clientY-offsetY)+"px"; }});
-    document.addEventListener("mouseup",()=>{ if(isDragging){ isDragging=false; b.style.transition=""; }});
-    b.addEventListener("touchstart",e=>{ isDragging=true; const t=e.touches[0]; offsetX=t.clientX-b.offsetLeft; offsetY=t.clientY-b.offsetTop; b.style.transition="none"; });
-    document.addEventListener("touchmove",e=>{ if(isDragging){ const t=e.touches[0]; b.style.left=(t.clientX-offsetX)+"px"; b.style.top=(t.clientY-offsetY)+"px"; }});
-    document.addEventListener("touchend",()=>{ if(isDragging){ isDragging=false; b.style.transition=""; }});
+
+    const b = document.createElement("div");
+    b.className = "bubble";
+
+    const size = 15 + Math.random()*15;
+    b.style.width = size + "px";
+    b.style.height = size + "px";
+
+    const randomColor = colors[Math.floor(Math.random()*colors.length)];
+    b.style.background = randomColor;
+    b.style.boxShadow = "0 0 12px " + randomColor;
+
+    b.style.left = Math.random()*window.innerWidth + "px";
+    b.style.animationDuration = (6+Math.random()*6) + "s";
+
+    let isDragging=false, offsetX=0, offsetY=0;
+
+    b.addEventListener("mousedown",e=>{
+      isDragging=true;
+      offsetX=e.clientX-b.offsetLeft;
+      offsetY=e.clientY-b.offsetTop;
+      b.style.animation="none";
+    });
+
+    document.addEventListener("mousemove",e=>{
+      if(isDragging){
+        b.style.left=(e.clientX-offsetX)+"px";
+        b.style.top=(e.clientY-offsetY)+"px";
+      }
+    });
+
+    document.addEventListener("mouseup",()=>{ isDragging=false; });
+
+    b.addEventListener("touchstart",e=>{
+      isDragging=true;
+      const t=e.touches[0];
+      offsetX=t.clientX-b.offsetLeft;
+      offsetY=t.clientY-b.offsetTop;
+      b.style.animation="none";
+    });
+
+    document.addEventListener("touchmove",e=>{
+      if(isDragging){
+        const t=e.touches[0];
+        b.style.left=(t.clientX-offsetX)+"px";
+        b.style.top=(t.clientY-offsetY)+"px";
+      }
+    });
+
+    document.addEventListener("touchend",()=>{ isDragging=false; });
+
+    b.addEventListener("click",()=>{
+      b.style.transform="scale(2)";
+      b.style.opacity="0";
+      setTimeout(()=>{ b.remove(); },300);
+    });
+
     document.body.appendChild(b);
   }
 }
+
 createBubbles();
 
-// Stars
-const starsContainer = document.getElementById("stars");
-const thankMessage = document.getElementById("thankMessage");
-let rating = 0;
-function renderStars(){
-    starsContainer.innerHTML="";
-    for(let i=1;i<=5;i++){
-        const star = document.createElement("span");
-        star.innerHTML="☆"; // empty star
-        star.onclick=()=> rateStar(i);
-        star.addEventListener("touchstart",()=> rateStar(i));
-        if(i<=rating){ star.innerHTML="★"; star.classList.add("filled"); }
-        starsContainer.appendChild(star);
-    }
-}
-function rateStar(i){
-    rating=i;
-    renderStars();
-    const messages={1:"😢 We'll improve! Thanks!",2:"🙂 Thank you! We’ll grow!",3:"😊 Nice! Thanks!",4:"🌟 Awesome! You’re amazing!",5:"😍 WOW! You love our pond!"};
-    thankMessage.innerText=messages[i];
-}
-renderStars();
-
-// Carousel
-function createCarousel(images){
-    const carouselDiv=document.getElementById("carousel");
-    carouselDiv.innerHTML="";
-    if(images.length===0) return;
-    images.forEach((src,i)=>{
-        const img=document.createElement("img");
-        img.src=src;
-        if(i===0) img.classList.add("active");
-        carouselDiv.appendChild(img);
-    });
-    const prevBtn=document.createElement("button");
-    prevBtn.className="prev"; prevBtn.innerHTML="&#10094;"; prevBtn.onclick=()=>{ moveSlide(-1); };
-    const nextBtn=document.createElement("button");
-    nextBtn.className="next"; nextBtn.innerHTML="&#10095;"; nextBtn.onclick=()=>{ moveSlide(1); };
-    carouselDiv.appendChild(prevBtn);
-    carouselDiv.appendChild(nextBtn);
-    carouselDiv.currentIndex=0;
-}
-function moveSlide(dir){
-    const carouselDiv=document.getElementById("carousel");
-    const imgs=carouselDiv.querySelectorAll("img");
-    imgs[carouselDiv.currentIndex].classList.remove("active");
-    carouselDiv.currentIndex=(carouselDiv.currentIndex+dir+imgs.length)%imgs.length;
-    imgs[carouselDiv.currentIndex].classList.add("active");
-}
-
-// Prediction
-document.getElementById("imageUpload").addEventListener("change", async function(event){
-    const file=event.target.files[0];
-    const img=new Image();
-    img.src=URL.createObjectURL(file);
-    img.onload=async function(){
-        const tensor=tf.browser.fromPixels(img).resizeNearestNeighbor([224,224]).toFloat().div(255.0).expandDims();
-        const prediction=model.predict(tensor);
-        const data=await prediction.data();
-        const maxValue=Math.max(...data);
-        const index=data.indexOf(maxValue);
-        const predictedClass=classes[index]; 
-        const confidence=(maxValue*100).toFixed(2);
-        const predictionText=document.getElementById("prediction");
-        const descriptionBox=document.getElementById("description");
-        const info=algaeInfo[predictedClass] || algaeInfo[predictedClass.toLowerCase()];
-        if(maxValue>=CONFIDENCE_THRESHOLD && info){
-            predictionText.innerHTML="Prediction: <b>"+predictedClass.charAt(0).toUpperCase()+predictedClass.slice(1)+"</b><br>Confidence: "+confidence+"%";
-            createCarousel(info.images);
-            descriptionBox.innerHTML=
-                "<h3>Habit</h3><ul>"+info.habit.map(x=>"<li>"+x+"</li>").join("")+"</ul>"+
-                "<h3>Economic Importance</h3><ul>"+info.economic.map(x=>"<li>"+x+"</li>").join("")+"</ul>"+
-                "<h3>Location</h3><ul>"+info.location.map(x=>"<li>"+x+"</li>").join("")+"</ul>";
-        }else{
-            predictionText.innerHTML="Confidence: "+confidence+"%";
-            createCarousel([]);
-            descriptionBox.innerHTML="<h3>🐟🌿 Oops!</h3><p>Hmm… this algae is not yet in our pond! If you know it, please contribute 🌱💚</p>";
-        }
-    };
-});
-
-// Buttons
-document.querySelector(".contribute").addEventListener("click",()=>{
-    const email="uniqueseeekers123@gmail.com";
-    const subject=encodeURIComponent("Algae Contribution 🌿");
-    const body=encodeURIComponent("Hello! I want to contribute an algae image or info to your pond project.");
-    if(window.innerWidth>768){ // desktop
-        alert(`💚 Thanks for contributing to our pond!\nSend images/info to: ${email}`);
-    } else { // mobile
-        alert(`💚 Thanks for contributing to our pond! We'll open your mail client now!`);
-        window.location.href=`mailto:${email}?subject=${subject}&body=${body}`;
-    }
-});
-document.querySelector(".explore").addEventListener("click",()=>{ alert("🌎 Global algae exploration coming soon!"); });
 </script>
 
 </body>
 </html>
-

@@ -31,23 +31,6 @@ body {
   position:relative;
 }
 
-/* Wave Glow */
-body::after {
-  content:"";
-  position:fixed;
-  bottom:0;
-  width:100%;
-  height:120px;
-  background:radial-gradient(circle at 50% 0%, rgba(255,255,255,0.25), transparent 70%);
-  animation:waveMove 6s ease-in-out infinite alternate;
-  pointer-events:none;
-  z-index:1;
-}
-@keyframes waveMove {
-  from{transform:translateX(-20px);}
-  to{transform:translateX(20px);}
-}
-
 /* Heading */
 h1{
   text-align:center;
@@ -75,7 +58,6 @@ h1{
   position:relative;
 }
 
-/* Upload */
 .upload-box{
   background:#f1f1f1;
   padding:25px;
@@ -166,29 +148,16 @@ button{
   cursor:pointer;
 }
 @keyframes rise{
-  0%{transform:translateY(0);opacity:0.7;}
+  0%{transform:translateY(0);opacity:0.6;}
   100%{transform:translateY(-110vh);opacity:0;}
 }
 @keyframes pop{
   0%{transform:scale(1);opacity:1;}
-  60%{transform:scale(1.6);opacity:0.7;}
+  60%{transform:scale(1.4);opacity:0.6;}
   100%{transform:scale(0);opacity:0;}
 }
 
-/* Fish */
-.fish{
-  position:fixed;
-  width:60px;
-  animation:swim 30s linear infinite;
-  z-index:1;
-  opacity:0.8;
-}
-@keyframes swim{
-  from{left:-100px;}
-  to{left:110%;}
-}
-
-/* Bottom Funny Text */
+/* Bottom Message */
 .bottom-text{
   position:fixed;
   bottom:10px;
@@ -204,13 +173,13 @@ button{
 
 <body>
 
-<h1>Welcome to Our Algae Pond 🌿</h1>
+<h1>Welcome to Our Algae Pond</h1>
 
 <div class="container">
 
 <div class="card">
   <div class="upload-box" onclick="document.getElementById('imageUpload').click()">
-    🌿 Select your algae photo to start!
+    Select your algae photo to start
   </div>
   <input type="file" id="imageUpload" accept="image/*" style="display:none;">
   <h3 id="prediction"></h3>
@@ -221,23 +190,14 @@ button{
 <div class="card" style="text-align:center;">
   <div class="stars" id="stars"></div>
   <div class="thank-message" id="thankMessage"></div>
-  <button class="contribute">Contribute 📨</button>
-  <button class="explore">Explore 🌏</button>
+  <button class="contribute">Contribute</button>
+  <button class="explore">Explore</button>
 </div>
 
 </div>
-
-<!-- Fish -->
-<img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" class="fish" style="top:75%;animation-delay:0s;">
-<img src="https://cdn-icons-png.flaticon.com/512/616/616430.png" class="fish" style="top:85%;animation-delay:10s;">
-
-<!-- Pop Sound -->
-<audio id="popSound">
-<source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_115b9b9f74.mp3?filename=water-bubble-pop-124467.mp3" type="audio/mpeg">
-</audio>
 
 <div class="bottom-text">
-😏💦 Yes… the bubbles are playable. Tap to pop. Hold to drag.
+Yes, the bubbles are playable. Tap to pop. Hold to drag.
 </div>
 
 <script>
@@ -246,6 +206,7 @@ button{
 const starsContainer=document.getElementById("stars");
 const thankMessage=document.getElementById("thankMessage");
 let rating=0;
+
 function renderStars(){
 starsContainer.innerHTML="";
 for(let i=1;i<=5;i++){
@@ -253,7 +214,7 @@ let s=document.createElement("span");
 s.innerHTML=i<=rating?"★":"☆";
 if(i<=rating)s.classList.add("filled");
 s.onclick=()=>{rating=i;renderStars();
-const msg=["😢 We'll improve!","🙂 Thank you!","😊 Nice!","🌟 Awesome!","😍 You love our pond!"];
+const msg=["We'll improve.","Thank you.","Nice.","Awesome.","You love our pond."];
 thankMessage.innerText=msg[i-1];
 };
 starsContainer.appendChild(s);
@@ -262,20 +223,23 @@ starsContainer.appendChild(s);
 renderStars();
 
 /* ---------- BUBBLES ---------- */
-function createSingleBubble(){
-const colors=[
+
+const bubbleColors=[
 "rgba(255,255,255,0.8)",
 "rgba(173,216,230,0.8)",
 "rgba(144,238,144,0.8)"
 ];
+
+function createSingleBubble(){
 const b=document.createElement("div");
 b.className="bubble";
-const size=15+Math.random()*20;
+
+const size=15+Math.random()*15;
 b.style.width=size+"px";
 b.style.height=size+"px";
 b.style.left=Math.random()*window.innerWidth+"px";
-b.style.background=colors[Math.floor(Math.random()*colors.length)];
-b.style.boxShadow="0 0 15px "+b.style.background;
+b.style.background=bubbleColors[Math.floor(Math.random()*bubbleColors.length)];
+b.style.boxShadow="0 0 12px "+b.style.background;
 b.style.animationDuration=(6+Math.random()*6)+"s";
 
 let holdTimer,isDragging=false,offsetX=0,offsetY=0;
@@ -321,27 +285,14 @@ document.body.appendChild(b);
 }
 
 function popBubble(b){
-document.getElementById("popSound").play();
 b.style.animation="pop 0.4s forwards";
 setTimeout(()=>{b.remove();createSingleBubble();},400);
 }
 
-for(let i=0;i<40;i++){createSingleBubble();}
-
-/* ---------- CONTRIBUTE ---------- */
-document.querySelector(".contribute").addEventListener("click",()=>{
-const email="uniqueseeekers123@gmail.com";
-if(window.innerWidth>768){
-alert("💚 Thanks for contributing!\nSend your algae images to:\n"+email);
-}else{
-alert("💚 Thanks for contributing to our pond! now Opening your mail app...");
-window.location.href=`mailto:${email}?subject=Algae Contribution 🌿`;
+/* Calm number of bubbles */
+for(let i=0;i<30;i++){
+createSingleBubble();
 }
-});
-
-document.querySelector(".explore").addEventListener("click",()=>{
-alert("🌎 More algae adventures coming soon!");
-});
 
 </script>
 

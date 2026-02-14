@@ -8,35 +8,105 @@
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
 
 <style>
-body { margin:0; font-family: Arial, sans-serif; background: linear-gradient(to bottom, #0f9b8e, #38ef7d); overflow-x:hidden; }
-/* Bubbles animation */
-body::before { content:""; position:fixed; width:200%; height:200%; background-image: radial-gradient(rgba(255,255,255,0.15) 2px, transparent 2px); background-size:60px 60px; animation:bubbles 35s linear infinite; z-index:-1; }
-@keyframes bubbles { 0%{transform:translateY(0);} 100%{transform:translateY(-120px);} }
-/* Heading animation */
-h1 { text-align:center; padding:30px 10px; color:white; font-size:42px; letter-spacing:2px; animation: floatTitle 3s ease-in-out infinite alternate; }
-@keyframes floatTitle { 0%{transform:translateY(0px);} 100%{transform:translateY(-8px);} }
+body {
+  margin:0;
+  font-family: 'Montserrat', sans-serif;
+  background: linear-gradient(to bottom, #00c6ff, #0072ff);
+  overflow-x:hidden;
+  position: relative;
+}
+
+/* Underwater bubbles */
+.bubble {
+  position: fixed;
+  bottom: -50px;
+  width: 12px;
+  height: 12px;
+  background: rgba(255,255,255,0.35);
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(255,255,255,0.6);
+  animation: rise linear infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+@keyframes rise {
+  0% { transform: translateY(0); opacity:0.6; }
+  100% { transform: translateY(-110vh); opacity:0; }
+}
+
+/* Heading */
+h1 {
+  text-align:center;
+  padding:30px 10px;
+  color:#ffffff;
+  font-size:48px;
+  letter-spacing:2px;
+  text-shadow: 0 0 15px #00ffea, 0 0 30px #00bfff;
+  animation: floatTitle 3s ease-in-out infinite alternate;
+}
+@keyframes floatTitle { 0%{transform:translateY(0);} 100%{transform:translateY(-10px);} }
+
+/* Layout */
 .container { display:flex; justify-content:center; gap:40px; padding:20px; flex-wrap:wrap; }
-.card { background:white; padding:25px; border-radius:15px; box-shadow:0 10px 25px rgba(0,0,0,0.2); animation:fadeIn 1s ease; }
+.card {
+  background:white;
+  padding:25px;
+  border-radius:15px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.2);
+  animation:fadeIn 1s ease;
+}
+
 /* Upload box */
-.upload-box { background:#f1f1f1; padding:25px; border-radius:12px; text-align:center; cursor:pointer; transition:0.3s; }
-.upload-box:hover { background:#e0ffff; transform:scale(1.03);}
-.result-image { max-width:250px; width:100%; border-radius:10px; margin-top:15px; display:none; }
-.description { margin-top:20px; font-size:14px; }
-/* Carousel */
-.carousel { margin-top:15px; position:relative; width:100%; max-width:300px; }
+.upload-box {
+  background:#f1f1f1;
+  padding:25px;
+  border-radius:12px;
+  text-align:center;
+  cursor:pointer;
+  transition:0.3s;
+}
+.upload-box:hover { background:#e0ffff; transform:scale(1.03); }
+
+/* Prediction image carousel */
+.carousel { margin-top:15px; position:relative; width:100%; max-width:250px; }
 .carousel img { width:100%; border-radius:10px; display:none; }
 .carousel img.active { display:block; }
 .carousel button { position:absolute; top:50%; transform:translateY(-50%); background:rgba(0,0,0,0.3); border:none; color:white; font-size:20px; padding:5px 10px; cursor:pointer; border-radius:5px; }
 .prev { left:5px; } .next { right:5px; }
+
+/* Description */
+.description { margin-top:20px; font-size:14px; line-height:1.5; }
+
 /* Stars */
-.stars span { font-size:30px; cursor:pointer; color:gold; transition:0.2s; }
-.stars span:hover { transform:scale(1.3); }
-.thank-message { margin-top:10px; font-size:14px; min-height:24px; transition:0.3s; }
+.stars span {
+  font-size:30px;
+  cursor:pointer;
+  color:gold;
+  transition: transform 0.3s, text-shadow 0.3s;
+  display:inline-block;
+}
+.stars span:hover {
+  transform: scale(1.5) rotate(-10deg);
+  text-shadow: 0 0 10px gold;
+}
+.stars span.clicked {
+  animation: bounce 0.5s ease forwards;
+}
+@keyframes bounce {
+  0% { transform: scale(1.5) rotate(-10deg); }
+  50% { transform: scale(1.8) rotate(10deg); }
+  100% { transform: scale(1.5) rotate(0deg); }
+}
+
 /* Buttons */
 button { padding:10px 18px; margin:8px; border-radius:8px; border:none; cursor:pointer; font-size:14px; transition:0.3s; }
 button:hover { transform:scale(1.05); }
 .contribute { background:#27ae60; color:white; }
 .explore { background:#2980b9; color:white; }
+
+/* Thank message */
+.thank-message { margin-top:10px; font-size:14px; min-height:24px; transition:0.3s; }
+
 /* Responsive */
 @media (max-width:900px){ .container{flex-direction:column; align-items:center;} }
 </style>
@@ -46,21 +116,22 @@ button:hover { transform:scale(1.05); }
 <h1>🌿 Algae Identifier</h1>
 
 <div class="container">
+
 <!-- LEFT -->
 <div class="card">
-<div class="upload-box" onclick="document.getElementById('imageUpload').click()">🌿 Select your algae photo to start!</div>
-<input type="file" id="imageUpload" accept="image/*" style="display:none;">
-<h2 id="prediction"></h2>
-<div class="carousel" id="carousel"></div>
-<div id="description" class="description"></div>
+  <div class="upload-box" onclick="document.getElementById('imageUpload').click()">🌿 Select your algae photo to start!</div>
+  <input type="file" id="imageUpload" accept="image/*" style="display:none;">
+  <h2 id="prediction"></h2>
+  <div class="carousel" id="carousel"></div>
+  <div id="description" class="description"></div>
 </div>
 
 <!-- RIGHT -->
 <div class="card" style="text-align:center; min-width:250px;">
-<div class="stars" id="stars"></div>
-<div class="thank-message" id="thankMessage"></div>
-<button class="contribute">Contribute</button>
-<button class="explore">Explore Algae Around the World</button>
+  <div class="stars" id="stars"></div>
+  <div class="thank-message" id="thankMessage"></div>
+  <button class="contribute">Contribute 📨</button>
+  <button class="explore">Explore Algae Around the World 🌏</button>
 </div>
 </div>
 
@@ -69,7 +140,7 @@ let model;
 let classes = [];
 const CONFIDENCE_THRESHOLD = 0.65;
 
-// Algae info (keys match your labels; lowercase)
+// Algae info
 const algaeInfo = {
 "spirogyra": {images:["images/spirogyra1.jpg","images/spirogyra2.jpg"], habit:["Filamentous freshwater green algae","Forms floating slimy masses","Has spiral chloroplasts"], economic:["Produces oxygen in ponds","Used in biological research"], location:["Found in freshwater ponds","Common in slow-moving water bodies"]},
 "cladophora": {images:["images/cladophora1.jpg","images/cladophora2.jpg","images/cladophora3.jpg"], habit:["Branched filamentous green algae","Attaches to submerged surfaces","Forms dense green mats"], economic:["Provides shelter for aquatic organisms","Indicates nutrient pollution levels"], location:["Freshwater & marine habitats","Common in nutrient-rich environments"]},
@@ -92,7 +163,22 @@ async function loadModel(){
 }
 loadModel();
 
-// Star rating
+// Bubbles
+function createBubbles() {
+  for(let i=0;i<25;i++){
+    const b=document.createElement("div");
+    b.className="bubble";
+    b.style.left=Math.random()*window.innerWidth+"px";
+    const size=8+Math.random()*20;
+    b.style.width=size+"px";
+    b.style.height=size+"px";
+    b.style.animationDuration=(6+Math.random()*6)+"s";
+    document.body.appendChild(b);
+  }
+}
+createBubbles();
+
+// Stars
 const starsContainer = document.getElementById("stars");
 const thankMessage = document.getElementById("thankMessage");
 let rating = 0;
@@ -100,14 +186,20 @@ function renderStars(){
     starsContainer.innerHTML="";
     for(let i=1;i<=5;i++){
         const star = document.createElement("span");
-        star.innerHTML = i<=rating?"★":"☆";
-        star.onclick = ()=>{ rating=i; renderStars(); showThanks(i); };
+        star.innerHTML=i<=rating?"★":"☆";
+        star.onclick=()=>{
+            rating=i;
+            renderStars();
+            showThanks(i);
+            star.classList.add("clicked");
+            setTimeout(()=>star.classList.remove("clicked"),500);
+        };
         starsContainer.appendChild(star);
     }
 }
 function showThanks(stars){
-    const messages = {1:"😢 We'll improve! Thanks!",2:"🙂 Thank you! We’ll grow!",3:"😊 Nice! Thanks!",4:"🌟 Awesome! You’re amazing!",5:"😍 WOW! You love our pond!"};
-    thankMessage.innerText = messages[stars];
+    const messages={1:"😢 We'll improve! Thanks!",2:"🙂 Thank you! We’ll grow!",3:"😊 Nice! Thanks!",4:"🌟 Awesome! You’re amazing!",5:"😍 WOW! You love our pond!"};
+    thankMessage.innerText=messages[stars];
 }
 renderStars();
 
@@ -126,7 +218,8 @@ function createCarousel(images){
     prevBtn.className="prev"; prevBtn.innerHTML="&#10094;"; prevBtn.onclick=()=>{ moveSlide(-1); };
     const nextBtn=document.createElement("button");
     nextBtn.className="next"; nextBtn.innerHTML="&#10095;"; nextBtn.onclick=()=>{ moveSlide(1); };
-    carouselDiv.appendChild(prevBtn); carouselDiv.appendChild(nextBtn);
+    carouselDiv.appendChild(prevBtn);
+    carouselDiv.appendChild(nextBtn);
     carouselDiv.currentIndex=0;
 }
 function moveSlide(dir){
@@ -137,7 +230,7 @@ function moveSlide(dir){
     imgs[carouselDiv.currentIndex].classList.add("active");
 }
 
-// Image upload & prediction
+// Prediction
 document.getElementById("imageUpload").addEventListener("change", async function(event){
     const file=event.target.files[0];
     const img=new Image();
@@ -148,14 +241,13 @@ document.getElementById("imageUpload").addEventListener("change", async function
         const data=await prediction.data();
         const maxValue=Math.max(...data);
         const index=data.indexOf(maxValue);
-        const predictedClass=classes[index]; // already lowercase
+        const predictedClass=classes[index]; 
         const confidence=(maxValue*100).toFixed(2);
         const predictionText=document.getElementById("prediction");
         const descriptionBox=document.getElementById("description");
-
         const info=algaeInfo[predictedClass] || algaeInfo[predictedClass.toLowerCase()];
         if(maxValue>=CONFIDENCE_THRESHOLD && info){
-            predictionText.innerHTML="Prediction: <b>"+predictedClass.charAt(0).toUpperCase() + predictedClass.slice(1)+"</b><br>Confidence: "+confidence+"%";
+            predictionText.innerHTML="Prediction: <b>"+predictedClass.charAt(0).toUpperCase()+predictedClass.slice(1)+"</b><br>Confidence: "+confidence+"%";
             createCarousel(info.images);
             descriptionBox.innerHTML=
                 "<h3>Habit</h3><ul>"+info.habit.map(x=>"<li>"+x+"</li>").join("")+"</ul>"+
@@ -170,7 +262,12 @@ document.getElementById("imageUpload").addEventListener("change", async function
 });
 
 // Buttons
-document.querySelector(".contribute").addEventListener("click",()=>{ alert("🌿 Thank you for helping our algae ecosystem grow!"); });
+document.querySelector(".contribute").addEventListener("click",()=>{
+    const email="your_email@example.com"; // replace with your email
+    const subject=encodeURIComponent("Algae Contribution 🌿");
+    const body=encodeURIComponent("Hello! I want to contribute an algae image or info to your pond project.");
+    window.location.href=`mailto:${email}?subject=${subject}&body=${body}`;
+});
 document.querySelector(".explore").addEventListener("click",()=>{ alert("🌎 Global algae exploration coming soon!"); });
 </script>
 

@@ -442,75 +442,97 @@ function renderStars(){
         starsContainer.appendChild(star);
     }
 }
-  function createBubbles() {
-  for(let i=0;i<22;i++){
-    const b=document.createElement("div");
-    b.className="bubble";
-    b.style.background = ["white","#4caf50","#4fc3f7"][Math.floor(Math.random()*3)];
-    b.style.left=Math.random()*window.innerWidth+"px";
-    const size=15+Math.random()*15;
-    b.style.width=size+"px";
-    b.style.height=size+"px";
-    b.style.animationDuration=(6+Math.random()*6)+"s";
+ const MAX_BUBBLES = 22;
 
-    let isDragging=false,offsetX=0,offsetY=0;
+function spawnOneBubble(){
+  const b = document.createElement("div");
+  b.className = "bubble";
+  b.style.background = ["white","#4caf50","#4fc3f7"][Math.floor(Math.random()*3)];
+  b.style.left = Math.random()*window.innerWidth + "px";
 
-    b.addEventListener("mousedown",e=>{
-      isDragging=true;
-      offsetX=e.clientX-b.offsetLeft;
-      offsetY=e.clientY-b.offsetTop;
-      b.style.transition="none";
-    });
+  const size = 15 + Math.random()*15;
+  b.style.width = size + "px";
+  b.style.height = size + "px";
 
-    document.addEventListener("mousemove",e=>{
-      if(isDragging){
-        b.style.left=(e.clientX-offsetX)+"px";
-        b.style.top=(e.clientY-offsetY)+"px";
-      }
-    });
+  const duration = 6 + Math.random()*6;
+  b.style.animationDuration = duration + "s";
 
-    document.addEventListener("mouseup",()=>{
-      if(isDragging){
-        isDragging=false;
-        b.style.transition="";
-      }
-    });
+  let isDragging=false,offsetX=0,offsetY=0;
 
-    b.addEventListener("touchstart",e=>{
-      isDragging=true;
+  b.addEventListener("mousedown",e=>{
+    isDragging=true;
+    offsetX=e.clientX-b.offsetLeft;
+    offsetY=e.clientY-b.offsetTop;
+    b.style.transition="none";
+  });
+
+  document.addEventListener("mousemove",e=>{
+    if(isDragging){
+      b.style.left=(e.clientX-offsetX)+"px";
+      b.style.top=(e.clientY-offsetY)+"px";
+    }
+  });
+
+  document.addEventListener("mouseup",()=>{
+    if(isDragging){
+      isDragging=false;
+      b.style.transition="";
+    }
+  });
+
+  b.addEventListener("touchstart",e=>{
+    isDragging=true;
+    const t=e.touches[0];
+    offsetX=t.clientX-b.offsetLeft;
+    offsetY=t.clientY-b.offsetTop;
+    b.style.transition="none";
+  });
+
+  document.addEventListener("touchmove",e=>{
+    if(isDragging){
       const t=e.touches[0];
-      offsetX=t.clientX-b.offsetLeft;
-      offsetY=t.clientY-b.offsetTop;
-      b.style.transition="none";
-    });
+      b.style.left=(t.clientX-offsetX)+"px";
+      b.style.top=(t.clientY-offsetY)+"px";
+    }
+  });
 
-    document.addEventListener("touchmove",e=>{
-      if(isDragging){
-        const t=e.touches[0];
-        b.style.left=(t.clientX-offsetX)+"px";
-        b.style.top=(t.clientY-offsetY)+"px";
-      }
-    });
+  document.addEventListener("touchend",()=>{
+    if(isDragging){
+      isDragging=false;
+      b.style.transition="";
+    }
+  });
 
-    document.addEventListener("touchend",()=>{
-      if(isDragging){
-        isDragging=false;
-        b.style.transition="";
-      }
-    });
+  // pop bubble
+  b.addEventListener("click",()=> b.remove());
+  b.addEventListener("touchstart",()=> b.remove(), {passive:true});
 
-    // 🫧 single burst
-    b.addEventListener("click",()=>{
-      b.remove();
-      });
-      b.addEventListener("touchstart",()=>{
-  b.remove();
-    });
-    document.body.appendChild(b);
+  document.body.appendChild(b);
+
+  // remove after animation ends
+  setTimeout(()=>{
+    if(b.parentNode) b.remove();
+  }, duration*1000 + 300);
+}
+
+function createBubbles(){
+  // initial batch
+  for(let i=0;i<MAX_BUBBLES;i++){
+    spawnOneBubble();
   }
+
+  // keep refilling
+  setInterval(()=>{
+    const current = document.querySelectorAll(".bubble").length;
+    const needed = MAX_BUBBLES - current;
+    for(let i=0;i<needed;i++){
+      spawnOneBubble();
+    }
+  }, 1000);
 }
 
 createBubbles();
+
   
 function createCreatures() {
 
@@ -752,6 +774,7 @@ document.querySelector(".explore").addEventListener("click",()=>{ alert("🌎 Gl
 
 </body>
 </html>
+
 
 
 

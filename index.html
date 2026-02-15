@@ -148,7 +148,18 @@ button:hover { transform:scale(1.05); }
 @keyframes rise { 0% { transform: translateY(0); opacity:0.6; } 100% { transform: translateY(-110vh); opacity:0; } }
 
 /* Responsive */
-@media (max-width:900px){ .container{flex-direction:column; align-items:center;} }
+@media (max-width:900px){ 
+  .container{
+    flex-direction:column; 
+    align-items:center;
+  }
+
+  h1{
+    font-size: 26px;        /* smaller heading */
+    letter-spacing: 1px;
+    padding: 20px 8px;
+  }
+}
 
  /* Cartoon Pond Creatures */
 
@@ -807,6 +818,7 @@ document.querySelector(".explore").addEventListener("click",()=>{ alert("🌎 Gl
 
 </body>
 </html>
+
 
 
 

@@ -296,21 +296,22 @@ button:hover { transform:scale(1.05); }
 }
 .lotus-flower{
   position:absolute;
-  left:50%;
-  top:50%;
-  transform: translate(-50%, -70%); /* sits on pad */
+
+  left: 34%;      /* ⬅ move flower to left side of pad */
+  top: 10%;       /* sits nicely on pad */
+
   width:30px;
   height:30px;
   z-index:3;
   pointer-events:none;
+
+  transform: none;              /* IMPORTANT */
   animation: flowerSway 3.2s ease-in-out infinite;
 }
-
-
 @keyframes flowerSway{
-  0%   { transform: translate(-50%, -70%) rotate(-2deg); }
-  50%  { transform: translate(-50%, -72%) rotate(2deg); }
-  100% { transform: translate(-50%, -70%) rotate(-2deg); }
+  0%   { transform: rotate(-2deg) translateY(0); }
+  50%  { transform: rotate(2deg) translateY(-1px); }
+  100% { transform: rotate(-2deg) translateY(0); }
 }
 
 .lotus-flower span{
@@ -745,6 +746,7 @@ document.querySelector(".explore").addEventListener("click",()=>{ alert("🌎 Gl
 
 </body>
 </html>
+
 
 
 

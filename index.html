@@ -23,6 +23,13 @@ body {
   background: linear-gradient(to bottom, #3b9d4c 0%, #3b9d4c 33%, #f5e0a1 33%, #f5e0a1 66%, #1c3e8a 66%, #1c3e8a 100%);
   position: relative;
 }
+  /* Pond animation layer (behind UI) */
+#pond-layer{
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
 
 /* Heading */
 /* Heading with sway, works for desktop and mobile */
@@ -376,7 +383,7 @@ button:hover { transform:scale(1.05); }
 </style>
 </head>
 <body>
-
+<div id="pond-layer"></div>
 <h1>Welcome to Our Algae Pond 🌿</h1>
 
 <div class="container">
@@ -784,6 +791,7 @@ document.querySelector(".explore").addEventListener("click",()=>{ alert("🌎 Gl
 
 </body>
 </html>
+
 
 
 

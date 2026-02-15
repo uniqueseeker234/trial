@@ -510,10 +510,9 @@ function spawnOneBubble(){
   document.body.appendChild(b);
 
   // remove after animation ends
-  setTimeout(()=>{
-    if(b.parentNode) b.remove();
-  }, duration*1000 + 300);
-}
+ b.addEventListener("animationend", () => {
+  b.remove();
+});
 
 function createBubbles(){
   // initial batch
@@ -774,6 +773,7 @@ document.querySelector(".explore").addEventListener("click",()=>{ alert("🌎 Gl
 
 </body>
 </html>
+
 
 
 

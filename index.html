@@ -314,10 +314,6 @@ async function loadModel(){
 }
 loadModel();
 
-// Bubbles
-
-createBubbles();
-
 // Stars
 const starsContainer = document.getElementById("stars");
 const thankMessage = document.getElementById("thankMessage");
@@ -404,13 +400,13 @@ function renderStars(){
 createBubbles();
   
 function createCreatures() {
-  function spawnFish() {
-  // 4 fish, fixed layers + directions
+
+  // ---------- FISH (4 fish, fixed layers, no spin, bubble trail) ----------
   const fishConfigs = [
-    { color: "purple", top: "14%", dir: "right" }, // green band
-    { color: "orange", top: "48%", dir: "left"  }, // sand band
-    { color: "blue",   top: "76%", dir: "right" }, // blue band (upper)
-    { color: "green",  top: "88%", dir: "left"  }, // blue band (lower)
+    { color: "purple", top: "12%", dir: "right" }, // green band
+    { color: "blue",   top: "22%", dir: "right" }, // green band
+    { color: "orange", top: "45%", dir: "left"  }, // sand band
+    { color: "green",  top: "55%", dir: "left"  }, // sand band
   ];
 
   fishConfigs.forEach((cfg, i) => {
@@ -448,42 +444,20 @@ function createCreatures() {
       const b = document.createElement("div");
       b.className = "bubble-trail";
 
-      const s = 4 + Math.random() * 2;
+      const s = 3 + Math.random() * 2;   // smaller bubbles
       b.style.width = s + "px";
       b.style.height = s + "px";
 
       const x = cfg.dir === "right" ? (r.left - 6) : (r.right + 6);
       b.style.left = x + "px";
-      b.style.top = (r.top + r.height * 0.6) + "px";
+      b.style.top = (r.top + r.height * 0.65) + "px";
 
       document.body.appendChild(b);
       setTimeout(() => b.remove(), 650);
-    }, 220);
-  });
-}
-
-// call ONCE (after the page loads / after createBubbles is fine)
-spawnFish();
-
-    // Bubble trail behind fish
-    setInterval(() => {
-      const bubble = document.createElement("div");
-      bubble.className = "bubble-trail";
-      const rect = fish.getBoundingClientRect();
-      bubble.style.top = rect.top + rect.height / 2 + "px";
-      if (fishData.direction === "right") {
-        bubble.style.left = rect.left - 6 + "px"; // behind
-      } else {
-        bubble.style.left = rect.right + 6 + "px"; // behind
-      }
-      document.body.appendChild(bubble);
-      setTimeout(() => bubble.remove(), 600); // disappears fast
-    }, 300);
-
-    document.body.appendChild(fish);
+    }, 180);
   });
 
-  // Lotus pads (already fine)
+  // ---------- LOTUS PADS ----------
   const lotus1 = document.createElement("div");
   lotus1.className = "lotus";
   lotus1.style.left = "20%";
@@ -494,7 +468,7 @@ spawnFish();
   lotus2.style.left = "70%";
   document.body.appendChild(lotus2);
 
-  // Frogs on lotus (already fine)
+  // ---------- FROGS ----------
   const frog1 = document.createElement("div");
   frog1.className = "frog";
   frog1.style.left = "25%";
@@ -507,7 +481,7 @@ spawnFish();
   frog2.style.bottom = "18%";
   document.body.appendChild(frog2);
 
-  // Seaweed 8–9 (already fine)
+  // ---------- SEAWEED (9) ----------
   for (let i = 0; i < 9; i++) {
     const seaweed = document.createElement("div");
     seaweed.className = "seaweed";
@@ -516,10 +490,6 @@ spawnFish();
     document.body.appendChild(seaweed);
   }
 }
-
-// Call the function to generate creatures
-createCreatures();
-
 
 
 
@@ -615,6 +585,7 @@ document.querySelector(".explore").addEventListener("click",()=>{ alert("🌎 Gl
 
 </body>
 </html>
+
 
 
 

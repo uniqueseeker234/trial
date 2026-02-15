@@ -457,80 +457,76 @@ function spawnOneBubble(){
   const duration = 6 + Math.random()*6;
   b.style.animationDuration = duration + "s";
 
-  let isDragging=false,offsetX=0,offsetY=0;
+  let isDragging=false, offsetX=0, offsetY=0;
 
-  b.addEventListener("mousedown",e=>{
+  b.addEventListener("mousedown", (e)=>{
     isDragging=true;
-    offsetX=e.clientX-b.offsetLeft;
-    offsetY=e.clientY-b.offsetTop;
+    offsetX=e.clientX - b.offsetLeft;
+    offsetY=e.clientY - b.offsetTop;
     b.style.transition="none";
   });
 
-  document.addEventListener("mousemove",e=>{
+  document.addEventListener("mousemove", (e)=>{
     if(isDragging){
-      b.style.left=(e.clientX-offsetX)+"px";
-      b.style.top=(e.clientY-offsetY)+"px";
+      b.style.left = (e.clientX - offsetX) + "px";
+      b.style.top  = (e.clientY - offsetY) + "px";
     }
   });
 
-  document.addEventListener("mouseup",()=>{
+  document.addEventListener("mouseup", ()=>{
     if(isDragging){
       isDragging=false;
       b.style.transition="";
     }
   });
 
-  b.addEventListener("touchstart",e=>{
+  // Touch drag (NOTE: don't remove on touchstart or it will instantly pop)
+  b.addEventListener("touchstart", (e)=>{
     isDragging=true;
     const t=e.touches[0];
-    offsetX=t.clientX-b.offsetLeft;
-    offsetY=t.clientY-b.offsetTop;
+    offsetX=t.clientX - b.offsetLeft;
+    offsetY=t.clientY - b.offsetTop;
     b.style.transition="none";
-  });
+  }, {passive:true});
 
-  document.addEventListener("touchmove",e=>{
+  document.addEventListener("touchmove", (e)=>{
     if(isDragging){
       const t=e.touches[0];
-      b.style.left=(t.clientX-offsetX)+"px";
-      b.style.top=(t.clientY-offsetY)+"px";
+      b.style.left = (t.clientX - offsetX) + "px";
+      b.style.top  = (t.clientY - offsetY) + "px";
     }
-  });
+  }, {passive:true});
 
-  document.addEventListener("touchend",()=>{
+  document.addEventListener("touchend", ()=>{
     if(isDragging){
       isDragging=false;
       b.style.transition="";
     }
   });
 
-  // pop bubble
-  b.addEventListener("click",()=> b.remove());
-  b.addEventListener("touchstart",()=> b.remove(), {passive:true});
+  // Pop on click (desktop) and on double-tap (mobile feel)
+  b.addEventListener("click", ()=> b.remove());
+
+  // Remove automatically when animation completes (no "auto pop at bottom")
+  b.addEventListener("animationend", ()=> b.remove());
 
   document.body.appendChild(b);
-
-  // remove after animation ends
- b.addEventListener("animationend", () => {
-  b.remove();
-});
+}
 
 function createBubbles(){
   // initial batch
-  for(let i=0;i<MAX_BUBBLES;i++){
-    spawnOneBubble();
-  }
+  for(let i=0;i<MAX_BUBBLES;i++) spawnOneBubble();
 
-  // keep refilling
+  // refill forever
   setInterval(()=>{
     const current = document.querySelectorAll(".bubble").length;
     const needed = MAX_BUBBLES - current;
-    for(let i=0;i<needed;i++){
-      spawnOneBubble();
-    }
+    for(let i=0;i<needed;i++) spawnOneBubble();
   }, 1000);
 }
 
 createBubbles();
+
 
   
 function createCreatures() {
@@ -773,6 +769,7 @@ document.querySelector(".explore").addEventListener("click",()=>{ alert("🌎 Gl
 
 </body>
 </html>
+
 
 
 

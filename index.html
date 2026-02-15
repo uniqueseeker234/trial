@@ -65,14 +65,26 @@ h1 {
 
 
 /* Layout */
-.container { display:flex; justify-content:center; gap:40px; padding:20px; flex-wrap:wrap; }
-.card {
+.container { 
+  display:flex; 
+  justify-content:center; 
+  gap:40px; 
+  padding:20px; 
+  flex-wrap:wrap; 
+  position: relative;
+  z-index: 5;
+}
+
+ .card {
   background:white;
   padding:25px;
   border-radius:15px;
   box-shadow:0 10px 25px rgba(0,0,0,0.2);
   animation:fadeIn 1s ease;
+  position: relative;
+  z-index: 5;
 }
+
 
 /* Upload box */
 .upload-box {
@@ -411,6 +423,7 @@ button:hover { transform:scale(1.05); }
 let model;
 let classes = [];
 const CONFIDENCE_THRESHOLD = 0.65;
+  const pond = document.getElementById("pond-layer");
 
 // Algae info (images & description)
 const algaeInfo = {
@@ -552,8 +565,9 @@ createBubbles();
 
   
 function createCreatures() {
+function createCreatures() {
 
-  // ---------- FISH (4 fish, fixed layers, no spin, bubble trail) ----------
+  // ---------- FISH (4 fish, fixed layers, bubble trail) ----------
   const fishConfigs = [
     { color: "purple", top: "12%", dir: "right" }, // green band
     { color: "blue",   top: "22%", dir: "right" }, // green band
@@ -567,6 +581,11 @@ function createCreatures() {
     fish.style.background = cfg.color;
     fish.style.top = cfg.top;
 
+    // (optional fin support if you added fin CSS)
+    fish.style.color = cfg.color; // enables currentColor fin if used
+    const fin = document.createElement("div");
+    fin.className = "fin";
+    fish.appendChild(fin);
 
     // different speeds + different starting positions (prevents clumping)
     const duration = 11000 + i * 1200;
@@ -586,82 +605,81 @@ function createCreatures() {
       );
     }
 
-    document.body.appendChild(fish);
+    pond.appendChild(fish);
 
-    // bubble trail behind fish
+    // bubble trail behind fish (in pond layer)
     setInterval(() => {
       const r = fish.getBoundingClientRect();
       const b = document.createElement("div");
-b.className = "bubble-trail";
+      b.className = "bubble-trail";
 
-const s = 4 + Math.random() * 3;
-b.style.width = s + "px";
-b.style.height = s + "px";
+      const s = 4 + Math.random() * 3;
+      b.style.width = s + "px";
+      b.style.height = s + "px";
 
-/* White bubble with colored glow (recommended) */
-b.style.background = "rgba(255,255,255,0.85)";
-b.style.boxShadow = "0 0 8px " + cfg.color;
-b.style.opacity = "0.75";
+      // white bubble with colored glow
+      b.style.background = "rgba(255,255,255,0.85)";
+      b.style.boxShadow = "0 0 8px " + cfg.color;
+      b.style.opacity = "0.75";
 
-      const x = cfg.dir === "right"
-  ? (r.left - 10)   // tail is left for right fish
-  : (r.right + 10); // tail is right for left fish
+      const x = (cfg.dir === "right")
+        ? (r.left - 10)     // tail is left for right fish
+        : (r.right + 10);   // tail is right for left fish
 
       b.style.left = x + "px";
-      b.style.top = (r.top + r.height * 0.65) + "px";
+      b.style.top  = (r.top + r.height * 0.65) + "px";
 
-      document.body.appendChild(b);
+      pond.appendChild(b);
       setTimeout(() => b.remove(), 650);
     }, 180);
   });
 
- // ---------- LOTUS PADS + FLOWERS (flower inside pad so it sways together) ----------
-function makeLotus(leftPos){
-  const lotus = document.createElement("div");
-  lotus.className = "lotus";
-  lotus.style.left = leftPos;
+  // ---------- LOTUS PADS + FLOWERS ----------
+  function makeLotus(leftPos){
+    const lotus = document.createElement("div");
+    lotus.className = "lotus";
+    lotus.style.left = leftPos;
 
-  const flower = document.createElement("div");
-  flower.className = "lotus-flower";
+    const flower = document.createElement("div");
+    flower.className = "lotus-flower";
 
-  for(let i=0;i<6;i++){
-    const petal = document.createElement("span");
-    flower.appendChild(petal);
+    for(let i=0;i<6;i++){
+      const petal = document.createElement("span");
+      flower.appendChild(petal);
+    }
+
+    lotus.appendChild(flower); // flower moves with pad
+    pond.appendChild(lotus);
+
+    return lotus;
   }
 
-  lotus.appendChild(flower);     // ✅ flower moves with pad
-  document.body.appendChild(lotus);
-
-  return lotus;
-}
-
-makeLotus("20%");
-makeLotus("70%");
-
+  makeLotus("20%");
+  makeLotus("70%");
 
   // ---------- FROGS ----------
   const frog1 = document.createElement("div");
   frog1.className = "frog";
   frog1.style.left = "25%";
   frog1.style.bottom = "18%";
-  document.body.appendChild(frog1);
-  const ripple1 = document.createElement("div");
-ripple1.className = "ripple";
-ripple1.style.left = "25%";   // same as frog1 left
-document.body.appendChild(ripple1);
+  pond.appendChild(frog1);
 
+  const ripple1 = document.createElement("div");
+  ripple1.className = "ripple";
+  ripple1.style.left = "25%";
+  pond.appendChild(ripple1);
 
   const frog2 = document.createElement("div");
   frog2.className = "frog";
   frog2.style.left = "75%";
   frog2.style.bottom = "18%";
-  document.body.appendChild(frog2);
-  const ripple2 = document.createElement("div");
-ripple2.className = "ripple";
-ripple2.style.left = "75%";   // same as frog2 left
-ripple2.style.animationDelay = "0.6s"; // nice offset
-document.body.appendChild(ripple2);
+  pond.appendChild(frog2);
 
+  const ripple2 = document.createElement("div");
+  ripple2.className = "ripple";
+  ripple2.style.left = "75%";
+  ripple2.style.animationDelay = "0.6s";
+  pond.appendChild(ripple2);
 
   // ---------- SEAWEED (9) ----------
   for (let i = 0; i < 9; i++) {
@@ -669,10 +687,10 @@ document.body.appendChild(ripple2);
     seaweed.className = "seaweed";
     seaweed.style.left = 5 + i * 10 + Math.random() * 5 + "%";
     seaweed.style.height = 80 + Math.random() * 30 + "px";
-    document.body.appendChild(seaweed);
+    pond.appendChild(seaweed);
   }
 }
-createCreatures();
+
 function isInBlueZone(clientY){
   const h = window.innerHeight;
   return clientY >= h * 0.66; // blue starts at 66%
@@ -791,6 +809,7 @@ document.querySelector(".explore").addEventListener("click",()=>{ alert("🌎 Gl
 
 </body>
 </html>
+
 
 
 

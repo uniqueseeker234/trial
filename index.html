@@ -553,11 +553,16 @@ function createCreatures() {
     setInterval(() => {
       const r = fish.getBoundingClientRect();
       const b = document.createElement("div");
-      b.className = "bubble-trail";
+b.className = "bubble-trail";
 
-      const s = 3 + Math.random() * 2;   // smaller bubbles
-      b.style.width = s + "px";
-      b.style.height = s + "px";
+const s = 4 + Math.random() * 3;
+b.style.width = s + "px";
+b.style.height = s + "px";
+
+/* White bubble with colored glow (recommended) */
+b.style.background = "rgba(255,255,255,0.85)";
+b.style.boxShadow = "0 0 8px " + cfg.color;
+b.style.opacity = "0.75";
 
       const x = cfg.dir === "right"
   ? (r.left - 10)   // tail is left for right fish
@@ -747,6 +752,7 @@ document.querySelector(".explore").addEventListener("click",()=>{ alert("🌎 Gl
 
 </body>
 </html>
+
 
 
 

@@ -203,21 +203,32 @@ button:hover { transform:scale(1.05); }
   50% { transform: translateY(-25px); }
 }
 
-/* Seaweed: green stick swaying */
+  /* Seaweed with faster sway (small range) */
 .seaweed {
   position: absolute;
-  width: 8px;
-  height: 80px;
+  width: 12px;
+  height: 100px;
   background: #2e7d32;
   bottom: 0;
-  border-radius: 5px;
-  animation: swayweed 3s ease-in-out infinite alternate;
+  border-radius: 20px 20px 10px 10px;
+  animation: swayweed 1.5s ease-in-out infinite alternate; /* faster */
 }
 
 @keyframes swayweed {
   0% { transform: rotate(-5deg); }
   100% { transform: rotate(5deg); }
 }
+
+/* Bubble trail */
+.bubble-trail {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: rgba(255,255,255,0.8);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
   /* Lotus pad */
 .lotus {
   position: absolute;
@@ -384,17 +395,17 @@ createBubbles();
   function createCreatures() {
   const fishColors = ["orange", "green", "blue", "purple"];
   const fishCount = 4;
+  const fishLayers = [30, 40, 60, 70]; // vertical positions
 
-  // Fish with bubble trails
   for (let i = 0; i < fishCount; i++) {
     const fish = document.createElement("div");
     fish.className = "fish";
-    fish.style.background = fishColors[i % fishColors.length];
-    fish.style.top = (20 + Math.random() * 40) + "%";
+    fish.style.background = fishColors[i];
+    fish.style.top = fishLayers[i] + "%";
 
-    // Random direction
-    const direction = Math.random() > 0.5 ? "right" : "left";
-    const duration = 8 + Math.random() * 4; // 8–12s
+    // Alternate directions
+    let duration = 12 + Math.random() * 3; // 12–15s
+    let direction = i < 2 ? "right" : "left";
 
     if (direction === "right") {
       fish.style.left = "-50px";
@@ -410,7 +421,7 @@ createBubbles();
       );
     }
 
-    // Bubble trail behind fish
+    // Bubble trail
     setInterval(() => {
       const bubble = document.createElement("div");
       bubble.className = "bubble-trail";
@@ -418,7 +429,7 @@ createBubbles();
       bubble.style.left = fishRect.left + fishRect.width / 2 + "px";
       bubble.style.top = fishRect.top + fishRect.height / 2 + "px";
       document.body.appendChild(bubble);
-      setTimeout(() => bubble.remove(), 1000); // disappears after 1s
+      setTimeout(() => bubble.remove(), 800); // disappear after 0.8s
     }, 300);
 
     document.body.appendChild(fish);
@@ -435,7 +446,7 @@ createBubbles();
   lotus2.style.left = "70%";
   document.body.appendChild(lotus2);
 
-  // Frogs sitting on lotus pads
+  // Frogs on lotus
   const frog1 = document.createElement("div");
   frog1.className = "frog";
   frog1.style.left = "25%";
@@ -448,18 +459,19 @@ createBubbles();
   frog2.style.bottom = "18%";
   document.body.appendChild(frog2);
 
-  // Seaweeds (8–9 total)
+  // Seaweed 8–9
   for (let i = 0; i < 9; i++) {
     const seaweed = document.createElement("div");
     seaweed.className = "seaweed";
-    seaweed.style.left = 5 + i * 10 + Math.random() * 5 + "%"; // spread naturally
-    seaweed.style.height = 80 + Math.random() * 30 + "px";     // random height
+    seaweed.style.left = 5 + i * 10 + Math.random() * 5 + "%";
+    seaweed.style.height = 80 + Math.random() * 30 + "px";
     document.body.appendChild(seaweed);
   }
 }
 
-// Call the function
+// Call it
 createCreatures();
+
 
 
 
@@ -554,6 +566,7 @@ document.querySelector(".explore").addEventListener("click",()=>{ alert("🌎 Gl
 
 </body>
 </html>
+
 
 
 

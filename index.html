@@ -395,56 +395,56 @@ function renderStars(){
 createBubbles();
   
 function createCreatures() {
-  const fishColors = ["orange", "green", "blue", "purple"];
-  const fishCount = 4;
+  // Define 3 layers with colors and directions
+  const fishLayers = [
+    { top: "20%", color: "orange", direction: "right", layer: "green" }, // top
+    { top: "50%", color: "blue", direction: "left", layer: "sand" },     // middle
+    { top: "75%", color: "purple", direction: "right", layer: "blue" }   // bottom
+  ];
 
-  // vertical layers (% from top), spaced out
-  const fishLayers = [25, 35, 55, 65]; 
-
-  for (let i = 0; i < fishCount; i++) {
+  fishLayers.forEach(fishData => {
     const fish = document.createElement("div");
     fish.className = "fish";
-    fish.style.background = fishColors[i];
-    fish.style.top = fishLayers[i] + "%";
+    fish.style.background = fishData.color;
+    fish.style.top = fishData.top;
     fish.style.position = "absolute";
 
-    let duration = 12 + Math.random() * 3; // 12–15s
-    let direction = i < 2 ? "right" : "left"; // alternate direction
+    // Set head orientation via CSS transform (flip if swimming left)
+    fish.style.transform = fishData.direction === "left" ? "scaleX(-1)" : "scaleX(1)";
 
-    if (direction === "right") {
+    let duration = 12 + Math.random() * 3; // 12–15s
+
+    if (fishData.direction === "right") {
       fish.style.left = "-60px";
-      // straight animation to right
-      fish.animate([{ left: "-60px" }, { left: "100vw" }], {
-        duration: duration * 1000,
-        iterations: Infinity
-      });
+      fish.animate(
+        [{ left: "-60px" }, { left: "100vw" }],
+        { duration: duration * 1000, iterations: Infinity }
+      );
     } else {
       fish.style.left = "100vw";
-      // straight animation to left
-      fish.animate([{ left: "100vw" }, { left: "-60px" }], {
-        duration: duration * 1000,
-        iterations: Infinity
-      });
+      fish.animate(
+        [{ left: "100vw" }, { left: "-60px" }],
+        { duration: duration * 1000, iterations: Infinity }
+      );
     }
 
-    // Bubble trail following fish
+    // Bubble trail behind fish
     setInterval(() => {
       const bubble = document.createElement("div");
       bubble.className = "bubble-trail";
       const rect = fish.getBoundingClientRect();
-      // put bubble behind fish
       bubble.style.top = rect.top + rect.height / 2 + "px";
-      if (direction === "right") {
-        bubble.style.left = rect.left - 4 + "px"; // slightly behind
+      if (fishData.direction === "right") {
+        bubble.style.left = rect.left - 6 + "px"; // behind
       } else {
-        bubble.style.left = rect.right + 4 + "px"; // behind
+        bubble.style.left = rect.right + 6 + "px"; // behind
       }
       document.body.appendChild(bubble);
-      setTimeout(() => bubble.remove(), 600); // disappear quickly
+      setTimeout(() => bubble.remove(), 600); // short-lived
     }, 300);
 
     document.body.appendChild(fish);
-  }
+  });
 
   // Lotus pads
   const lotus1 = document.createElement("div");
@@ -482,6 +482,7 @@ function createCreatures() {
 
 // Call it
 createCreatures();
+
 
 
 
@@ -577,6 +578,7 @@ document.querySelector(".explore").addEventListener("click",()=>{ alert("🌎 Gl
 
 </body>
 </html>
+
 
 
 

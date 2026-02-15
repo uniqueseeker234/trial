@@ -138,39 +138,45 @@ button:hover { transform:scale(1.05); }
 /* Responsive */
 @media (max-width:900px){ .container{flex-direction:column; align-items:center;} }
 
-  /* Pond creatures */
+ /* Cartoon Pond Creatures */
 
-/* Fish swimming left-right */
+/* Fish: orange with tail and eye */
 .fish {
   position: absolute;
   width: 40px;
   height: 20px;
   background: orange;
-  border-radius: 50%;
+  border-radius: 50% 50% 50% 50%;
   animation: swim 8s linear infinite alternate;
 }
+.fish::after {
+  content: "";
+  position: absolute;
+  right: -10px;
+  top: 5px;
+  width: 10px;
+  height: 10px;
+  background: orange;
+  clip-path: polygon(100% 50%, 0 0, 0 100%); /* tail */
+}
+.fish::before {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 5px;
+  width: 5px;
+  height: 5px;
+  background: white;
+  border-radius: 50%; /* eye */
+}
 
+/* Fish swim animation */
 @keyframes swim {
-  0% { left: -50px; top: 30%; transform: scaleX(1) rotate(0deg); }
+  0% { left: -50px; top: 25%; transform: scaleX(1) rotate(0deg); }
   100% { left: 100vw; top: 35%; transform: scaleX(-1) rotate(0deg); }
 }
 
-/* Turtle crawling slowly */
-.turtle {
-  position: absolute;
-  width: 50px;
-  height: 30px;
-  background: green;
-  border-radius: 50% / 30%;
-  animation: crawl 15s linear infinite;
-}
-
-@keyframes crawl {
-  0% { left: -60px; top: 70%; }
-  100% { left: 100vw; top: 70%; }
-}
-
-/* Frog jumping */
+/* Frog: green oval with eyes */
 .frog {
   position: absolute;
   width: 30px;
@@ -178,18 +184,29 @@ button:hover { transform:scale(1.05); }
   background: limegreen;
   border-radius: 50%;
   animation: jump 2s ease-in-out infinite;
-  bottom: 15%;
 }
+.frog::before, .frog::after {
+  content: "";
+  position: absolute;
+  top: -5px;
+  width: 6px;
+  height: 6px;
+  background: white;
+  border-radius: 50%;
+}
+.frog::before { left: 4px; }   /* left eye */
+.frog::after { right: 4px; }  /* right eye */
 
+/* Frog jump animation */
 @keyframes jump {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-30px); }
+  50% { transform: translateY(-25px); }
 }
 
-/* Seaweed swaying */
+/* Seaweed: green stick swaying */
 .seaweed {
   position: absolute;
-  width: 10px;
+  width: 8px;
   height: 80px;
   background: #2e7d32;
   bottom: 0;
@@ -346,47 +363,39 @@ function renderStars(){
 createBubbles();
   // Create pond creatures dynamically
 function createCreatures() {
-  // Number of each creature
   const fishCount = 4;
-  const turtleCount = 2;
-  const frogCount = 2;
+  const frogCount = 3;
   const seaweedCount = 6;
 
-  // Fish
+  // Fish (cartoon orange)
   for (let i = 0; i < fishCount; i++) {
     const fish = document.createElement("div");
     fish.className = "fish";
-    fish.style.top = (20 + Math.random() * 40) + "%"; // random vertical position
+    fish.style.top = (20 + Math.random() * 40) + "%";
     document.body.appendChild(fish);
   }
 
-  // Turtles
-  for (let i = 0; i < turtleCount; i++) {
-    const turtle = document.createElement("div");
-    turtle.className = "turtle";
-    turtle.style.top = (65 + Math.random() * 10) + "%"; // near bottom
-    document.body.appendChild(turtle);
-  }
-
-  // Frogs
+  // Frogs (cartoon green)
   for (let i = 0; i < frogCount; i++) {
     const frog = document.createElement("div");
     frog.className = "frog";
-    frog.style.left = (10 + Math.random() * 70) + "%"; // random horizontal
+    frog.style.left = (10 + Math.random() * 70) + "%";
+    frog.style.bottom = "15%";
     document.body.appendChild(frog);
   }
 
-  // Seaweed
+  // Seaweed (green sticks at bottom)
   for (let i = 0; i < seaweedCount; i++) {
     const seaweed = document.createElement("div");
     seaweed.className = "seaweed";
-    seaweed.style.left = (5 + Math.random() * 90) + "%"; // spread along bottom
+    seaweed.style.left = (5 + Math.random() * 90) + "%";
     document.body.appendChild(seaweed);
   }
 }
 
-// Call the function to generate creatures
+// Call it
 createCreatures();
+
 
 function rateStar(i){
     rating=i;
@@ -479,6 +488,7 @@ document.querySelector(".explore").addEventListener("click",()=>{ alert("🌎 Gl
 
 </body>
 </html>
+
 
 
 

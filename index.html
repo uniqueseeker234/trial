@@ -331,6 +331,27 @@ button:hover { transform:scale(1.05); }
   top:14px;
   left:14px;
 }
+  
+/* Touch ripple on water */
+.touch-ripple{
+  position: fixed;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,255,255,0.55);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 2;
+  transform: translate(-50%, -50%) scale(0.6);
+  opacity: 0.8;
+  animation: touchRipple 0.8s ease-out forwards;
+}
+
+@keyframes touchRipple{
+  to{
+    transform: translate(-50%, -50%) scale(2.4);
+    opacity: 0;
+  }
+}
 
 </style>
 </head>
@@ -592,9 +613,32 @@ document.body.appendChild(ripple2);
   }
 }
 createCreatures();
+function isInBlueZone(clientY){
+  const h = window.innerHeight;
+  return clientY >= h * 0.66; // blue starts at 66%
+}
 
+function makeRipple(x, y){
+  const r = document.createElement("div");
+  r.className = "touch-ripple";
+  r.style.left = x + "px";
+  r.style.top = y + "px";
+  document.body.appendChild(r);
+  setTimeout(()=> r.remove(), 900);
+}
 
+// Touch + click support
+document.addEventListener("pointerdown", (e) => {
+  if(!isInBlueZone(e.clientY)) return;      // only in blue
+  // avoid creating ripples when tapping UI cards/buttons
+  if (e.target.closest(".card, button, input, .upload-box, .carousel")) return;
 
+  makeRipple(e.clientX, e.clientY);
+
+  // optional: 2 extra small ripples for a nicer splash
+  setTimeout(()=> makeRipple(e.clientX + 12, e.clientY + 4), 90);
+  setTimeout(()=> makeRipple(e.clientX - 10, e.clientY + 6), 160);
+});
 
 function rateStar(i){
     rating=i;
@@ -687,6 +731,7 @@ document.querySelector(".explore").addEventListener("click",()=>{ alert("🌎 Gl
 
 </body>
 </html>
+
 
 
 

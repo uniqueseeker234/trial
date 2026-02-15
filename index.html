@@ -25,8 +25,9 @@ body {
 }
 
 /* Heading */
-/* Heading with sway, fully centered */
+/* Mobile-first heading (works perfectly on phone) */
 h1 {
+  text-align: center;
   padding: 30px 10px;
   font-family: 'Fredoka One', cursive;
   color: #ffffff;
@@ -34,17 +35,33 @@ h1 {
   letter-spacing: 2px;
 
   display: inline-block; /* needed for rotation */
-  position: relative;
-  left: 50%;
-  transform: translateX(-50%) rotate(0deg); /* center and initial rotation */
   animation: sway 3s ease-in-out infinite;
+
+  margin: 0 auto; /* centers heading on mobile */
 }
 
-/* Keyframes for swaying heading */
+/* Desktop fix */
+@media (min-width: 901px) {
+  h1 {
+    /* Keep sway but ensure perfect centering on desktop */
+    display: inline-block;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%) rotate(0deg);
+  }
+
+  @keyframes sway {
+    0% { transform: translateX(-50%) rotate(-2deg); }
+    50% { transform: translateX(-50%) rotate(2deg); }
+    100% { transform: translateX(-50%) rotate(-2deg); }
+  }
+}
+
+/* Mobile sway keyframes remain the same */
 @keyframes sway {
-  0%   { transform: translateX(-50%) rotate(-2deg); }
-  50%  { transform: translateX(-50%) rotate(2deg); }
-  100% { transform: translateX(-50%) rotate(-2deg); }
+  0% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
+  100% { transform: rotate(-2deg); }
 }
 
 /* Layout */
@@ -372,6 +389,7 @@ document.querySelector(".explore").addEventListener("click",()=>{ alert("🌎 Gl
 
 </body>
 </html>
+
 
 
 

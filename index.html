@@ -26,12 +26,23 @@ body {
 
 /* Heading */
 h1 {
-  text-align:center;
-  padding:30px 10px;
-  font-family:'Fredoka One', cursive;
-  color:#ffffff;
-  font-size:48px;
-  letter-spacing:2px;
+  text-align: center;
+  padding: 30px 10px;
+  font-family: 'Fredoka One', cursive;
+  color: #ffffff;
+  font-size: 48px;
+  letter-spacing: 2px;
+
+  /* For swaying effect */
+  display: inline-block; /* needed for rotation */
+  animation: sway 3s ease-in-out infinite;
+}
+
+/* Keyframes for swaying heading */
+@keyframes sway {
+  0% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
+  100% { transform: rotate(-2deg); }
 }
 
 /* Layout */
@@ -359,6 +370,7 @@ document.querySelector(".explore").addEventListener("click",()=>{ alert("🌎 Gl
 
 </body>
 </html>
+
 
 
 

@@ -565,13 +565,13 @@ createBubbles();
 function createCreatures() {
 
   // ---------- FISH (4 fish, fixed layers, bubble trail over cards) ----------
-  const fishConfigs = [
-    { color: "purple", top: "12%", dir: "right" },
-    { color: "blue",   top: "22%", dir: "right" },
-    { color: "orange", top: "45%", dir: "left"  },
-    { color: "green",  top: "55%", dir: "left"  },
-    { color: "red", top: "75%", dir: "right" },
-  ];
+ const fishConfigs = [
+  { color: "purple", top: "10%", dir: "right" },
+  { color: "blue",   top: "18%", dir: "right" },
+  { color: "orange", top: "40%", dir: "left"  },
+  { color: "green",  top: "48%", dir: "left"  },
+  { color: "red",    top: "68%", dir: "right" } // lifted above frog zone
+];
 
   fishConfigs.forEach((cfg, i) => {
     const fish = document.createElement("div");
@@ -807,6 +807,7 @@ document.querySelector(".explore").addEventListener("click",()=>{ alert("🌎 Gl
 
 </body>
 </html>
+
 
 
 

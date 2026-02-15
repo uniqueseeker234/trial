@@ -33,34 +33,27 @@ body {
 
 /* Heading */
 /* Heading with sway, works for desktop and mobile */
-h1 {
+h1{
   padding: 30px 10px;
   font-family: 'Fredoka One', cursive;
   color: #ffffff;
   font-size: 48px;
   letter-spacing: 2px;
+  margin: 0;
 
-  display: inline-block;
+  width: 100%;
   text-align: center;
+
   position: relative;
-  left: 50%;
-  transform: translateX(-50%) rotate(0deg);
-  animation: sway 3s ease-in-out infinite;
-  margin: 0; /* no extra margin needed */
+  left: 0;
+  transform: rotate(0deg);
+  animation: swayTitle 3s ease-in-out infinite;
 }
 
-/* Keyframes for sway */
-@keyframes sway {
-  0%   { transform: translateX(-50%) rotate(-2deg); }
-  50%  { transform: translateX(-50%) rotate(2deg); }
-  100% { transform: translateX(-50%) rotate(-2deg); }
-}
-
-/* Mobile adjustment */
-@media (max-width: 900px) {
-  h1 {
-    font-size: 36px; /* optional smaller size */
-  }
+@keyframes swayTitle{
+  0%   { transform: rotate(-2deg); }
+  50%  { transform: rotate(2deg); }
+  100% { transform: rotate(-2deg); }
 }
 
 
@@ -813,6 +806,7 @@ document.querySelector(".explore").addEventListener("click",()=>{ alert("🌎 Gl
 
 </body>
 </html>
+
 
 
 

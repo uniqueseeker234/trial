@@ -222,12 +222,14 @@ button:hover { transform:scale(1.05); }
 /* Bubble trail */
 .bubble-trail {
   position: absolute;
-  width: 10px;
-  height: 10px;
+  width: 6px;  /* small */
+  height: 6px; /* small */
   background: rgba(255,255,255,0.8);
   border-radius: 50%;
   pointer-events: none;
+  z-index: 0; /* behind fish */
 }
+
 
   /* Lotus pad */
 .lotus {
@@ -392,44 +394,53 @@ function renderStars(){
 
 createBubbles();
   
-  function createCreatures() {
+function createCreatures() {
   const fishColors = ["orange", "green", "blue", "purple"];
   const fishCount = 4;
-  const fishLayers = [30, 40, 60, 70]; // vertical positions
+
+  // vertical layers (% from top), spaced out
+  const fishLayers = [25, 35, 55, 65]; 
 
   for (let i = 0; i < fishCount; i++) {
     const fish = document.createElement("div");
     fish.className = "fish";
     fish.style.background = fishColors[i];
     fish.style.top = fishLayers[i] + "%";
+    fish.style.position = "absolute";
 
-    // Alternate directions
     let duration = 12 + Math.random() * 3; // 12–15s
-    let direction = i < 2 ? "right" : "left";
+    let direction = i < 2 ? "right" : "left"; // alternate direction
 
     if (direction === "right") {
-      fish.style.left = "-50px";
-      fish.animate(
-        [{ left: "-50px" }, { left: "100vw" }],
-        { duration: duration * 1000, iterations: Infinity }
-      );
+      fish.style.left = "-60px";
+      // straight animation to right
+      fish.animate([{ left: "-60px" }, { left: "100vw" }], {
+        duration: duration * 1000,
+        iterations: Infinity
+      });
     } else {
       fish.style.left = "100vw";
-      fish.animate(
-        [{ left: "100vw" }, { left: "-50px" }],
-        { duration: duration * 1000, iterations: Infinity }
-      );
+      // straight animation to left
+      fish.animate([{ left: "100vw" }, { left: "-60px" }], {
+        duration: duration * 1000,
+        iterations: Infinity
+      });
     }
 
-    // Bubble trail
+    // Bubble trail following fish
     setInterval(() => {
       const bubble = document.createElement("div");
       bubble.className = "bubble-trail";
-      const fishRect = fish.getBoundingClientRect();
-      bubble.style.left = fishRect.left + fishRect.width / 2 + "px";
-      bubble.style.top = fishRect.top + fishRect.height / 2 + "px";
+      const rect = fish.getBoundingClientRect();
+      // put bubble behind fish
+      bubble.style.top = rect.top + rect.height / 2 + "px";
+      if (direction === "right") {
+        bubble.style.left = rect.left - 4 + "px"; // slightly behind
+      } else {
+        bubble.style.left = rect.right + 4 + "px"; // behind
+      }
       document.body.appendChild(bubble);
-      setTimeout(() => bubble.remove(), 800); // disappear after 0.8s
+      setTimeout(() => bubble.remove(), 600); // disappear quickly
     }, 300);
 
     document.body.appendChild(fish);
@@ -566,6 +577,7 @@ document.querySelector(".explore").addEventListener("click",()=>{ alert("🌎 Gl
 
 </body>
 </html>
+
 
 
 

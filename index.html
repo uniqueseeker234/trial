@@ -25,44 +25,37 @@ body {
 }
 
 /* Heading */
-/* Mobile-first heading (works perfectly on phone) */
+/* Heading with sway, works for desktop and mobile */
 h1 {
-  text-align: center;
   padding: 30px 10px;
   font-family: 'Fredoka One', cursive;
   color: #ffffff;
   font-size: 48px;
   letter-spacing: 2px;
 
-  display: inline-block; /* needed for rotation */
+  display: inline-block;
+  text-align: center;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%) rotate(0deg);
   animation: sway 3s ease-in-out infinite;
-
-  margin: 0 auto; /* centers heading on mobile */
+  margin: 0; /* no extra margin needed */
 }
 
-/* Desktop fix */
-@media (min-width: 901px) {
-  h1 {
-    /* Keep sway but ensure perfect centering on desktop */
-    display: inline-block;
-    position: relative;
-    left: 50%;
-    transform: translateX(-50%) rotate(0deg);
-  }
-
-  @keyframes sway {
-    0% { transform: translateX(-50%) rotate(-2deg); }
-    50% { transform: translateX(-50%) rotate(2deg); }
-    100% { transform: translateX(-50%) rotate(-2deg); }
-  }
-}
-
-/* Mobile sway keyframes remain the same */
+/* Keyframes for sway */
 @keyframes sway {
-  0% { transform: rotate(-2deg); }
-  50% { transform: rotate(2deg); }
-  100% { transform: rotate(-2deg); }
+  0%   { transform: translateX(-50%) rotate(-2deg); }
+  50%  { transform: translateX(-50%) rotate(2deg); }
+  100% { transform: translateX(-50%) rotate(-2deg); }
 }
+
+/* Mobile adjustment */
+@media (max-width: 900px) {
+  h1 {
+    font-size: 36px; /* optional smaller size */
+  }
+}
+
 
 /* Layout */
 .container { display:flex; justify-content:center; gap:40px; padding:20px; flex-wrap:wrap; }
@@ -389,6 +382,7 @@ document.querySelector(".explore").addEventListener("click",()=>{ alert("🌎 Gl
 
 </body>
 </html>
+
 
 
 

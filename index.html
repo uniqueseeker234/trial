@@ -25,23 +25,26 @@ body {
 }
 
 /* Heading */
+/* Heading with sway, fully centered */
 h1 {
-  text-align: center;
   padding: 30px 10px;
   font-family: 'Fredoka One', cursive;
   color: #ffffff;
   font-size: 48px;
   letter-spacing: 2px;
+
   display: inline-block; /* needed for rotation */
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%) rotate(0deg); /* center and initial rotation */
   animation: sway 3s ease-in-out infinite;
-  margin: 0 auto; /* centers heading on desktop */
 }
 
 /* Keyframes for swaying heading */
 @keyframes sway {
-  0% { transform: rotate(-2deg); }
-  50% { transform: rotate(2deg); }
-  100% { transform: rotate(-2deg); }
+  0%   { transform: translateX(-50%) rotate(-2deg); }
+  50%  { transform: translateX(-50%) rotate(2deg); }
+  100% { transform: translateX(-50%) rotate(-2deg); }
 }
 
 /* Layout */
@@ -369,6 +372,7 @@ document.querySelector(".explore").addEventListener("click",()=>{ alert("🌎 Gl
 
 </body>
 </html>
+
 
 
 

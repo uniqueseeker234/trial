@@ -395,11 +395,12 @@ function renderStars(){
 createBubbles();
   
 function createCreatures() {
-  // Define 3 layers with colors and directions
+  // Define fish layers
   const fishLayers = [
-    { top: "20%", color: "orange", direction: "right", layer: "green" }, // top
-    { top: "50%", color: "blue", direction: "left", layer: "sand" },     // middle
-    { top: "75%", color: "purple", direction: "right", layer: "blue" }   // bottom
+    { top: "20%", color: "orange", direction: "right" },  // top layer
+    { top: "35%", color: "green", direction: "left" },    // second layer
+    { top: "55%", color: "blue", direction: "right" },    // third layer
+    { top: "70%", color: "purple", direction: "left" }    // bottom layer
   ];
 
   fishLayers.forEach(fishData => {
@@ -408,20 +409,26 @@ function createCreatures() {
     fish.style.background = fishData.color;
     fish.style.top = fishData.top;
     fish.style.position = "absolute";
+    fish.style.width = "50px";  // adjust fish size
+    fish.style.height = "20px";
+    fish.style.borderRadius = "50%"; // oval fish shape
 
-    // Set head orientation via CSS transform (flip if swimming left)
+    // Keep fish head always facing direction
     fish.style.transform = fishData.direction === "left" ? "scaleX(-1)" : "scaleX(1)";
 
-    let duration = 12 + Math.random() * 3; // 12–15s
+    let duration = 12 + Math.random() * 3; // 12–15s speed
 
+    // Set initial position
     if (fishData.direction === "right") {
       fish.style.left = "-60px";
+      // Animate straight to right
       fish.animate(
         [{ left: "-60px" }, { left: "100vw" }],
         { duration: duration * 1000, iterations: Infinity }
       );
     } else {
       fish.style.left = "100vw";
+      // Animate straight to left
       fish.animate(
         [{ left: "100vw" }, { left: "-60px" }],
         { duration: duration * 1000, iterations: Infinity }
@@ -440,13 +447,13 @@ function createCreatures() {
         bubble.style.left = rect.right + 6 + "px"; // behind
       }
       document.body.appendChild(bubble);
-      setTimeout(() => bubble.remove(), 600); // short-lived
+      setTimeout(() => bubble.remove(), 600); // disappears fast
     }, 300);
 
     document.body.appendChild(fish);
   });
 
-  // Lotus pads
+  // Lotus pads (already fine)
   const lotus1 = document.createElement("div");
   lotus1.className = "lotus";
   lotus1.style.left = "20%";
@@ -457,7 +464,7 @@ function createCreatures() {
   lotus2.style.left = "70%";
   document.body.appendChild(lotus2);
 
-  // Frogs on lotus
+  // Frogs on lotus (already fine)
   const frog1 = document.createElement("div");
   frog1.className = "frog";
   frog1.style.left = "25%";
@@ -470,7 +477,7 @@ function createCreatures() {
   frog2.style.bottom = "18%";
   document.body.appendChild(frog2);
 
-  // Seaweed 8–9
+  // Seaweed 8–9 (already fine)
   for (let i = 0; i < 9; i++) {
     const seaweed = document.createElement("div");
     seaweed.className = "seaweed";
@@ -480,7 +487,7 @@ function createCreatures() {
   }
 }
 
-// Call it
+// Call the function to generate creatures
 createCreatures();
 
 
@@ -578,6 +585,7 @@ document.querySelector(".explore").addEventListener("click",()=>{ alert("🌎 Gl
 
 </body>
 </html>
+
 
 
 

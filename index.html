@@ -561,12 +561,7 @@ function createBubbles(){
 }
 
 createBubbles();
-
-
-  
 function createCreatures() {
-function createCreatures() {
-
   // ---------- FISH (4 fish, fixed layers, bubble trail) ----------
   const fishConfigs = [
     { color: "purple", top: "12%", dir: "right" }, // green band
@@ -581,13 +576,12 @@ function createCreatures() {
     fish.style.background = cfg.color;
     fish.style.top = cfg.top;
 
-    // (optional fin support if you added fin CSS)
-    fish.style.color = cfg.color; // enables currentColor fin if used
+    // (optional fin support)
+    fish.style.color = cfg.color; // enables currentColor if you use fin
     const fin = document.createElement("div");
     fin.className = "fin";
     fish.appendChild(fin);
 
-    // different speeds + different starting positions (prevents clumping)
     const duration = 11000 + i * 1200;
     const randomDelay = -Math.random() * duration;
 
@@ -617,7 +611,6 @@ function createCreatures() {
       b.style.width = s + "px";
       b.style.height = s + "px";
 
-      // white bubble with colored glow
       b.style.background = "rgba(255,255,255,0.85)";
       b.style.boxShadow = "0 0 8px " + cfg.color;
       b.style.opacity = "0.75";
@@ -690,6 +683,9 @@ function createCreatures() {
     pond.appendChild(seaweed);
   }
 }
+
+// ✅ IMPORTANT: call it
+createCreatures();
 
 function isInBlueZone(clientY){
   const h = window.innerHeight;
@@ -809,6 +805,7 @@ document.querySelector(".explore").addEventListener("click",()=>{ alert("🌎 Gl
 
 </body>
 </html>
+
 
 
 

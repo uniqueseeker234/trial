@@ -202,6 +202,7 @@ button:hover { transform:scale(1.05); }
   background: limegreen;
   border-radius: 50%;
   animation: jump 2s ease-in-out infinite;
+   z-index: 6;  /* frog always on top */
 }
 .frog::before, .frog::after {
   content: "";
@@ -293,22 +294,23 @@ button:hover { transform:scale(1.05); }
   animation: none !important;      /* kills swim keyframes that rotate/flip */
   will-change: left;
 }
-/* Lotus flower (fits 60x30 pad + gentle motion) */
 .lotus-flower{
   position:absolute;
-  width:30px;          /* smaller */
+  left:50%;
+  top:50%;
+  transform: translate(-50%, -70%); /* sits on pad */
+  width:30px;
   height:30px;
-  bottom:16.2%;        /* sits on pad */
   z-index:3;
   pointer-events:none;
-  transform: translateX(-50%);
   animation: flowerSway 3.2s ease-in-out infinite;
 }
 
+
 @keyframes flowerSway{
-  0%   { transform: translateX(-50%) rotate(-2deg) translateY(0); }
-  50%  { transform: translateX(-50%) rotate(2deg) translateY(-1px); }
-  100% { transform: translateX(-50%) rotate(-2deg) translateY(0); }
+  0%   { transform: translate(-50%, -70%) rotate(-2deg); }
+  50%  { transform: translate(-50%, -72%) rotate(2deg); }
+  100% { transform: translate(-50%, -70%) rotate(-2deg); }
 }
 
 .lotus-flower span{
@@ -567,33 +569,29 @@ function createCreatures() {
     }, 180);
   });
 
-  // ---------- LOTUS PADS ----------
-  const lotus1 = document.createElement("div");
-  lotus1.className = "lotus";
-  lotus1.style.left = "20%";
-  document.body.appendChild(lotus1);
+ // ---------- LOTUS PADS + FLOWERS (flower inside pad so it sways together) ----------
+function makeLotus(leftPos){
+  const lotus = document.createElement("div");
+  lotus.className = "lotus";
+  lotus.style.left = leftPos;
 
-  const lotus2 = document.createElement("div");
-  lotus2.className = "lotus";
-  lotus2.style.left = "70%";
-  document.body.appendChild(lotus2);
-
-  // ---------- LOTUS FLOWERS (6 petals) ----------
-function addFlower(leftPos){
   const flower = document.createElement("div");
   flower.className = "lotus-flower";
-  flower.style.left = leftPos;
 
   for(let i=0;i<6;i++){
     const petal = document.createElement("span");
     flower.appendChild(petal);
   }
 
-  document.body.appendChild(flower);
+  lotus.appendChild(flower);     // ✅ flower moves with pad
+  document.body.appendChild(lotus);
+
+  return lotus;
 }
 
-addFlower("20%");
-addFlower("70%");
+makeLotus("20%");
+makeLotus("70%");
+
 
   // ---------- FROGS ----------
   const frog1 = document.createElement("div");
@@ -747,6 +745,7 @@ document.querySelector(".explore").addEventListener("click",()=>{ alert("🌎 Gl
 
 </body>
 </html>
+
 
 
 

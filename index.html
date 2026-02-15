@@ -269,36 +269,6 @@ button:hover { transform:scale(1.05); }
   to   { transform: translateY(-18px); opacity: 0; }
 }
 
-/* Petals near lotus pad */
-.petals {
-  position: absolute;
-  width: 26px;
-  height: 26px;
-  bottom: 16.5%;
-  pointer-events: none;
-  z-index: 2;
-  animation: petalFloat 3.5s ease-in-out infinite;
-}
-
-.petals::before,
-.petals::after {
-  content: "";
-  position: absolute;
-  width: 16px;
-  height: 10px;
-  background: rgba(255, 182, 193, 0.9); /* pink */
-  border-radius: 10px 10px 10px 10px;
-  transform-origin: center;
-}
-
-.petals::before { transform: rotate(25deg); left: 2px; top: 8px; }
-.petals::after  { transform: rotate(-25deg); right: 2px; top: 8px; }
-
-@keyframes petalFloat {
-  0%   { transform: translateY(0) rotate(-2deg); }
-  50%  { transform: translateY(-4px) rotate(2deg); }
-  100% { transform: translateY(0) rotate(-2deg); }
-}
 
   /* Lotus pad */
 .lotus {
@@ -323,7 +293,44 @@ button:hover { transform:scale(1.05); }
   animation: none !important;      /* kills swim keyframes that rotate/flip */
   will-change: left;
 }
+/* Lotus flower (6 petals) */
+.lotus-flower{
+  position:absolute;
+  width:42px;
+  height:42px;
+  bottom:17%;
+  z-index:3;
+  pointer-events:none;
+}
 
+.lotus-flower span{
+  position:absolute;
+  width:16px;
+  height:22px;
+  background: rgba(255,182,193,0.95);
+  border-radius: 50%;
+  top:10px;
+  left:13px;
+  transform-origin: center bottom;
+}
+
+.lotus-flower span:nth-child(1){ transform: rotate(0deg) translateY(-10px); }
+.lotus-flower span:nth-child(2){ transform: rotate(60deg) translateY(-10px); }
+.lotus-flower span:nth-child(3){ transform: rotate(120deg) translateY(-10px); }
+.lotus-flower span:nth-child(4){ transform: rotate(180deg) translateY(-10px); }
+.lotus-flower span:nth-child(5){ transform: rotate(240deg) translateY(-10px); }
+.lotus-flower span:nth-child(6){ transform: rotate(300deg) translateY(-10px); }
+
+.lotus-flower::after{
+  content:"";
+  position:absolute;
+  width:14px;
+  height:14px;
+  background: rgba(255,215,0,0.95);
+  border-radius:50%;
+  top:14px;
+  left:14px;
+}
 
 </style>
 </head>
@@ -528,22 +535,28 @@ function createCreatures() {
   lotus1.className = "lotus";
   lotus1.style.left = "20%";
   document.body.appendChild(lotus1);
-  const petals1 = document.createElement("div");
-petals1.className = "petals";
-petals1.style.left = "17%"; // slightly left of lotus1 (lotus1 is 20%)
-document.body.appendChild(petals1);
-
 
   const lotus2 = document.createElement("div");
   lotus2.className = "lotus";
   lotus2.style.left = "70%";
   document.body.appendChild(lotus2);
-  const petals2 = document.createElement("div");
-petals2.className = "petals";
-petals2.style.left = "67%"; // slightly left of lotus2 (lotus2 is 70%)
-petals2.style.animationDelay = "1s";
-document.body.appendChild(petals2);
 
+  // ---------- LOTUS FLOWERS (6 petals) ----------
+function addFlower(leftPos){
+  const flower = document.createElement("div");
+  flower.className = "lotus-flower";
+  flower.style.left = leftPos;
+
+  for(let i=0;i<6;i++){
+    const petal = document.createElement("span");
+    flower.appendChild(petal);
+  }
+
+  document.body.appendChild(flower);
+}
+
+addFlower("20%");
+addFlower("70%");
 
   // ---------- FROGS ----------
   const frog1 = document.createElement("div");
@@ -674,6 +687,7 @@ document.querySelector(".explore").addEventListener("click",()=>{ alert("🌎 Gl
 
 </body>
 </html>
+
 
 
 

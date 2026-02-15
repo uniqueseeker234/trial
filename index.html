@@ -319,6 +319,14 @@ document.getElementById("imageUpload").addEventListener("change", async function
         const predictionText=document.getElementById("prediction");
         const descriptionBox=document.getElementById("description");
         const info=algaeInfo[predictedClass] || algaeInfo[predictedClass.toLowerCase()];
+      // Check if predicted class is "unknown algae"
+if(predictedClass.toLowerCase() === "unknown algae") {
+    predictionText.innerHTML = "Prediction: Unknown Algae";
+    descriptionBox.innerHTML = "<h3>🐟🌿 Hmm… this algae is not yet in our pond!</h3><p>If you know it, please contribute a photo 🌱💚</p>";
+    createCarousel([]); // clear any images
+    return; // skip the normal prediction block
+}
+
         if(maxValue>=CONFIDENCE_THRESHOLD && info){
             predictionText.innerHTML="Prediction: <b>"+predictedClass.charAt(0).toUpperCase()+predictedClass.slice(1)+"</b><br>Confidence: "+confidence+"%";
             createCarousel(info.images);
@@ -351,6 +359,7 @@ document.querySelector(".explore").addEventListener("click",()=>{ alert("🌎 Gl
 
 </body>
 </html>
+
 
 
 

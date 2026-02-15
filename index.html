@@ -480,29 +480,44 @@ function spawnOneBubble(){
     }
   });
 
-  // Touch drag (NOTE: don't remove on touchstart or it will instantly pop)
-  b.addEventListener("touchstart", (e)=>{
-    isDragging=true;
-    const t=e.touches[0];
-    offsetX=t.clientX - b.offsetLeft;
-    offsetY=t.clientY - b.offsetTop;
-    b.style.transition="none";
-  }, {passive:true});
+ // Touch: drag OR tap-to-pop (tap = no movement)
+let startX = 0, startY = 0, moved = false;
 
-  document.addEventListener("touchmove", (e)=>{
-    if(isDragging){
-      const t=e.touches[0];
-      b.style.left = (t.clientX - offsetX) + "px";
-      b.style.top  = (t.clientY - offsetY) + "px";
-    }
-  }, {passive:true});
+b.addEventListener("touchstart", (e)=>{
+  isDragging = true;
+  moved = false;
 
-  document.addEventListener("touchend", ()=>{
-    if(isDragging){
-      isDragging=false;
-      b.style.transition="";
-    }
-  });
+  const t = e.touches[0];
+  startX = t.clientX;
+  startY = t.clientY;
+
+  offsetX = t.clientX - b.offsetLeft;
+  offsetY = t.clientY - b.offsetTop;
+
+  b.style.transition = "none";
+}, {passive:true});
+
+document.addEventListener("touchmove", (e)=>{
+  if(!isDragging) return;
+
+  const t = e.touches[0];
+  const dx = Math.abs(t.clientX - startX);
+  const dy = Math.abs(t.clientY - startY);
+
+  if(dx > 6 || dy > 6) moved = true; // threshold to detect drag
+
+  b.style.left = (t.clientX - offsetX) + "px";
+  b.style.top  = (t.clientY - offsetY) + "px";
+}, {passive:true});
+
+document.addEventListener("touchend", ()=>{
+  if(!isDragging) return;
+  isDragging = false;
+  b.style.transition = "";
+
+  // If it was a tap (not dragged), pop it
+  if(!moved) b.remove();
+});
 
   // Pop on click (desktop) and on double-tap (mobile feel)
   b.addEventListener("click", ()=> b.remove());
@@ -769,6 +784,7 @@ document.querySelector(".explore").addEventListener("click",()=>{ alert("🌎 Gl
 
 </body>
 </html>
+
 
 
 

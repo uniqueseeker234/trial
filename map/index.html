@@ -19,7 +19,7 @@
 
     body{ margin:0; overflow:hidden; background:var(--bg); font-family:system-ui, Arial; }
 
-    /* Always keep UI above canvas */
+    /* Keep UI above WebGL + constellation canvas */
     #topbar, #hint, #overlay, #popup { position:fixed; z-index:9999; }
 
     #topbar{
@@ -59,6 +59,16 @@
       padding:10px 12px;
       backdrop-filter: blur(8px);
       max-width:80vw;
+    }
+
+    /* Constellation drawing layer (above WebGL, below UI) */
+    #constellationCanvas{
+      position:fixed;
+      inset:0;
+      z-index:5000;
+      background:transparent;
+      pointer-events:auto;
+      touch-action:none; /* helps on mobile */
     }
 
     #overlay{
@@ -123,7 +133,6 @@
     }
     ul{ margin:6px 0 0 18px; }
 
-    /* Mobile bottom-sheet popup */
     @media (max-width:768px){
       #popup{
         left:10px; right:10px;
@@ -136,7 +145,6 @@
     }
   </style>
 
-  <!-- Import map for Three.js addons -->
   <script type="importmap">
   {
     "imports": {
@@ -153,9 +161,14 @@
     <span style="opacity:.8">•</span>
     <a href="../" title="Back to main site">Back</a>
     <button id="resetBtn">Reset View</button>
+    <button id="constBtn" title="Tap stars to draw. Double tap to clear.">
+      Constellation: ON
+    </button>
   </div>
 
-  <div id="hint">Drag to rotate • Scroll/pinch to zoom • Tap a district</div>
+  <div id="hint">Drag to rotate • Scroll/pinch to zoom • Tap a district • Tap stars to connect (auto-fade)</div>
+
+  <canvas id="constellationCanvas"></canvas>
 
   <div id="overlay"></div>
 
@@ -204,10 +217,10 @@
       "Kottayam": ["Meenachil River","Vembanad Lake (Kumarakom)"],
       "Idukki": ["Periyar River (upper stretches)","Reservoir margins (Idukki region)"],
       "Ernakulam": ["Periyar River (Aluva belt)","Kochi backwater region","Vembanad lake margins"],
-      "Thrissur": ["Chalakudy River (Athirappilly belt)","Karuvannur River (Kole wetlands)","Bharathapuzha (Nila) regions"],
+      "Thrissur": ["Chalakudy River","Karuvannur River (Kole wetlands)","Bharathapuzha (Nila)"],
       "Palakkad": ["Malampuzha Reservoir / Dam","Malampuzha River","Bharathapuzha (Nila)"],
       "Malappuram": ["Chaliyar River","Kadalundi River","Bharathapuzha (Nila)","Tirur River"],
-      "Kozhikode": ["Kallayi River","Chaliyar River (Beypore belt)"],
+      "Kozhikode": ["Kallayi River","Chaliyar River"],
       "Wayanad": ["Kabini River system","Panamaram River","Mananthavady River"],
       "Kannur": ["Valapattanam River","Anjarakandy River","Kuppam River"],
       "Kasaragod": ["Chandragiri (Payaswini) River","Kariangode River"]
@@ -244,7 +257,6 @@
       popup.classList.remove("show");
     }
 
-    // prevent popup auto-close on mobile taps
     popup.addEventListener("pointerdown", (e)=> e.stopPropagation(), {passive:false});
     popup.addEventListener("click", (e)=> e.stopPropagation());
     closeBtn.addEventListener("click", closePopup);
@@ -275,12 +287,11 @@
     scene.add(sun);
 
     /* =========================
-       NIGHT SKY 360 STAR FIELD
-       (Always surrounds camera)
+       NIGHT SKY 360 STARS
+       + subtle rotation + twinkle
     ========================= */
     const starsGeometry = new THREE.BufferGeometry();
     const starCount = 2600;
-
     const starPositions = new Float32Array(starCount * 3);
 
     for (let i = 0; i < starCount; i++) {
@@ -302,12 +313,13 @@
     starsGeometry.setAttribute("position", new THREE.BufferAttribute(starPositions, 3));
 
     const starsMaterial = new THREE.PointsMaterial({
-      color: 0xfff1c1,        // warm starlight
-      size: 10,
+      color: 0xfff3c4,
+      size: 7,
       sizeAttenuation: true,
       transparent: true,
       opacity: 1,
-      depthWrite: false
+      depthWrite: false,
+      blending: THREE.AdditiveBlending
     });
 
     const starField = new THREE.Points(starsGeometry, starsMaterial);
@@ -328,38 +340,30 @@
       return new THREE.Vector2(lon*scale, lat*scale);
     }
 
-    // Distinct palette (no same colors merging)
     const PALETTE = [
       "#ff6b6b","#ffd93d","#6bcb77","#4d96ff","#9d4edd","#ff9f1c","#00bbf9",
       "#f15bb5","#00f5d4","#b8f2e6","#f7b267","#7bdff2","#c77dff","#80ed99"
     ];
-    function paletteColor(i){
-      return new THREE.Color(PALETTE[i % PALETTE.length]);
-    }
+    function paletteColor(i){ return new THREE.Color(PALETTE[i % PALETTE.length]); }
 
-    // Selected glow
     let selectedMesh = null;
-
     function setSelected(mesh){
       if (selectedMesh && selectedMesh.material){
         selectedMesh.material.emissive = new THREE.Color(0x000000);
         selectedMesh.material.emissiveIntensity = 0;
-        selectedMesh.position.y -= 1.2; // undo lift
+        selectedMesh.position.y -= 1.2;
       }
       selectedMesh = mesh;
-
       if (selectedMesh && selectedMesh.material){
         const glow = selectedMesh.material.color.clone().lerp(new THREE.Color(0xffffff), 0.35);
         selectedMesh.material.emissive = glow;
         selectedMesh.material.emissiveIntensity = 0.85;
-        selectedMesh.position.y += 1.2; // small lift
+        selectedMesh.position.y += 1.2;
       }
     }
 
-    // Load geojson
     const geo = await fetch("./kerala_districts.geojson").then(r => r.json());
 
-    // Sort for stable colors
     const features = [...geo.features].sort((a,b)=>{
       const A = (a.properties?.shapeName || "").toLowerCase();
       const B = (b.properties?.shapeName || "").toLowerCase();
@@ -385,10 +389,7 @@
         const pts = outer.map(([lon,lat]) => projectLonLat(lon,lat));
         const shape = new THREE.Shape(pts);
 
-        const extrudeGeo = new THREE.ExtrudeGeometry(shape, {
-          depth: 10,
-          bevelEnabled: false
-        });
+        const extrudeGeo = new THREE.ExtrudeGeometry(shape, { depth: 10, bevelEnabled: false });
 
         const mat = new THREE.MeshStandardMaterial({
           color: districtColor,
@@ -406,13 +407,11 @@
         const mesh = new THREE.Mesh(extrudeGeo, mat);
         mesh.rotation.x = -Math.PI/2;
         mesh.userData = { name, hex };
-
-        mesh.position.y += 0.01; // tiny lift to avoid z-fighting
+        mesh.position.y += 0.01;
 
         mapGroup.add(mesh);
         clickable.push(mesh);
 
-        // outline so neighbors don't blend
         const edges = new THREE.EdgesGeometry(extrudeGeo, 25);
         const line = new THREE.LineSegments(
           edges,
@@ -424,13 +423,11 @@
       }
     }
 
-    // Center map
     const bbox = new THREE.Box3().setFromObject(mapGroup);
     const center = new THREE.Vector3();
     bbox.getCenter(center);
     mapGroup.position.sub(center);
 
-    // Fit camera
     function fitCamera(){
       const box = new THREE.Box3().setFromObject(mapGroup);
       const size = new THREE.Vector3();
@@ -448,9 +445,204 @@
     fitCamera();
 
     /* =========================
-       INTERACTION
+       CONSTELLATION DRAWING
+       - Tap stars to connect
+       - Max 6 stars
+       - Lines fade out automatically
+       - Double tap clears instantly
     ========================= */
-    function onPointerDown(e){
+    const constCanvas = document.getElementById("constellationCanvas");
+    const ctx = constCanvas.getContext("2d");
+
+    function resizeConstCanvas(){
+      constCanvas.width = Math.floor(innerWidth * devicePixelRatio);
+      constCanvas.height = Math.floor(innerHeight * devicePixelRatio);
+      constCanvas.style.width = innerWidth + "px";
+      constCanvas.style.height = innerHeight + "px";
+      ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+    }
+    resizeConstCanvas();
+
+    const starPosAttr = starsGeometry.getAttribute("position");
+    const tmpV3 = new THREE.Vector3();
+
+    // Each point: { idx, t }
+    let constellation = [];
+    const MAX_CONST_POINTS = 6;
+    const FADE_MS = 12000; // 12s fade
+    let constellationEnabled = true;
+
+    const constBtn = document.getElementById("constBtn");
+    constBtn.addEventListener("click", () => {
+      constellationEnabled = !constellationEnabled;
+      constBtn.textContent = constellationEnabled ? "Constellation: ON" : "Constellation: OFF";
+      if (!constellationEnabled){
+        constellation = [];
+        ctx.clearRect(0,0, innerWidth, innerHeight);
+      }
+    });
+
+    function starScreenPos(i){
+      tmpV3.set(
+        starPosAttr.getX(i) + starField.position.x,
+        starPosAttr.getY(i) + starField.position.y,
+        starPosAttr.getZ(i) + starField.position.z
+      );
+      tmpV3.project(camera);
+      return {
+        x: (tmpV3.x * 0.5 + 0.5) * innerWidth,
+        y: (-tmpV3.y * 0.5 + 0.5) * innerHeight,
+        visible: tmpV3.z >= -1 && tmpV3.z <= 1
+      };
+    }
+
+    function pickNearestStar(screenX, screenY){
+      const isMobile = window.innerWidth < 768;
+      const MAX_DIST = isMobile ? 34 : 28;
+      const MAX_D2 = MAX_DIST * MAX_DIST;
+
+      let best = -1;
+      let bestD2 = Infinity;
+      let secondD2 = Infinity;
+
+      for (let i = 0; i < starCount; i++){
+        const p = starScreenPos(i);
+        if (!p.visible) continue;
+
+        const dx = p.x - screenX;
+        const dy = p.y - screenY;
+        const d2 = dx*dx + dy*dy;
+
+        if (d2 < bestD2){
+          secondD2 = bestD2;
+          bestD2 = d2;
+          best = i;
+        } else if (d2 < secondD2){
+          secondD2 = d2;
+        }
+      }
+
+      // "Clearly closest" rule (reduces wrong picks when stars are dense)
+      // If second nearest is too close, reject.
+      const CLEAR_RATIO = 0.72;
+      const clearEnough = (bestD2 < secondD2 * CLEAR_RATIO);
+
+      if (bestD2 <= MAX_D2 && (secondD2 === Infinity || clearEnough)){
+        return best;
+      }
+      return -1;
+    }
+
+    function addConstellationPoint(idx){
+      const last = constellation[constellation.length - 1];
+      if (last && last.idx === idx) return;
+      if (constellation.length >= MAX_CONST_POINTS) return;
+      constellation.push({ idx, t: performance.now() });
+    }
+
+    function pruneFaded(now){
+      constellation = constellation.filter(p => (now - p.t) < FADE_MS);
+    }
+
+    function alphaForPoint(p, now){
+      const age = now - p.t;
+      const a = 1 - (age / FADE_MS);
+      return Math.max(0, Math.min(1, a));
+    }
+
+    function drawConstellation(now){
+      ctx.clearRect(0,0, innerWidth, innerHeight);
+      if (!constellationEnabled) return;
+
+      pruneFaded(now);
+      if (constellation.length === 0) return;
+
+      // Lines
+      ctx.save();
+      ctx.lineWidth = 2.0;
+      ctx.strokeStyle = "rgba(255,255,255,1)";
+      ctx.shadowColor = "rgba(255,255,255,0.85)";
+      ctx.shadowBlur = 12;
+
+      ctx.beginPath();
+      let started = false;
+
+      for (let k=0; k<constellation.length; k++){
+        const pt = constellation[k];
+        const a = alphaForPoint(pt, now);
+        const p = starScreenPos(pt.idx);
+        if (!p.visible) continue;
+
+        // fade affects drawing: if point is nearly gone, skip it
+        if (a < 0.03) continue;
+
+        if (!started){
+          ctx.moveTo(p.x, p.y);
+          started = true;
+        } else {
+          ctx.lineTo(p.x, p.y);
+        }
+      }
+
+      // Apply overall fade using average alpha (simple + looks smooth)
+      const avgA = constellation.reduce((s,pt)=>s+alphaForPoint(pt,now),0) / constellation.length;
+      ctx.globalAlpha = Math.max(0, Math.min(1, avgA));
+      ctx.stroke();
+      ctx.restore();
+
+      // Points
+      ctx.save();
+      ctx.fillStyle = "rgba(255,255,255,1)";
+      ctx.shadowColor = "rgba(255,255,255,0.9)";
+      ctx.shadowBlur = 16;
+
+      for (const pt of constellation){
+        const a = alphaForPoint(pt, now);
+        const p = starScreenPos(pt.idx);
+        if (!p.visible || a < 0.03) continue;
+
+        ctx.globalAlpha = a;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 3.3, 0, Math.PI*2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    let lastTapTime = 0;
+    function onConstellationPointerDown(e){
+      if (!constellationEnabled) return;
+
+      // If popup is open, don't draw
+      if (popup.classList.contains("show")) return;
+
+      const now = Date.now();
+      const doubleTap = (now - lastTapTime) < 320;
+      lastTapTime = now;
+
+      if (doubleTap){
+        constellation = [];
+        return;
+      }
+
+      const x = e.clientX;
+      const y = e.clientY;
+
+      const picked = pickNearestStar(x, y);
+      if (picked !== -1){
+        addConstellationPoint(picked);
+
+        // Stop district click when a star is selected
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }
+    constCanvas.addEventListener("pointerdown", onConstellationPointerDown, { passive:false });
+
+    /* =========================
+       DISTRICT INTERACTION
+    ========================= */
+    function onDistrictPointerDown(e){
       const rect = renderer.domElement.getBoundingClientRect();
       pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
       pointer.y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
@@ -460,29 +652,43 @@
 
       if (hits.length){
         const obj = hits[0].object;
-        setSelected(obj); // glow + lift
+        setSelected(obj);
         openPopup(obj.userData.name, obj.userData.hex);
       }
     }
-    window.addEventListener("pointerdown", onPointerDown, { passive:true });
+    window.addEventListener("pointerdown", onDistrictPointerDown, { passive:true });
 
     document.getElementById("resetBtn").addEventListener("click", () => {
       closePopup();
       if (selectedMesh) setSelected(null);
+      constellation = [];
       fitCamera();
     });
 
     /* =========================
        LOOP + RESIZE
     ========================= */
+    const clock = new THREE.Clock();
+
     function animate(){
       requestAnimationFrame(animate);
       controls.update();
 
-      // Keep stars always around the camera (true 360 night sky)
+      // Keep stars surrounding camera (true 360 sky)
       starField.position.copy(camera.position);
 
+      // Slow star rotation (makes sky feel alive)
+      starField.rotation.y += 0.00035;
+      starField.rotation.x += 0.00008;
+
+      // Subtle twinkle: gentle opacity pulse (not annoying)
+      const t = clock.getElapsedTime();
+      starsMaterial.opacity = 0.92 + 0.08 * (0.5 + 0.5 * Math.sin(t * 1.15));
+
       renderer.render(scene, camera);
+
+      // Draw constellation overlay (fading)
+      drawConstellation(performance.now());
     }
     animate();
 
@@ -491,10 +697,8 @@
       camera.updateProjectionMatrix();
       renderer.setSize(innerWidth, innerHeight);
       fitCamera();
+      resizeConstCanvas();
     });
   </script>
 </body>
 </html>
-
-
-

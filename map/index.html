@@ -271,71 +271,50 @@
     sun.position.set(220, 520, 180);
     scene.add(sun);
 
-    /* =========================
-   SIMPLE EMOJI STYLE EARTH 🌎
+   /* =========================
+   REAL NASA EARTH 🌍
 ========================= */
 
-const earthGroup = new THREE.Group();
-scene.add(earthGroup);
+const textureLoader = new THREE.TextureLoader();
 
-// --- Main blue sphere ---
-const earthGeometry = new THREE.SphereGeometry(60, 48, 48);
-const earthMaterial = new THREE.MeshStandardMaterial({
-  color: 0x2d6cdf,      // ocean blue
-  roughness: 0.9,
-  metalness: 0.0
-});
+// Load your downloaded file
+const earthTexture = textureLoader.load("./earth.jpg");
+earthTexture.colorSpace = THREE.SRGBColorSpace;
 
-const earth = new THREE.Mesh(earthGeometry, earthMaterial);
-earthGroup.add(earth);
+// Create sphere
+const earthRadius = 65;
 
-// --- Fake green land patches (simple shapes) ---
-const landMaterial = new THREE.MeshStandardMaterial({
-  color: 0x2ecc71,  // green land
-  roughness: 1
-});
+const earth = new THREE.Mesh(
+  new THREE.SphereGeometry(earthRadius, 64, 64),
+  new THREE.MeshStandardMaterial({
+    map: earthTexture,
+    roughness: 1.0,
+    metalness: 0.0
+  })
+);
 
-function addLand(lat, lon, size) {
-  const landGeo = new THREE.SphereGeometry(size, 24, 24);
-  const land = new THREE.Mesh(landGeo, landMaterial);
+scene.add(earth);
 
-  const radius = 61; // slightly above earth surface
+// Atmosphere glow
+const atmosphere = new THREE.Mesh(
+  new THREE.SphereGeometry(earthRadius * 1.03, 64, 64),
+  new THREE.MeshBasicMaterial({
+    color: 0x4fb3ff,
+    transparent: true,
+    opacity: 0.08
+  })
+);
 
-  const phi = (90 - lat) * (Math.PI / 180);
-  const theta = (lon + 180) * (Math.PI / 180);
+scene.add(atmosphere);
 
-  land.position.set(
-    -radius * Math.sin(phi) * Math.cos(theta),
-    radius * Math.cos(phi),
-    radius * Math.sin(phi) * Math.sin(theta)
-  );
+// Position below Kerala map
+earth.position.set(0, -110, -50);
+atmosphere.position.copy(earth.position);
 
-  earthGroup.add(land);
-}
-
-// Add a few cartoon-like land areas
-addLand(20, 80, 18);   // Asia-ish
-addLand(-10, -60, 15); // South America-ish
-addLand(40, -100, 14); // North America-ish
-addLand(0, 20, 16);    // Africa-ish
-
-// --- Soft atmosphere glow ---
-const atmosphereGeo = new THREE.SphereGeometry(64, 48, 48);
-const atmosphereMat = new THREE.MeshBasicMaterial({
-  color: 0x4fb3ff,
-  transparent: true,
-  opacity: 0.08
-});
-
-const atmosphere = new THREE.Mesh(atmosphereGeo, atmosphereMat);
-earthGroup.add(atmosphere);
-
-// Position earth below Kerala map
-earthGroup.position.set(0, -100, -40);
-
-// Slow spin
-function animateEarth() {
-  earthGroup.rotation.y += 0.0015;
+// Rotation animation
+function animateEarth(){
+  earth.rotation.y += 0.0015;
+  atmosphere.rotation.y += 0.0015;
 }
 
     /* =========================
@@ -705,6 +684,7 @@ for (let i=0; i<centers.length; i++) {
     function animate(){
       requestAnimationFrame(animate);
       controls.update();
+      animateEarth(); //
 
       // keep stars around camera (true 360 sky)
       starField.position.copy(camera.position);
@@ -730,6 +710,7 @@ for (let i=0; i<centers.length; i++) {
   </script>
 </body>
 </html>
+
 
 
 

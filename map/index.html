@@ -271,86 +271,53 @@
     sun.position.set(220, 520, 180);
     scene.add(sun);
 
-  /* =========================
-   CINEMATIC NASA EARTH 🌍
+/* =========================
+   EARTH (FULL BRIGHT - NO HALF DARK)
+   - Uses MeshBasicMaterial (no lighting)
 ========================= */
 
-// ---------- LIGHTING ----------
-scene.add(new THREE.AmbientLight(0xffffff, 1.25));
+// OPTIONAL: remove any extra duplicate lights you added earlier
+// (Keep your original light setup above, but don't add new ones here)
 
-const sun2 = new THREE.DirectionalLight(0xffffff, 1.0);
-sun.position.set(300, 400, 200);
-scene.add(sun);
-
-const fill = new THREE.DirectionalLight(0xffffff, 0.45);
-fill.position.set(-300, 200, -200);
-scene.add(fill);
-
-
-// ---------- TEXTURE ----------
 const textureLoader = new THREE.TextureLoader();
+
+// IMPORTANT: earth.jpg must be in SAME folder as index.html
 const earthTexture = textureLoader.load("./earth.jpg");
 earthTexture.colorSpace = THREE.SRGBColorSpace;
 
-
-// ---------- EARTH SPHERE ----------
 const earthRadius = 55;
 
+// Full bright Earth (no shadows, no half dark)
 const earth = new THREE.Mesh(
   new THREE.SphereGeometry(earthRadius, 96, 96),
-  new THREE.MeshStandardMaterial({
-    map: earthTexture,
-    roughness: 0.85,
-    metalness: 0.0,
-    emissive:new THREE.Color(0x222222),
-    emissiveIntensity:0.6
+  new THREE.MeshBasicMaterial({
+    map: earthTexture
   })
 );
-
 scene.add(earth);
 
-
-// ---------- ATMOSPHERE GLOW ----------
+// Soft atmosphere glow (optional, looks nice)
 const atmosphere = new THREE.Mesh(
-  new THREE.SphereGeometry(earthRadius * 1.015, 64, 64),
-  new THREE.MeshBasicMaterial({
-    color: 0x4fb3ff,
-    transparent: true,
-    opacity: 0.05,
-    depthWrite:false
-  })
-);
-
-scene.add(atmosphere);
-
-
-// ---------- RIM LIGHT EFFECT ----------
-const rimGlow = new THREE.Mesh(
   new THREE.SphereGeometry(earthRadius * 1.02, 64, 64),
   new THREE.MeshBasicMaterial({
     color: 0x66ccff,
     transparent: true,
-    opacity: 0.06,
-    side: THREE.BackSide
+    opacity: 0.08,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending
   })
 );
+scene.add(atmosphere);
 
-scene.add(rimGlow);
-
-
-// ---------- POSITION ----------
+// Position under Kerala
 earth.position.set(0, -130, 0);
 atmosphere.position.copy(earth.position);
-rimGlow.position.copy(earth.position);
 
-
-// ---------- ROTATION ----------
+// Rotation (keep your animateEarth() call)
 function animateEarth(){
   earth.rotation.y += 0.0016;
   atmosphere.rotation.y += 0.0016;
-  rimGlow.rotation.y += 0.0016;
 }
-
     /* =========================
        NIGHT SKY 360 STARS
        + subtle rotation + twinkle
@@ -744,6 +711,7 @@ for (let i=0; i<centers.length; i++) {
   </script>
 </body>
 </html>
+
 
 
 

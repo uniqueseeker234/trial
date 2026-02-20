@@ -291,10 +291,29 @@ function addTextOnDistrict(name, districtGroup){
   // very tiny districts: skip label if too small
   if (size.x < 5 || size.z < 5) return;
 
-  // base geometry
-  const textGeo = new TextGeometry(name, {
+   // ---- Name shortening for very small districts (optional but helps a lot) ----
+  const shortNameMap = {
+    "Thiruvananthapuram": "TVM",
+    "Ernakulam": "EKM",
+    "Alappuzha": "ALP",
+    "Pathanamthitta": "PTA",
+    "Thiruvananthapuram ": "TVM"
+  };
+
+  // Choose label text
+  let labelText = name;
+
+  // If district is small OR name is very long, use short name when available
+  const minDim = Math.min(size.x, size.z);
+  if ((minDim < 35 || name.length > 10) && shortNameMap[name]) {
+    labelText = shortNameMap[name];
+  }
+
+  // ---- Create text geometry ----
+  const baseSize = 2.6; // base font size (we'll scale, but keep this stable)
+  const textGeo = new TextGeometry(labelText, {
     font,
-    size: 2.6,
+    size: baseSize,
     height: 0.35,
     curveSegments: 4,
     bevelEnabled: false
@@ -304,9 +323,17 @@ function addTextOnDistrict(name, districtGroup){
   const textWidth = textGeo.boundingBox.max.x - textGeo.boundingBox.min.x;
   if (textWidth <= 0) return;
 
-  // scale to fit inside district width
-  const target = Math.max(6, size.x * 0.62);
-  const scaleFactor = target / textWidth;
+  // ---- Fit to district using BOTH width and height ----
+  // This makes sizes more consistent than using only size.x
+  const target = minDim * 0.55; // uses smaller dimension so it doesn't overflow
+  let scaleFactor = target / textWidth;
+
+  // ---- Clamp so text sizes don't become extreme ----
+  // (Tune these if you want)
+  const MIN_SCALE = 0.75;
+  const MAX_SCALE = 2.10;
+  scaleFactor = Math.min(MAX_SCALE, Math.max(MIN_SCALE, scaleFactor));
+
   textGeo.scale(scaleFactor, scaleFactor, scaleFactor);
   textGeo.computeBoundingBox();
 
@@ -315,30 +342,27 @@ function addTextOnDistrict(name, districtGroup){
     new THREE.MeshBasicMaterial({ color: 0xffffff })
   );
 
-  // center geometry at origin
+  // Center geometry
   const centerOffset = new THREE.Vector3();
   textGeo.boundingBox.getCenter(centerOffset).multiplyScalar(-1);
   textMesh.position.copy(centerOffset);
 
-  // place at district center
+  // Place at district center
   const center = new THREE.Vector3();
   box.getCenter(center);
   textMesh.position.x += center.x;
   textMesh.position.z += center.z;
-  textMesh.position.y = 11; // slightly above surface
+  textMesh.position.y = 11;
 
-  // lay flat
+  // Lay flat
   textMesh.rotation.x = -Math.PI/2;
 
-  // auto-rotate if district is tall/narrow
+  // Rotate if tall/narrow (works for Alappuzha etc.)
   if (size.z > size.x * 1.25) {
     textMesh.rotation.z = Math.PI/2;
   }
 
-  // add to same group so it follows
   mapGroup.add(textMesh);
-}
-
 /* =========================
    Load GeoJSON and build districts
 ========================= */
@@ -448,3 +472,4 @@ window.addEventListener("resize", () => {
 </script>
 </body>
 </html>
+

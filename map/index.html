@@ -309,55 +309,91 @@
 
     const starField = new THREE.Points(starsGeometry, starsMaterial);
     scene.add(starField);
+/* =========================
+   MINI CONSTELLATIONS
+========================= */
 
-    /* =========================
-       FIXED SUBTLE CONSTELLATIONS
-       (long-distance, elegant, not triangles)
-    ========================= */
-    function addConstellation(indices, opacity=0.28){
-      // clamp indices safety
-      const pts = [];
-      for (const idx of indices){
-        const i = Math.max(0, Math.min(starCount-1, idx));
-        pts.push(
-          starPositions[i*3 + 0],
-          starPositions[i*3 + 1],
-          starPositions[i*3 + 2]
-        );
-      }
+const constellationLayer = new THREE.Group();
+starField.add(constellationLayer); // rotate with sky
 
-      const g = new THREE.BufferGeometry();
-      g.setAttribute("position", new THREE.Float32BufferAttribute(pts, 3));
+function makeGlowSprite() {
+  const c = document.createElement("canvas");
+  c.width = 128; c.height = 128;
+  const ctx = c.getContext("2d");
+  const g = ctx.createRadialGradient(64,64,2, 64,64,60);
+  g.addColorStop(0.0, "rgba(255,200,90,1)");
+  g.addColorStop(0.4,"rgba(255,200,90,0.5)");
+  g.addColorStop(1.0, "rgba(255,200,90,0)");
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.arc(64,64,60,0,Math.PI*2);
+  ctx.fill();
+  return new THREE.CanvasTexture(c);
+}
 
-      // base line
-      const m = new THREE.LineBasicMaterial({
-        color: 0xffffff,
-        transparent: true,
-        opacity,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false
-      });
+const glowTex = makeGlowSprite();
 
-      const line = new THREE.Line(g, m);
-      scene.add(line);
+function addMiniConstellation(theta, phi) {
 
-      // soft glow duplicate (slightly stronger, same geometry)
-      const glowM = new THREE.LineBasicMaterial({
-        color: 0xffffff,
-        transparent: true,
-        opacity: opacity * 0.55,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false
-      });
-      const glowLine = new THREE.Line(g, glowM);
-      scene.add(glowLine);
-    }
+  const radius = 3000;
+  const scale = 0.07;
 
-    // 3 minimal constellations: long, subtle strokes
-    addConstellation([95, 620, 1410, 2280, 2525], 0.30);   // long gentle chain
-    addConstellation([210, 980, 1760, 2415], 0.26);        // shorter chain
-    addConstellation([430, 1200, 1950, 2580], 0.24);       // faint chain
+  const baseShape = [
+    [-1,0],[ -0.4,0.2 ],[0.4,0],[1,-0.3]
+  ];
 
+  const points = baseShape.map(([x,y])=>{
+    const t = theta + x*scale;
+    const p = phi + y*scale;
+    return new THREE.Vector3(
+      radius * Math.sin(p) * Math.cos(t),
+      radius * Math.sin(p) * Math.sin(t),
+      radius * Math.cos(p)
+    );
+  });
+
+  // Glow stars
+  points.forEach(pos=>{
+    const spr = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: glowTex,
+      transparent:true,
+      opacity:0.9,
+      blending:THREE.AdditiveBlending,
+      depthWrite:false
+    }));
+    spr.scale.set(22,22,1);
+    spr.position.copy(pos);
+    constellationLayer.add(spr);
+  });
+
+  // Lines
+  const linePts=[];
+  for(let i=0;i<points.length-1;i++){
+    linePts.push(points[i].x,points[i].y,points[i].z);
+    linePts.push(points[i+1].x,points[i+1].y,points[i+1].z);
+  }
+
+  const g=new THREE.BufferGeometry();
+  g.setAttribute("position",new THREE.Float32BufferAttribute(linePts,3));
+
+  const line=new THREE.LineSegments(
+    g,
+    new THREE.LineBasicMaterial({
+      color:0xffffff,
+      transparent:true,
+      opacity:0.25,
+      blending:THREE.AdditiveBlending,
+      depthWrite:false
+    })
+  );
+
+  constellationLayer.add(line);
+}
+
+// Place 3 small constellations around sky
+addMiniConstellation(0.8,1.0);
+addMiniConstellation(2.4,0.9);
+addMiniConstellation(4.5,1.1);
     /* =========================
        MAP BUILD
     ========================= */
@@ -543,3 +579,4 @@
   </script>
 </body>
 </html>
+

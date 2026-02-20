@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Kerala Algae Map (3D Districts)</title>
+  <title>uniqueseeker's algae map </title>
 
   <style>
     :root{
@@ -183,7 +183,6 @@
     <span style="opacity:.8">•</span>
     <a href="../" title="Back to main site">Back</a>
     <button id="resetBtn">Reset View</button>
-    <button id="labelsBtn">Labels: ON</button>
   </div>
 
   <div id="hint">Drag to rotate • Scroll/pinch to zoom • Tap a district</div>
@@ -203,8 +202,6 @@
 
     <div class="sectionTitle">Commonly seen in (examples)</div>
     <div id="habitatList"></div>
-
-    <div class="note">Tip: Later replace these with your exact pond/river names in each district.</div>
   </div>
 
   <script type="module">
@@ -508,13 +505,7 @@
       fitCamera();
     });
 
-    const labelsBtn = document.getElementById("labelsBtn");
-    labelsBtn.addEventListener("click", () => {
-      labelsOn = !labelsOn;
-      labelsBtn.textContent = labelsOn ? "Labels: ON" : "Labels: OFF";
-      // Show/hide all label divs
-      Array.from(labelLayer.children).forEach(el => el.style.display = labelsOn ? "block" : "none");
-    });
+    
 
     // =========================
     // 7) LABEL POSITION UPDATE
@@ -569,4 +560,5 @@
   </script>
 </body>
 </html>
+
 

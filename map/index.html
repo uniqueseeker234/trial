@@ -310,237 +310,164 @@
     const starField = new THREE.Points(starsGeometry, starsMaterial);
     scene.add(starField);
 /* =========================
-   MINI ZODIAC CONSTELLATIONS (MORE + DIFFERENT SHAPES)
+   PREMIUM NIGHT CONSTELLATIONS (10)
    - small clusters
-   - glowing star nodes
-   - dotted lines
-   - spread in many places
-   - rotates with starField
+   - glowing star dots
+   - smooth glow lines
+   - rotates with sky
 ========================= */
 
 const constellationLayer = new THREE.Group();
-starField.add(constellationLayer); // rotates with sky
+starField.add(constellationLayer); // attach to sky
 
-// Glow sprite (gold)
-function makeGlowSprite() {
+// ---- Create glow texture for star nodes ----
+function makeGlowTexture() {
   const c = document.createElement("canvas");
-  c.width = 128; c.height = 128;
+  c.width = 128;
+  c.height = 128;
   const ctx = c.getContext("2d");
-  const g = ctx.createRadialGradient(64,64,2, 64,64,60);
-  g.addColorStop(0.00, "rgba(255,200,90,1)");
-  g.addColorStop(0.25, "rgba(255,200,90,0.60)");
-  g.addColorStop(1.00, "rgba(255,200,90,0)");
-  ctx.fillStyle = g;
+
+  const gradient = ctx.createRadialGradient(64,64,5, 64,64,60);
+  gradient.addColorStop(0.0, "rgba(255,215,140,1)");
+  gradient.addColorStop(0.3, "rgba(255,215,140,0.7)");
+  gradient.addColorStop(1.0, "rgba(255,215,140,0)");
+
+  ctx.fillStyle = gradient;
   ctx.beginPath();
   ctx.arc(64,64,60,0,Math.PI*2);
   ctx.fill();
+
   return new THREE.CanvasTexture(c);
 }
-const glowTex = makeGlowSprite();
 
-/** Convert small local (x,y) to point on sky sphere near a direction */
-function toSphere(x, y, theta0, phi0, scale, radius) {
-  const theta = theta0 + x * scale;
-  const phi   = phi0   + y * scale;
+const glowTexture = makeGlowTexture();
+
+// ---- Convert small 2D cluster to sky sphere ----
+function toSphere(x,y,theta0,phi0,scale,radius){
+  const theta = theta0 + x*scale;
+  const phi   = phi0   + y*scale;
 
   return new THREE.Vector3(
-    radius * Math.sin(phi) * Math.cos(theta),
-    radius * Math.sin(phi) * Math.sin(theta),
+    radius * Math.sin(phi)*Math.cos(theta),
+    radius * Math.sin(phi)*Math.sin(theta),
     radius * Math.cos(phi)
   );
 }
 
-/**
- * Create a mini constellation:
- * points: array of [x,y,w] (w controls star size)
- * edges: array of [a,b] connections
- */
-function addMiniConstellation({
-  points,
-  edges,
-  theta,
-  phi,
-  scale = 0.07,
-  radius = 3000,
-  dotOpacity = 0.95,
-  lineOpacity = 0.22,
-  dotSizeBase = 8
-}) {
-  // 3D points
-  const pts3 = points.map(([x,y,w]) => ({
-    p: toSphere(x,y, theta,phi, scale, radius),
+// ---- Create one constellation ----
+function addConstellation({points,edges,theta,phi}){
+
+  const radius = 3000;
+  const scale  = 0.065;
+
+  const pts3 = points.map(([x,y,w])=>({
+    p: toSphere(x,y,theta,phi,scale,radius),
     w
   }));
 
-  // Dots (sprites)
-  for (const {p,w} of pts3) {
-    const spr = new THREE.Sprite(new THREE.SpriteMaterial({
-      map: glowTex,
+  // ⭐ Glow stars
+  pts3.forEach(({p,w})=>{
+    const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: glowTexture,
       transparent:true,
-      opacity: dotOpacity,
-      blending: THREE.AdditiveBlending,
+      blending:THREE.AdditiveBlending,
       depthWrite:false
     }));
-    const s = dotSizeBase + (w * 10);
-    spr.scale.set(s, s, 1);
-    spr.position.copy(p);
-    constellationLayer.add(spr);
-  }
 
-  // Dotted lines (LineDashedMaterial)
-  const linePts = [];
-  for (const [a,b] of edges){
-    linePts.push(pts3[a].p.x, pts3[a].p.y, pts3[a].p.z);
-    linePts.push(pts3[b].p.x, pts3[b].p.y, pts3[b].p.z);
-  }
-  const g = new THREE.BufferGeometry();
-  g.setAttribute("position", new THREE.Float32BufferAttribute(linePts, 3));
-
-  const dashed = new THREE.LineDashedMaterial({
-    color: 0xffffff,
-    transparent: true,
-    opacity: lineOpacity,
-    dashSize: 8,
-    gapSize: 10,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false
+    const size = 8 + w*14;  // balanced size
+    sprite.scale.set(size,size,1);
+    sprite.position.copy(p);
+    constellationLayer.add(sprite);
   });
-  const lines = new THREE.LineSegments(g, dashed);
-  lines.computeLineDistances();
-  constellationLayer.add(lines);
 
-  // Soft glow copy (fainter)
-  const glow = new THREE.LineDashedMaterial({
-    color: 0xffffff,
-    transparent: true,
-    opacity: lineOpacity * 0.45,
-    dashSize: 6,
-    gapSize: 14,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false
+  // ✨ Smooth glow lines
+  const linePositions=[];
+  edges.forEach(([a,b])=>{
+    linePositions.push(pts3[a].p.x,pts3[a].p.y,pts3[a].p.z);
+    linePositions.push(pts3[b].p.x,pts3[b].p.y,pts3[b].p.z);
   });
-  const glowLines = new THREE.LineSegments(g, glow);
-  glowLines.computeLineDistances();
-  constellationLayer.add(glowLines);
+
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.Float32BufferAttribute(linePositions,3));
+
+  // core line
+  const core = new THREE.LineSegments(
+    geo,
+    new THREE.LineBasicMaterial({
+      color:0xffffff,
+      transparent:true,
+      opacity:0.28,
+      blending:THREE.AdditiveBlending,
+      depthWrite:false
+    })
+  );
+
+  // soft glow layer
+  const glow = new THREE.LineSegments(
+    geo,
+    new THREE.LineBasicMaterial({
+      color:0xffffff,
+      transparent:true,
+      opacity:0.12,
+      blending:THREE.AdditiveBlending,
+      depthWrite:false
+    })
+  );
+
+  glow.scale.multiplyScalar(1.002);
+
+  constellationLayer.add(core);
+  constellationLayer.add(glow);
 }
 
-/* -------------------------
-   SHAPE TEMPLATES (zodiac-like)
-   Each template: points + edges
-------------------------- */
+/* =========================
+   10 CONSTELLATION SHAPES
+========================= */
 
-// 1) Small chain (Aries-ish)
-const SH_CHAIN = {
-  points: [
-    [-1.2, 0.1, 0.9],
-    [-0.4, 0.2, 0.3],
-    [ 0.3, 0.0, 0.6],
-    [ 1.1,-0.4, 0.2]
-  ],
-  edges: [[0,1],[1,2],[2,3]]
-};
+const shapes = [
 
-// 2) Long bent chain (Taurus-ish)
-const SH_BENT = {
-  points: [
-    [-1.4, 0.0, 1.0],
-    [-0.6, 0.3, 0.4],
-    [ 0.1, 0.1, 0.7],
-    [ 0.8, 0.2, 0.3],
-    [ 1.3,-0.2, 0.8]
-  ],
-  edges: [[0,1],[1,2],[2,3],[3,4]]
-};
+  { points:[[-1,0,0.8],[-0.4,0.2,0.4],[0.3,0,0.6],[1,-0.3,0.2]],
+    edges:[[0,1],[1,2],[2,3]],
+    theta:0.7, phi:1.0 },
 
-// 3) Loop (Gemini-ish)
-const SH_LOOP = {
-  points: [
-    [-1.0, 0.4, 0.7],
-    [-0.2, 0.6, 0.3],
-    [ 0.6, 0.4, 0.6],
-    [ 0.7,-0.2, 0.4],
-    [ 0.0,-0.5, 0.9],
-    [-0.8,-0.1, 0.3]
-  ],
-  edges: [[0,1],[1,2],[2,3],[3,4],[4,5],[5,0]]
-};
+  { points:[[-1.2,0,0.9],[-0.5,0.3,0.3],[0.2,0.1,0.7],[0.9,0.2,0.3],[1.4,-0.2,0.8]],
+    edges:[[0,1],[1,2],[2,3],[3,4]],
+    theta:1.6, phi:0.9 },
 
-// 4) V shape with tail (Cancer-ish)
-const SH_VTAIL = {
-  points: [
-    [-1.0, 0.3, 0.6],
-    [-0.2, 0.1, 0.4],
-    [ 0.6, 0.4, 0.9],
-    [ 0.2,-0.3, 0.3],
-    [-0.4,-0.6, 0.8]
-  ],
-  edges: [[0,1],[1,2],[1,3],[3,4]]
-};
+  { points:[[-1,0.4,0.6],[-0.2,0.6,0.4],[0.6,0.4,0.5],[0.7,-0.2,0.4],[0,-0.5,0.8],[-0.8,-0.1,0.3]],
+    edges:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,0]],
+    theta:2.6, phi:1.2 },
 
-// 5) Zigzag (Leo-ish)
-const SH_ZIGZAG = {
-  points: [
-    [-1.3, 0.1, 0.6],
-    [-0.7, 0.5, 0.3],
-    [-0.1, 0.0, 0.8],
-    [ 0.5, 0.4, 0.4],
-    [ 1.2,-0.1, 0.7]
-  ],
-  edges: [[0,1],[1,2],[2,3],[3,4]]
-};
+  { points:[[-1,0.3,0.6],[-0.2,0.1,0.4],[0.6,0.4,0.9],[0.2,-0.3,0.3],[-0.4,-0.6,0.8]],
+    edges:[[0,1],[1,2],[1,3],[3,4]],
+    theta:3.4, phi:1.0 },
 
-// 6) Triangle-ish but open (Virgo-ish) — not a closed triangle
-const SH_OPENTRI = {
-  points: [
-    [-1.0, 0.0, 0.7],
-    [-0.1, 0.6, 0.4],
-    [ 0.9, 0.0, 0.9],
-    [ 0.1,-0.6, 0.5]
-  ],
-  edges: [[0,1],[1,2],[2,3]] // open shape
-};
+  { points:[[-1.3,0.1,0.6],[-0.7,0.5,0.3],[-0.1,0,0.8],[0.5,0.4,0.4],[1.2,-0.1,0.7]],
+    edges:[[0,1],[1,2],[2,3],[3,4]],
+    theta:4.3, phi:1.15 },
 
-// 7) Curved chain (Scorpio-ish)
-const SH_CURVE = {
-  points: [
-    [-1.1, 0.2, 0.8],
-    [-0.6, 0.4, 0.3],
-    [-0.1, 0.2, 0.6],
-    [ 0.4,-0.1, 0.4],
-    [ 0.9,-0.4, 0.9],
-    [ 1.2,-0.7, 0.5]
-  ],
-  edges: [[0,1],[1,2],[2,3],[3,4],[4,5]]
-};
+  { points:[[-1.1,0.2,0.8],[-0.6,0.4,0.3],[-0.1,0.2,0.6],[0.4,-0.1,0.4],[0.9,-0.4,0.9],[1.2,-0.7,0.5]],
+    edges:[[0,1],[1,2],[2,3],[3,4],[4,5]],
+    theta:5.1, phi:1.2 },
 
-// 8) Short “boxy” (Libra-ish)
-const SH_BOX = {
-  points: [
-    [-0.8, 0.3, 0.7],
-    [ 0.0, 0.5, 0.4],
-    [ 0.8, 0.3, 0.8],
-    [ 0.5,-0.3, 0.4],
-    [-0.3,-0.4, 0.9]
-  ],
-  edges: [[0,1],[1,2],[2,3],[3,4]]
-};
+  { points:[[-1.0,0.2,0.7],[-0.3,0.25,0.4],[0.2,0.05,0.6],[0.6,-0.2,0.3],[0.9,-0.45,0.8]],
+    edges:[[0,1],[1,2],[2,3],[3,4]],
+    theta:5.8, phi:0.95 },
 
-/* -------------------------
-   PLACE MANY CONSTELLATIONS
-   theta: 0..2π
-   phi:   0..π (keep ~0.7..2.2)
-------------------------- */
-addMiniConstellation({ ...SH_CHAIN,    theta: 0.7, phi: 1.0, scale: 0.065 });
-addMiniConstellation({ ...SH_BENT,     theta: 1.6, phi: 0.9, scale: 0.070 });
-addMiniConstellation({ ...SH_LOOP,     theta: 2.6, phi: 1.2, scale: 0.075 });
-addMiniConstellation({ ...SH_VTAIL,    theta: 3.4, phi: 1.0, scale: 0.070 });
-addMiniConstellation({ ...SH_ZIGZAG,   theta: 4.3, phi: 1.15, scale: 0.070 });
-addMiniConstellation({ ...SH_OPENTRI,  theta: 5.1, phi: 0.95, scale: 0.065 });
-addMiniConstellation({ ...SH_CURVE,    theta: 5.7, phi: 1.25, scale: 0.070 });
-addMiniConstellation({ ...SH_BOX,      theta: 0.2, phi: 1.35, scale: 0.070 });
+  { points:[[-0.9,0.1,0.8],[-0.2,0.15,0.4],[0.4,0.1,0.7],[0.0,-0.35,0.3],[0.2,-0.65,0.9]],
+    edges:[[0,1],[1,2],[1,3],[3,4]],
+    theta:0.2, phi:1.35 },
 
-// Optional: slight overall constellation visibility tuning
-// constellationLayer.children.forEach(obj => { if(obj.material) obj.material.opacity *= 0.95; });
+  { points:[[-0.8,0.0,0.7],[-0.1,0.4,0.3],[0.7,0.0,0.9],[0.0,-0.4,0.5]],
+    edges:[[0,1],[1,2],[2,3],[3,0]],
+    theta:1.1, phi:1.55 },
+
+  { points:[[-1.2,0.15,0.9],[-0.6,0.25,0.4],[-0.1,0.10,0.6],[0.4,-0.05,0.3],[0.9,-0.25,0.8],[1.25,-0.35,0.5]],
+    edges:[[0,1],[1,2],[2,3],[3,4],[4,5]],
+    theta:2.95, phi:0.78 }
+];
+
+shapes.forEach(s => addConstellation(s));
     /* =========================
        MAP BUILD
     ========================= */
@@ -726,5 +653,6 @@ addMiniConstellation({ ...SH_BOX,      theta: 0.2, phi: 1.35, scale: 0.070 });
   </script>
 </body>
 </html>
+
 
 

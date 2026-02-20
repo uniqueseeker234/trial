@@ -303,11 +303,12 @@
 
     const starsMaterial = new THREE.PointsMaterial({
       color: 0xfff1c1,        // warm starlight
-      size: 7,
+      size: 10,
       sizeAttenuation: true,
       transparent: true,
       opacity: 1,
       depthWrite: false
+      blending: THREE.AddictiveBlending
     });
 
     const starField = new THREE.Points(starsGeometry, starsMaterial);
@@ -495,4 +496,5 @@
   </script>
 </body>
 </html>
+
 

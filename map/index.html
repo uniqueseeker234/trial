@@ -276,7 +276,7 @@
 ========================= */
 
 // ---------- LIGHTING ----------
-scene.add(new THREE.AmbientLight(0xffffff, 1.0));
+scene.add(new THREE.AmbientLight(0xffffff, 1.25));
 
 const sun2 = new THREE.DirectionalLight(0xffffff, 1.0);
 sun.position.set(300, 400, 200);
@@ -300,8 +300,10 @@ const earth = new THREE.Mesh(
   new THREE.SphereGeometry(earthRadius, 64, 64),
   new THREE.MeshStandardMaterial({
     map: earthTexture,
-    roughness: 1.0,
+    roughness: 0.85,
     metalness: 0.0
+    emmisive:new THREE.Color(0x111111)
+    emissiveIntensity:0.35
   })
 );
 
@@ -310,12 +312,12 @@ scene.add(earth);
 
 // ---------- ATMOSPHERE GLOW ----------
 const atmosphere = new THREE.Mesh(
-  new THREE.SphereGeometry(earthRadius * 1.06, 64, 64),
+  new THREE.SphereGeometry(earthRadius * 1.015, 64, 64),
   new THREE.MeshBasicMaterial({
     color: 0x4fb3ff,
     transparent: true,
-    opacity: 0.12,
-    side: THREE.BackSide
+    opacity: 0.05,
+    depthWrite:false
   })
 );
 
@@ -742,6 +744,7 @@ for (let i=0; i<centers.length; i++) {
   </script>
 </body>
 </html>
+
 
 
 

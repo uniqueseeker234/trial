@@ -210,6 +210,8 @@
   <script type="module">
     import * as THREE from "three";
     import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+    import { FontLoader } from "three/addons/loaders/FontLoader.js";
+import { TextGeometry } from "three/addons/geometries/TextGeometry.js";
 
     // =========================
     // 1) DATA (EDIT ANYTIME)
@@ -390,6 +392,7 @@
         mesh.userData = { name, hex };
         mapGroup.add(mesh);
         clickable.push(mesh);
+        addTextOnDistrict(name, mesh);
 
         if (!labelLocal && pts.length){
           let sx=0, sy=0;
@@ -499,6 +502,50 @@
     }
   }
 }
+    function addTextOnDistrict(name, mesh){
+
+  const loader = new FontLoader();
+
+  loader.load(
+    "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/fonts/helvetiker_bold.typeface.json",
+    function (font) {
+
+      const textGeo = new TextGeometry(name, {
+        font: font,
+        size: 5,
+        height: 0.5,
+        curveSegments: 4,
+        bevelEnabled: false
+      });
+
+      const textMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+      const textMesh = new THREE.Mesh(textGeo, textMat);
+
+      // Lay flat
+      textMesh.rotation.x = -Math.PI/2;
+
+      // Center text
+      textGeo.computeBoundingBox();
+      const textWidth = textGeo.boundingBox.max.x - textGeo.boundingBox.min.x;
+
+      // Get district center
+      const box = new THREE.Box3().setFromObject(mesh);
+      const center = new THREE.Vector3();
+      box.getCenter(center);
+
+      textMesh.position.x = center.x - textWidth/2;
+      textMesh.position.z = center.z;
+      textMesh.position.y = 12;
+
+      // Rotate narrow district manually
+      if(name === "Alappuzha"){
+        textMesh.rotation.z = Math.PI/2;
+      }
+
+      scene.add(textMesh);
+    }
+  );
+}
 
     // =========================
     // 8) LOOP + RESIZE
@@ -520,4 +567,5 @@
   </script>
 </body>
 </html>
+
 

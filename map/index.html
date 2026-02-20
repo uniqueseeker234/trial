@@ -19,7 +19,7 @@
 
     body{ margin:0; overflow:hidden; background:var(--bg); font-family:system-ui, Arial; }
 
-    /* Keep UI always above canvas */
+    /* Always keep UI above canvas */
     #topbar, #hint, #overlay, #popup { position:fixed; z-index:9999; }
 
     #topbar{
@@ -123,7 +123,7 @@
     }
     ul{ margin:6px 0 0 18px; }
 
-    /* Mobile bottom sheet popup */
+    /* Mobile bottom-sheet popup */
     @media (max-width:768px){
       #popup{
         left:10px; right:10px;
@@ -136,7 +136,7 @@
     }
   </style>
 
-  <!-- Three.js import map -->
+  <!-- Import map for Three.js addons -->
   <script type="importmap">
   {
     "imports": {
@@ -275,56 +275,42 @@
     scene.add(sun);
 
     /* =========================
-       GALAXY DOME
+       NIGHT SKY 360 STAR FIELD
+       (Always surrounds camera)
     ========================= */
-    let galaxySphere;
+    const starsGeometry = new THREE.BufferGeometry();
+    const starCount = 2600;
 
-    function addGalaxyDome(){
-      const c = document.createElement("canvas");
-      c.width = 1024;
-      c.height = 1024;
-      const ctx = c.getContext("2d");
+    const starPositions = new Float32Array(starCount * 3);
 
-      // base
-      ctx.fillStyle = "#050611";
-      ctx.fillRect(0,0,c.width,c.height);
+    for (let i = 0; i < starCount; i++) {
+      const radius = 3000;
+      const u = Math.random();
+      const v = Math.random();
+      const theta = 2 * Math.PI * u;
+      const phi = Math.acos(2 * v - 1);
 
-      // stars
-      for(let i=0;i<2600;i++){
-        const x = Math.random()*c.width;
-        const y = Math.random()*c.height;
-        const r = Math.random()*1.7;
-        const a = 0.25 + Math.random()*0.75;
-        const colors = ["255,235,180","255,215,140","255,255,255"];
-        const col = colors[Math.floor(Math.random()*colors.length)];
-        ctx.fillStyle = `rgba(${col},${a})`;
-        ctx.beginPath();
-        ctx.arc(x,y,r,0,Math.PI*2);
-        ctx.fill();
-      }
+      const x = radius * Math.sin(phi) * Math.cos(theta);
+      const y = radius * Math.sin(phi) * Math.sin(theta);
+      const z = radius * Math.cos(phi);
 
-      // soft nebulas
-      for(let i=0;i<10;i++){
-        const x = Math.random()*c.width;
-        const y = Math.random()*c.height;
-        const rad = 140 + Math.random()*240;
-        const g = ctx.createRadialGradient(x,y,0,x,y,rad);
-        g.addColorStop(0, "rgba(120,170,255,0.14)");
-        g.addColorStop(1, "rgba(0,0,0,0)");
-        ctx.fillStyle = g;
-        ctx.beginPath();
-        ctx.arc(x,y,rad,0,Math.PI*2);
-        ctx.fill();
-      }
-
-      const tex = new THREE.CanvasTexture(c);
-      const geom = new THREE.SphereGeometry(3200, 64, 64);
-      const mat = new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide });
-
-      galaxySphere = new THREE.Mesh(geom, mat);
-      scene.add(galaxySphere);
+      starPositions[i * 3 + 0] = x;
+      starPositions[i * 3 + 1] = y;
+      starPositions[i * 3 + 2] = z;
     }
-    addGalaxyDome();
+
+    starsGeometry.setAttribute("position", new THREE.BufferAttribute(starPositions, 3));
+
+    const starsMaterial = new THREE.PointsMaterial({
+      color: 0xfff1c1,        // warm starlight
+      size: 3,
+      sizeAttenuation: true,
+      transparent: true,
+      opacity: 0.9
+    });
+
+    const starField = new THREE.Points(starsGeometry, starsMaterial);
+    scene.add(starField);
 
     /* =========================
        MAP BUILD
@@ -354,21 +340,17 @@
     let selectedMesh = null;
 
     function setSelected(mesh){
-      // reset previous
       if (selectedMesh && selectedMesh.material){
         selectedMesh.material.emissive = new THREE.Color(0x000000);
         selectedMesh.material.emissiveIntensity = 0;
         selectedMesh.position.y -= 1.2; // undo lift
       }
-
       selectedMesh = mesh;
 
       if (selectedMesh && selectedMesh.material){
-        // glow color: slightly brighter version of district color
         const glow = selectedMesh.material.color.clone().lerp(new THREE.Color(0xffffff), 0.35);
         selectedMesh.material.emissive = glow;
         selectedMesh.material.emissiveIntensity = 0.85;
-
         selectedMesh.position.y += 1.2; // small lift
       }
     }
@@ -376,7 +358,7 @@
     // Load geojson
     const geo = await fetch("./kerala_districts.geojson").then(r => r.json());
 
-    // Sort so district->color assignment is stable and consistent
+    // Sort for stable colors
     const features = [...geo.features].sort((a,b)=>{
       const A = (a.properties?.shapeName || "").toLowerCase();
       const B = (b.properties?.shapeName || "").toLowerCase();
@@ -407,7 +389,6 @@
           bevelEnabled: false
         });
 
-        // Cleaner material to reduce weird “triangulation shine”
         const mat = new THREE.MeshStandardMaterial({
           color: districtColor,
           roughness: 0.92,
@@ -425,17 +406,16 @@
         mesh.rotation.x = -Math.PI/2;
         mesh.userData = { name, hex };
 
-        // tiny lift to avoid z-fighting artifacts
-        mesh.position.y += 0.01;
+        mesh.position.y += 0.01; // tiny lift to avoid z-fighting
 
         mapGroup.add(mesh);
         clickable.push(mesh);
 
-        // optional outline (helps districts not merge visually)
+        // outline so neighbors don't blend
         const edges = new THREE.EdgesGeometry(extrudeGeo, 25);
         const line = new THREE.LineSegments(
           edges,
-          new THREE.LineBasicMaterial({ color: 0x000000, transparent:true, opacity:0.32 })
+          new THREE.LineBasicMaterial({ color: 0x000000, transparent:true, opacity:0.30 })
         );
         line.rotation.x = -Math.PI/2;
         line.position.copy(mesh.position);
@@ -449,7 +429,7 @@
     bbox.getCenter(center);
     mapGroup.position.sub(center);
 
-    // Fit camera nicely
+    // Fit camera
     function fitCamera(){
       const box = new THREE.Box3().setFromObject(mapGroup);
       const size = new THREE.Vector3();
@@ -479,8 +459,7 @@
 
       if (hits.length){
         const obj = hits[0].object;
-
-        setSelected(obj); // ✅ glow + lift
+        setSelected(obj); // glow + lift
         openPopup(obj.userData.name, obj.userData.hex);
       }
     }
@@ -499,11 +478,8 @@
       requestAnimationFrame(animate);
       controls.update();
 
-      // slow galaxy movement
-      if (galaxySphere){
-        galaxySphere.rotation.y += 0.00018;
-        galaxySphere.rotation.x += 0.00004;
-      }
+      // Keep stars always around the camera (true 360 night sky)
+      starField.position.copy(camera.position);
 
       renderer.render(scene, camera);
     }

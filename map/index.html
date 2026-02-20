@@ -310,29 +310,26 @@
     const starField = new THREE.Points(starsGeometry, starsMaterial);
     scene.add(starField);
 /* =========================
-   PREMIUM NIGHT CONSTELLATIONS (10)
-   - small clusters
-   - glowing star dots
-   - smooth glow lines
-   - rotates with sky
+   15 SMOOTH GLOW CONSTELLATIONS
+   (Mobile-safe, no dashed lines)
 ========================= */
 
 const constellationLayer = new THREE.Group();
-starField.add(constellationLayer); // attach to sky
+starField.add(constellationLayer);
 
-// ---- Create glow texture for star nodes ----
-function makeGlowTexture() {
+// ---- Glow texture for stars ----
+function makeGlowTexture(){
   const c = document.createElement("canvas");
   c.width = 128;
   c.height = 128;
   const ctx = c.getContext("2d");
 
-  const gradient = ctx.createRadialGradient(64,64,5, 64,64,60);
-  gradient.addColorStop(0.0, "rgba(255,215,140,1)");
-  gradient.addColorStop(0.3, "rgba(255,215,140,0.7)");
-  gradient.addColorStop(1.0, "rgba(255,215,140,0)");
+  const g = ctx.createRadialGradient(64,64,5,64,64,60);
+  g.addColorStop(0.0,"rgba(255,220,150,1)");
+  g.addColorStop(0.4,"rgba(255,220,150,0.6)");
+  g.addColorStop(1.0,"rgba(255,220,150,0)");
 
-  ctx.fillStyle = gradient;
+  ctx.fillStyle = g;
   ctx.beginPath();
   ctx.arc(64,64,60,0,Math.PI*2);
   ctx.fill();
@@ -342,7 +339,7 @@ function makeGlowTexture() {
 
 const glowTexture = makeGlowTexture();
 
-// ---- Convert small 2D cluster to sky sphere ----
+// ---- Convert small cluster to sky sphere ----
 function toSphere(x,y,theta0,phi0,scale,radius){
   const theta = theta0 + x*scale;
   const phi   = phi0   + y*scale;
@@ -354,19 +351,22 @@ function toSphere(x,y,theta0,phi0,scale,radius){
   );
 }
 
-// ---- Create one constellation ----
-function addConstellation({points,edges,theta,phi}){
+function addConstellation(theta,phi){
 
   const radius = 3000;
   const scale  = 0.065;
 
-  const pts3 = points.map(([x,y,w])=>({
-    p: toSphere(x,y,theta,phi,scale,radius),
-    w
-  }));
+  // random small shape each time
+  const baseShape = [
+    [-1,0],[ -0.4,0.2 ],[0.3,0],[1,-0.3]
+  ];
 
-  // ⭐ Glow stars
-  pts3.forEach(({p,w})=>{
+  const pts = baseShape.map(([x,y]) =>
+    toSphere(x,y,theta,phi,scale,radius)
+  );
+
+  // ---- Stars ----
+  pts.forEach(p=>{
     const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
       map: glowTexture,
       transparent:true,
@@ -374,21 +374,21 @@ function addConstellation({points,edges,theta,phi}){
       depthWrite:false
     }));
 
-    const size = 8 + w*14;  // balanced size
+    const size = window.innerWidth < 768 ? 18 : 12;
     sprite.scale.set(size,size,1);
     sprite.position.copy(p);
     constellationLayer.add(sprite);
   });
 
-  // ✨ Smooth glow lines
-  const linePositions=[];
-  edges.forEach(([a,b])=>{
-    linePositions.push(pts3[a].p.x,pts3[a].p.y,pts3[a].p.z);
-    linePositions.push(pts3[b].p.x,pts3[b].p.y,pts3[b].p.z);
-  });
+  // ---- Smooth Glow Lines ----
+  const positions=[];
+  for(let i=0;i<pts.length-1;i++){
+    positions.push(pts[i].x,pts[i].y,pts[i].z);
+    positions.push(pts[i+1].x,pts[i+1].y,pts[i+1].z);
+  }
 
   const geo = new THREE.BufferGeometry();
-  geo.setAttribute("position", new THREE.Float32BufferAttribute(linePositions,3));
+  geo.setAttribute("position", new THREE.Float32BufferAttribute(positions,3));
 
   // core line
   const core = new THREE.LineSegments(
@@ -396,19 +396,19 @@ function addConstellation({points,edges,theta,phi}){
     new THREE.LineBasicMaterial({
       color:0xffffff,
       transparent:true,
-      opacity:0.28,
+      opacity: window.innerWidth < 768 ? 0.55 : 0.35,
       blending:THREE.AdditiveBlending,
       depthWrite:false
     })
   );
 
-  // soft glow layer
+  // glow layer
   const glow = new THREE.LineSegments(
     geo,
     new THREE.LineBasicMaterial({
       color:0xffffff,
       transparent:true,
-      opacity:0.12,
+      opacity: window.innerWidth < 768 ? 0.25 : 0.15,
       blending:THREE.AdditiveBlending,
       depthWrite:false
     })
@@ -420,54 +420,12 @@ function addConstellation({points,edges,theta,phi}){
   constellationLayer.add(glow);
 }
 
-/* =========================
-   10 CONSTELLATION SHAPES
-========================= */
-
-const shapes = [
-
-  { points:[[-1,0,0.8],[-0.4,0.2,0.4],[0.3,0,0.6],[1,-0.3,0.2]],
-    edges:[[0,1],[1,2],[2,3]],
-    theta:0.7, phi:1.0 },
-
-  { points:[[-1.2,0,0.9],[-0.5,0.3,0.3],[0.2,0.1,0.7],[0.9,0.2,0.3],[1.4,-0.2,0.8]],
-    edges:[[0,1],[1,2],[2,3],[3,4]],
-    theta:1.6, phi:0.9 },
-
-  { points:[[-1,0.4,0.6],[-0.2,0.6,0.4],[0.6,0.4,0.5],[0.7,-0.2,0.4],[0,-0.5,0.8],[-0.8,-0.1,0.3]],
-    edges:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,0]],
-    theta:2.6, phi:1.2 },
-
-  { points:[[-1,0.3,0.6],[-0.2,0.1,0.4],[0.6,0.4,0.9],[0.2,-0.3,0.3],[-0.4,-0.6,0.8]],
-    edges:[[0,1],[1,2],[1,3],[3,4]],
-    theta:3.4, phi:1.0 },
-
-  { points:[[-1.3,0.1,0.6],[-0.7,0.5,0.3],[-0.1,0,0.8],[0.5,0.4,0.4],[1.2,-0.1,0.7]],
-    edges:[[0,1],[1,2],[2,3],[3,4]],
-    theta:4.3, phi:1.15 },
-
-  { points:[[-1.1,0.2,0.8],[-0.6,0.4,0.3],[-0.1,0.2,0.6],[0.4,-0.1,0.4],[0.9,-0.4,0.9],[1.2,-0.7,0.5]],
-    edges:[[0,1],[1,2],[2,3],[3,4],[4,5]],
-    theta:5.1, phi:1.2 },
-
-  { points:[[-1.0,0.2,0.7],[-0.3,0.25,0.4],[0.2,0.05,0.6],[0.6,-0.2,0.3],[0.9,-0.45,0.8]],
-    edges:[[0,1],[1,2],[2,3],[3,4]],
-    theta:5.8, phi:0.95 },
-
-  { points:[[-0.9,0.1,0.8],[-0.2,0.15,0.4],[0.4,0.1,0.7],[0.0,-0.35,0.3],[0.2,-0.65,0.9]],
-    edges:[[0,1],[1,2],[1,3],[3,4]],
-    theta:0.2, phi:1.35 },
-
-  { points:[[-0.8,0.0,0.7],[-0.1,0.4,0.3],[0.7,0.0,0.9],[0.0,-0.4,0.5]],
-    edges:[[0,1],[1,2],[2,3],[3,0]],
-    theta:1.1, phi:1.55 },
-
-  { points:[[-1.2,0.15,0.9],[-0.6,0.25,0.4],[-0.1,0.10,0.6],[0.4,-0.05,0.3],[0.9,-0.25,0.8],[1.25,-0.35,0.5]],
-    edges:[[0,1],[1,2],[2,3],[3,4],[4,5]],
-    theta:2.95, phi:0.78 }
-];
-
-shapes.forEach(s => addConstellation(s));
+// ---- Create 15 spread constellations ----
+for(let i=0;i<15;i++){
+  const theta = Math.random() * Math.PI * 2;
+  const phi   = 0.7 + Math.random() * 1.4;
+  addConstellation(theta,phi);
+}
     /* =========================
        MAP BUILD
     ========================= */
@@ -653,6 +611,7 @@ shapes.forEach(s => addConstellation(s));
   </script>
 </body>
 </html>
+
 
 
 

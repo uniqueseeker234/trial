@@ -294,10 +294,10 @@ earthTexture.colorSpace = THREE.SRGBColorSpace;
 
 
 // ---------- EARTH SPHERE ----------
-const earthRadius = 75;
+const earthRadius = 55;
 
 const earth = new THREE.Mesh(
-  new THREE.SphereGeometry(earthRadius, 64, 64),
+  new THREE.SphereGeometry(earthRadius, 96, 96),
   new THREE.MeshStandardMaterial({
     map: earthTexture,
     roughness: 0.85,
@@ -339,7 +339,7 @@ scene.add(rimGlow);
 
 
 // ---------- POSITION ----------
-earth.position.set(0, -120, -20);
+earth.position.set(0, -130, 0);
 atmosphere.position.copy(earth.position);
 rimGlow.position.copy(earth.position);
 
@@ -744,6 +744,7 @@ for (let i=0; i<centers.length; i++) {
   </script>
 </body>
 </html>
+
 
 
 

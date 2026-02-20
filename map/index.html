@@ -466,35 +466,39 @@
     // =========================
     // 7) LABEL POSITION UPDATE
     // =========================
-    function updateLabels(){
-      if (!labelsOn) return;
+  function updateLabels(){
 
-      // We only stored labels on some meshes; loop all and update if label exists
-      for (const obj of clickable){
-        const el = obj.userData.labelEl;
-        const local = obj.userData.labelLocal;
-        if (!el || !local) continue;
+  if (!labelsOn) return;
 
-        // Convert label local point to world
-        const worldPos = local.clone();
-        // Apply mesh rotation/position via matrixWorld
-        obj.updateMatrixWorld(true);
-        worldPos.applyMatrix4(obj.matrixWorld);
+  for (const obj of clickable){
 
-        // Project to screen
-        worldPos.project(camera);
+    const el = obj.userData.labelEl;
+    if (!el) continue;
 
-        const x = (worldPos.x * 0.5 + 0.5) * innerWidth;
-        const y = (-worldPos.y * 0.5 + 0.5) * innerHeight;
+    // Get bounding box center of this mesh
+    const box = new THREE.Box3().setFromObject(obj);
+    const center = new THREE.Vector3();
+    box.getCenter(center);
 
-        // Hide if behind camera or out of view
-        const visible = worldPos.z >= -1 && worldPos.z <= 1;
-        el.style.display = visible ? "block" : "none";
-        if (visible){
-          el.style.transform = `translate(-50%,-50%) translate(${x}px,${y}px)`;
-        }
-      }
+    // Slightly raise above surface
+    center.y += 15;
+
+    // Convert to screen space
+    center.project(camera);
+
+    const x = (center.x * 0.5 + 0.5) * innerWidth;
+    const y = (-center.y * 0.5 + 0.5) * innerHeight;
+
+    // Hide only if behind camera
+    const visible = center.z < 1;
+
+    el.style.display = visible ? "block" : "none";
+
+    if (visible){
+      el.style.transform = `translate(-50%,-50%) translate(${x}px,${y}px)`;
     }
+  }
+}
 
     // =========================
     // 8) LOOP + RESIZE
@@ -516,3 +520,4 @@
   </script>
 </body>
 </html>
+

@@ -271,18 +271,30 @@
     sun.position.set(220, 520, 180);
     scene.add(sun);
 
-   /* =========================
-   REAL NASA EARTH 🌍
+  /* =========================
+   CINEMATIC NASA EARTH 🌍
 ========================= */
 
-const textureLoader = new THREE.TextureLoader();
+// ---------- LIGHTING ----------
+scene.add(new THREE.AmbientLight(0xffffff, 1.0));
 
-// Load your downloaded file
+const sun = new THREE.DirectionalLight(0xffffff, 1.0);
+sun.position.set(300, 400, 200);
+scene.add(sun);
+
+const fill = new THREE.DirectionalLight(0xffffff, 0.45);
+fill.position.set(-300, 200, -200);
+scene.add(fill);
+
+
+// ---------- TEXTURE ----------
+const textureLoader = new THREE.TextureLoader();
 const earthTexture = textureLoader.load("./earth.jpg");
 earthTexture.colorSpace = THREE.SRGBColorSpace;
 
-// Create sphere
-const earthRadius = 65;
+
+// ---------- EARTH SPHERE ----------
+const earthRadius = 75;
 
 const earth = new THREE.Mesh(
   new THREE.SphereGeometry(earthRadius, 64, 64),
@@ -295,26 +307,46 @@ const earth = new THREE.Mesh(
 
 scene.add(earth);
 
-// Atmosphere glow
+
+// ---------- ATMOSPHERE GLOW ----------
 const atmosphere = new THREE.Mesh(
-  new THREE.SphereGeometry(earthRadius * 1.03, 64, 64),
+  new THREE.SphereGeometry(earthRadius * 1.06, 64, 64),
   new THREE.MeshBasicMaterial({
     color: 0x4fb3ff,
     transparent: true,
-    opacity: 0.08
+    opacity: 0.12,
+    side: THREE.BackSide
   })
 );
 
 scene.add(atmosphere);
 
-// Position below Kerala map
-earth.position.set(0, -110, -50);
-atmosphere.position.copy(earth.position);
 
-// Rotation animation
+// ---------- RIM LIGHT EFFECT ----------
+const rimGlow = new THREE.Mesh(
+  new THREE.SphereGeometry(earthRadius * 1.02, 64, 64),
+  new THREE.MeshBasicMaterial({
+    color: 0x66ccff,
+    transparent: true,
+    opacity: 0.06,
+    side: THREE.BackSide
+  })
+);
+
+scene.add(rimGlow);
+
+
+// ---------- POSITION ----------
+earth.position.set(0, -120, -20);
+atmosphere.position.copy(earth.position);
+rimGlow.position.copy(earth.position);
+
+
+// ---------- ROTATION ----------
 function animateEarth(){
-  earth.rotation.y += 0.0015;
-  atmosphere.rotation.y += 0.0015;
+  earth.rotation.y += 0.0016;
+  atmosphere.rotation.y += 0.0016;
+  rimGlow.rotation.y += 0.0016;
 }
 
     /* =========================
@@ -710,6 +742,7 @@ for (let i=0; i<centers.length; i++) {
   </script>
 </body>
 </html>
+
 
 
 

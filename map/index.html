@@ -282,41 +282,21 @@
 const textureLoader = new THREE.TextureLoader();
 
 // IMPORTANT: earth.jpg must be in SAME folder as index.html
-const earthTexture = textureLoader.load("./earth.jpg");
+const earthTexture = new THREE.TextureLoader().load("./earth.jpg");
 earthTexture.colorSpace = THREE.SRGBColorSpace;
 
-const earthRadius = 55;
-
-// Full bright Earth (no shadows, no half dark)
 const earth = new THREE.Mesh(
-  new THREE.SphereGeometry(earthRadius, 96, 96),
+  new THREE.SphereGeometry(55, 96, 96),
   new THREE.MeshBasicMaterial({
     map: earthTexture
   })
 );
+
 scene.add(earth);
-
-// Soft atmosphere glow (optional, looks nice)
-const atmosphere = new THREE.Mesh(
-  new THREE.SphereGeometry(earthRadius * 1.02, 64, 64),
-  new THREE.MeshBasicMaterial({
-    color: 0x66ccff,
-    transparent: true,
-    opacity: 0.08,
-    depthWrite: false,
-    blending: THREE.AdditiveBlending
-  })
-);
-scene.add(atmosphere);
-
-// Position under Kerala
 earth.position.set(0, -130, 0);
-atmosphere.position.copy(earth.position);
 
-// Rotation (keep your animateEarth() call)
 function animateEarth(){
   earth.rotation.y += 0.0016;
-  atmosphere.rotation.y += 0.0016;
 }
     /* =========================
        NIGHT SKY 360 STARS
@@ -711,6 +691,7 @@ for (let i=0; i<centers.length; i++) {
   </script>
 </body>
 </html>
+
 
 
 

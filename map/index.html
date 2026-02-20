@@ -360,6 +360,38 @@
     const sun = new THREE.DirectionalLight(0xffffff, 0.95);
     sun.position.set(220, 520, 180);
     scene.add(sun);
+    // ⭐ STAR BACKGROUND
+const starGeometry = new THREE.BufferGeometry();
+const starCount = 1500;
+
+const positions = [];
+
+for (let i = 0; i < starCount; i++) {
+  const radius = 2500;
+  const theta = Math.random() * 2 * Math.PI;
+  const phi = Math.acos((Math.random() * 2) - 1);
+
+  const x = radius * Math.sin(phi) * Math.cos(theta);
+  const y = radius * Math.sin(phi) * Math.sin(theta);
+  const z = radius * Math.cos(phi);
+
+  positions.push(x, y, z);
+}
+
+starGeometry.setAttribute(
+  "position",
+  new THREE.Float32BufferAttribute(positions, 3)
+);
+
+const starMaterial = new THREE.PointsMaterial({
+  color: 0xffe9b3,   // soft gold
+  size: 3,
+  transparent: true,
+  opacity: 0.9
+});
+
+const stars = new THREE.Points(starGeometry, starMaterial);
+scene.add(stars);
 
     const base = new THREE.Mesh(
       new THREE.PlaneGeometry(2000, 2000),
@@ -560,6 +592,7 @@
   </script>
 </body>
 </html>
+
 
 
 

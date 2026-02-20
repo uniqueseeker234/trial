@@ -1,477 +1,518 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Kerala 3D Algae Map</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Kerala Algae Map (3D Districts)</title>
 
-<style>
-:root{
-  --bg:#0b1220;
-  --accent:#4fb3ff;
-  --text:#e8f0ff;
-  --glass:rgba(255,255,255,0.12);
-}
-body{ margin:0; overflow:hidden; background:var(--bg); font-family:system-ui, Arial; }
+  <style>
+    :root{
+      --bg:#0b1220;
+      --accent:#4fb3ff;
+      --text:#e8f0ff;
+      --glass:rgba(255,255,255,0.10);
+      --glass2:rgba(255,255,255,0.16);
+      --border:rgba(255,255,255,0.18);
+      --shadow:0 14px 40px rgba(0,0,0,0.45);
+      --card:rgba(255,255,255,0.98);
+    }
 
-#topbar{
-  position:fixed; top:15px; left:15px;
-  z-index:1000;
-  background:var(--glass);
-  color:var(--text);
-  padding:10px 14px;
-  border-radius:14px;
-  backdrop-filter: blur(8px);
-  border:1px solid rgba(255,255,255,0.18);
-}
+    body{ margin:0; overflow:hidden; background:var(--bg); font-family:system-ui, Arial; }
 
-/* Popup */
-#overlay{
-  position:fixed; inset:0;
-  background:rgba(0,0,0,0.45);
-  display:none;
-  z-index:2000;
-}
-#popup{
-  position:fixed; top:15px; right:15px;
-  width:340px;
-  max-height:75vh;
-  overflow:auto;
-  background:#fff;
-  border-radius:16px;
-  padding:14px;
-  display:none;
-  z-index:3000;
-  border:3px solid var(--accent);
-  box-shadow:0 14px 40px rgba(0,0,0,0.45);
-}
-#overlay.show, #popup.show{ display:block; }
+    /* Always keep UI above canvas */
+    #topbar, #hint, #overlay, #popup, #labelLayer { position:fixed; z-index:9999; }
 
-#popupHeader{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  padding-bottom:10px;
-  border-bottom:2px solid color-mix(in srgb, var(--accent) 35%, transparent);
-  margin-bottom:10px;
-}
-#popupTitle{
-  margin:0;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-size:18px;
-  line-height:1.2;
-}
-#dot{
-  width:14px; height:14px;
-  border-radius:999px;
-  background:var(--accent);
-  box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
-}
-.sectionTitle{
-  margin:10px 0 6px;
-  font-size:12px;
-  letter-spacing:.35px;
-  text-transform:uppercase;
-  color:#444;
-}
-ul{ margin:6px 0 0 18px; }
-#closeBtn{
-  border:none;
-  border-radius:12px;
-  padding:8px 10px;
-  font-weight:900;
-  cursor:pointer;
-  background:color-mix(in srgb, var(--accent) 18%, rgba(0,0,0,0.06));
-  color:#111;
-}
+    #topbar{
+      top:15px; left:15px;
+      display:flex; gap:10px; align-items:center;
+      color:var(--text);
+      background:var(--glass);
+      border:1px solid var(--border);
+      padding:10px 12px;
+      border-radius:14px;
+      backdrop-filter: blur(8px);
+    }
+    #topbar a{
+      color:var(--text);
+      text-decoration:none;
+      border-bottom:1px dashed rgba(255,255,255,0.45);
+    }
+    button{
+      cursor:pointer;
+      border:none;
+      border-radius:12px;
+      padding:8px 10px;
+      font-weight:800;
+      background:var(--glass2);
+      color:var(--text);
+    }
+    button:hover{ background:rgba(255,255,255,0.25); }
 
-@media(max-width:768px){
-  #popup{
-    left:10px; right:10px;
-    top:auto; bottom:10px;
-    width:auto;
-    max-height:60vh;
-    border-radius:18px;
+    #hint{
+      left:15px; bottom:15px;
+      color:var(--text);
+      background:var(--glass);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:10px 12px;
+      backdrop-filter: blur(8px);
+      max-width:80vw;
+    }
+
+    #overlay{
+      inset:0;
+      background:rgba(0,0,0,0.45);
+      display:none;
+    }
+    #overlay.show{ display:block; }
+
+    #popup{
+      top:15px; right:15px;
+      width:340px;
+      max-height:78vh;
+      overflow:auto;
+      background:var(--card);
+      border-radius:16px;
+      padding:14px;
+      display:none;
+      box-shadow:var(--shadow);
+      border:3px solid color-mix(in srgb, var(--accent) 65%, transparent);
+    }
+    #popup.show{ display:block; }
+
+    #popupHeader{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding-bottom:10px;
+      border-bottom:2px solid color-mix(in srgb, var(--accent) 35%, transparent);
+      margin-bottom:10px;
+    }
+    #popupTitle{
+      margin:0;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-size:18px;
+      line-height:1.2;
+    }
+    #dot{
+      width:14px; height:14px;
+      border-radius:999px;
+      background:var(--accent);
+      box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
+      flex:0 0 auto;
+    }
+    #closeBtn{
+      background: color-mix(in srgb, var(--accent) 18%, rgba(0,0,0,0.06));
+      color:#111;
+      font-weight:900;
+      padding:8px 10px;
+      border-radius:12px;
+    }
+
+    .sectionTitle{
+      margin:10px 0 6px;
+      font-size:12px;
+      letter-spacing:.35px;
+      text-transform:uppercase;
+      color:#444;
+    }
+    ul{ margin:6px 0 0 18px; }
+
+    .note{
+      margin-top:10px;
+      font-size:12px;
+      color:#666;
+      line-height:1.35;
+    }
+
+    /* Mobile bottom-sheet popup */
+    @media (max-width:768px){
+      #popup{
+        left:10px; right:10px;
+        top:auto; bottom:10px;
+        width:auto;
+        max-height:60vh;
+        border-radius:18px;
+      }
+      #topbar{ right:15px; }
+    }
+
+    /* Labels layer */
+    #labelLayer{
+      inset:0;
+      pointer-events:none; /* very important */
+    }
+    .label{
+      position:absolute;
+      transform:translate(-50%,-50%);
+      background:rgba(0,0,0,0.60);
+      color:#fff;
+      padding:4px 8px;
+      border-radius:10px;
+      font-weight:800;
+      white-space:nowrap;
+      user-select:none;
+      -webkit-user-select:none;
+      box-shadow:0 6px 20px rgba(0,0,0,0.35);
+    }
+    @media (max-width:768px){
+      .label{ font-size:10px; padding:3px 7px; border-radius:9px; }
+    }
+    @media (min-width:769px){
+      .label{ font-size:11px; }
+    }
+  </style>
+
+  <!-- Import map for Three.js addons -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
   }
-}
-</style>
-
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-  }
-}
-</script>
+  </script>
 </head>
 
 <body>
-<div id="topbar">Kerala 3D Algae Map</div>
-
-<div id="overlay"></div>
-
-<div id="popup" role="dialog" aria-modal="true">
-  <div id="popupHeader">
-    <h3 id="popupTitle"><span id="dot"></span><span id="titleText">District</span></h3>
-    <button id="closeBtn">Close</button>
+  <div id="topbar">
+    <b>Kerala 3D Algae Map</b>
+    <span style="opacity:.8">•</span>
+    <a href="../" title="Back to main site">Back</a>
+    <button id="resetBtn">Reset View</button>
+    <button id="labelsBtn">Labels: ON</button>
   </div>
 
-  <div class="sectionTitle">Common algae (4–5)</div>
-  <div id="algaeList"></div>
+  <div id="hint">Drag to rotate • Scroll/pinch to zoom • Tap a district</div>
 
-  <div class="sectionTitle">Commonly seen in (examples)</div>
-  <div id="habitatList"></div>
-</div>
+  <div id="labelLayer"></div>
 
-<script type="module">
-import * as THREE from "three";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { FontLoader } from "three/addons/loaders/FontLoader.js";
-import { TextGeometry } from "three/addons/geometries/TextGeometry.js";
+  <div id="overlay"></div>
 
-/* =========================
-   DATA (edit later)
-========================= */
-const algaeByDistrict = {
-  "Thiruvananthapuram": ["Spirogyra","Oedogonium","Cladophora","Nostoc","Scenedesmus"],
-  "Kollam": ["Cladophora","Spirogyra","Scenedesmus","Pediastrum","Nostoc"],
-  "Pathanamthitta": ["Cosmarium","Staurastrum","Spirogyra","Nostoc","Scenedesmus"],
-  "Alappuzha": ["Nostoc","Pediastrum","Scenedesmus","Spirogyra","Cladophora"],
-  "Kottayam": ["Spirogyra","Cosmarium","Scenedesmus","Pediastrum","Nostoc"],
-  "Idukki": ["Cosmarium","Staurastrum","Spirogyra","Cladophora","Nostoc"],
-  "Ernakulam": ["Cladophora","Scenedesmus","Spirogyra","Pediastrum","Nostoc"],
-  "Thrissur": ["Spirogyra","Oedogonium","Scenedesmus","Pediastrum","Nostoc"],
-  "Palakkad": ["Oedogonium","Spirogyra","Scenedesmus","Nostoc","Pediastrum"],
-  "Malappuram": ["Spirogyra","Scenedesmus","Cladophora","Nostoc","Pediastrum"],
-  "Kozhikode": ["Cosmarium","Cladophora","Scenedesmus","Spirogyra","Nostoc"],
-  "Wayanad": ["Cosmarium","Staurastrum","Spirogyra","Nostoc","Pediastrum"],
-  "Kannur": ["Cladophora","Scenedesmus","Spirogyra","Nostoc","Pediastrum"],
-  "Kasaragod": ["Spirogyra","Cladophora","Scenedesmus","Nostoc","Pediastrum"]
-};
+  <div id="popup" role="dialog" aria-modal="true">
+    <div id="popupHeader">
+      <h3 id="popupTitle"><span id="dot"></span><span id="titleText">District</span></h3>
+      <button id="closeBtn">Close</button>
+    </div>
 
-const habitatsByDistrict = {
-  "Thiruvananthapuram": ["Temple ponds (kulam)","Paddy-field canals","Slow river edges"],
-  "Kollam": ["Backwater margins","Ponds & tanks","Canals with still water"],
-  "Pathanamthitta": ["Stream pools","Paddy-field water channels","Ponds near cultivation"],
-  "Alappuzha": ["Backwater edges","Paddy wetland water","Canals and small ponds"],
-  "Kottayam": ["Temple ponds","Canals & paddy water","Backwater/lake margins"],
-  "Idukki": ["Forest stream pools","Reservoir margins","Cool-water ponds"],
-  "Ernakulam": ["River banks (slow zones)","Ponds & tanks","Backwater canals"],
-  "Thrissur": ["Ponds (kulam)","Canals near fields","River edge pools"],
-  "Palakkad": ["Irrigation canals","Paddy standing water","Reservoir/pond margins"],
-  "Malappuram": ["Paddy canals","Village ponds","Stream-side pools"],
-  "Kozhikode": ["Wetland ponds","Canals/drains (still water)","Stream pools"],
-  "Wayanad": ["Highland ponds","Stream pools","Wetland edges"],
-  "Kannur": ["Ponds & tanks","Slow river edges","Canals in wet areas"],
-  "Kasaragod": ["Village ponds","Paddy canals","Stream pools"]
-};
+    <div class="sectionTitle">Common algae (4–5)</div>
+    <div id="algaeList"></div>
 
-/* =========================
-   POPUP UI (mobile safe)
-========================= */
-const overlay = document.getElementById("overlay");
-const popup = document.getElementById("popup");
-const titleText = document.getElementById("titleText");
-const algaeList = document.getElementById("algaeList");
-const habitatList = document.getElementById("habitatList");
-const closeBtn = document.getElementById("closeBtn");
+    <div class="sectionTitle">Commonly seen in (examples)</div>
+    <div id="habitatList"></div>
 
-function setAccent(hex){ document.documentElement.style.setProperty("--accent", hex); }
+    <div class="note">Tip: Later replace these with your exact pond/river names in each district.</div>
+  </div>
 
-function openPopup(district, hex){
-  setAccent(hex);
-  titleText.textContent = district;
+  <script type="module">
+    import * as THREE from "three";
+    import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
-  const algae = (algaeByDistrict[district] || ["No data"]).slice(0,5);
-  algaeList.innerHTML = `<ul>${algae.map(a=>`<li>${a}</li>`).join("")}</ul>`;
+    // =========================
+    // 1) DATA (EDIT ANYTIME)
+    // =========================
+    const algaeByDistrict = {
+      "Thiruvananthapuram": ["Spirogyra","Oedogonium","Cladophora","Nostoc","Scenedesmus"],
+      "Kollam": ["Cladophora","Spirogyra","Scenedesmus","Pediastrum","Nostoc"],
+      "Pathanamthitta": ["Cosmarium","Staurastrum","Spirogyra","Nostoc","Scenedesmus"],
+      "Alappuzha": ["Nostoc","Pediastrum","Scenedesmus","Spirogyra","Cladophora"],
+      "Kottayam": ["Spirogyra","Cosmarium","Scenedesmus","Pediastrum","Nostoc"],
+      "Idukki": ["Cosmarium","Staurastrum","Spirogyra","Cladophora","Nostoc"],
+      "Ernakulam": ["Cladophora","Scenedesmus","Spirogyra","Pediastrum","Nostoc"],
+      "Thrissur": ["Spirogyra","Oedogonium","Scenedesmus","Pediastrum","Nostoc"],
+      "Palakkad": ["Oedogonium","Spirogyra","Scenedesmus","Nostoc","Pediastrum"],
+      "Malappuram": ["Spirogyra","Scenedesmus","Cladophora","Nostoc","Pediastrum"],
+      "Kozhikode": ["Cosmarium","Cladophora","Scenedesmus","Spirogyra","Nostoc"],
+      "Wayanad": ["Cosmarium","Staurastrum","Spirogyra","Nostoc","Pediastrum"],
+      "Kannur": ["Cladophora","Scenedesmus","Spirogyra","Nostoc","Pediastrum"],
+      "Kasaragod": ["Spirogyra","Cladophora","Scenedesmus","Nostoc","Pediastrum"]
+    };
 
-  const hab = habitatsByDistrict[district] || ["Ponds","Canals","River edges"];
-  habitatList.innerHTML = `<ul>${hab.map(h=>`<li>${h}</li>`).join("")}</ul>`;
+    const habitatsByDistrict = {
+      "Thiruvananthapuram": ["Temple ponds (kulam)","Paddy-field canals","Slow river edges (freshwater)"],
+      "Kollam": ["Backwater margins","Ponds & tanks","Canals with still water"],
+      "Pathanamthitta": ["Stream pools","Paddy-field water channels","Ponds near cultivation areas"],
+      "Alappuzha": ["Backwater edges","Paddy wetland water","Canals and small ponds"],
+      "Kottayam": ["Ponds near homes/temples","Canals & paddy water","Backwater/lake margins"],
+      "Idukki": ["Forest stream pools","Dam/reservoir margins","Cool-water ponds"],
+      "Ernakulam": ["River banks (slow zones)","Ponds & tanks","Backwater canals"],
+      "Thrissur": ["Ponds (kulam) & tanks","Canals near fields","River edge pools"],
+      "Palakkad": ["Irrigation canals","Paddy-field standing water","Reservoir/pond margins"],
+      "Malappuram": ["Paddy canals","Village ponds","Stream-side pools"],
+      "Kozhikode": ["Ponds near wetlands","Canals/drains (still water)","Stream pools"],
+      "Wayanad": ["Highland ponds","Stream pools","Wetland edges"],
+      "Kannur": ["Ponds & tanks","Slow river edges","Canals in wet areas"],
+      "Kasaragod": ["Village ponds","Canals & paddy water","Stream pools"]
+    };
 
-  overlay.classList.add("show");
-  popup.classList.add("show");
-}
-function closePopup(){
-  overlay.classList.remove("show");
-  popup.classList.remove("show");
-}
-closeBtn.addEventListener("click", closePopup);
-overlay.addEventListener("pointerdown", closePopup);
-popup.addEventListener("pointerdown", (e)=>e.stopPropagation(), {passive:false});
-popup.addEventListener("click", (e)=>e.stopPropagation());
+    // =========================
+    // 2) POPUP UI
+    // =========================
+    const overlay = document.getElementById("overlay");
+    const popup = document.getElementById("popup");
+    const titleText = document.getElementById("titleText");
+    const algaeList = document.getElementById("algaeList");
+    const habitatList = document.getElementById("habitatList");
+    const closeBtn = document.getElementById("closeBtn");
 
-/* =========================
-   THREE scene
-========================= */
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x0b1220);
+    function setAccent(hex){
+      document.documentElement.style.setProperty("--accent", hex);
+    }
 
-const camera = new THREE.PerspectiveCamera(55, innerWidth/innerHeight, 0.1, 7000);
-camera.position.set(0, 170, 260);
+    function openPopup(district, hex){
+      setAccent(hex);
+      titleText.textContent = district;
 
-const renderer = new THREE.WebGLRenderer({ antialias:true });
-renderer.setSize(innerWidth, innerHeight);
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-document.body.appendChild(renderer.domElement);
+      const algae = (algaeByDistrict[district] || ["No data"]).slice(0,5);
+      algaeList.innerHTML = `<ul>${algae.map(a=>`<li>${a}</li>`).join("")}</ul>`;
 
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.dampingFactor = 0.08;
-controls.minDistance = 90;
-controls.maxDistance = 1500;
+      const hab = habitatsByDistrict[district] || ["Ponds","Canals","River edges"];
+      habitatList.innerHTML = `<ul>${hab.map(h=>`<li>${h}</li>`).join("")}</ul>`;
 
-scene.add(new THREE.AmbientLight(0xffffff, 0.80));
-const sun = new THREE.DirectionalLight(0xffffff, 0.95);
-sun.position.set(220, 520, 180);
-scene.add(sun);
+      overlay.classList.add("show");
+      popup.classList.add("show");
+    }
 
-const base = new THREE.Mesh(
-  new THREE.PlaneGeometry(2200, 2200),
-  new THREE.MeshStandardMaterial({ color: 0x0e1b2e, roughness: 1 })
-);
-base.rotation.x = -Math.PI/2;
-base.position.y = -2;
-scene.add(base);
+    function closePopup(){
+      overlay.classList.remove("show");
+      popup.classList.remove("show");
+    }
 
-/* =========================
-   Helpers
-========================= */
-const raycaster = new THREE.Raycaster();
-const pointer = new THREE.Vector2();
-const clickable = [];
+    // IMPORTANT: prevent popup auto-close on mobile
+    popup.addEventListener("pointerdown", (e)=> e.stopPropagation(), {passive:false});
+    popup.addEventListener("click", (e)=> e.stopPropagation());
+    closeBtn.addEventListener("click", closePopup);
+    overlay.addEventListener("pointerdown", closePopup);
 
-const mapGroup = new THREE.Group();
-scene.add(mapGroup);
+    // =========================
+    // 3) THREE.JS SETUP
+    // =========================
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0b1220);
 
-function colorFromName(name){
-  let hash = 0;
-  for (let i=0;i<name.length;i++) hash = name.charCodeAt(i) + ((hash<<5)-hash);
-  const hue = Math.abs(hash) % 360;
-  return new THREE.Color(`hsl(${hue},70%,55%)`);
-}
+    const camera = new THREE.PerspectiveCamera(55, innerWidth/innerHeight, 0.1, 7000);
 
-// lon/lat projection (simple)
-function projectLonLat(lon, lat){
-  const scale = 20;
-  return new THREE.Vector2(lon*scale, lat*scale);
-}
+    const renderer = new THREE.WebGLRenderer({ antialias:true });
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    document.body.appendChild(renderer.domElement);
 
-// Build shape from a ring (outer ring)
-function ringToShape(outerRing){
-  const pts = outerRing.map(([lon,lat]) => projectLonLat(lon,lat));
-  return new THREE.Shape(pts);
-}
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+    controls.minDistance = 90;
+    controls.maxDistance = 1400;
 
-/* =========================
-   Load font ONCE
-========================= */
-const font = await new Promise((resolve, reject) => {
-  const loader = new FontLoader();
-  loader.load(
-    "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/fonts/helvetiker_regular.typeface.json",
-    resolve,
-    undefined,
-    reject
-  );
-});
+    scene.add(new THREE.AmbientLight(0xffffff, 0.80));
+    const sun = new THREE.DirectionalLight(0xffffff, 0.95);
+    sun.position.set(220, 520, 180);
+    scene.add(sun);
 
-/* =========================
-   Text label creator (imprint)
-========================= */
-function addTextOnDistrict(name, districtGroup){
-  // districtGroup contains all polygons of that district
-  const box = new THREE.Box3().setFromObject(districtGroup);
-  const size = new THREE.Vector3();
-  box.getSize(size);
+    const base = new THREE.Mesh(
+      new THREE.PlaneGeometry(2000, 2000),
+      new THREE.MeshStandardMaterial({ color: 0x0e1b2e, roughness: 1 })
+    );
+    base.rotation.x = -Math.PI/2;
+    base.position.y = -2;
+    scene.add(base);
 
-  // very tiny districts: skip label if too small
-  if (size.x < 5 || size.z < 5) return;
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+    const clickable = [];
 
-   // ---- Name shortening for very small districts (optional but helps a lot) ----
-  const shortNameMap = {
-    "Thiruvananthapuram": "TVM",
-    "Ernakulam": "EKM",
-    "Alappuzha": "ALP",
-    "Pathanamthitta": "PTA",
-    "Thiruvananthapuram ": "TVM"
-  };
+    // Put map in its own group so centering is safe
+    const mapGroup = new THREE.Group();
+    scene.add(mapGroup);
 
-  // Choose label text
-  let labelText = name;
+    function colorFromName(name){
+      let hash = 0;
+      for (let i=0;i<name.length;i++) hash = name.charCodeAt(i) + ((hash<<5)-hash);
+      const hue = Math.abs(hash) % 360;
+      return new THREE.Color(`hsl(${hue},70%,55%)`);
+    }
 
-  // If district is small OR name is very long, use short name when available
-  const minDim = Math.min(size.x, size.z);
-  if ((minDim < 35 || name.length > 10) && shortNameMap[name]) {
-    labelText = shortNameMap[name];
-  }
+    function projectLonLat(lon, lat){
+      const scale = 20;
+      return new THREE.Vector2(lon*scale, lat*scale);
+    }
 
-  // ---- Create text geometry ----
-  const baseSize = 2.6; // base font size (we'll scale, but keep this stable)
-  const textGeo = new TextGeometry(labelText, {
-    font,
-    size: baseSize,
-    height: 0.35,
-    curveSegments: 4,
-    bevelEnabled: false
-  });
-  textGeo.computeBoundingBox();
+    // =========================
+    // 4) HTML LABELS
+    // =========================
+    const labelLayer = document.getElementById("labelLayer");
+    let labelsOn = true;
 
-  const textWidth = textGeo.boundingBox.max.x - textGeo.boundingBox.min.x;
-  if (textWidth <= 0) return;
+    function makeLabel(text){
+      const el = document.createElement("div");
+      el.className = "label";
+      el.textContent = text;
+      labelLayer.appendChild(el);
+      return el;
+    }
 
-  // ---- Fit to district using BOTH width and height ----
-  // This makes sizes more consistent than using only size.x
-  const target = minDim * 0.55; // uses smaller dimension so it doesn't overflow
-  let scaleFactor = target / textWidth;
+    // =========================
+    // 5) LOAD GEOJSON & BUILD
+    // =========================
+    const geo = await fetch("./kerala_districts.geojson").then(r => r.json());
 
-  // ---- Clamp so text sizes don't become extreme ----
-  // (Tune these if you want)
-  const MIN_SCALE = 0.75;
-  const MAX_SCALE = 2.10;
-  scaleFactor = Math.min(MAX_SCALE, Math.max(MIN_SCALE, scaleFactor));
+    for (const f of geo.features){
+      const name = f.properties?.shapeName || "Unknown";
+      const geom = f.geometry;
 
-  textGeo.scale(scaleFactor, scaleFactor, scaleFactor);
-  textGeo.computeBoundingBox();
+      const districtColor = colorFromName(name);
+      const hex = "#" + districtColor.getHexString();
 
-  const textMesh = new THREE.Mesh(
-    textGeo,
-    new THREE.MeshBasicMaterial({ color: 0xffffff })
-  );
+      const polys = (geom.type === "Polygon") ? [geom.coordinates]
+                  : (geom.type === "MultiPolygon") ? geom.coordinates
+                  : [];
 
-  // Center geometry
-  const centerOffset = new THREE.Vector3();
-  textGeo.boundingBox.getCenter(centerOffset).multiplyScalar(-1);
-  textMesh.position.copy(centerOffset);
+      // label position (avg of first ring points)
+      let labelLocal = null;
 
-  // Place at district center
-  const center = new THREE.Vector3();
-  box.getCenter(center);
-  textMesh.position.x += center.x;
-  textMesh.position.z += center.z;
-  textMesh.position.y = 11;
+      for (const poly of polys){
+        const outer = poly[0];
+        const pts = outer.map(([lon,lat]) => projectLonLat(lon,lat));
+        const shape = new THREE.Shape(pts);
 
-  // Lay flat
-  textMesh.rotation.x = -Math.PI/2;
+        const extrudeGeo = new THREE.ExtrudeGeometry(shape, { depth: 10, bevelEnabled:false });
+        const mat = new THREE.MeshStandardMaterial({
+          color: districtColor,
+          roughness: 0.75,
+          metalness: 0.05,
+          emissive: new THREE.Color(0x000000),
+        });
 
-  // Rotate if tall/narrow (works for Alappuzha etc.)
-  if (size.z > size.x * 1.25) {
-    textMesh.rotation.z = Math.PI/2;
-  }
+        const mesh = new THREE.Mesh(extrudeGeo, mat);
+        mesh.rotation.x = -Math.PI/2;
+        mesh.userData = { name, hex };
+        mapGroup.add(mesh);
+        clickable.push(mesh);
 
-  mapGroup.add(textMesh);
-  }
-/* =========================
-   Load GeoJSON and build districts
-========================= */
-const geo = await fetch("./kerala_districts.geojson").then(r => r.json());
+        if (!labelLocal && pts.length){
+          let sx=0, sy=0;
+          for (const p of pts){ sx += p.x; sy += p.y; }
+          labelLocal = new THREE.Vector3(sx/pts.length, 14, sy/pts.length); // above surface
+        }
+      }
 
-// We build a small group per district to compute box correctly
-for (const f of geo.features){
-  const name = f.properties?.shapeName || "Unknown";
-  const districtColor = colorFromName(name);
-  const hex = "#" + districtColor.getHexString();
+      // Create one label per district
+      const labelEl = makeLabel(name);
+      // Store label info on a lightweight object (not only one mesh)
+      // We'll attach it to the first mesh of that district (good enough)
+      // Find the last added mesh that has this name
+      const lastMesh = clickable[clickable.length - 1];
+      lastMesh.userData.labelEl = labelEl;
+      lastMesh.userData.labelLocal = labelLocal;
+    }
 
-  const districtGroup = new THREE.Group();
-  districtGroup.userData = { name, hex };
-  mapGroup.add(districtGroup);
+    // Center the mapGroup
+    const bbox = new THREE.Box3().setFromObject(mapGroup);
+    const center = new THREE.Vector3();
+    bbox.getCenter(center);
+    mapGroup.position.sub(center);
 
-  const geom = f.geometry;
+    function fitCamera(){
+      const box = new THREE.Box3().setFromObject(mapGroup);
+      const size = new THREE.Vector3();
+      box.getSize(size);
 
-  // Normalize polygons list: array of polygons, each polygon is array of rings
-  const polygons = (geom.type === "Polygon") ? [geom.coordinates]
-                 : (geom.type === "MultiPolygon") ? geom.coordinates
-                 : [];
+      const maxDim = Math.max(size.x, size.y, size.z);
+      const fov = camera.fov * (Math.PI / 180);
+      let dist = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+      dist *= (window.innerWidth < 768) ? 1.6 : 1.25;
 
-  for (const poly of polygons){
-    const outerRing = poly[0];
-    if (!outerRing || outerRing.length < 3) continue;
+      camera.position.set(0, dist * 0.85, dist);
+      controls.target.set(0, 0, 0);
+      controls.update();
+    }
+    fitCamera();
 
-    const shape = ringToShape(outerRing);
+    // =========================
+    // 6) INTERACTION
+    // =========================
+    function onPointerDown(e){
+      // If popup is open and the user taps on it, do nothing (already stopped propagation)
+      const rect = renderer.domElement.getBoundingClientRect();
+      pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      pointer.y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
 
-    const extrudeGeo = new THREE.ExtrudeGeometry(shape, {
-      depth: 10,
-      bevelEnabled: false
+      raycaster.setFromCamera(pointer, camera);
+      const hits = raycaster.intersectObjects(clickable, true);
+
+      if (hits.length){
+        const obj = hits[0].object;
+        openPopup(obj.userData.name, obj.userData.hex);
+      }
+    }
+    window.addEventListener("pointerdown", onPointerDown, { passive:true });
+
+    // Buttons
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      closePopup();
+      fitCamera();
     });
 
-    const mat = new THREE.MeshStandardMaterial({
-      color: districtColor,
-      roughness: 0.75,
-      metalness: 0.05,
-      emissive: new THREE.Color(0x000000)
+    const labelsBtn = document.getElementById("labelsBtn");
+    labelsBtn.addEventListener("click", () => {
+      labelsOn = !labelsOn;
+      labelsBtn.textContent = labelsOn ? "Labels: ON" : "Labels: OFF";
+      // Show/hide all label divs
+      Array.from(labelLayer.children).forEach(el => el.style.display = labelsOn ? "block" : "none");
     });
 
-    const mesh = new THREE.Mesh(extrudeGeo, mat);
-    mesh.rotation.x = -Math.PI/2;
-    mesh.userData = { name, hex };
+    // =========================
+    // 7) LABEL POSITION UPDATE
+    // =========================
+    function updateLabels(){
+      if (!labelsOn) return;
 
-    districtGroup.add(mesh);
-    clickable.push(mesh);
-  }
+      // We only stored labels on some meshes; loop all and update if label exists
+      for (const obj of clickable){
+        const el = obj.userData.labelEl;
+        const local = obj.userData.labelLocal;
+        if (!el || !local) continue;
 
-  // Add one label per district (based on districtGroup bbox)
-  addTextOnDistrict(name, districtGroup);
-}
+        // Convert label local point to world
+        const worldPos = local.clone();
+        // Apply mesh rotation/position via matrixWorld
+        obj.updateMatrixWorld(true);
+        worldPos.applyMatrix4(obj.matrixWorld);
 
-/* =========================
-   Center map + auto fit camera
-========================= */
-function fitCamera(){
-  const bbox = new THREE.Box3().setFromObject(mapGroup);
-  const c = new THREE.Vector3();
-  bbox.getCenter(c);
-  mapGroup.position.sub(c);
+        // Project to screen
+        worldPos.project(camera);
 
-  // fit distance
-  const size = new THREE.Vector3();
-  bbox.getSize(size);
-  const maxDim = Math.max(size.x, size.y, size.z);
-  const fov = camera.fov * (Math.PI/180);
-  let dist = Math.abs(maxDim / 2 / Math.tan(fov/2));
-  dist *= (window.innerWidth < 768) ? 1.6 : 1.25;
+        const x = (worldPos.x * 0.5 + 0.5) * innerWidth;
+        const y = (-worldPos.y * 0.5 + 0.5) * innerHeight;
 
-  camera.position.set(0, dist * 0.85, dist);
-  controls.target.set(0,0,0);
-  controls.update();
-}
-fitCamera();
+        // Hide if behind camera or out of view
+        const visible = worldPos.z >= -1 && worldPos.z <= 1;
+        el.style.display = visible ? "block" : "none";
+        if (visible){
+          el.style.transform = `translate(-50%,-50%) translate(${x}px,${y}px)`;
+        }
+      }
+    }
 
-/* =========================
-   Click
-========================= */
-window.addEventListener("pointerdown", (e) => {
-  const rect = renderer.domElement.getBoundingClientRect();
-  pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-  pointer.y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
+    // =========================
+    // 8) LOOP + RESIZE
+    // =========================
+    function animate(){
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+      updateLabels();
+    }
+    animate();
 
-  raycaster.setFromCamera(pointer, camera);
-  const hits = raycaster.intersectObjects(clickable, true);
-  if (hits.length){
-    const obj = hits[0].object;
-    openPopup(obj.userData.name, obj.userData.hex);
-  }
-}, { passive:true });
-
-/* =========================
-   Render loop + resize
-========================= */
-function animate(){
-  requestAnimationFrame(animate);
-  controls.update();
-  renderer.render(scene, camera);
-}
-animate();
-
-window.addEventListener("resize", () => {
-  camera.aspect = innerWidth/innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth, innerHeight);
-});
-</script>
+    window.addEventListener("resize", () => {
+      camera.aspect = innerWidth/innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+      fitCamera();
+    });
+  </script>
 </body>
 </html>
-
-

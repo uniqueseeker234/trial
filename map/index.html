@@ -266,7 +266,7 @@
     controls.minDistance = 90;
     controls.maxDistance = 1600;
 
-    scene.add(new THREE.AmbientLight(0xffffff, 0.82));
+    scene.add(new THREE.AmbientLight(0xffffff, 1.4));
     const sun = new THREE.DirectionalLight(0xffffff, 0.95);
     sun.position.set(220, 520, 180);
     scene.add(sun);
@@ -302,8 +302,8 @@ const earth = new THREE.Mesh(
     map: earthTexture,
     roughness: 0.85,
     metalness: 0.0,
-    emissive:new THREE.Color(0x111111),
-    emissiveIntensity:0.35
+    emissive:new THREE.Color(0x222222),
+    emissiveIntensity:0.6
   })
 );
 
@@ -744,6 +744,7 @@ for (let i=0; i<centers.length; i++) {
   </script>
 </body>
 </html>
+
 
 
 

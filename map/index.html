@@ -350,7 +350,7 @@ glowTex.colorSpace = THREE.SRGBColorSpace;
 
 // Move glow a tiny bit above surface (prevents black cutting)
 const outward = markerPos.clone().normalize();
-const lift = outward.clone().multiplyScalar(0.35);
+const lift = outward.clone().multiplyScalar(0.12);
 
 const coreMat = new THREE.SpriteMaterial({
   map: glowTex,
@@ -415,17 +415,31 @@ keralaMarker.add(core);
 
     // Pulse animation
     let pulseT = 0;
-    function animateEarth(){
-      earth.rotation.y += 0.0013;
+function animateEarth(){
+  earth.rotation.y += 0.0013;
 
-     pulseT += 0.06;
-     const s = 1 + Math.sin(pulseT) * 0.25;
+  pulseT += 0.06;
+  const s = 1 + Math.sin(pulseT) * 0.25;
 
-halo.scale.set(22 * s, 22 * s, 1);
-halo.material.opacity = 0.32 + (Math.sin(pulseT) + 1) * 0.07;
+  halo.scale.set(22 * s, 22 * s, 1);
+  halo.material.opacity = 0.32 + (Math.sin(pulseT) + 1) * 0.07;
 
-core.scale.set(8 * (1 + (s-1)*0.8), 8*(1 + (s-1)*0.8),1);
-core.material.opacity = 0.82 + (Math.sin(pulseT + 0.9) + 1) * 0.06; 
+  core.scale.set(8 * (1 + (s-1)*0.8), 8*(1 + (s-1)*0.8), 1);
+  core.material.opacity = 0.82 + (Math.sin(pulseT + 0.9) + 1) * 0.06;
+    // Hide glow when it goes behind the globe (nice realism)
+  const worldPos = new THREE.Vector3();
+  keralaMarker.getWorldPosition(worldPos);
+
+  const earthCenter = earth.position.clone();
+  const camDir = camera.position.clone().sub(earthCenter).normalize();
+  const markerDir = worldPos.clone().sub(earthCenter).normalize();
+
+  const facing = markerDir.dot(camDir); // >0 = visible side, <0 = behind
+  const show = facing > 0.05;
+
+  core.material.opacity = show ? (0.82 + (Math.sin(pulseT + 0.9) + 1) * 0.06) : 0;
+  halo.material.opacity = show ? (0.32 + (Math.sin(pulseT) + 1) * 0.07) : 0;
+}
 
     /* =========================
        STARS (your existing sky)
@@ -697,6 +711,7 @@ core.material.opacity = 0.82 + (Math.sin(pulseT + 0.9) + 1) * 0.06;
   </script>
 </body>
 </html>
+
 
 
 

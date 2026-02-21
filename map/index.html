@@ -347,7 +347,7 @@
 
   // --- Original volumetric glow (first version) ---
 
-const glowCore = new THREE.Mesh(
+glowCore = new THREE.Mesh(
   new THREE.SphereGeometry(1.25, 24, 24),
   new THREE.MeshBasicMaterial({
     color: 0x00ff88,
@@ -359,7 +359,7 @@ const glowCore = new THREE.Mesh(
   })
 );
 
-const glowHalo = new THREE.Mesh(
+glowHalo = new THREE.Mesh(
   new THREE.SphereGeometry(2.6, 32, 32),
   new THREE.MeshBasicMaterial({
     color: 0x00ff88,
@@ -410,6 +410,7 @@ keralaMarker.add(glowCore);
     setGlobeCamera();
 
     // Pulse animation
+    let glowCore, glowHalo;
     let pulseT = 0;
 function animateEarth(){
   earth.rotation.y += 0.0013;
@@ -709,6 +710,7 @@ glowCore.material.opacity = 0.80 + (Math.sin(pulseT + 0.9) + 1) * 0.06;
   </script>
 </body>
 </html>
+
 
 
 

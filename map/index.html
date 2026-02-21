@@ -419,13 +419,13 @@ keralaMarker.add(core);
       earth.rotation.y += 0.0013;
 
      pulseT += 0.06;
-const s = 1 + Math.sin(pulseT) * 0.25;
+     const s = 1 + Math.sin(pulseT) * 0.25;
 
 halo.scale.set(22 * s, 22 * s, 1);
-halo.material.opacity = 0.32 + (Math.sin(pulseT) + 1) * 0.07; // 0.08..0.18
+halo.material.opacity = 0.32 + (Math.sin(pulseT) + 1) * 0.07;
 
 core.scale.set(8 * (1 + (s-1)*0.8), 8*(1 + (s-1)*0.8),1);
-      core.material.opacity = 0.82 = (Math.sin(pulseT = 0.9) = 1) * 0.06;    }
+core.material.opacity = 0.82 = (Math.sin(pulseT = 0.9) = 1) * 0.06; 
 
     /* =========================
        STARS (your existing sky)
@@ -697,6 +697,7 @@ core.scale.set(8 * (1 + (s-1)*0.8), 8*(1 + (s-1)*0.8),1);
   </script>
 </body>
 </html>
+
 
 
 

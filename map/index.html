@@ -291,8 +291,8 @@
     const EARTH_RADIUS = 55;
 
     // IMPORTANT: declare glow vars BEFORE using them
-    let glowCore = null;
-    let glowHalo = null;
+    let core = null;
+    let halo = null;
     let pulseT = 0;
 
     const earthTexture = new THREE.TextureLoader().load("./earth.jpg");
@@ -327,39 +327,55 @@
     keralaMarker.position.copy(markerPos);
 
     // --- Original volumetric glow (your first glow) ---
-    glowCore = new THREE.Mesh(
-      new THREE.SphereGeometry(1.25, 24, 24),
-      new THREE.MeshBasicMaterial({
-        color: 0x00ff88,
-        transparent: true,
-        opacity: 0.95,
-        depthWrite: false,
-        depthTest: true,
-        blending: THREE.AdditiveBlending
-      })
-    );
+    // Create a group so we can pulse both core + halo
+const keralaMarker = new THREE.Group();
+const markerPos = latLonToVec3(keralaLat, keralaLon, EARTH_RADIUS + 0.8);
+keralaMarker.position.copy(markerPos);
 
-    glowHalo = new THREE.Mesh(
-      new THREE.SphereGeometry(2.6, 32, 32),
-      new THREE.MeshBasicMaterial({
-        color: 0x00ff88,
-        transparent: true,
-        opacity: 0.28,
-        depthWrite: false,
-        depthTest: true,
-        blending: THREE.AdditiveBlending
-      })
-    );
+// Core dot (old style)
+core = new THREE.Mesh(
+  new THREE.SphereGeometry(1.25, 24, 24),
+  new THREE.MeshBasicMaterial({
+    color: 0x00ff88,
+    transparent: true,
+    opacity: 0.95,
+    depthWrite: false,
+    depthTest: true,
+    blending: THREE.AdditiveBlending
+  })
+);
 
-    // Slight lift
-    const outward = markerPos.clone().normalize();
-    const lift = outward.clone().multiplyScalar(0.35);
+// Halo (old style)
+halo = new THREE.Mesh(
+  new THREE.SphereGeometry(2.6, 32, 32),
+  new THREE.MeshBasicMaterial({
+    color: 0x00ff88,
+    transparent: true,
+    opacity: 0.28,
+    depthWrite: false,
+    depthTest: true,
+    blending: THREE.AdditiveBlending
+  })
+);
 
-    glowCore.position.copy(lift);
-    glowHalo.position.copy(lift);
+// Lift slightly off the surface so it doesn't clip
+const outward = markerPos.clone().normalize();
+const lift = outward.clone().multiplyScalar(0.35);
+core.position.copy(lift);
+halo.position.copy(lift);
 
-    keralaMarker.add(glowHalo);
-    keralaMarker.add(glowCore);
+keralaMarker.add(core);
+keralaMarker.add(halo);
+
+// Invisible pick sphere (keep for easy clicking)
+const pickSphere = new THREE.Mesh(
+  new THREE.SphereGeometry(3.2, 16, 16),
+  new THREE.MeshBasicMaterial({ transparent:true, opacity: 0.0 })
+);
+keralaMarker.add(pickSphere);
+
+// Attach marker to earth so it rotates with globe
+earth.add(keralaMarker);
 
     // Invisible pick sphere
     const pickSphere = new THREE.Mesh(
@@ -392,34 +408,19 @@
     const _markerDir = new THREE.Vector3();
 
     function animateEarth(){
-      earth.rotation.y += 0.0013;
+  earth.rotation.y += 0.0016;
 
-      if (!glowCore || !glowHalo) return;
+  if (!core || !halo) return;
 
-      pulseT += 0.06;
-      const s = 1 + Math.sin(pulseT) * 0.25;
+  pulseT += 0.06;
+  const s = 1 + Math.sin(pulseT) * 0.25;
 
-      // Base pulse (we will multiply by visibility below)
-      const haloOpacity = 0.18 + (Math.sin(pulseT) + 1) * 0.08;      // 0.18..0.34
-      const coreOpacity = 0.80 + (Math.sin(pulseT + 0.9) + 1) * 0.06; // ~0.80..0.92
+  halo.scale.set(s * 1.25, s * 1.25, s * 1.25);
+  halo.material.opacity = 0.18 + (Math.sin(pulseT) + 1) * 0.08; // 0.18..0.34
 
-      glowHalo.scale.set(s * 1.15, s * 1.15, s * 1.15);
-      const cs = 1 + (s - 1) * 0.9;
-      glowCore.scale.set(cs, cs, cs);
-
-      // Hide when behind the globe (realistic)
-      keralaMarker.getWorldPosition(_worldPos);
-
-      const earthCenter = earth.position;
-      _camDir.copy(camera.position).sub(earthCenter).normalize();
-      _markerDir.copy(_worldPos).sub(earthCenter).normalize();
-
-      const facing = _markerDir.dot(_camDir); // >0 visible, <0 behind
-      const vis = (facing > 0.05) ? 1 : 0;
-
-      glowHalo.material.opacity = haloOpacity * vis;
-      glowCore.material.opacity = coreOpacity * vis;
-    }
+  core.scale.set(s * 0.95, s * 0.95, s * 0.95);
+  core.material.opacity = 0.80 + (Math.sin(pulseT + 0.9) + 1) * 0.06;
+}
 
     /* =========================
        STARS
@@ -683,3 +684,4 @@
   </script>
 </body>
 </html>
+

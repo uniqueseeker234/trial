@@ -594,6 +594,8 @@ const visibility = Math.pow(Math.max(dot, 0), 1.5);
   glowCore.material.opacity = corePulse * visibility;
   glowRing.material.opacity = ringPulse * visibility;
   glowHalo.material.opacity = haloPulse * visibility;
+    coreBall.material.opacity = 0.95 * visibility;
+coreBall.visible = visibility > 0.02;
 }
 
     /* =========================
@@ -1015,5 +1017,6 @@ const _v2 = new THREE.Vector3();
   </script>
 </body>
 </html>
+
 
 

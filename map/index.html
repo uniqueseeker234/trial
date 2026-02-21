@@ -363,7 +363,7 @@ const glowCoreMat = new THREE.MeshBasicMaterial({
 const glowHaloMat = new THREE.MeshBasicMaterial({
   color: 0x00ff88,
   transparent: true,
-  opacity: 0.22,
+  opacity: 0.12,
   depthWrite: false,
   depthTest: true,
   blending: THREE.AdditiveBlending
@@ -371,13 +371,13 @@ const glowHaloMat = new THREE.MeshBasicMaterial({
 
 // Small bright core
 const glowCore = new THREE.Mesh(
-  new THREE.SphereGeometry(1.4, 24, 24),
+  new THREE.SphereGeometry(0.95, 24, 24),
   glowCoreMat
 );
 
 // Larger soft halo sphere
 const glowHalo = new THREE.Mesh(
-  new THREE.SphereGeometry(4.8, 32, 32),
+  new THREE.SphereGeometry(7.2, 32, 32),
   glowHaloMat
 );
 
@@ -426,12 +426,12 @@ keralaMarker.add(glowCore);
      pulseT += 0.06;
 const s = 1 + Math.sin(pulseT) * 0.25;
 
-glowHalo.scale.set(s * 1.15, s * 1.15, s * 1.15);
-glowHalo.material.opacity = 0.16 + (Math.sin(pulseT) + 1) * 0.06; // 0.16..0.28
+glowHalo.scale.set(s * 1.35, s * 1.35, s * 1.35);
+glowHalo.material.opacity = 0.08 + (Math.sin(pulseT) + 1) * 0.05; // 0.08..0.18
 
-const cs = 1 + (s - 1) * 0.9;
+const cs = 1 + (s - 1) * 0.7;
 glowCore.scale.set(cs, cs, cs);
-glowCore.material.opacity = 0.80 + (Math.sin(pulseT + 0.9) + 1) * 0.06;
+glowCore.material.opacity = 0.78 + (Math.sin(pulseT + 0.9) + 1) * 0.08;
     }
 
     /* =========================
@@ -704,5 +704,6 @@ glowCore.material.opacity = 0.80 + (Math.sin(pulseT + 0.9) + 1) * 0.06;
   </script>
 </body>
 </html>
+
 
 

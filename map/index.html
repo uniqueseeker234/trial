@@ -362,24 +362,25 @@ function makeHaloTex(){
   return new THREE.CanvasTexture(c);
 }
 
-function makeGlowSprite(tex, opacity){
-  const material = new THREE.SpriteMaterial({
+function makeGlowPlane(tex, opacity){
+  const mat = new THREE.MeshBasicMaterial({
     map: tex,
     transparent: true,
     depthWrite: false,
-    depthTest: false,
+    depthTest: false,            // keep smooth, no black cutting
     blending: THREE.AdditiveBlending,
-    opacity
+    opacity,
+    side: THREE.DoubleSide
   });
 
-  const sprite = new THREE.Sprite(material);
-  sprite.renderOrder = 999;
-  return sprite;
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), mat);
+  mesh.renderOrder = 999;
+  return mesh;
 }
 
-glowCore = makeGlowSprite(makeCoreTex(), 0.95);
-glowRing = makeGlowSprite(makeRingTex(), 0.55);
-glowHalo = makeGlowSprite(makeHaloTex(), 0.22);
+glowCore = makeGlowPlane(makeCoreTex(), 0.95);
+glowRing = makeGlowPlane(makeRingTex(), 0.55);
+glowHalo = makeGlowPlane(makeHaloTex(), 0.22);
 
 glowCore.scale.set(10,10,1);
 glowRing.scale.set(18,18,1);
@@ -394,23 +395,11 @@ glowCore.position.copy(lift);
 glowRing.position.copy(lift);
 glowHalo.position.copy(lift);
 
-/* ---- BRIGHT CORE BALL ---- */
-
-const coreBall = new THREE.Mesh(
-  new THREE.SphereGeometry(0.75,24,24),
-  new THREE.MeshBasicMaterial({
-    color:0x00ff88,
-    transparent:true,
-    opacity:1,
-    depthWrite:false,
-    depthTest:false,
-    blending:THREE.AdditiveBlending
-  })
-);
-
-coreBall.position.copy(lift);
-
-/* ---- ADD ORDER ---- */
+// Make planes face outward (stick to Earth surface)
+const earthCenter = new THREE.Vector3(); // (0,0,0) in earth local space
+glowCore.lookAt(earthCenter); glowCore.rotateX(Math.PI);
+glowRing.lookAt(earthCenter); glowRing.rotateX(Math.PI);
+glowHalo.lookAt(earthCenter); glowHalo.rotateX(Math.PI);
 
 keralaMarker.add(glowHalo);
 keralaMarker.add(glowRing);
@@ -744,6 +733,7 @@ earth.add(keralaMarker);
   </script>
 </body>
 </html>
+
 
 
 

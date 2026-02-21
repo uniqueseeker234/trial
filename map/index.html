@@ -286,13 +286,14 @@
     let mode = "globe"; // "globe" | "keralaMap"
 
     /* =========================
-       EARTH + KERALA GLOW (FIXED)
+       EARTH + KERALA GLOW (LAYERED A)
     ========================= */
     const EARTH_RADIUS = 55;
 
-    // IMPORTANT: declare glow vars BEFORE using them
-    let core = null;
-    let halo = null;
+    // Layered glow sprites
+    let glowCore = null;
+    let glowRing = null;
+    let glowHalo = null;
     let pulseT = 0;
 
     const earthTexture = new THREE.TextureLoader().load("./earth.jpg");
@@ -326,56 +327,102 @@
     const markerPos = latLonToVec3(keralaLat, keralaLon, EARTH_RADIUS + 0.9);
     keralaMarker.position.copy(markerPos);
 
-    // --- Original volumetric glow (your first glow) ---
-    // Create a group so we can pulse both core + halo
-keralaMarker.position.copy(markerPos);
+    // --- Make layered textures (core + ring + halo) ---
+    function makeCoreTex(){
+      const c = document.createElement("canvas");
+      c.width = c.height = 256;
+      const ctx = c.getContext("2d");
+      const g = ctx.createRadialGradient(128,128,0, 128,128,120);
+      g.addColorStop(0.00, "rgba(0,255,180,1.00)");
+      g.addColorStop(0.22, "rgba(0,255,160,0.95)");
+      g.addColorStop(0.55, "rgba(0,255,160,0.25)");
+      g.addColorStop(1.00, "rgba(0,255,160,0.00)");
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(128,128,120,0,Math.PI*2); ctx.fill();
+      const t = new THREE.CanvasTexture(c);
+      t.colorSpace = THREE.SRGBColorSpace;
+      return t;
+    }
 
-// Core dot (old style)
-core = new THREE.Mesh(
-  new THREE.SphereGeometry(1.25, 24, 24),
-  new THREE.MeshBasicMaterial({
-    color: 0x00ff88,
-    transparent: true,
-    opacity: 0.95,
-    depthWrite: false,
-    depthTest: true,
-    blending: THREE.AdditiveBlending
-  })
-);
+    function makeRingTex(){
+      const c = document.createElement("canvas");
+      c.width = c.height = 256;
+      const ctx = c.getContext("2d");
+      const g = ctx.createRadialGradient(128,128,0, 128,128,120);
+      g.addColorStop(0.00, "rgba(0,255,160,0.00)");
+      g.addColorStop(0.18, "rgba(0,255,160,0.00)");
+      g.addColorStop(0.30, "rgba(0,255,160,0.75)");
+      g.addColorStop(0.52, "rgba(0,255,160,0.25)");
+      g.addColorStop(1.00, "rgba(0,255,160,0.00)");
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(128,128,120,0,Math.PI*2); ctx.fill();
+      const t = new THREE.CanvasTexture(c);
+      t.colorSpace = THREE.SRGBColorSpace;
+      return t;
+    }
 
-// Halo (old style)
-halo = new THREE.Mesh(
-  new THREE.SphereGeometry(2.6, 32, 32),
-  new THREE.MeshBasicMaterial({
-    color: 0x00ff88,
-    transparent: true,
-    opacity: 0.28,
-    depthWrite: false,
-    depthTest: true,
-    blending: THREE.AdditiveBlending
-  })
-);
+    function makeHaloTex(){
+      const c = document.createElement("canvas");
+      c.width = c.height = 256;
+      const ctx = c.getContext("2d");
+      const g = ctx.createRadialGradient(128,128,30, 128,128,120);
+      g.addColorStop(0.00, "rgba(0,255,160,0.28)");
+      g.addColorStop(0.55, "rgba(0,255,160,0.10)");
+      g.addColorStop(1.00, "rgba(0,255,160,0.00)");
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(128,128,120,0,Math.PI*2); ctx.fill();
+      const t = new THREE.CanvasTexture(c);
+      t.colorSpace = THREE.SRGBColorSpace;
+      return t;
+    }
 
-// Lift slightly off the surface so it doesn't clip
-const outward = markerPos.clone().normalize();
-const lift = outward.clone().multiplyScalar(0.35);
-core.position.copy(lift);
-halo.position.copy(lift);
+    const coreTex = makeCoreTex();
+    const ringTex = makeRingTex();
+    const haloTex = makeHaloTex();
 
-keralaMarker.add(core);
-keralaMarker.add(halo);
+    function makeGlowSprite(tex, opacity){
+      return new THREE.Sprite(
+        new THREE.SpriteMaterial({
+          map: tex,
+          transparent: true,
+          depthWrite: false,
+          depthTest: true,
+          blending: THREE.AdditiveBlending,
+          opacity
+        })
+      );
+    }
 
-// Invisible pick sphere (keep for easy clicking)
-const pickSphere = new THREE.Mesh(
-  new THREE.SphereGeometry(3.2, 16, 16),
-  new THREE.MeshBasicMaterial({ transparent:true, opacity: 0.0 })
-);
-keralaMarker.add(pickSphere);
+    glowCore = makeGlowSprite(coreTex, 0.95);
+    glowRing = makeGlowSprite(ringTex, 0.55);
+    glowHalo = makeGlowSprite(haloTex, 0.22);
 
-// Attach marker to earth so it rotates with globe
-earth.add(keralaMarker);
+    // Sizes (tweak here if you want smaller/bigger)
+    glowCore.scale.set(10, 10, 1);
+    glowRing.scale.set(18, 18, 1);
+    glowHalo.scale.set(30, 30, 1);
 
- 
+    // Push a bit outward so it sits on the surface
+    const outward = markerPos.clone().normalize();
+    const lift = outward.multiplyScalar(0.7);
+    glowCore.position.copy(lift);
+    glowRing.position.copy(lift);
+    glowHalo.position.copy(lift);
+
+    keralaMarker.add(glowHalo);
+    keralaMarker.add(glowRing);
+    keralaMarker.add(glowCore);
+
+    // Invisible pick sphere (keep for easy clicking)
+    const pickSphere = new THREE.Mesh(
+      new THREE.SphereGeometry(3.2, 16, 16),
+      new THREE.MeshBasicMaterial({ transparent:true, opacity: 0.0 })
+    );
+    keralaMarker.add(pickSphere);
+
+    // Attach marker to earth so it rotates with globe
+    earth.add(keralaMarker);
+
     // Rotate earth to face marker toward camera initially
     const ang = Math.atan2(markerPos.x, markerPos.z);
     earth.rotation.y -= ang;
@@ -398,19 +445,37 @@ earth.add(keralaMarker);
     const _markerDir = new THREE.Vector3();
 
     function animateEarth(){
-  earth.rotation.y += 0.0016;
+      earth.rotation.y += 0.0016;
 
-  if (!core || !halo) return;
+      if (!glowCore || !glowRing || !glowHalo) return;
 
-  pulseT += 0.06;
-  const s = 1 + Math.sin(pulseT) * 0.25;
+      pulseT += 0.06;
+      const s = 1 + Math.sin(pulseT) * 0.18;
 
-  halo.scale.set(s * 1.25, s * 1.25, s * 1.25);
-  halo.material.opacity = 0.18 + (Math.sin(pulseT) + 1) * 0.08; // 0.18..0.34
+      // Pulse sizes (layered)
+      glowHalo.scale.set(30*s, 30*s, 1);
+      glowRing.scale.set(18*(1 + (s-1)*1.1), 18*(1 + (s-1)*1.1), 1);
+      glowCore.scale.set(10*(1 + (s-1)*0.9), 10*(1 + (s-1)*0.9), 1);
 
-  core.scale.set(s * 0.95, s * 0.95, s * 0.95);
-  core.material.opacity = 0.80 + (Math.sin(pulseT + 0.9) + 1) * 0.06;
-}
+      // Base opacities
+      const haloOpacity = 0.18 + (Math.sin(pulseT) + 1) * 0.04;
+      const ringOpacity = 0.48 + (Math.sin(pulseT + 0.6) + 1) * 0.06;
+      const coreOpacity = 0.85 + (Math.sin(pulseT + 0.9) + 1) * 0.05;
+
+      // Hide when behind the globe
+      keralaMarker.getWorldPosition(_worldPos);
+      const earthCenter = earth.position;
+
+      _camDir.copy(camera.position).sub(earthCenter).normalize();
+      _markerDir.copy(_worldPos).sub(earthCenter).normalize();
+
+      const facing = _markerDir.dot(_camDir);
+      const vis = (facing > 0.05) ? 1 : 0;
+
+      glowHalo.material.opacity = haloOpacity * vis;
+      glowRing.material.opacity = ringOpacity * vis;
+      glowCore.material.opacity = coreOpacity * vis;
+    }
 
     /* =========================
        STARS
@@ -608,7 +673,7 @@ earth.add(keralaMarker);
     }
 
     /* =========================
-       SINGLE POINTERDOWN HANDLER
+       DISTRICT CLICK
     ========================= */
     function onPointerDown(e){
       if (popup.classList.contains("show")) return;
@@ -674,8 +739,3 @@ earth.add(keralaMarker);
   </script>
 </body>
 </html>
-
-
-
-
-

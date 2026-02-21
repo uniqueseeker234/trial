@@ -583,12 +583,14 @@
   const ringPulse = 0.42 + (Math.sin(pulseT + 0.4) + 1) * 0.07;
   const haloPulse = 0.18 + (Math.sin(pulseT) + 1) * 0.06;
 
-  // 👇 NEW: fade based on viewing angle
-  const normal = markerPos.clone().sub(earth.position).normalize();
-  const toCamera = camera.position.clone().sub(markerPos).normalize();
-  const dot = normal.dot(toCamera);
-  const visibility = Math.pow(Math.max(dot, 0), 1.5);
+  glowCore.getWorldPosition(_mPos);
+earth.getWorldPosition(_ePos);
 
+_v1.copy(_mPos).sub(_ePos).normalize();
+_v2.copy(camera.position).sub(_mPos).normalize();
+
+const dot = _v1.dot(_v2);
+const visibility = Math.pow(Math.max(dot, 0), 1.5);
   glowCore.material.opacity = corePulse * visibility;
   glowRing.material.opacity = ringPulse * visibility;
   glowHalo.material.opacity = haloPulse * visibility;
@@ -973,6 +975,10 @@
        LOOP + RESIZE
     ========================= */
     const clock = new THREE.Clock();
+    const _mPos = new THREE.Vector3();
+const _ePos = new THREE.Vector3();
+const _v1 = new THREE.Vector3();
+const _v2 = new THREE.Vector3();
 
     function animate(){
       requestAnimationFrame(animate);
@@ -1009,4 +1015,5 @@
   </script>
 </body>
 </html>
+
 

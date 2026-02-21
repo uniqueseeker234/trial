@@ -345,45 +345,41 @@
     const markerPos = latLonToVec3(keralaLat, keralaLon, EARTH_RADIUS + 0.9);
     keralaMarker.position.copy(markerPos);
 
-   // ===== Clean Sprite Glow (nice aura like demo) =====
-glowTex.colorSpace = THREE.SRGBColorSpace;
+  // --- Original volumetric glow (first version) ---
 
-// Move glow a tiny bit above surface (prevents black cutting)
+const glowCore = new THREE.Mesh(
+  new THREE.SphereGeometry(1.25, 24, 24),
+  new THREE.MeshBasicMaterial({
+    color: 0x00ff88,
+    transparent: true,
+    opacity: 0.95,
+    depthWrite: false,
+    depthTest: true,
+    blending: THREE.AdditiveBlending
+  })
+);
+
+const glowHalo = new THREE.Mesh(
+  new THREE.SphereGeometry(2.6, 32, 32),
+  new THREE.MeshBasicMaterial({
+    color: 0x00ff88,
+    transparent: true,
+    opacity: 0.28,
+    depthWrite: false,
+    depthTest: true,
+    blending: THREE.AdditiveBlending
+  })
+);
+
+// Slight lift to prevent texture fighting
 const outward = markerPos.clone().normalize();
-const lift = outward.clone().multiplyScalar(0.12);
+const lift = outward.clone().multiplyScalar(0.35);
 
-const coreMat = new THREE.SpriteMaterial({
-  map: glowTex,
-  transparent: true,
-  opacity: 0.95,
-  depthWrite: false,
-  depthTest: true,                 // realistic (hides behind globe)
-  blending: THREE.AdditiveBlending,
-  alphaTest: 0.06
-});
-coreMat.premultipliedAlpha = true;
+glowCore.position.copy(lift);
+glowHalo.position.copy(lift);
 
-const haloMat = new THREE.SpriteMaterial({
-  map: glowTex,
-  transparent: true,
-  opacity: 0.45,
-  depthWrite: false,
-  depthTest: true,
-  blending: THREE.AdditiveBlending,
-  alphaTest: 0.04
-});
-haloMat.premultipliedAlpha = true;
-
-const core = new THREE.Sprite(coreMat);
-core.scale.set(8, 8, 1);
-core.position.copy(lift);
-
-const halo = new THREE.Sprite(haloMat);
-halo.scale.set(22, 22, 1);
-halo.position.copy(lift);
-
-keralaMarker.add(halo);
-keralaMarker.add(core);
+keralaMarker.add(glowHalo);
+keralaMarker.add(glowCore);
     
     // Invisible pick sphere (easy raycast)
     const pickSphere = new THREE.Mesh(
@@ -418,14 +414,16 @@ keralaMarker.add(core);
 function animateEarth(){
   earth.rotation.y += 0.0013;
 
-  pulseT += 0.06;
-  const s = 1 + Math.sin(pulseT) * 0.25;
+ pulseT += 0.06;
+const s = 1 + Math.sin(pulseT) * 0.25;
 
-  halo.scale.set(22 * s, 22 * s, 1);
-  halo.material.opacity = 0.32 + (Math.sin(pulseT) + 1) * 0.07;
+glowHalo.scale.set(s * 1.15, s * 1.15, s * 1.15);
+glowHalo.material.opacity = 0.18 + (Math.sin(pulseT) + 1) * 0.08;
 
-  core.scale.set(8 * (1 + (s-1)*0.8), 8*(1 + (s-1)*0.8), 1);
-  core.material.opacity = 0.82 + (Math.sin(pulseT + 0.9) + 1) * 0.06;
+const cs = 1 + (s - 1) * 0.9;
+glowCore.scale.set(cs, cs, cs);
+glowCore.material.opacity = 0.80 + (Math.sin(pulseT + 0.9) + 1) * 0.06;
+  
     // Hide glow when it goes behind the globe (nice realism)
   const worldPos = new THREE.Vector3();
   keralaMarker.getWorldPosition(worldPos);
@@ -711,6 +709,7 @@ function animateEarth(){
   </script>
 </body>
 </html>
+
 
 
 

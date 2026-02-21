@@ -19,7 +19,7 @@
     body{ margin:0; overflow:hidden; background:var(--bg); font-family:system-ui, Arial; }
 
     /* UI always above canvas */
-    #topbar, #hint, #overlay, #popup { position:fixed; z-index:9999; }
+    #topbar, #hint, #overlay, #popup, #enterMsg { position:fixed; z-index:9999; }
 
     #topbar{
       top:15px; left:15px;
@@ -122,6 +122,30 @@
     }
     ul{ margin:6px 0 0 18px; }
 
+    /* Typewriter message */
+    #enterMsg{
+      left:50%;
+      top:55%;
+      transform:translate(-50%, -50%);
+      display:none;
+      padding:14px 18px;
+      border-radius:16px;
+      background: rgba(15, 25, 45, 0.55);
+      border: 1px solid rgba(255,255,255,0.18);
+      backdrop-filter: blur(10px);
+      color: var(--text);
+      font-weight: 900;
+      letter-spacing: 0.6px;
+      box-shadow: 0 16px 50px rgba(0,0,0,0.45);
+      white-space:nowrap;
+    }
+    #enterMsg::after{
+      content:"▍";
+      margin-left:6px;
+      animation: blink 0.75s steps(1) infinite;
+    }
+    @keyframes blink{ 50%{ opacity:0; } }
+
     @media (max-width:768px){
       #popup{
         left:10px; right:10px;
@@ -152,20 +176,20 @@
     <button id="resetBtn">Reset View</button>
   </div>
 
-  <div id="hint">Drag to rotate • Scroll/pinch to zoom • Tap the green glow on Kerala</div>
-
+  <div id="hint">Drag to rotate • Scroll/pinch to zoom • Tap the green glow on India</div>
+  <div id="enterMsg" aria-live="polite"></div>
   <div id="overlay"></div>
 
   <div id="popup" role="dialog" aria-modal="true">
     <div id="popupHeader">
-      <h3 id="popupTitle"><span id="dot"></span><span id="titleText">District</span></h3>
+      <h3 id="popupTitle"><span id="dot"></span><span id="titleText">Place</span></h3>
       <button id="closeBtn">Close</button>
     </div>
 
-    <div class="sectionTitle">Common algae (4–5)</div>
+    <div class="sectionTitle">Common algae (3–4)</div>
     <div id="algaeList"></div>
 
-    <div class="sectionTitle">Commonly seen in (real locations)</div>
+    <div class="sectionTitle">Commonly seen in (typical locations)</div>
     <div id="habitatList"></div>
   </div>
 
@@ -174,7 +198,7 @@
     import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
     /* =========================
-       DATA (edit anytime)
+       DATA (Kerala districts)
     ========================= */
     const algaeByDistrict = {
       "Thiruvananthapuram": ["Spirogyra","Oedogonium","Cladophora","Nostoc","Scenedesmus"],
@@ -194,26 +218,83 @@
     };
 
     const habitatsByDistrict = {
-      "Thiruvananthapuram": ["Neyyar River","Karamana River","Vamanapuram River"],
-      "Kollam": ["Ashtamudi Lake","Kallada River"],
-      "Pathanamthitta": ["Pamba River (Aranmula belt)","Manimala River (Kallooppara belt)","Achankovil River (Konni belt)"],
-      "Alappuzha": ["Pamba River","Manimala River","Achankovil River","Vembanad / Punnamada Lake (backwaters)"],
-      "Kottayam": ["Meenachil River","Vembanad Lake (Kumarakom)"],
-      "Idukki": ["Periyar River (upper stretches)","Reservoir margins (Idukki region)"],
-      "Ernakulam": ["Periyar River (Aluva belt)","Kochi backwater region","Vembanad lake margins"],
-      "Thrissur": ["Chalakudy River","Karuvannur River (Kole wetlands)","Bharathapuzha (Nila)"],
-      "Palakkad": ["Malampuzha Reservoir / Dam","Malampuzha River","Bharathapuzha (Nila)"],
-      "Malappuram": ["Chaliyar River","Kadalundi River","Bharathapuzha (Nila)","Tirur River"],
-      "Kozhikode": ["Kallayi River","Chaliyar River"],
-      "Wayanad": ["Kabini River system","Panamaram River","Mananthavady River"],
-      "Kannur": ["Valapattanam River","Anjarakandy River","Kuppam River"],
-      "Kasaragod": ["Chandragiri (Payaswini) River","Kariangode River"]
+      "Thiruvananthapuram": ["Rivers & streams","Temple ponds","Paddy-field canals"],
+      "Kollam": ["Backwaters / lake edges","River stretches","Canals"],
+      "Pathanamthitta": ["River sandbars","Wetlands","Seasonal pools"],
+      "Alappuzha": ["Backwater margins","Canals","Paddy wetlands"],
+      "Kottayam": ["Lake margins","River banks","Ponds"],
+      "Idukki": ["Hill streams","Reservoir margins","Moist rocks (algal films)"],
+      "Ernakulam": ["River banks","Backwater edges","Canals"],
+      "Thrissur": ["Wetlands","Rivers","Irrigation channels"],
+      "Palakkad": ["Reservoir margins","Canals","Paddy-field water"],
+      "Malappuram": ["Rivers","Ponds","Wetlands"],
+      "Kozhikode": ["Rivers","Paddy canals","Ponds"],
+      "Wayanad": ["Hill streams","Wetlands","Paddy fields"],
+      "Kannur": ["Rivers","Ponds","Canals"],
+      "Kasaragod": ["Rivers","Ponds","Backwater edges"]
+    };
+
+    /* =========================
+       DATA (India states/UT) – starter set
+       Note: algae listed are common freshwater/soil algae often reported widely.
+       Locations are typical habitats (kept generic to avoid wrong named sites).
+    ========================= */
+    const algaeByState = {
+      "Kerala": ["Spirogyra","Cladophora","Oscillatoria","Navicula"],
+      "Tamil Nadu": ["Spirogyra","Scenedesmus","Oscillatoria","Chlorella"],
+      "Karnataka": ["Spirogyra","Chlorella","Scenedesmus","Nostoc"],
+      "Andhra Pradesh": ["Chlorella","Scenedesmus","Oscillatoria","Navicula"],
+      "Telangana": ["Scenedesmus","Chlorella","Oscillatoria","Microcystis"],
+      "Maharashtra": ["Spirogyra","Cladophora","Chlorella","Navicula"],
+      "Gujarat": ["Oscillatoria","Nostoc","Chlorella","Navicula"],
+      "Rajasthan": ["Nostoc","Oscillatoria","Chlorella","Navicula"],
+      "Madhya Pradesh": ["Spirogyra","Scenedesmus","Nostoc","Navicula"],
+      "Chhattisgarh": ["Spirogyra","Chlorella","Oscillatoria","Nostoc"],
+      "Odisha": ["Spirogyra","Scenedesmus","Oscillatoria","Navicula"],
+      "West Bengal": ["Spirogyra","Microcystis","Oscillatoria","Navicula"],
+      "Bihar": ["Spirogyra","Oscillatoria","Scenedesmus","Navicula"],
+      "Uttar Pradesh": ["Spirogyra","Oscillatoria","Microcystis","Navicula"],
+      "Uttarakhand": ["Ulothrix","Spirogyra","Nostoc","Navicula"],
+      "Himachal Pradesh": ["Ulothrix","Nostoc","Spirogyra","Navicula"],
+      "Punjab": ["Spirogyra","Scenedesmus","Oscillatoria","Chlorella"],
+      "Haryana": ["Spirogyra","Scenedesmus","Oscillatoria","Chlorella"],
+      "Jammu and Kashmir": ["Ulothrix","Nostoc","Navicula","Spirogyra"],
+      "Ladakh": ["Nostoc","Oscillatoria","Navicula","Chlorella"],
+      "Delhi": ["Chlorella","Scenedesmus","Oscillatoria","Microcystis"],
+      "Jharkhand": ["Spirogyra","Nostoc","Chlorella","Navicula"],
+      "Assam": ["Spirogyra","Oscillatoria","Navicula","Scenedesmus"],
+      "Arunachal Pradesh": ["Ulothrix","Nostoc","Spirogyra","Navicula"],
+      "Manipur": ["Spirogyra","Oscillatoria","Navicula","Chlorella"],
+      "Meghalaya": ["Ulothrix","Nostoc","Spirogyra","Navicula"],
+      "Mizoram": ["Spirogyra","Nostoc","Navicula","Chlorella"],
+      "Nagaland": ["Spirogyra","Nostoc","Navicula","Oscillatoria"],
+      "Tripura": ["Spirogyra","Oscillatoria","Navicula","Chlorella"],
+      "Sikkim": ["Ulothrix","Nostoc","Navicula","Spirogyra"],
+      "Goa": ["Cladophora","Spirogyra","Navicula","Oscillatoria"],
+      "Puducherry": ["Chlorella","Scenedesmus","Navicula","Oscillatoria"],
+      "Chandigarh": ["Chlorella","Scenedesmus","Oscillatoria","Navicula"],
+      "Andaman and Nicobar Islands": ["Cladophora","Oscillatoria","Navicula","Chlorella"],
+      "Lakshadweep": ["Cladophora","Oscillatoria","Navicula","Chlorella"],
+      "Dadra and Nagar Haveli and Daman and Diu": ["Chlorella","Oscillatoria","Navicula","Scenedesmus"]
+    };
+
+    const habitatsByState = {
+      "default": ["Ponds & tanks","Lakes / reservoirs","Canals & slow rivers","Wet soils / paddy fields"],
+      "Kerala": ["Backwaters & lake edges","Canals & paddy wetlands","River banks","Temple ponds"],
+      "Goa": ["Estuary edges & ponds","Canals / paddy fields","Wet rock surfaces"],
+      "Rajasthan": ["Seasonal ponds","Step-wells / tanks","Irrigation canals"],
+      "Himachal Pradesh": ["Cold streams","Spring pools","Moist rocks (biofilms)"],
+      "Uttarakhand": ["Cold streams","Spring water pools","Moist rocks (biofilms)"],
+      "Ladakh": ["Cold desert ponds","Meltwater streams","Moist soil crusts"],
+      "Andaman and Nicobar Islands": ["Ponds & wetlands","Stream edges","Moist rocks / biofilms"],
+      "Lakshadweep": ["Ponds & brackish pools","Moist rocks","Wet soils"]
     };
 
     /* =========================
        POPUP UI
     ========================= */
     const hintEl = document.getElementById("hint");
+    const enterMsgEl = document.getElementById("enterMsg");
     const overlay = document.getElementById("overlay");
     const popup = document.getElementById("popup");
     const titleText = document.getElementById("titleText");
@@ -223,14 +304,25 @@
 
     function setAccent(hex){ document.documentElement.style.setProperty("--accent", hex); }
 
-    function openPopup(district, hex){
+    function openPopup(placeName, hex, mode){
       setAccent(hex);
-      titleText.textContent = district;
+      titleText.textContent = placeName;
 
-      const algae = (algaeByDistrict[district] || ["Spirogyra","Nostoc","Cladophora","Scenedesmus"]).slice(0,5);
+      let algae = [];
+      let hab = [];
+
+      if (mode === "keralaMap"){
+        algae = (algaeByDistrict[placeName] || ["Spirogyra","Nostoc","Cladophora","Scenedesmus"]).slice(0,5);
+        hab = habitatsByDistrict[placeName] || ["Ponds","Canals","River edges"];
+      } else if (mode === "indiaMap"){
+        algae = (algaeByState[placeName] || ["Spirogyra","Chlorella","Oscillatoria","Navicula"]).slice(0,4);
+        hab = habitatsByState[placeName] || habitatsByState.default;
+      } else {
+        algae = ["Spirogyra","Chlorella","Oscillatoria","Navicula"];
+        hab = habitatsByState.default;
+      }
+
       algaeList.innerHTML = `<ul>${algae.map(a=>`<li>${a}</li>`).join("")}</ul>`;
-
-      const hab = habitatsByDistrict[district] || ["Ponds","Canals","River edges"];
       habitatList.innerHTML = `<ul>${hab.map(h=>`<li>${h}</li>`).join("")}</ul>`;
 
       overlay.classList.add("show");
@@ -246,6 +338,31 @@
     popup.addEventListener("click", (e)=> e.stopPropagation());
     closeBtn.addEventListener("click", closePopup);
     overlay.addEventListener("pointerdown", closePopup);
+
+    /* =========================
+       TYPEWRITER MESSAGE
+    ========================= */
+    let isTransitioning = false;
+
+    function typeMessage(text, msPerChar = 55){
+      return new Promise((resolve) => {
+        enterMsgEl.style.display = "block";
+        enterMsgEl.textContent = "";
+
+        let i = 0;
+        const timer = setInterval(() => {
+          enterMsgEl.textContent += text[i] || "";
+          i++;
+          if (i > text.length){
+            clearInterval(timer);
+            setTimeout(() => {
+              enterMsgEl.style.display = "none";
+              resolve();
+            }, 600);
+          }
+        }, msPerChar);
+      });
+    }
 
     /* =========================
        THREE.JS SETUP
@@ -283,154 +400,158 @@
     /* =========================
        MODE CONTROL
     ========================= */
-    let mode = "globe"; // "globe" | "keralaMap"
+    let mode = "globe"; // "globe" | "indiaMap" | "keralaMap"
 
     /* =========================
-   EARTH + KERALA GLOW (FINAL CLEAN)
-========================= */
+       EARTH + INDIA GLOW (stable)
+       (Glow position set to India center-ish, slightly west)
+    ========================= */
+    const EARTH_RADIUS = 55;
 
-const EARTH_RADIUS = 55;
+    // Glow sprites + core ball
+    let glowCore = null;
+    let glowRing = null;
+    let glowHalo = null;
+    let coreBall = null;
+    let pulseT = 0;
 
-let glowCore, glowRing, glowHalo, coreBall;
-let pulseT = 0;
+    const earthTexture = new THREE.TextureLoader().load("./earth.jpg");
+    earthTexture.colorSpace = THREE.SRGBColorSpace;
+    earthTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    earthTexture.minFilter = THREE.LinearMipmapLinearFilter;
+    earthTexture.magFilter = THREE.LinearFilter;
 
-const earthTexture = new THREE.TextureLoader().load("./earth.jpg");
-earthTexture.colorSpace = THREE.SRGBColorSpace;
+    const earth = new THREE.Mesh(
+      new THREE.SphereGeometry(EARTH_RADIUS, 96, 96),
+      new THREE.MeshBasicMaterial({ map: earthTexture })
+    );
+    earth.position.set(0, -130, 0);
+    scene.add(earth);
 
-const earth = new THREE.Mesh(
-  new THREE.SphereGeometry(EARTH_RADIUS, 96, 96),
-  new THREE.MeshBasicMaterial({ map: earthTexture })
-);
-earth.position.set(0, -130, 0);
-scene.add(earth);
+    function latLonToVec3(lat, lon, radius){
+      const phi = (90 - lat) * (Math.PI / 180);
+      const theta = (lon + 180) * (Math.PI / 180);
+      const x = -(radius * Math.sin(phi) * Math.cos(theta));
+      const y = radius * Math.cos(phi);
+      const z = radius * Math.sin(phi) * Math.sin(theta);
+      return new THREE.Vector3(x, y, z);
+    }
 
-function latLonToVec3(lat, lon, radius){
-  const phi = (90 - lat) * (Math.PI / 180);
-  const theta = (lon + 180) * (Math.PI / 180);
-  return new THREE.Vector3(
-    -(radius * Math.sin(phi) * Math.cos(theta)),
-    radius * Math.cos(phi),
-    radius * Math.sin(phi) * Math.sin(theta)
-  );
-}
+    // India glow position (center-ish, slightly west)
+    const indiaLat = 22.5;
+    const indiaLon = 76.0;
 
-const keralaLat = 22.5;
-const keralaLon = 75.5;
+    const keralaMarker = new THREE.Group();
+    const markerPos = latLonToVec3(indiaLat, indiaLon, EARTH_RADIUS + 0.9);
+    keralaMarker.position.copy(markerPos);
 
-const keralaMarker = new THREE.Group();
-const markerPos = latLonToVec3(keralaLat, keralaLon, EARTH_RADIUS + 0.9);
-keralaMarker.position.copy(markerPos);
+    function makeCoreTex(){
+      const c = document.createElement("canvas");
+      c.width = c.height = 256;
+      const ctx = c.getContext("2d");
+      const g = ctx.createRadialGradient(128,128,0, 128,128,120);
+      g.addColorStop(0.00, "rgba(0,255,180,1.00)");
+      g.addColorStop(0.22, "rgba(0,255,160,0.95)");
+      g.addColorStop(0.55, "rgba(0,255,160,0.25)");
+      g.addColorStop(1.00, "rgba(0,255,160,0.00)");
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(128,128,120,0,Math.PI*2); ctx.fill();
+      const t = new THREE.CanvasTexture(c);
+      t.colorSpace = THREE.SRGBColorSpace;
+      return t;
+    }
+    function makeRingTex(){
+      const c = document.createElement("canvas");
+      c.width = c.height = 256;
+      const ctx = c.getContext("2d");
+      const g = ctx.createRadialGradient(128,128,0, 128,128,120);
+      g.addColorStop(0.00, "rgba(0,255,160,0.00)");
+      g.addColorStop(0.18, "rgba(0,255,160,0.00)");
+      g.addColorStop(0.30, "rgba(0,255,160,0.75)");
+      g.addColorStop(0.52, "rgba(0,255,160,0.25)");
+      g.addColorStop(1.00, "rgba(0,255,160,0.00)");
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(128,128,120,0,Math.PI*2); ctx.fill();
+      const t = new THREE.CanvasTexture(c);
+      t.colorSpace = THREE.SRGBColorSpace;
+      return t;
+    }
+    function makeHaloTex(){
+      const c = document.createElement("canvas");
+      c.width = c.height = 256;
+      const ctx = c.getContext("2d");
+      const g = ctx.createRadialGradient(128,128,30, 128,128,120);
+      g.addColorStop(0.00, "rgba(0,255,160,0.28)");
+      g.addColorStop(0.55, "rgba(0,255,160,0.10)");
+      g.addColorStop(1.00, "rgba(0,255,160,0.00)");
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(128,128,120,0,Math.PI*2); ctx.fill();
+      const t = new THREE.CanvasTexture(c);
+      t.colorSpace = THREE.SRGBColorSpace;
+      return t;
+    }
 
-/* ---- TEXTURES ---- */
+    const coreTex = makeCoreTex();
+    const ringTex = makeRingTex();
+    const haloTex = makeHaloTex();
 
-function makeCoreTex(){
-  const c = document.createElement("canvas");
-  c.width = c.height = 256;
-  const ctx = c.getContext("2d");
-  const g = ctx.createRadialGradient(128,128,0,128,128,120);
-  g.addColorStop(0,"rgba(0,255,180,1)");
-  g.addColorStop(0.5,"rgba(0,255,160,0.4)");
-  g.addColorStop(1,"rgba(0,255,160,0)");
-  ctx.fillStyle = g;
-  ctx.beginPath(); ctx.arc(128,128,120,0,Math.PI*2); ctx.fill();
-  return new THREE.CanvasTexture(c);
-}
+    function makeGlowSprite(tex, opacity){
+      const material = new THREE.SpriteMaterial({
+        map: tex,
+        transparent: true,
+        depthWrite: false,
+        depthTest: false,
+        blending: THREE.AdditiveBlending,
+        opacity
+      });
+      const sprite = new THREE.Sprite(material);
+      sprite.renderOrder = 999;
+      return sprite;
+    }
 
-function makeRingTex(){
-  const c = document.createElement("canvas");
-  c.width = c.height = 256;
-  const ctx = c.getContext("2d");
-  const g = ctx.createRadialGradient(128,128,0,128,128,120);
-  g.addColorStop(0,"rgba(0,255,160,0)");
-  g.addColorStop(0.3,"rgba(0,255,160,0.7)");
-  g.addColorStop(0.6,"rgba(0,255,160,0.2)");
-  g.addColorStop(1,"rgba(0,255,160,0)");
-  ctx.fillStyle = g;
-  ctx.beginPath(); ctx.arc(128,128,120,0,Math.PI*2); ctx.fill();
-  return new THREE.CanvasTexture(c);
-}
+    glowCore = makeGlowSprite(coreTex, 0.95);
+    glowRing = makeGlowSprite(ringTex, 0.55);
+    glowHalo = makeGlowSprite(haloTex, 0.22);
 
-function makeHaloTex(){
-  const c = document.createElement("canvas");
-  c.width = c.height = 256;
-  const ctx = c.getContext("2d");
-  const g = ctx.createRadialGradient(128,128,30,128,128,120);
-  g.addColorStop(0,"rgba(0,255,160,0.25)");
-  g.addColorStop(1,"rgba(0,255,160,0)");
-  ctx.fillStyle = g;
-  ctx.beginPath(); ctx.arc(128,128,120,0,Math.PI*2); ctx.fill();
-  return new THREE.CanvasTexture(c);
-}
+    glowCore.scale.set(10, 10, 1);
+    glowRing.scale.set(18, 18, 1);
+    glowHalo.scale.set(30, 30, 1);
 
-function makeGlowPlane(tex, opacity){
-  const mat = new THREE.MeshBasicMaterial({
-    map: tex,
-    transparent: true,
-    depthWrite: false,
-    depthTest: false,            // keep smooth, no black cutting
-    blending: THREE.AdditiveBlending,
-    opacity,
-    side: THREE.DoubleSide
-  });
+    const outward = markerPos.clone().normalize();
+    const lift = outward.clone().multiplyScalar(1.25);
 
-  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), mat);
-  mesh.renderOrder = 999;
-  return mesh;
-}
+    glowCore.position.copy(lift);
+    glowRing.position.copy(lift);
+    glowHalo.position.copy(lift);
 
-glowCore = makeGlowPlane(makeCoreTex(), 0.95);
-glowRing = makeGlowPlane(makeRingTex(), 0.55);
-glowHalo = makeGlowPlane(makeHaloTex(), 0.22);
+    coreBall = new THREE.Mesh(
+      new THREE.SphereGeometry(0.75, 24, 24),
+      new THREE.MeshBasicMaterial({
+        color: 0x00ff88,
+        transparent: true,
+        opacity: 1,
+        depthWrite: false,
+        depthTest: false,
+        blending: THREE.AdditiveBlending
+      })
+    );
+    coreBall.position.copy(lift);
 
-glowCore.scale.set(10,10,1);
-glowRing.scale.set(18,18,1);
-glowHalo.scale.set(30,30,1);
+    keralaMarker.add(coreBall);
+    keralaMarker.add(glowHalo);
+    keralaMarker.add(glowRing);
+    keralaMarker.add(glowCore);
 
-/* ---- POSITIONING ---- */
-
-const outward = markerPos.clone().normalize();
-const lift = outward.clone().multiplyScalar(1.25);
-coreBall = new THREE.Mesh(
-  new THREE.SphereGeometry(0.75, 24, 24),
-  new THREE.MeshBasicMaterial({
-    color: 0x00ff88,
-    transparent: true,
-    opacity: 1,
-    depthWrite: false,
-    depthTest: false,
-    blending: THREE.AdditiveBlending
-  })
-);
-
-coreBall.position.copy(lift);
-keralaMarker.add(coreBall);
-glowCore.position.copy(lift);
-glowRing.position.copy(lift);
-glowHalo.position.copy(lift);
-
-// Make planes face outward (stick to Earth surface)
-const earthCenter = new THREE.Vector3(); // (0,0,0) in earth local space
-glowCore.lookAt(earthCenter); glowCore.rotateX(Math.PI);
-glowRing.lookAt(earthCenter); glowRing.rotateX(Math.PI);
-glowHalo.lookAt(earthCenter); glowHalo.rotateX(Math.PI);
-
-keralaMarker.add(glowHalo);
-keralaMarker.add(glowRing);
-keralaMarker.add(glowCore);
-keralaMarker.add(coreBall);
-
-earth.add(keralaMarker);
-    // Invisible pick sphere (keep for easy clicking)
+    // Invisible pick sphere for clicking
     const pickSphere = new THREE.Mesh(
-      new THREE.SphereGeometry(3.2, 16, 16),
+      new THREE.SphereGeometry(3.4, 16, 16),
       new THREE.MeshBasicMaterial({ transparent:true, opacity: 0.0 })
     );
     keralaMarker.add(pickSphere);
 
-    // Attach marker to earth so it rotates with globe
     earth.add(keralaMarker);
 
-    // Rotate earth to face marker toward camera initially
+    // Rotate earth to face glow initially
     const ang = Math.atan2(markerPos.x, markerPos.z);
     earth.rotation.y -= ang;
 
@@ -446,46 +567,23 @@ earth.add(keralaMarker);
     }
     setGlobeCamera();
 
-    // Reusable vectors (avoid garbage each frame)
-    const _worldPos = new THREE.Vector3();
-    const _camDir = new THREE.Vector3();
-    const _markerDir = new THREE.Vector3();
-
     function animateEarth(){
-      earth.rotation.y += 0.0016;
-
-      if (!glowCore || !glowRing || !glowHalo) return;
+      earth.rotation.y += 0.0014;
 
       pulseT += 0.06;
-      const s = 1 + Math.sin(pulseT) * 0.18;
+      const s = 1 + Math.sin(pulseT) * 0.22;
 
-      // Pulse sizes (layered)
       glowHalo.scale.set(30*s, 30*s, 1);
-      glowRing.scale.set(18*(1 + (s-1)*1.1), 18*(1 + (s-1)*1.1), 1);
-      glowCore.scale.set(10*(1 + (s-1)*0.9), 10*(1 + (s-1)*0.9), 1);
+      glowRing.scale.set(18*(1+(s-1)*0.8), 18*(1+(s-1)*0.8), 1);
+      glowCore.scale.set(10*(1+(s-1)*0.7), 10*(1+(s-1)*0.7), 1);
 
-      // Base opacities
-      const haloOpacity = 0.18 + (Math.sin(pulseT) + 1) * 0.04;
-      const ringOpacity = 0.48 + (Math.sin(pulseT + 0.6) + 1) * 0.06;
-      const coreOpacity = 0.85 + (Math.sin(pulseT + 0.9) + 1) * 0.05;
-
-      // Hide when behind the globe
-      keralaMarker.getWorldPosition(_worldPos);
-      const earthCenter = earth.position;
-
-      _camDir.copy(camera.position).sub(earthCenter).normalize();
-      _markerDir.copy(_worldPos).sub(earthCenter).normalize();
-
-      const facing = _markerDir.dot(_camDir);
-      const vis = THREE.MathUtils.clamp((facing - 0.05) / 0.12, 0, 1);
-
-      glowHalo.material.opacity = haloOpacity * vis;
-      glowRing.material.opacity = ringOpacity * vis;
-      glowCore.material.opacity = coreOpacity * vis;
+      glowCore.material.opacity = 0.78 + (Math.sin(pulseT + 0.9) + 1) * 0.08;
+      glowRing.material.opacity = 0.42 + (Math.sin(pulseT + 0.4) + 1) * 0.07;
+      glowHalo.material.opacity = 0.18 + (Math.sin(pulseT) + 1) * 0.06;
     }
 
     /* =========================
-       STARS
+       STARS (sky)
     ========================= */
     const starsGeometry = new THREE.BufferGeometry();
     const starCount = 2600;
@@ -523,24 +621,128 @@ earth.add(keralaMarker);
     scene.add(starField);
 
     /* =========================
-       KERALA DISTRICT MAP BUILD (hidden at start)
+       MAPS: India ADM1 + Kerala districts
     ========================= */
-    const clickable = [];
-    const mapGroup = new THREE.Group();
-    mapGroup.visible = false;
-    scene.add(mapGroup);
-
-    function projectLonLat(lon, lat){
-      const scale = 20;
-      return new THREE.Vector2(lon*scale, lat*scale);
-    }
-
     const PALETTE = [
       "#ff6b6b","#ffd93d","#6bcb77","#4d96ff","#9d4edd","#ff9f1c","#00bbf9",
       "#f15bb5","#00f5d4","#b8f2e6","#f7b267","#7bdff2","#c77dff","#80ed99",
       "#ff4d6d","#34d399","#60a5fa","#f59e0b","#a78bfa","#22c55e"
     ];
     function paletteColor(i){ return new THREE.Color(PALETTE[i % PALETTE.length]); }
+
+    // INDIA
+    const indiaClickable = [];
+    const indiaGroup = new THREE.Group();
+    indiaGroup.visible = false;
+    scene.add(indiaGroup);
+
+    function projectIndiaLonLat(lon, lat){
+      const scale = 6.5;
+      return new THREE.Vector2(lon*scale, lat*scale);
+    }
+
+    // Build India
+    const indiaGeo = await fetch("./geoBoundaries-IND-ADM1.json").then(r => r.json());
+    const indiaFeatures = [...indiaGeo.features].sort((a,b)=>{
+      const A = (a.properties?.shapeName || "").toLowerCase();
+      const B = (b.properties?.shapeName || "").toLowerCase();
+      return A.localeCompare(B);
+    });
+
+    for (let idx=0; idx<indiaFeatures.length; idx++){
+      const f = indiaFeatures[idx];
+      const name = f.properties?.shapeName || "Unknown";
+      const geom = f.geometry;
+
+      // Kerala should be green
+      const stateColor = (name === "Kerala") ? new THREE.Color("#22c55e") : paletteColor(idx);
+      const hex = "#" + stateColor.getHexString();
+
+      const polygons = (geom.type === "Polygon") ? [geom.coordinates]
+                     : (geom.type === "MultiPolygon") ? geom.coordinates
+                     : [];
+
+      for (const poly of polygons){
+        const outer = poly[0];
+        if (!outer || outer.length < 3) continue;
+
+        const pts = outer.map(([lon,lat]) => projectIndiaLonLat(lon,lat));
+        const shape = new THREE.Shape(pts);
+
+        const extrudeGeo = new THREE.ExtrudeGeometry(shape, {
+          depth: 8,
+          bevelEnabled: false
+        });
+
+        const mat = new THREE.MeshStandardMaterial({
+          color: stateColor,
+          roughness: 0.92,
+          metalness: 0.00,
+          flatShading: true,
+          polygonOffset: true,
+          polygonOffsetFactor: 2,
+          polygonOffsetUnits: 2,
+          emissive: new THREE.Color(0x000000),
+          emissiveIntensity: 0
+        });
+
+        const mesh = new THREE.Mesh(extrudeGeo, mat);
+        mesh.rotation.x = -Math.PI/2;
+        mesh.userData = { name, hex };
+        mesh.position.y += 0.01;
+
+        indiaGroup.add(mesh);
+        indiaClickable.push(mesh);
+
+        const edges = new THREE.EdgesGeometry(extrudeGeo, 25);
+        const line = new THREE.LineSegments(
+          edges,
+          new THREE.LineBasicMaterial({ color: 0x000000, transparent:true, opacity:0.25 })
+        );
+        line.rotation.x = -Math.PI/2;
+        line.position.copy(mesh.position);
+        indiaGroup.add(line);
+      }
+    }
+
+    // Center India
+    {
+      const box = new THREE.Box3().setFromObject(indiaGroup);
+      const center = new THREE.Vector3();
+      box.getCenter(center);
+      indiaGroup.position.sub(center);
+    }
+
+    function fitCameraToIndia(){
+      const box = new THREE.Box3().setFromObject(indiaGroup);
+      const size = new THREE.Vector3();
+      box.getSize(size);
+
+      const maxDim = Math.max(size.x, size.y, size.z);
+      const fov = camera.fov * (Math.PI / 180);
+      let dist = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+      dist *= (window.innerWidth < 768) ? 1.5 : 1.15;
+
+      camera.position.set(0, dist * 0.85, dist);
+      controls.target.set(0, 0, 0);
+
+      controls.minDistance = 140;
+      controls.maxDistance = 2800;
+      controls.enablePan = true;
+
+      controls.update();
+    }
+
+    // KERALA
+    const clickable = [];
+    const mapGroup = new THREE.Group();
+    mapGroup.visible = false;
+    scene.add(mapGroup);
+
+    function projectKeralaLonLat(lon, lat){
+      const scale = 20;
+      return new THREE.Vector2(lon*scale, lat*scale);
+    }
 
     let selectedMesh = null;
     function setSelected(mesh){
@@ -558,16 +760,15 @@ earth.add(keralaMarker);
       }
     }
 
-    const geo = await fetch("./kerala_districts.geojson").then(r => r.json());
-
-    const features = [...geo.features].sort((a,b)=>{
+    const keralaGeo = await fetch("./kerala_districts.geojson").then(r => r.json());
+    const keralaFeatures = [...keralaGeo.features].sort((a,b)=>{
       const A = (a.properties?.shapeName || "").toLowerCase();
       const B = (b.properties?.shapeName || "").toLowerCase();
       return A.localeCompare(B);
     });
 
-    for (let idx=0; idx<features.length; idx++){
-      const f = features[idx];
+    for (let idx=0; idx<keralaFeatures.length; idx++){
+      const f = keralaFeatures[idx];
       const name = f.properties?.shapeName || "Unknown";
       const geom = f.geometry;
 
@@ -582,7 +783,7 @@ earth.add(keralaMarker);
         const outer = poly[0];
         if (!outer || outer.length < 3) continue;
 
-        const pts = outer.map(([lon,lat]) => projectLonLat(lon,lat));
+        const pts = outer.map(([lon,lat]) => projectKeralaLonLat(lon,lat));
         const shape = new THREE.Shape(pts);
 
         const extrudeGeo = new THREE.ExtrudeGeometry(shape, {
@@ -622,11 +823,13 @@ earth.add(keralaMarker);
       }
     }
 
-    // center map
-    const bbox = new THREE.Box3().setFromObject(mapGroup);
-    const center = new THREE.Vector3();
-    bbox.getCenter(center);
-    mapGroup.position.sub(center);
+    // Center Kerala
+    {
+      const box = new THREE.Box3().setFromObject(mapGroup);
+      const center = new THREE.Vector3();
+      box.getCenter(center);
+      mapGroup.position.sub(center);
+    }
 
     function fitCameraToKerala(){
       const box = new THREE.Box3().setFromObject(mapGroup);
@@ -651,6 +854,35 @@ earth.add(keralaMarker);
     /* =========================
        TRANSITIONS
     ========================= */
+    function goToGlobe(){
+      mode = "globe";
+      closePopup();
+      if (selectedMesh) setSelected(null);
+
+      indiaGroup.visible = false;
+      mapGroup.visible = false;
+
+      earth.visible = true;
+      keralaMarker.visible = true;
+
+      setGlobeCamera();
+      hintEl.textContent = "Drag to rotate • Scroll/pinch to zoom • Tap the green glow on India";
+    }
+
+    function goToIndiaMap(){
+      mode = "indiaMap";
+      closePopup();
+
+      earth.visible = false;
+      keralaMarker.visible = false;
+
+      mapGroup.visible = false;
+      indiaGroup.visible = true;
+
+      fitCameraToIndia();
+      hintEl.textContent = "Drag to rotate • Scroll/pinch to zoom • Tap a state/UT (Kerala is green)";
+    }
+
     function goToKeralaMap(){
       mode = "keralaMap";
       closePopup();
@@ -658,49 +890,64 @@ earth.add(keralaMarker);
       earth.visible = false;
       keralaMarker.visible = false;
 
+      indiaGroup.visible = false;
       mapGroup.visible = true;
-      fitCameraToKerala();
 
+      fitCameraToKerala();
       hintEl.textContent = "Drag to rotate • Scroll/pinch to zoom • Tap a district";
     }
 
-    function goToGlobe(){
-      mode = "globe";
-      closePopup();
-      if (selectedMesh) setSelected(null);
-
-      mapGroup.visible = false;
-
-      earth.visible = true;
-      keralaMarker.visible = true;
-
-      setGlobeCamera();
-
-      hintEl.textContent = "Drag to rotate • Scroll/pinch to zoom • Tap the green glow on Kerala";
-    }
-
     /* =========================
-       DISTRICT CLICK
+       SINGLE POINTERDOWN HANDLER
     ========================= */
-    function onPointerDown(e){
+    async function onPointerDown(e){
+      if (isTransitioning) return;
       if (popup.classList.contains("show")) return;
 
       setPointerFromEvent(e);
       raycaster.setFromCamera(pointer, camera);
 
+      // Globe click -> India
       if (mode === "globe"){
         const hits = raycaster.intersectObject(pickSphere, true);
         if (hits.length){
-          goToKeralaMap();
+          isTransitioning = true;
+          await typeMessage("Now entering India...");
+          goToIndiaMap();
+          isTransitioning = false;
         }
         return;
       }
 
-      const hits = raycaster.intersectObjects(clickable, true);
-      if (hits.length){
-        const obj = hits[0].object;
-        setSelected(obj);
-        openPopup(obj.userData.name, obj.userData.hex);
+      // India clicks
+      if (mode === "indiaMap"){
+        const hits = raycaster.intersectObjects(indiaClickable, true);
+        if (hits.length){
+          const obj = hits[0].object;
+          const name = obj.userData?.name || "Unknown";
+
+          // Kerala -> Kerala map
+          if (name === "Kerala"){
+            isTransitioning = true;
+            await typeMessage("Now entering Kerala...");
+            goToKeralaMap();
+            isTransitioning = false;
+            return;
+          }
+
+          openPopup(name, obj.userData.hex, "indiaMap");
+        }
+        return;
+      }
+
+      // Kerala district clicks
+      if (mode === "keralaMap"){
+        const hits = raycaster.intersectObjects(clickable, true);
+        if (hits.length){
+          const obj = hits[0].object;
+          setSelected(obj);
+          openPopup(obj.userData.name, obj.userData.hex, "keralaMap");
+        }
       }
     }
 
@@ -723,11 +970,14 @@ earth.add(keralaMarker);
         animateEarth();
       }
 
+      // keep stars around camera (true 360 sky)
       starField.position.copy(camera.position);
 
+      // slow sky motion
       starField.rotation.y += 0.00035;
       starField.rotation.x += 0.00008;
 
+      // subtle twinkle
       const t = clock.getElapsedTime();
       starsMaterial.opacity = 0.92 + 0.08 * (0.5 + 0.5 * Math.sin(t * 1.15));
 
@@ -741,16 +991,9 @@ earth.add(keralaMarker);
       renderer.setSize(innerWidth, innerHeight);
 
       if (mode === "globe") setGlobeCamera();
+      else if (mode === "indiaMap") fitCameraToIndia();
       else fitCameraToKerala();
     });
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-

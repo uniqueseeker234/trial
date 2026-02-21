@@ -386,11 +386,15 @@
           map: tex,
           transparent: true,
           depthWrite: false,
-          depthTest: true,
+          depthTest: false,
           blending: THREE.AdditiveBlending,
           opacity
         })
       );
+
+    const sprite = new THREE.Sprite(material);
+      sprite.renderOrder = 999;
+      return sprite
     }
 
     glowCore = makeGlowSprite(coreTex, 0.95);
@@ -404,11 +408,25 @@
 
     // Push a bit outward so it sits on the surface
     const outward = markerPos.clone().normalize();
-    const lift = outward.multiplyScalar(0.7);
+    const lift = outward.multiplyScalar(1.25);
     glowCore.position.copy(lift);
     glowRing.position.copy(lift);
     glowHalo.position.copy(lift);
+    
+const coreBall = new THREE.Mesh(
+  new THREE.SphereGeometry(0.75, 24, 24),
+  new THREE.MeshBasicMaterial({
+    color: 0x00ff88,
+    transparent: true,
+    opacity: 1,
+    depthWrite: false,
+    depthTest: false,
+    blending: THREE.AdditiveBlending
+  })
+);
 
+coreBall.position.copy(lift);
+keralaMarker.add(coreBall);
     keralaMarker.add(glowHalo);
     keralaMarker.add(glowRing);
     keralaMarker.add(glowCore);
@@ -470,7 +488,7 @@
       _markerDir.copy(_worldPos).sub(earthCenter).normalize();
 
       const facing = _markerDir.dot(_camDir);
-      const vis = (facing > 0.05) ? 1 : 0;
+      const vis = THREE.MathUtils.clamp((facing - 0.15) / 0.25, 0, 1);
 
       glowHalo.material.opacity = haloOpacity * vis;
       glowRing.material.opacity = ringOpacity * vis;
@@ -739,3 +757,4 @@
   </script>
 </body>
 </html>
+

@@ -345,28 +345,45 @@
     const markerPos = latLonToVec3(keralaLat, keralaLon, EARTH_RADIUS + 0.9);
     keralaMarker.position.copy(markerPos);
 
-    // Bright core (small)
-    const core = new THREE.Sprite(new THREE.SpriteMaterial({
-      map: glowTex,
-      transparent: true,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-      opacity: 1.0
-    }));
-    core.scale.set(10, 10, 1);
-    keralaMarker.add(core);
+   // --- Surface-attached glow (no popping out) ---
+// Make glow texture a bit more correct for color
+glowTex.colorSpace = THREE.SRGBColorSpace;
 
-    // Big halo (soft)
-    const halo = new THREE.Sprite(new THREE.SpriteMaterial({
-      map: glowTex,
-      transparent: true,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-      opacity: 0.55
-    }));
-    halo.scale.set(34, 34, 1);
-    keralaMarker.add(halo);
+// Create 2 planes (core + halo) that sit tangent to the globe surface
+const coreMat = new THREE.MeshBasicMaterial({
+  map: glowTex,
+  transparent: true,
+  opacity: 1.0,
+  depthWrite: false,
+  depthTest: true,                 // IMPORTANT: realistic occlusion (your choice 2)
+  blending: THREE.AdditiveBlending,
+  side: THREE.DoubleSide,
+  alphaTest: 0.02                  // helps remove dark fringe edges
+});
 
+const haloMat = coreMat.clone();
+haloMat.opacity = 0.55;
+
+const corePlane = new THREE.Mesh(new THREE.PlaneGeometry(10, 10), coreMat);
+const haloPlane = new THREE.Mesh(new THREE.PlaneGeometry(34, 34), haloMat);
+
+// Orient planes so they are tangent to the sphere at the marker location.
+// PlaneGeometry faces +Z by default, so rotate +Z to match the outward surface normal.
+const outward = markerPos.clone().normalize();
+const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), outward);
+
+corePlane.quaternion.copy(q);
+haloPlane.quaternion.copy(q);
+
+// Push the planes a tiny bit outward so they don't z-fight with the texture
+const lift = outward.clone().multiplyScalar(0.25);
+corePlane.position.copy(lift);
+haloPlane.position.copy(lift);
+
+// Add to marker group
+keralaMarker.add(haloPlane);
+keralaMarker.add(corePlane);
+    
     // Invisible pick sphere (easy raycast)
     const pickSphere = new THREE.Mesh(
       new THREE.SphereGeometry(3.2, 16, 16),
@@ -403,11 +420,12 @@
       pulseT += 0.06;
       const s = 1 + Math.sin(pulseT) * 0.25;
 
-      halo.scale.set(34 * s, 34 * s, 1);
-      halo.material.opacity = 0.40 + (Math.sin(pulseT) + 1) * 0.10; // 0.40..0.60
+      haloPlane.scale.set(s, s, 1);
+      haloPlane.material.opacity = 0.40 + (Math.sin(pulseT) + 1) * 0.10; // 0.40..0.60
 
-      core.scale.set(10 * (1 + (s-1)*0.8), 10 * (1 + (s-1)*0.8), 1);
-      core.material.opacity = 0.85 + (Math.sin(pulseT + 0.9) + 1) * 0.07;
+      const coreScale = 1 + (s-1) * 0.8;
+      corePlane.scale.set(coreScale, coreScale, 1);
+      corePlane.material.opacity = 0.85 + (Math.sin(pulseT + 0.9) + 1) * 0.07;
     }
 
     /* =========================
@@ -680,3 +698,4 @@
   </script>
 </body>
 </html>
+

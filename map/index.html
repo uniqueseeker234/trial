@@ -375,15 +375,7 @@ keralaMarker.add(pickSphere);
 // Attach marker to earth so it rotates with globe
 earth.add(keralaMarker);
 
-    // Invisible pick sphere
-    const pickSphere = new THREE.Mesh(
-      new THREE.SphereGeometry(3.2, 16, 16),
-      new THREE.MeshBasicMaterial({ color: 0x00ff88, transparent:true, opacity: 0.0 })
-    );
-    keralaMarker.add(pickSphere);
-
-    earth.add(keralaMarker);
-
+ 
     // Rotate earth to face marker toward camera initially
     const ang = Math.atan2(markerPos.x, markerPos.z);
     earth.rotation.y -= ang;
@@ -682,6 +674,7 @@ earth.add(keralaMarker);
   </script>
 </body>
 </html>
+
 
 
 

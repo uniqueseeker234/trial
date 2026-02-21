@@ -345,50 +345,45 @@
     const markerPos = latLonToVec3(keralaLat, keralaLon, EARTH_RADIUS + 0.9);
     keralaMarker.position.copy(markerPos);
 
-   // --- Surface-attached glow (no popping out) ---
-// Make glow texture a bit more correct for color
+   // ===== Clean Sprite Glow (nice aura like demo) =====
 glowTex.colorSpace = THREE.SRGBColorSpace;
 
-// Create 2 planes (core + halo) that sit tangent to the globe surface
-// --- 3D volumetric glow (best for side angles) ---
-const glowCoreMat = new THREE.MeshBasicMaterial({
-  color: 0x00ff88,
+// Move glow a tiny bit above surface (prevents black cutting)
+const outward = markerPos.clone().normalize();
+const lift = outward.clone().multiplyScalar(0.35);
+
+const coreMat = new THREE.SpriteMaterial({
+  map: glowTex,
   transparent: true,
   opacity: 0.95,
   depthWrite: false,
-  depthTest: true,                 // realistic: hides when behind globe
-  blending: THREE.AdditiveBlending
+  depthTest: true,                 // realistic (hides behind globe)
+  blending: THREE.AdditiveBlending,
+  alphaTest: 0.06
 });
+coreMat.premultipliedAlpha = true;
 
-const glowHaloMat = new THREE.MeshBasicMaterial({
-  color: 0x00ff88,
+const haloMat = new THREE.SpriteMaterial({
+  map: glowTex,
   transparent: true,
-  opacity: 0.12,
+  opacity: 0.45,
   depthWrite: false,
   depthTest: true,
-  blending: THREE.AdditiveBlending
+  blending: THREE.AdditiveBlending,
+  alphaTest: 0.04
 });
+haloMat.premultipliedAlpha = true;
 
-// Small bright core
-const glowCore = new THREE.Mesh(
-  new THREE.SphereGeometry(0.95, 24, 24),
-  glowCoreMat
-);
+const core = new THREE.Sprite(coreMat);
+core.scale.set(8, 8, 1);
+core.position.copy(lift);
 
-// Larger soft halo sphere
-const glowHalo = new THREE.Mesh(
-  new THREE.SphereGeometry(7.2, 32, 32),
-  glowHaloMat
-);
+const halo = new THREE.Sprite(haloMat);
+halo.scale.set(22, 22, 1);
+halo.position.copy(lift);
 
-// Place them slightly above surface to avoid z-fighting
-const outward = markerPos.clone().normalize();
-const lift = outward.clone().multiplyScalar(0.35);
-glowCore.position.copy(lift);
-glowHalo.position.copy(lift);
-
-keralaMarker.add(glowHalo);
-keralaMarker.add(glowCore);
+keralaMarker.add(halo);
+keralaMarker.add(core);
     
     // Invisible pick sphere (easy raycast)
     const pickSphere = new THREE.Mesh(
@@ -426,13 +421,11 @@ keralaMarker.add(glowCore);
      pulseT += 0.06;
 const s = 1 + Math.sin(pulseT) * 0.25;
 
-glowHalo.scale.set(s * 1.35, s * 1.35, s * 1.35);
-glowHalo.material.opacity = 0.08 + (Math.sin(pulseT) + 1) * 0.05; // 0.08..0.18
+halo.scale.set(22 * s, 22 * s, 1);
+halo.material.opacity = 0.32 + (Math.sin(pulseT) + 1) * 0.07; // 0.08..0.18
 
-const cs = 1 + (s - 1) * 0.7;
-glowCore.scale.set(cs, cs, cs);
-glowCore.material.opacity = 0.78 + (Math.sin(pulseT + 0.9) + 1) * 0.08;
-    }
+core.scale.set(8 * (1 + (s-1)*0.8), 8*(1 + (s-1)*0.8),1);
+      core.material.opacity = 0.82 = (Math.sin(pulseT = 0.9) = 1) * 0.06;    }
 
     /* =========================
        STARS (your existing sky)
@@ -704,6 +697,7 @@ glowCore.material.opacity = 0.78 + (Math.sin(pulseT + 0.9) + 1) * 0.08;
   </script>
 </body>
 </html>
+
 
 
 

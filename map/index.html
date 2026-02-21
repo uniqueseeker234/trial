@@ -435,8 +435,8 @@ glowCore.material.opacity = 0.80 + (Math.sin(pulseT + 0.9) + 1) * 0.06;
   const facing = markerDir.dot(camDir); // >0 = visible side, <0 = behind
   const show = facing > 0.05;
 
-  core.material.opacity = show ? (0.82 + (Math.sin(pulseT + 0.9) + 1) * 0.06) : 0;
-  halo.material.opacity = show ? (0.32 + (Math.sin(pulseT) + 1) * 0.07) : 0;
+  glowcore.material.opacity = show ? (0.82 + (Math.sin(pulseT + 0.9) + 1) * 0.06) : 0;
+  glowHalo.material.opacity = show ? (0.32 + (Math.sin(pulseT) + 1) * 0.07) : 0;
 }
 
     /* =========================
@@ -709,6 +709,7 @@ glowCore.material.opacity = 0.80 + (Math.sin(pulseT + 0.9) + 1) * 0.06;
   </script>
 </body>
 </html>
+
 
 
 

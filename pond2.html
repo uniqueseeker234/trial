@@ -10,7 +10,7 @@
 
 <style>
   :root{
-    /* LOCKED “anime pond” water tones (based on your chosen image) */
+    /* LOCKED “anime pond” water tones */
     --surfaceA:#69d6b7;
     --surfaceB:#32b99a;
 
@@ -35,14 +35,14 @@
 
   /* Make page scrollable (pond stays fixed) */
   body{
-    min-height: 180vh; /* guarantees scroll even if UI is short */
+    min-height: 260vh; /* strong scroll */
   }
 
   /* =============== TOP BAR =============== */
   .topbar{
     position:fixed;
     top:12px; left:12px; right:12px;
-    z-index:50;
+    z-index:90;
     display:flex;
     align-items:center;
     justify-content:space-between;
@@ -87,7 +87,7 @@
   .intro{
     position:fixed;
     inset:0;
-    z-index:45;
+    z-index:85;
     display:flex;
     align-items:flex-start;
     justify-content:center;
@@ -144,6 +144,7 @@
     filter: blur(1px);
     opacity:0.65;
     animation: shimmer 7s ease-in-out infinite alternate;
+    pointer-events:none;
   }
   @keyframes shimmer{
     from { transform: translateX(-10px) translateY(0px); }
@@ -154,7 +155,7 @@
   .waterline{
     position:absolute;
     top:34vh; left:0; right:0;
-    height:40px;
+    height:44px;
     background:
       linear-gradient(to bottom,
         rgba(255,255,255,0.22),
@@ -162,6 +163,7 @@
         rgba(255,255,255,0.00));
     filter: blur(0.3px);
     opacity:0.85;
+    pointer-events:none;
   }
   .waterline::after{
     content:"";
@@ -171,7 +173,7 @@
       repeating-linear-gradient(90deg,
         rgba(255,255,255,0.14) 0 22px,
         rgba(255,255,255,0.02) 22px 52px);
-    opacity:0.35;
+    opacity:0.30;
     filter: blur(1px);
     animation: surfaceWaves 4.6s linear infinite;
   }
@@ -203,105 +205,99 @@
     pointer-events:none;
   }
 
-  /* =============== SEAWEED (SIDES + BASE) =============== */
+  /* =============== SEAWEED (MORE “LEAFY”, ANCHORED) =============== */
   .weed{
     position:absolute;
-    bottom:-10px;
-    width:16px;
-    border-radius: 14px 14px 10px 10px;
-    background: linear-gradient(to top, rgba(6,58,47,0.9), rgba(20,110,86,0.95));
+    bottom:-14px;                 /* anchored */
+    width:18px;
+    height:220px;
+    border-radius: 30px;
+    background: linear-gradient(to top, rgba(5,45,38,0.95), rgba(34,175,135,0.92));
     transform-origin: bottom center;
-    animation: weedSway 2.8s ease-in-out infinite alternate;
-    opacity:0.92;
+    animation: weedSway 3.4s ease-in-out infinite alternate;
+    opacity:0.94;
+    filter: drop-shadow(0 10px 10px rgba(0,0,0,0.15));
   }
+  .weed::before, .weed::after{
+    content:"";
+    position:absolute;
+    bottom:0;
+    width:16px;
+    height:200px;
+    background: inherit;
+    border-radius: 30px;
+    opacity:0.75;
+  }
+  .weed::before{ left:-10px; transform: rotate(-6deg); }
+  .weed::after { right:-10px; transform: rotate(6deg); }
+
   @keyframes weedSway{
-    from { transform: rotate(-4deg); }
-    to   { transform: rotate(5deg); }
+    from { transform: rotate(-5deg); }
+    to   { transform: rotate(6deg); }
   }
 
-  /* left cluster */
-  .weed.left{ left: 4vw; }
-  .weed.left2{ left: 9vw; opacity:0.75; }
-  .weed.left3{ left: 13vw; opacity:0.65; }
+  .weed.left{ left: 3.5vw; height:230px; animation-duration:3.2s; }
+  .weed.left2{ left: 8.5vw; height:280px; opacity:0.80; animation-duration:4.0s; }
+  .weed.left3{ left: 13.5vw; height:210px; opacity:0.70; animation-duration:3.6s; }
 
-  /* right cluster */
-  .weed.right{ right: 4vw; }
-  .weed.right2{ right: 9vw; opacity:0.75; }
-  .weed.right3{ right: 13vw; opacity:0.65; }
+  .weed.right{ right: 3.5vw; height:240px; animation-duration:3.4s; }
+  .weed.right2{ right: 8.5vw; height:295px; opacity:0.80; animation-duration:4.2s; }
+  .weed.right3{ right: 13.5vw; height:220px; opacity:0.70; animation-duration:3.7s; }
 
-  /* =============== LOTUS PAD (REAL LILYPAD SHAPE) =============== */
+  /* =============== LOTUS PAD (SIDE VIEW LIKE IMAGE 2) =============== */
   .pad{
     position:absolute;
     top:16vh;
     left:16vw;
-
-    /* Round pad like your photo */
-    width: 160px;
-    height: 160px;
-    border-radius: 50%;
-
-    /* Leaf texture + highlight */
+    width: 220px;
+    height: 72px;
+    border-radius: 999px;
     background:
-      radial-gradient(circle at 35% 30%, rgba(255,255,255,0.22), rgba(255,255,255,0) 45%),
-      radial-gradient(circle at 60% 65%, rgba(0,0,0,0.10), rgba(0,0,0,0) 55%),
-      linear-gradient(to bottom, #86dd86, #49b86a);
-
-    box-shadow: 0 18px 36px rgba(0,0,0,0.18);
-    transform: rotate(-6deg);
-    animation: padFloat 5.4s ease-in-out infinite alternate;
+      radial-gradient(circle at 35% 30%, rgba(255,255,255,0.24), rgba(255,255,255,0) 55%),
+      radial-gradient(circle at 70% 80%, rgba(0,0,0,0.18), rgba(0,0,0,0) 55%),
+      linear-gradient(to bottom, #94e89b, #49b86a);
+    box-shadow: 0 18px 34px rgba(0,0,0,0.20);
+    transform: rotate(-8deg);
+    animation: padFloat 5.8s ease-in-out infinite alternate;
+    pointer-events:none; /* not a button */
   }
 
-  /* subtle leaf veins */
-  .pad::before{
-    content:"";
-    position:absolute;
-    inset:0;
-    border-radius:50%;
-    background:
-      conic-gradient(from 220deg,
-        rgba(255,255,255,0.00) 0deg 20deg,
-        rgba(255,255,255,0.12) 20deg 22deg,
-        rgba(255,255,255,0.00) 22deg 40deg,
-        rgba(255,255,255,0.10) 40deg 42deg,
-        rgba(255,255,255,0.00) 42deg 360deg);
-    opacity:0.35;
-    filter: blur(0.2px);
-    pointer-events:none;
-  }
-
-  /* V-notch cut (real lily pad bite) */
+  /* underside shadow (gives side-view feel) */
   .pad::after{
     content:"";
     position:absolute;
-    left: 50%;
-    top: -10%;
-    width: 70%;
-    height: 70%;
-    transform: translateX(-50%) rotate(18deg);
+    left: 10%;
+    right: 10%;
+    bottom: -10px;
+    height: 18px;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.22);
+    filter: blur(8px);
+    opacity: 0.55;
+  }
 
-    /* cut-out illusion using background matching surface */
-    background: linear-gradient(to bottom, var(--surfaceA), var(--surfaceB));
-    clip-path: polygon(50% 55%, 0 0, 100% 0);
-    border-radius: 30px;
-    opacity: 0.98;
-    filter: blur(0.4px);
+  /* slight edge highlight */
+  .pad::before{
+    content:"";
+    position:absolute;
+    inset: 6px 10px 14px 10px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.12);
+    opacity:0.55;
   }
 
   @keyframes padFloat{
-    from { transform: translateY(0) rotate(-6deg); }
-    to   { transform: translateY(7px) rotate(-4deg); }
+    from { transform: translateY(0) rotate(-8deg); }
+    to   { transform: translateY(8px) rotate(-6deg); }
   }
 
-  /* =============== LOTUS FLOWER (BIGGER + INNER WHORLS) =============== */
+  /* =============== LOTUS FLOWER (BIGGER, KEEP STYLE + INNER WHORLS) =============== */
   .lotus3d{
     position:absolute;
-    top: -32px;
-    right: -18px;
-
-    /* bigger */
-    width: 120px;
-    height: 120px;
-
+    top: -56px;
+    right: -24px;
+    width: 148px;
+    height: 148px;
     transform: rotate(10deg);
     pointer-events:none;
     filter: drop-shadow(0 14px 18px rgba(0,0,0,0.18));
@@ -309,53 +305,54 @@
   }
   @keyframes lotusBob{
     from { transform: translateY(0) rotate(10deg); }
-    to   { transform: translateY(4px) rotate(12deg); }
+    to   { transform: translateY(5px) rotate(12deg); }
   }
 
-  /* =============== FROG (KEEP ORIGINAL STYLE) =============== */
+  /* =============== FROG (SMALLER) =============== */
   .frog{
     position:absolute;
-    top:14vh;
-    left:20vw;
-    width: 72px;
-    height: 46px;
-    border-radius: 28px;
+    top:14.2vh;
+    left:20.6vw;
+    width: 52px;
+    height: 34px;
+    border-radius: 22px;
     background: linear-gradient(to bottom, #8ef07a, #4bd06b);
-    box-shadow: 0 18px 28px rgba(0,0,0,0.18);
+    box-shadow: 0 14px 22px rgba(0,0,0,0.18);
     transform: rotate(-2deg);
     animation: frogBob 2.1s ease-in-out infinite;
+    pointer-events:none;
   }
   @keyframes frogBob{
     0%,100% { transform: translateY(0) rotate(-2deg); }
-    50%     { transform: translateY(-6px) rotate(-1deg); }
+    50%     { transform: translateY(-4px) rotate(-1deg); }
   }
   .frog .eye{
     position:absolute;
-    top:-10px;
-    width: 22px;
-    height: 22px;
+    top:-8px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
     background: linear-gradient(to bottom, #a7ff95, #55d86e);
-    box-shadow: 0 10px 14px rgba(0,0,0,0.12);
+    box-shadow: 0 8px 12px rgba(0,0,0,0.12);
   }
   .frog .eye::after{
     content:"";
     position:absolute;
-    inset:6px;
+    inset:4.5px;
     border-radius:50%;
     background: #18241f;
     box-shadow: inset 0 0 0 2px rgba(255,255,255,0.35);
   }
-  .frog .eye.left{ left:10px; }
-  .frog .eye.right{ right:10px; }
+  .frog .eye.left{ left:8px; }
+  .frog .eye.right{ right:8px; }
 
   .frog .mouth{
     position:absolute;
-    left: 18px;
-    right: 18px;
-    bottom: 12px;
-    height: 10px;
-    border-bottom: 3px solid rgba(0,0,0,0.18);
+    left: 12px;
+    right: 12px;
+    bottom: 7px;
+    height: 8px;
+    border-bottom: 2px solid rgba(0,0,0,0.20);
     border-radius: 0 0 999px 999px;
     opacity:0.75;
   }
@@ -366,45 +363,26 @@
   }
   @keyframes frogTurn{
     0%, 70% { transform: translateY(0) rotate(-2deg) rotateY(0deg); }
-    80%     { transform: translateY(-6px) rotate(-1deg) rotateY(18deg); }
+    80%     { transform: translateY(-4px) rotate(-1deg) rotateY(18deg); }
     90%     { transform: translateY(-2px) rotate(-2deg) rotateY(-14deg); }
     100%    { transform: translateY(0) rotate(-2deg) rotateY(0deg); }
   }
 
-  /* Ripple around pad/frog */
-  .ripple{
-    position:absolute;
-    top: 24vh;
-    left: 15vw;
-    width: 230px;
-    height: 120px;
-    border-radius: 999px;
-    border: 2px solid rgba(255,255,255,0.28);
-    opacity:0.55;
-    filter: blur(0.2px);
-    animation: ripplePulse 2.4s ease-out infinite;
-  }
-  @keyframes ripplePulse{
-    0%   { transform: scale(0.85); opacity:0.55; }
-    100% { transform: scale(1.18); opacity:0; }
-  }
+  /* ✅ REMOVED RIPPLE COMPLETELY */
 
-  /* =============== FISH (SHORTER BODY + BIG TAIL + TRIANGLE FINS) =============== */
+  /* =============== FISH (OVAL + BIG TAIL + SHARK FIN + WIGGLE + SMILE) =============== */
   .fish{
     position:absolute;
-
-    /* shorter body */
-    width: 46px;
-    height: 26px;
-
+    width: 52px;
+    height: 28px;
     border-radius: 999px;
     top: 42vh;
-    left: -120px;
+    left: -140px;
 
-    /* ABOVE UI now */
-    z-index: 40;
+    /* ABOVE UI */
+    z-index: 80;
 
-    filter: drop-shadow(0 10px 14px rgba(0,0,0,0.20));
+    filter: drop-shadow(0 10px 14px rgba(0,0,0,0.18));
     will-change: transform;
   }
 
@@ -412,23 +390,23 @@
   .fish::before{
     content:"";
     position:absolute;
-    inset:5px 8px 9px 8px;
+    inset:5px 8px 11px 8px;
     border-radius: 999px;
     background: rgba(255,255,255,0.18);
-    opacity:0.65;
+    opacity:0.55;
   }
 
-  /* BIG tail (same color as body due to background: inherit) */
+  /* BIG tail (same color) */
   .fish::after{
     content:"";
     position:absolute;
-    left:-18px;
+    left:-22px;
     top:4px;
-    width: 26px;
-    height: 18px;
+    width: 34px;
+    height: 20px;
     background: inherit;
     clip-path: polygon(100% 50%, 0 0, 0 100%);
-    border-radius: 6px;
+    border-radius: 8px;
     opacity:0.98;
   }
 
@@ -437,46 +415,96 @@
     position:absolute;
     right:8px;
     top:9px;
-    width: 7px;
-    height: 7px;
+    width: 6px;
+    height: 6px;
     background: rgba(0,0,0,0.65);
     border-radius:50%;
-    box-shadow: inset 0 0 0 2px rgba(255,255,255,0.45);
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,0.42);
   }
 
-  /* TOP fin triangle (same body color via background: inherit) */
+  /* small smile mouth */
+  .fish .mouth{
+    position:absolute;
+    right:12px;
+    top: 16px;
+    width: 10px;
+    height: 6px;
+    border-bottom: 2px solid rgba(0,0,0,0.35);
+    border-radius: 0 0 999px 999px;
+    opacity:0.9;
+  }
+
+  /* TOP fin: shark style */
   .fish .finTop{
     position:absolute;
-    top:-8px;
+    top:-10px;
     left: 18px;
-    width: 16px;
-    height: 14px;
+    width: 22px;
+    height: 20px;
     background: inherit;
     clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
     opacity:0.95;
-    filter: none;
   }
 
-  /* SIDE fin triangle (same body color) */
+  /* SIDE fin */
   .fish .finSide{
     position:absolute;
-    top: 13px;
-    left: 16px;
-    width: 14px;
+    top: 15px;
+    left: 18px;
+    width: 16px;
     height: 12px;
     background: inherit;
     clip-path: polygon(0% 50%, 100% 0%, 100% 100%);
+    opacity:0.92;
+  }
+
+  /* BOTTOM fin */
+  .fish .finBottom{
+    position:absolute;
+    bottom: -8px;
+    left: 20px;
+    width: 16px;
+    height: 14px;
+    background: inherit;
+    clip-path: polygon(50% 100%, 0% 0%, 100% 0%);
     opacity:0.90;
   }
 
-  /* Fish movement: CSS keyframes (smooth & low lag) */
+  /* Fish wiggle */
+  @keyframes wiggle{
+    0%   { transform: translateX(0) rotate(0deg); }
+    50%  { transform: translateX(0) rotate(1.8deg); }
+    100% { transform: translateX(0) rotate(-1.8deg); }
+  }
+
+  /* Fish swim */
   @keyframes swimRight {
-    from { transform: translateX(-140px); }
-    to   { transform: translateX(calc(100vw + 220px)); }
+    from { transform: translateX(-160px); }
+    to   { transform: translateX(calc(100vw + 240px)); }
   }
   @keyframes swimLeft {
-    from { transform: translateX(calc(100vw + 220px)) scaleX(-1); }
-    to   { transform: translateX(-140px) scaleX(-1); }
+    from { transform: translateX(calc(100vw + 240px)) scaleX(-1); }
+    to   { transform: translateX(-160px) scaleX(-1); }
+  }
+
+  /* Bubble trail (super light) */
+  .fish .trail{
+    position:absolute;
+    left:-18px;
+    top: 9px;
+    width: 16px;
+    height: 10px;
+    background:
+      radial-gradient(circle at 70% 50%, rgba(255,255,255,0.55), rgba(255,255,255,0.0) 60%),
+      radial-gradient(circle at 30% 50%, rgba(255,255,255,0.35), rgba(255,255,255,0.0) 62%);
+    opacity:0.75;
+    filter: blur(0.2px);
+    animation: trailPulse 0.9s ease-in-out infinite alternate;
+    pointer-events:none;
+  }
+  @keyframes trailPulse{
+    from { transform: translateX(0); opacity:0.55; }
+    to   { transform: translateX(-4px); opacity:0.85; }
   }
 
   /* =============== BUBBLES (LIGHTWEIGHT) =============== */
@@ -485,18 +513,18 @@
     width: 10px;
     height: 10px;
     border-radius:50%;
-    background: rgba(255,255,255,0.38);
-    border: 1px solid rgba(255,255,255,0.20);
+    background: rgba(255,255,255,0.34);
+    border: 1px solid rgba(255,255,255,0.18);
     opacity:0.8;
     filter: none;
     box-shadow: none;
-    z-index: 8;
+    z-index: 10;
     cursor: pointer;
     will-change: transform, opacity;
     animation: bubbleUp linear forwards;
   }
   @keyframes bubbleUp{
-    from { transform: translateY(0) scale(1); opacity:0.70; }
+    from { transform: translateY(0) scale(1); opacity:0.65; }
     to   { transform: translateY(-90vh) scale(0.85); opacity:0; }
   }
 
@@ -506,7 +534,7 @@
     z-index:30;
 
     /* push UI lower so it does NOT cover pad/frog */
-    padding: 170px 14px 18px;
+    padding: 240px 14px 18px;
   }
 
   .cards{
@@ -632,41 +660,19 @@
   .prev{ left:8px; }
   .next{ right:8px; }
 
-  /* Extra scroll space (so you can scroll like Pond 1) */
+  /* extra scroll space */
   .scrollSpace{
-    height: 70vh;
-  }
-  .scrollHint{
-    width: min(860px, 94vw);
-    margin: 16px auto 0;
-    padding: 14px 14px;
-    border-radius: 18px;
-    background: rgba(0,0,0,0.22);
-    border: 1px solid rgba(255,255,255,0.14);
-    color: rgba(255,255,255,0.92);
-    backdrop-filter: blur(8px);
-    box-shadow: 0 14px 40px rgba(0,0,0,0.22);
-    text-align:center;
-    font-weight:800;
-  }
-  .scrollHint small{
-    display:block;
-    margin-top: 6px;
-    font-weight:700;
-    opacity:0.9;
+    height: 95vh;
   }
 
   @media (max-width: 700px){
     .introBox .line1{ font-size: 18px; }
     .introBox .line2{ font-size: 13px; }
 
-    /* shift pad/frog slightly on mobile */
-    .pad{ left: 7vw; top: 14vh; transform: scale(0.90) rotate(-6deg); }
-    .frog{ left: 13vw; top: 12.8vh; transform: scale(0.92) rotate(-2deg); }
-    .ripple{ left: 6vw; top: 22.5vh; }
+    .pad{ left: 7vw; top: 14.5vh; transform: scale(0.90) rotate(-8deg); }
+    .frog{ left: 13.5vw; top: 13.8vh; transform: scale(0.92) rotate(-2deg); }
 
-    /* keep UI lower on mobile too */
-    .uiWrap{ padding-top: 190px; }
+    .uiWrap{ padding-top: 260px; }
   }
 </style>
 </head>
@@ -696,20 +702,18 @@
   <div class="waterline"></div>
   <div class="underwater"></div>
 
-  <!-- Seaweed clusters -->
-  <div class="weed left"  style="height:140px; top: calc(34vh + 12vh);"></div>
-  <div class="weed left2" style="height:190px; top: calc(34vh + 20vh); animation-duration:3.4s;"></div>
-  <div class="weed left3" style="height:120px; top: calc(34vh + 30vh); animation-duration:2.6s;"></div>
+  <!-- Seaweed clusters (anchored bottom/sides) -->
+  <div class="weed left"  style="bottom:-18px;"></div>
+  <div class="weed left2" style="bottom:-18px;"></div>
+  <div class="weed left3" style="bottom:-18px;"></div>
 
-  <div class="weed right"  style="height:150px; top: calc(34vh + 14vh);"></div>
-  <div class="weed right2" style="height:210px; top: calc(34vh + 22vh); animation-duration:3.6s;"></div>
-  <div class="weed right3" style="height:130px; top: calc(34vh + 32vh); animation-duration:2.8s;"></div>
+  <div class="weed right"  style="bottom:-18px;"></div>
+  <div class="weed right2" style="bottom:-18px;"></div>
+  <div class="weed right3" style="bottom:-18px;"></div>
 
   <!-- Surface objects -->
-  <div class="ripple"></div>
-
   <div class="pad">
-    <!-- lotus: bigger + inner whorls (same style) -->
+    <!-- lotus: bigger + inner whorls (clean, single outer whorl) -->
     <svg class="lotus3d" viewBox="0 0 120 120" aria-hidden="true">
       <defs>
         <radialGradient id="p" cx="50%" cy="50%" r="50%">
@@ -770,18 +774,18 @@
     <div class="mouth"></div>
   </div>
 
-  <!-- Underwater fish -->
+  <!-- Fish (above UI) -->
   <div class="fish" id="f1" style="top: calc(34vh + 10vh); background: #ff7b7b;">
-    <div class="finTop"></div><div class="finSide"></div><div class="eye"></div>
+    <div class="trail"></div><div class="finTop"></div><div class="finSide"></div><div class="finBottom"></div><div class="eye"></div><div class="mouth"></div>
   </div>
   <div class="fish" id="f2" style="top: calc(34vh + 18vh); background: #ffd16a;">
-    <div class="finTop"></div><div class="finSide"></div><div class="eye"></div>
+    <div class="trail"></div><div class="finTop"></div><div class="finSide"></div><div class="finBottom"></div><div class="eye"></div><div class="mouth"></div>
   </div>
   <div class="fish" id="f3" style="top: calc(34vh + 28vh); background: #70d6ff;">
-    <div class="finTop"></div><div class="finSide"></div><div class="eye"></div>
+    <div class="trail"></div><div class="finTop"></div><div class="finSide"></div><div class="finBottom"></div><div class="eye"></div><div class="mouth"></div>
   </div>
   <div class="fish" id="f4" style="top: calc(34vh + 38vh); background: #a8ff9c;">
-    <div class="finTop"></div><div class="finSide"></div><div class="eye"></div>
+    <div class="trail"></div><div class="finTop"></div><div class="finSide"></div><div class="finBottom"></div><div class="eye"></div><div class="mouth"></div>
   </div>
 </div>
 
@@ -809,12 +813,6 @@
 
   </div>
 
-  <!-- Optional: visual hint + extra scroll -->
-  <div class="scrollHint">
-    🫧 Scroll down to explore more of the pond
-    <small>(Pond background stays fixed — only the page content scrolls)</small>
-  </div>
-
   <div class="scrollSpace"></div>
 </div>
 
@@ -824,7 +822,7 @@ let model;
 let classes = [];
 const CONFIDENCE_THRESHOLD = 0.65;
 
-/* (Fixed) Algae info */
+/* Algae info */
 const algaeInfo = {
   "spirogyra": {
     images:["images/spirogyra1.jpg","images/spirogyra2.jpg"],
@@ -900,21 +898,21 @@ const uploadBox = document.getElementById("uploadBox");
 const imageUpload = document.getElementById("imageUpload");
 uploadBox.addEventListener("click", ()=> imageUpload.click());
 
-/* ===================== FISH ANIMATION (CSS ONLY) ===================== */
+/* ===================== FISH ANIMATION (CSS + WIGGLE) ===================== */
 function startFish(){
   const f1 = document.getElementById("f1");
   const f2 = document.getElementById("f2");
   const f3 = document.getElementById("f3");
   const f4 = document.getElementById("f4");
 
-  f1.style.animation = "swimRight 15s linear infinite";
-  f2.style.animation = "swimLeft  18s linear infinite";
-  f3.style.animation = "swimRight 21s linear infinite";
-  f4.style.animation = "swimLeft  24s linear infinite";
+  f1.style.animation = "swimRight 15s linear infinite, wiggle 1.3s ease-in-out infinite";
+  f2.style.animation = "swimLeft  18s linear infinite, wiggle 1.4s ease-in-out infinite";
+  f3.style.animation = "swimRight 21s linear infinite, wiggle 1.25s ease-in-out infinite";
+  f4.style.animation = "swimLeft  24s linear infinite, wiggle 1.5s ease-in-out infinite";
 }
 startFish();
 
-/* ===================== LIGHTWEIGHT BUBBLES (NO DRAG) ===================== */
+/* ===================== LIGHTWEIGHT BUBBLES ===================== */
 const pond = document.getElementById("pond-layer");
 const MAX_BUBBLES = 10;
 
@@ -922,7 +920,7 @@ function spawnBubble(){
   const b = document.createElement("div");
   b.className = "bubble";
 
-  const size = 8 + Math.random()*10;
+  const size = 7 + Math.random()*9;
   b.style.width = size+"px";
   b.style.height = size+"px";
 
@@ -935,7 +933,7 @@ function spawnBubble(){
   const dur = 7 + Math.random()*6;
   b.style.animationDuration = dur + "s";
 
-  b.style.opacity = (0.45 + Math.random()*0.35).toFixed(2);
+  b.style.opacity = (0.40 + Math.random()*0.35).toFixed(2);
 
   b.addEventListener("pointerdown", ()=> b.remove(), {passive:true});
   b.addEventListener("animationend", ()=> b.remove());

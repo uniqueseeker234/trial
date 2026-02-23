@@ -1035,19 +1035,6 @@ function spawnOneBubble(){
     b.style.transition="none";
   });
 
-  document.addEventListener("mousemove", (e)=>{
-    if(!isDragging) return;
-    b.style.left = (e.clientX - offsetX) + "px";
-    b.style.top  = (e.clientY - offsetY) + "px";
-  });
-
-  document.addEventListener("mouseup", ()=>{
-    if(isDragging){
-      isDragging=false;
-      b.style.transition="";
-    }
-  });
-
   // touch: drag or tap-to-pop
   let startX=0, startY=0, moved=false;
 
@@ -1061,22 +1048,6 @@ function spawnOneBubble(){
     b.style.transition="none";
   }, {passive:true});
 
-  document.addEventListener("touchmove", (e)=>{
-    if(!isDragging) return;
-    const t = e.touches[0];
-    const dx = Math.abs(t.clientX - startX);
-    const dy = Math.abs(t.clientY - startY);
-    if(dx>6 || dy>6) moved=true;
-    b.style.left = (t.clientX - offsetX) + "px";
-    b.style.top  = (t.clientY - offsetY) + "px";
-  }, {passive:true});
-
-  document.addEventListener("touchend", ()=>{
-    if(!isDragging) return;
-    isDragging=false;
-    b.style.transition="";
-    if(!moved) b.remove();
-  });
 
   // pop on click (desktop)
   b.addEventListener("click", ()=> b.remove());

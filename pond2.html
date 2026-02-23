@@ -1,1 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Welcome to Our Algae Pond (Pond 2)</title>
 
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+
+<!-- TFJS -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
+
+<style>
+  :root{
+    /* LOCKED Pond 2 water identity */
+    --waterA:#5FC2A7;           /* primary teal-green */
+    --waterB:#42A98E;           /* deeper */
+    --waterDeep:#2F7E6D;        /* deepest shadow */
+    --surfaceGlow: rgba(255,255,255,0.22);
+    --glass: rgba(255,255,255,0.14);
+    --glass2: rgba(255,255,255,0.10);
+    --glassBorder: rgba(255,255,255,0.22);
+    --text:#eafcff;
+    --shadow: 0 18px 40px rgba(0,0,0,0.25);
+  }
+
+  html, body{
+    margin:0;
+    height:100%;
+    font-family: 'Poppins', sans-serif;
+    overflow-x:hidden;
+    background:#0b2330;
+  }
+
+  /* ========== UNDERWATER BACKGROUND ========== */
+  body{
+    position:relative;
+    color: var(--text);
+    background:
+      radial-gradient(1200px 600px at 50% 15%, rgba(255,255,255,0.08), transparent 55%),
+      linear-gradient(to bottom, var(--waterA) 0%, var(--waterB) 45%, var(--waterDeep) 100%);
+  }
+
+  /* light rays */
+  body::before{
+    content:"";
+    position:fixed;
+    inset:-20vh -20vw;
+    pointer-events:none;
+    z-index:0;
+    background:
+      conic-gradient(from 220deg at 50% 0%,
+        rgba(255,255,255,0.12),
+        rgba(255,255,255,0.00) 30%,
+        rgba(255,255,255,0.10) 60%,
+        rgba(255,255,255,0.00) 75%,
+        rgba(255,255,255,0.12));
+    opacity:0.35;
+    filter: blur(1px);
+    animation: raysMove 7s ease-in-out infinite alternate;
+  }
+  @keyframes raysMove{
+    from{ transform: translateY(-10px) rotate(-1deg); opacity:0.28; }
+    to  { transform: translateY(12px) rotate(1deg);  opacity:0.42; }
+  }
+
+  /* tiny particle specks */
+  body::after{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:0;
+    background-image:
+      radial-gradient(circle at 10% 30%, rgba(255,255,255,0.22) 1px, transparent 2px),
+      radial-gradient(circle at 30% 55%, rgba(255,255,255,0.14) 1px, transparent 2px),
+      radial-gradient(circle at 55% 25%, rgba(255,255,255,0.18) 1px, transparent 2px),
+      radial-gradient(circle at 70% 60%, rgba(255,255,255,0.16) 1px, transparent 2px),
+      radial-gradient(circle at 85% 38%, rgba(255,255,255,0.12) 1px, transparent 2px);
+    background-size: 520px 520px;
+    opacity:0.32;
+    animation: particlesDrift 12s linear infinite;
+  }
+  @keyframes particlesDrift{
+    from{ transform: translateY(0); }
+    to  { transform: translateY(-80px); }
+  }
+
+  /* ========== LAYERS ========== */
+  #scene{
+    position:relative;
+    min-height:100vh;
+    z-index:1;
+  }
+
+  /* Surface split (top zone) */
+  #surface-zone{
+    position:relative;
+    height:32vh;
+    min-height:240px;
+    z-index:2;
+    pointer-events:none;
+  }
+
+  /* Underwater zone */
+  #underwater-zone{
+    position:relative;
+    min-height:68vh;
+    z-index:1;
+    pointer-events:none;
+  }
+
+  /* Surface shimmer band (the split line) */
+  #surface-line{
+    position:sticky;
+    top:0;
+    height:64px;
+    margin-top:-18px;
+    z-index:3;
+    pointer-events:none;
+  }
+  #surface-line::before{
+    content:"";
+    position:absolute;
+    left:0; right:0;
+    top:18px;
+    height:2px;
+    background: linear-gradient(90deg,
+      rgba(255,255,255,0.10),
+      rgba(255,255,255,0.35),
+      rgba(255,255,255,0.10));
+    filter: blur(0.2px);
+    opacity:0.8;
+  }
+  #surface-line::after{
+    content:"";
+    position:absolute;
+    left:-30%;
+    top:0;
+    width:160%;
+    height:64px;
+    background:
+      radial-gradient(120px 30px at 20% 40%, rgba(255,255,255,0.18), transparent 65%),
+      radial-gradient(140px 34px at 50% 55%, rgba(255,255,255,0.14), transparent 65%),
+      radial-gradient(160px 38px at 78% 45%, rgba(255,255,255,0.16), transparent 65%);
+    opacity:0.85;
+    filter: blur(0.4px);
+    animation: surfaceWave 4.2s ease-in-out infinite;
+  }
+  @keyframes surfaceWave{
+    0%   { transform: translateX(-2%) translateY(0); opacity:0.75; }
+    50%  { transform: translateX(2%) translateY(2px); opacity:0.95; }
+    100% { transform: translateX(-2%) translateY(0); opacity:0.75; }
+  }
+
+  /* ========== TOP BAR ========== */
+  .topbar{
+    position:fixed;
+    top:14px; left:14px; right:14px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    z-index:20;
+    pointer-events:auto;
+  }
+
+  .pill{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    padding:10px 14px;
+    border-radius:16px;
+    background: rgba(0,0,0,0.18);
+    border: 1px solid rgba(255,255,255,0.14);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 12px 26px rgba(0,0,0,0.18);
+    color: var(--text);
+    font-weight:700;
+    letter-spacing:0.2px;
+  }
+
+  .btn-link{
+    text-decoration:none;
+    color: var(--text);
+    font-weight:700;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 14px;
+    border-radius:14px;
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.16);
+    backdrop-filter: blur(10px);
+  }
+  .btn-link:active{ transform: scale(0.98); }
+
+  .switch{
+    display:flex;
+    gap:10px;
+    align-items:center;
+  }
+  .tag{
+    padding:9px 12px;
+    border-radius:14px;
+    font-weight:800;
+    border:1px solid rgba(255,255,255,0.18);
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.9);
+    text-decoration:none;
+  }
+  .tag.active{
+    background: rgba(255,255,255,0.18);
+  }
+
+  /* ========== TITLE (fade out later if you want, but kept for now) ========== */
+  h1{
+    margin:0;
+    padding: 92px 10px 16px;
+    text-align:center;
+    font-family: 'Fredoka One', cursive;
+    color: rgba(255,255,255,0.92);
+    font-size: 44px;
+    letter-spacing: 1.2px;
+    text-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    animation: swayTitle 3.2s ease-in-out infinite;
+    position:relative;
+    z-index:5;
+    pointer-events:none;
+  }
+  @keyframes swayTitle{
+    0%   { transform: rotate(-1.6deg); }
+    50%  { transform: rotate(1.6deg); }
+    100% { transform: rotate(-1.6deg); }
+  }
+
+  /* ========== UI CARDS (GLASS) ========== */
+  .container{
+    display:flex;
+    justify-content:center;
+    gap:22px;
+    padding: 10px 16px 24px;
+    flex-wrap:wrap;
+    position:relative;
+    z-index:10;
+    pointer-events:auto;
+  }
+
+  .card{
+    width:min(440px, 92vw);
+    background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.10));
+    border:1px solid var(--glassBorder);
+    border-radius: 22px;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(12px);
+    padding: 18px;
+    animation: fadeIn 0.9s ease;
+  }
+
+  @keyframes fadeIn{
+    from{ opacity:0; transform: translateY(10px); }
+    to  { opacity:1; transform: translateY(0); }
+  }
+
+  .upload-box{
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.18);
+    padding: 18px;
+    border-radius: 18px;
+    text-align:center;
+    cursor:pointer;
+    transition: 0.25s;
+    color: rgba(255,255,255,0.95);
+    font-weight:800;
+  }
+  .upload-box:hover{ transform: translateY(-2px); background: rgba(255,255,255,0.16); }
+
+  #prediction{
+    margin: 14px 6px 6px;
+    font-size: 18px;
+    color: rgba(255,255,255,0.95);
+    text-shadow: 0 10px 30px rgba(0,0,0,0.18);
+  }
+
+  .carousel{
+    margin-top:12px;
+    position:relative;
+    width:100%;
+    max-width: 240px;
+  }
+  .carousel img{
+    width:100%;
+    border-radius:16px;
+    display:none;
+    border:1px solid rgba(255,255,255,0.18);
+  }
+  .carousel img.active{ display:block; }
+  .carousel button{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    background: rgba(0,0,0,0.22);
+    border: 1px solid rgba(255,255,255,0.14);
+    color:white;
+    font-size:20px;
+    padding:6px 10px;
+    cursor:pointer;
+    border-radius:12px;
+    backdrop-filter: blur(8px);
+  }
+  .prev{ left:6px; }
+  .next{ right:6px; }
+
+  .description{
+    margin-top:14px;
+    font-size: 14px;
+    line-height:1.55;
+    color: rgba(255,255,255,0.90);
+  }
+  .description h3{
+    margin: 10px 0 6px;
+    font-size: 14px;
+    letter-spacing:0.3px;
+    color: rgba(255,255,255,0.95);
+  }
+  .description ul{ margin: 0 0 8px 18px; padding:0; }
+  .description li{ margin: 4px 0; }
+
+  /* Stars */
+  .stars span{
+    font-size:32px;
+    cursor:pointer;
+    color: rgba(255,255,255,0.35);
+    display:inline-block;
+    transition: transform 0.25s, color 0.25s;
+    user-select:none;
+  }
+  .stars span.filled{ color: gold; animation: bounce 0.45s ease forwards; }
+  @keyframes bounce{
+    0% { transform: scale(1.12); }
+    50%{ transform: scale(1.40); }
+    100%{ transform: scale(1.15); }
+  }
+
+  .thank-message{
+    margin-top:10px;
+    min-height:24px;
+    font-weight:700;
+    color: rgba(255,255,255,0.92);
+  }
+
+  button{
+    padding: 11px 16px;
+    margin: 10px 6px 0;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.18);
+    cursor:pointer;
+    font-size: 14px;
+    transition: 0.2s;
+    backdrop-filter: blur(10px);
+  }
+  button:hover{ transform: translateY(-1px); }
+  button:active{ transform: scale(0.99); }
+
+  .contribute{
+    background: rgba(39, 174, 96, 0.82);
+    color:white;
+    font-weight:800;
+  }
+  .explore{
+    background: rgba(41, 128, 185, 0.82);
+    color:white;
+    font-weight:800;
+  }
+
+  /* ========== ANIME BUBBLES (same interaction) ========== */
+  .bubble{
+    position: fixed;
+    bottom: -60px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    pointer-events:auto;
+    z-index: 12;
+    transition: transform 0.28s ease, opacity 0.28s ease;
+    background:
+      radial-gradient(circle at 30% 30%, rgba(255,255,255,0.85), rgba(255,255,255,0.12) 55%, rgba(255,255,255,0.05));
+    box-shadow: 0 0 14px rgba(255,255,255,0.35);
+    animation: rise linear infinite;
+    backdrop-filter: blur(2px);
+  }
+  .bubble:active{
+    transform: scale(2) !important;
+    opacity:0 !important;
+  }
+  @keyframes rise{
+    0%   { transform: translateY(0) scale(0.95); opacity:0.55; }
+    100% { transform: translateY(-120vh) scale(1.12); opacity:0; }
+  }
+
+  /* ========== FISH (ANIME STYLE, no scales) ========== */
+  .fish{
+    position: fixed;
+    width: 58px;
+    height: 28px;
+    z-index: 13;
+    pointer-events:none;
+    will-change: left, transform;
+  }
+  .fish .body{
+    position:absolute;
+    inset:0;
+    border-radius: 999px;
+    filter: drop-shadow(0 10px 16px rgba(0,0,0,0.14));
+  }
+  .fish .tail{
+    position:absolute;
+    width: 18px; height: 18px;
+    top: 5px;
+    background: inherit;
+    border-radius: 6px;
+    transform: rotate(45deg);
+    opacity:0.95;
+  }
+  .fish .eye{
+    position:absolute;
+    width: 7px; height: 7px;
+    background: rgba(255,255,255,0.92);
+    border-radius:50%;
+    top: 9px;
+    box-shadow: 0 0 0 2px rgba(0,0,0,0.08) inset;
+  }
+  .fish .pupil{
+    position:absolute;
+    width: 3px; height: 3px;
+    background: rgba(0,0,0,0.45);
+    border-radius:50%;
+    top: 2px; left: 2px;
+  }
+  .fish .fin{
+    position:absolute;
+    width: 16px;
+    height: 10px;
+    top: 12px;
+    left: 22px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.18);
+    transform: rotate(-14deg);
+    filter: blur(0.1px);
+  }
+
+  .fish.right .tail{ left: -8px; }
+  .fish.right .eye{ right: 11px; }
+  .fish.right .fin{ left: 22px; }
+
+  .fish.left{ transform: scaleX(-1); }
+  .fish.left .tail{ left: -8px; }
+  .fish.left .eye{ right: 11px; }
+  .fish.left .fin{ left: 22px; }
+
+  /* occasional head turn */
+  @keyframes headTurn{
+    0%, 80%, 100% { transform: translateY(0) rotate(0deg); }
+    86% { transform: translateY(-1px) rotate(-2deg); }
+    92% { transform: translateY(0) rotate(2deg); }
+  }
+  .fish .body{ animation: headTurn 6.5s ease-in-out infinite; }
+
+  /* bubble trail behind fish */
+  .bubble-trail{
+    position: fixed;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    pointer-events:none;
+    z-index: 12;
+    background: rgba(255,255,255,0.9);
+    opacity:0.9;
+    filter: blur(0.2px);
+    animation: bubbleTrail 0.65s ease-out forwards;
+  }
+  @keyframes bubbleTrail{
+    from { transform: translateY(0) scale(1); opacity: 0.9; }
+    to   { transform: translateY(-18px) scale(0.7); opacity: 0; }
+  }
+
+  /* ========== LOTUS PADS + FROGS (ABOVE WATER) ========== */
+  .lotus{
+    position:absolute;
+    width: 170px;
+    height: 64px;
+    border-radius: 999px;
+    background: radial-gradient(circle at 35% 35%, rgba(140, 255, 196, 0.45), rgba(36, 150, 94, 0.95));
+    box-shadow: 0 12px 26px rgba(0,0,0,0.18);
+    border: 1px solid rgba(255,255,255,0.14);
+    opacity:0.98;
+    animation: padSway 5.2s ease-in-out infinite;
+  }
+  @keyframes padSway{
+    0% { transform: translateX(0) rotate(-1deg); }
+    50%{ transform: translateX(10px) rotate(1deg); }
+    100%{ transform: translateX(0) rotate(-1deg); }
+  }
+
+  .lotus-flower{
+    position:absolute;
+    left: 60%;
+    top: 18%;
+    width: 62px;
+    height: 62px;
+    transform: translate(-50%, -50%);
+    pointer-events:none;
+    filter: drop-shadow(0 8px 14px rgba(0,0,0,0.18));
+  }
+  .lotus-flower span{
+    position:absolute;
+    width: 22px;
+    height: 30px;
+    background: rgba(255, 184, 210, 0.96);
+    border-radius: 50%;
+    top: 20px;
+    left: 20px;
+    transform-origin: center bottom;
+    animation: petalPulse 2.8s ease-in-out infinite;
+  }
+  @keyframes petalPulse{
+    0%,100% { filter: brightness(1); }
+    50%     { filter: brightness(1.08); }
+  }
+  .lotus-flower span:nth-child(1){ transform: rotate(0deg)   translateY(-14px); }
+  .lotus-flower span:nth-child(2){ transform: rotate(60deg)  translateY(-14px); }
+  .lotus-flower span:nth-child(3){ transform: rotate(120deg) translateY(-14px); }
+  .lotus-flower span:nth-child(4){ transform: rotate(180deg) translateY(-14px); }
+  .lotus-flower span:nth-child(5){ transform: rotate(240deg) translateY(-14px); }
+  .lotus-flower span:nth-child(6){ transform: rotate(300deg) translateY(-14px); }
+  .lotus-flower::after{
+    content:"";
+    position:absolute;
+    width: 16px;
+    height: 16px;
+    background: rgba(255, 220, 120, 0.96);
+    border-radius:50%;
+    left: 23px;
+    top: 26px;
+  }
+
+  .frog{
+    position:absolute;
+    width: 74px;
+    height: 52px;
+    border-radius: 999px;
+    background: radial-gradient(circle at 35% 35%, rgba(200,255,210,0.9), rgba(64, 190, 110, 0.98));
+    border: 1px solid rgba(255,255,255,0.18);
+    box-shadow: 0 12px 26px rgba(0,0,0,0.18);
+    animation: frogBob 2.9s ease-in-out infinite;
+  }
+  @keyframes frogBob{
+    0%,100% { transform: translateY(0); }
+    50%     { transform: translateY(-8px); }
+  }
+  .frog .eye{
+    position:absolute;
+    width: 18px; height: 18px;
+    background: rgba(255,255,255,0.92);
+    border-radius: 50%;
+    top: -6px;
+    box-shadow: inset 0 0 0 2px rgba(0,0,0,0.08);
+  }
+  .frog .eye.left{ left: 14px; }
+  .frog .eye.right{ right: 14px; }
+  .frog .eye .pupil{
+    position:absolute;
+    width: 6px; height: 6px;
+    background: rgba(0,0,0,0.45);
+    border-radius:50%;
+    left: 6px; top: 6px;
+    animation: lookAround 6.5s ease-in-out infinite;
+  }
+  @keyframes lookAround{
+    0%,80%,100%{ transform: translate(0,0); }
+    86%{ transform: translate(2px, 0); }
+    92%{ transform: translate(-2px, 0); }
+  }
+
+  /* ========== UNDERWATER PLANTS (SIDES FOR 3D FRAME) ========== */
+  .seaweed{
+    position:absolute;
+    bottom: 0;
+    width: 22px;
+    height: 210px;
+    border-radius: 18px 18px 10px 10px;
+    background: linear-gradient(180deg, rgba(190,255,220,0.18), rgba(26, 112, 72, 0.92));
+    filter: drop-shadow(0 12px 18px rgba(0,0,0,0.18));
+    transform-origin: bottom center;
+    animation: swayweed 2.2s ease-in-out infinite alternate;
+    opacity:0.95;
+  }
+  @keyframes swayweed{
+    0% { transform: rotate(-4deg) translateY(0); }
+    100% { transform: rotate(4deg) translateY(0); }
+  }
+
+  /* ========== TOUCH RIPPLE (UNDERWATER ONLY) ========== */
+  .touch-ripple{
+    position: fixed;
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255,255,255,0.45);
+    border-radius: 50%;
+    pointer-events:none;
+    z-index: 8;
+    transform: translate(-50%,-50%) scale(0.6);
+    opacity: 0.8;
+    animation: touchRipple 0.8s ease-out forwards;
+  }
+  @keyframes touchRipple{
+    to{
+      transform: translate(-50%,-50%) scale(2.4);
+      opacity:0;
+    }
+  }
+
+  /* Responsive */
+  @media (max-width:900px){
+    h1{ font-size:34px; padding-top:86px; }
+    .card{ padding: 16px; }
+  }
+</style>
+</head>
+
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="pill">🌿 UniqueSeeker’s Algae Pond</div>
+
+  <div class="switch">
+    <!-- set these to your real file names/paths -->
+    <a class="tag" href="index.html">Pond 1</a>
+    <a class="tag active" href="pond2.html">Pond 2</a>
+  </div>
+</div>
+
+<div id="scene">
+  <h1>Welcome to Our Algae Pond 🌿</h1>
+
+  <!-- Surface -->
+  <div id="surface-zone"></div>
+  <div id="surface-line"></div>
+
+  <!-- Underwater -->
+  <div id="underwater-zone"></div>
+
+  <!-- UI -->
+  <div class="container">
+
+    <!-- LEFT CARD -->
+    <div class="card">
+      <div class="upload-box" onclick="document.getElementById('imageUpload').click()">
+        🌿 Select your algae photo to start!
+      </div>
+
+      <input type="file" id="imageUpload" accept="image/*" style="display:none;">
+
+      <h2 id="prediction"></h2>
+      <div class="carousel" id="carousel"></div>
+      <div id="description" class="description"></div>
+    </div>
+
+    <!-- RIGHT CARD -->
+    <div class="card" style="text-align:center; min-width:260px;">
+      <div class="stars" id="stars"></div>
+      <div class="thank-message" id="thankMessage"></div>
+      <button class="contribute">Contribute 📨</button>
+      <button class="explore">Explore Algae Around the World 🌏</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ==============================
+   MODEL + DATA (UNCHANGED PATHS)
+============================== */
+let model;
+let classes = [];
+const CONFIDENCE_THRESHOLD = 0.65;
+
+const algaeInfo = {
+  "spirogyra": {images:["images/spirogyra1.jpg","images/spirogyra2.jpg"], habit:["Filamentous freshwater green algae","Forms floating slimy masses","Has spiral chloroplasts"], economic:["Produces oxygen in ponds","Used in biological research"], location:["Found in freshwater ponds","Common in slow-moving water bodies"]},
+  "cladophora": {images:["images/cladophora1.jpg","images/cladophora2.jpg","images/cladophora3.jpg"], habit:["Branched filamentous green algae","Attaches to submerged surfaces","Forms dense green mats"], economic:["Provides shelter for aquatic organisms","Indicates nutrient pollution levels"], location:["Freshwater & marine habitats","Common in nutrient-rich environments"]},
+  "oedogonium": {images:["images/oedogonium1.jpg","images/oedogonium2.jpg"], habit:["Filamentous green algae with basal holdfast","Grows in mats or attached filaments","Prefers calm water"], economic:["Used in research and water quality monitoring","Oxygen producer in water bodies"], location:["Freshwater ponds and slow streams","Common in nutrient-rich ponds"]},
+  "volvox": {images:["images/volvox1.jpg","images/volvox2.jpg"], habit:["Spherical colonial green algae","Colonies with flagella","Forms motile spheres"], economic:["Used in biological experiments","Oxygen producer"], location:["Freshwater ponds and lakes","Common in nutrient-rich water"]},
+  "nostoc": {images:["images/nostoc1.jpg","images/nostoc2.jpg"], habit:["Cyanobacteria forming colonies","Gelatinous colonies","Filamentous structure"], economic:["Nitrogen fixation","Used in research"], location:["Freshwater and moist soils","Found on rocks and soil surfaces"]},
+  "pediastrum": {images:["images/pediastrum1.jpg","images/pediastrum2.jpg"], habit:["Colonial green algae","Flat star-like colonies","Planktonic in water"], economic:["Used in ecological studies","Indicator of water quality"], location:["Freshwater ponds","Common in nutrient-rich water"]},
+  "cosmarium": {images:["images/cosmarium1.jpg","images/cosmarium2.jpg"], habit:["Single-celled green algae with semicells","Desmids are symmetrical","Often found in colonies"], economic:["Used in ecological studies","Indicator of water quality"], location:["Freshwater habitats","Ponds and lakes with clean water"]},
+  "noctiluca": {images:["images/noctiluca1.jpg","images/noctiluca2.jpg"], habit:["Bioluminescent marine plankton","Single-celled","Motile with flagella"], economic:["Indicators of marine water health","Can cause red tides"], location:["Marine environments","Coastal waters worldwide"]},
+  "staurastrum": {images:["images/staurastrum1.jpg","images/staurastrum2.jpg"], habit:["Single-celled desmid","Star-shaped cells","Free-floating"], economic:["Used in water quality studies","Indicator species"], location:["Freshwater ponds","Clean, slow-moving waters"]},
+  "scenedesmus": {images:["images/scenedesmus1.jpg","images/scenedesmus2.jpg"], habit:["Colonial green algae","Forms four-cell colonies","Common planktonic algae"], economic:["Used in biofuel research","Indicator of water quality"], location:["Freshwater ponds","Often in nutrient-rich waters"]}
+};
+
+async function loadModel(){
+  model = await tf.loadLayersModel("my_model/model.json");
+  const metadata = await fetch("my_model/metadata.json").then(res => res.json());
+  classes = metadata.labels.map(l => l.trim().toLowerCase());
+}
+loadModel();
+
+/* ==============================
+   UI: STARS
+============================== */
+const starsContainer = document.getElementById("stars");
+const thankMessage = document.getElementById("thankMessage");
+let rating = 0;
+
+function renderStars(){
+  starsContainer.innerHTML="";
+  for(let i=1;i<=5;i++){
+    const star = document.createElement("span");
+    star.innerHTML="☆";
+    star.onclick = () => rateStar(i);
+    star.addEventListener("touchstart", () => rateStar(i));
+    if(i<=rating){
+      star.innerHTML="★";
+      star.classList.add("filled");
+    }
+    starsContainer.appendChild(star);
+  }
+}
+function rateStar(i){
+  rating = i;
+  renderStars();
+  const messages={
+    1:"😢 We'll improve! Thanks!",
+    2:"🙂 Thank you! We’ll grow!",
+    3:"😊 Nice! Thanks!",
+    4:"🌟 Awesome! You’re amazing!",
+    5:"😍 WOW! You love our pond!"
+  };
+  thankMessage.innerText = messages[i];
+}
+renderStars();
+
+/* ==============================
+   CAROUSEL
+============================== */
+function createCarousel(images){
+  const carouselDiv = document.getElementById("carousel");
+  carouselDiv.innerHTML="";
+  if(!images || images.length===0) return;
+
+  images.forEach((src, i)=>{
+    const img = document.createElement("img");
+    img.src = src;
+    if(i===0) img.classList.add("active");
+    carouselDiv.appendChild(img);
+  });
+
+  const prevBtn = document.createElement("button");
+  prevBtn.className="prev";
+  prevBtn.innerHTML="&#10094;";
+  prevBtn.onclick = ()=> moveSlide(-1);
+
+  const nextBtn = document.createElement("button");
+  nextBtn.className="next";
+  nextBtn.innerHTML="&#10095;";
+  nextBtn.onclick = ()=> moveSlide(1);
+
+  carouselDiv.appendChild(prevBtn);
+  carouselDiv.appendChild(nextBtn);
+  carouselDiv.currentIndex = 0;
+}
+
+function moveSlide(dir){
+  const carouselDiv = document.getElementById("carousel");
+  const imgs = carouselDiv.querySelectorAll("img");
+  if(!imgs.length) return;
+  imgs[carouselDiv.currentIndex].classList.remove("active");
+  carouselDiv.currentIndex = (carouselDiv.currentIndex + dir + imgs.length) % imgs.length;
+  imgs[carouselDiv.currentIndex].classList.add("active");
+}
+
+/* ==============================
+   PREDICTION
+============================== */
+document.getElementById("imageUpload").addEventListener("change", async function(event){
+  const file = event.target.files[0];
+  if(!file) return;
+
+  const img = new Image();
+  img.src = URL.createObjectURL(file);
+
+  img.onload = async function(){
+    const tensor = tf.browser.fromPixels(img)
+      .resizeNearestNeighbor([224,224])
+      .toFloat()
+      .div(255.0)
+      .expandDims();
+
+    const prediction = model.predict(tensor);
+    const data = await prediction.data();
+    const maxValue = Math.max(...data);
+    const index = data.indexOf(maxValue);
+
+    const predictedClass = classes[index];
+    const confidence = (maxValue * 100).toFixed(2);
+
+    const predictionText = document.getElementById("prediction");
+    const descriptionBox = document.getElementById("description");
+
+    // Unknown class name check
+    if(predictedClass && predictedClass.toLowerCase() === "unknown algae"){
+      predictionText.innerHTML = "Prediction: <b>Unknown Algae</b>";
+      descriptionBox.innerHTML = "<h3>🐟🌿 Hmm… this algae is not yet in our pond!</h3><p>If you know it, please contribute a photo 🌱💚</p>";
+      createCarousel([]);
+      return;
+    }
+
+    const info = algaeInfo[predictedClass] || algaeInfo[(predictedClass||"").toLowerCase()];
+
+    if(maxValue >= CONFIDENCE_THRESHOLD && info){
+      predictionText.innerHTML =
+        "Prediction: <b>" + predictedClass.charAt(0).toUpperCase() + predictedClass.slice(1) +
+        "</b><br>Confidence: " + confidence + "%";
+
+      createCarousel(info.images);
+
+      descriptionBox.innerHTML =
+        "<h3>Habit</h3><ul>"+info.habit.map(x=>"<li>"+x+"</li>").join("")+"</ul>"+
+        "<h3>Economic Importance</h3><ul>"+info.economic.map(x=>"<li>"+x+"</li>").join("")+"</ul>"+
+        "<h3>Location</h3><ul>"+info.location.map(x=>"<li>"+x+"</li>").join("")+"</ul>";
+    }else{
+      predictionText.innerHTML = "Confidence: " + confidence + "%";
+      createCarousel([]);
+      descriptionBox.innerHTML =
+        "<h3>🐟🌿 Oops!</h3><p>Hmm… this algae is not yet in our pond! If you know it, please contribute 🌱💚</p>";
+    }
+  };
+});
+
+/* ==============================
+   BUTTONS
+============================== */
+document.querySelector(".contribute").addEventListener("click",()=>{
+  const email="uniqueseeekers123@gmail.com";
+  const subject=encodeURIComponent("Algae Contribution 🌿");
+  const body=encodeURIComponent("Hello! I want to contribute an algae image or info to your pond project.");
+  if(window.innerWidth>768){
+    alert(`💚 Thanks for contributing to our pond!\nSend images/info to: ${email}`);
+  }else{
+    alert(`💚 Thanks for contributing to our pond! We'll open your mail client now!`);
+    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+  }
+});
+document.querySelector(".explore").addEventListener("click",()=>{
+  alert("🌎 Global algae exploration coming soon!");
+});
+
+/* ==============================
+   POND 2 ANIME WORLD
+   - split surface + underwater
+   - side plants for 3D frame
+   - anime fish (no scales)
+   - bubbles keep drag + pop
+============================== */
+const surfaceZone = document.getElementById("surface-zone");
+const underwaterZone = document.getElementById("underwater-zone");
+
+/* --- Side plants (3D frame) --- */
+function buildSeaweed(){
+  const leftCount = 5;
+  const rightCount = 5;
+
+  for(let i=0;i<leftCount;i++){
+    const w = document.createElement("div");
+    w.className = "seaweed";
+    w.style.left = (3 + i*4) + "vw";
+    w.style.height = (150 + Math.random()*120) + "px";
+    w.style.animationDelay = (-Math.random()*2.2) + "s";
+    underwaterZone.appendChild(w);
+  }
+  for(let i=0;i<rightCount;i++){
+    const w = document.createElement("div");
+    w.className = "seaweed";
+    w.style.left = "calc(100vw - " + (6 + i*4) + "vw)";
+    w.style.height = (150 + Math.random()*120) + "px";
+    w.style.animationDelay = (-Math.random()*2.2) + "s";
+    underwaterZone.appendChild(w);
+  }
+
+  // a couple bottom-center plants (small)
+  for(let i=0;i<3;i++){
+    const w = document.createElement("div");
+    w.className = "seaweed";
+    w.style.left = (40 + i*8) + "vw";
+    w.style.height = (120 + Math.random()*80) + "px";
+    w.style.opacity = "0.85";
+    w.style.animationDelay = (-Math.random()*2.2) + "s";
+    underwaterZone.appendChild(w);
+  }
+}
+
+/* --- Lotus pads + frogs (above surface) --- */
+function makeLotusPad(xPercent, yPx){
+  const pad = document.createElement("div");
+  pad.className = "lotus";
+  pad.style.left = xPercent + "%";
+  pad.style.top  = yPx + "px";
+
+  // flower
+  const flower = document.createElement("div");
+  flower.className = "lotus-flower";
+  for(let i=0;i<6;i++) flower.appendChild(document.createElement("span"));
+  pad.appendChild(flower);
+
+  surfaceZone.appendChild(pad);
+  return pad;
+}
+
+function makeFrog(onPad, offsetX, offsetY){
+  const frog = document.createElement("div");
+  frog.className = "frog";
+  frog.style.left = (offsetX) + "px";
+  frog.style.top  = (offsetY) + "px";
+
+  const e1 = document.createElement("div");
+  e1.className = "eye left";
+  const p1 = document.createElement("div");
+  p1.className = "pupil";
+  e1.appendChild(p1);
+
+  const e2 = document.createElement("div");
+  e2.className = "eye right";
+  const p2 = document.createElement("div");
+  p2.className = "pupil";
+  e2.appendChild(p2);
+
+  frog.appendChild(e1);
+  frog.appendChild(e2);
+
+  onPad.appendChild(frog);
+}
+
+/* --- Anime fish --- */
+function createFish(color, topVh, dir){
+  const fish = document.createElement("div");
+  fish.className = "fish " + dir;
+  fish.style.top = topVh + "vh";
+
+  const body = document.createElement("div");
+  body.className = "body";
+  body.style.background = color;
+
+  const tail = document.createElement("div");
+  tail.className = "tail";
+  tail.style.background = color;
+
+  const eye = document.createElement("div");
+  eye.className = "eye";
+  const pupil = document.createElement("div");
+  pupil.className = "pupil";
+  eye.appendChild(pupil);
+
+  const fin = document.createElement("div");
+  fin.className = "fin";
+
+  body.appendChild(tail);
+  body.appendChild(eye);
+  body.appendChild(fin);
+
+  fish.appendChild(body);
+  document.body.appendChild(fish);
+
+  // swim animation
+  const duration = 11000 + Math.random()*4000;
+  const delay = -Math.random()*duration;
+
+  if(dir === "right"){
+    fish.style.left = "-90px";
+    fish.animate(
+      [{ left:"-90px" }, { left:"calc(100vw + 90px)" }],
+      { duration, iterations:Infinity, easing:"linear", delay }
+    );
+  }else{
+    fish.style.left = "calc(100vw + 90px)";
+    fish.animate(
+      [{ left:"calc(100vw + 90px)" }, { left:"-90px" }],
+      { duration, iterations:Infinity, easing:"linear", delay }
+    );
+  }
+
+  // bubble trail behind fish
+  setInterval(()=>{
+    const r = fish.getBoundingClientRect();
+    const b = document.createElement("div");
+    b.className = "bubble-trail";
+
+    const s = 4 + Math.random()*3;
+    b.style.width = s + "px";
+    b.style.height = s + "px";
+
+    const x = (dir === "right") ? (r.left - 10) : (r.right + 10);
+    b.style.left = x + "px";
+    b.style.top  = (r.top + r.height * 0.65) + "px";
+
+    document.body.appendChild(b);
+    setTimeout(()=> b.remove(), 700);
+  }, 190);
+}
+
+/* --- Bubbles (keep drag + pop) --- */
+const MAX_BUBBLES = 18;
+
+function spawnOneBubble(){
+  const b = document.createElement("div");
+  b.className = "bubble";
+
+  b.style.left = (Math.random() * window.innerWidth) + "px";
+  const size = 14 + Math.random()*16;
+  b.style.width = size + "px";
+  b.style.height = size + "px";
+
+  const duration = 7 + Math.random()*6;
+  b.style.animationDuration = duration + "s";
+
+  let isDragging=false, offsetX=0, offsetY=0;
+
+  // mouse drag
+  b.addEventListener("mousedown", (e)=>{
+    isDragging=true;
+    offsetX = e.clientX - b.offsetLeft;
+    offsetY = e.clientY - b.offsetTop;
+    b.style.transition="none";
+  });
+
+  document.addEventListener("mousemove", (e)=>{
+    if(!isDragging) return;
+    b.style.left = (e.clientX - offsetX) + "px";
+    b.style.top  = (e.clientY - offsetY) + "px";
+  });
+
+  document.addEventListener("mouseup", ()=>{
+    if(isDragging){
+      isDragging=false;
+      b.style.transition="";
+    }
+  });
+
+  // touch: drag or tap-to-pop
+  let startX=0, startY=0, moved=false;
+
+  b.addEventListener("touchstart", (e)=>{
+    isDragging=true;
+    moved=false;
+    const t = e.touches[0];
+    startX=t.clientX; startY=t.clientY;
+    offsetX=t.clientX - b.offsetLeft;
+    offsetY=t.clientY - b.offsetTop;
+    b.style.transition="none";
+  }, {passive:true});
+
+  document.addEventListener("touchmove", (e)=>{
+    if(!isDragging) return;
+    const t = e.touches[0];
+    const dx = Math.abs(t.clientX - startX);
+    const dy = Math.abs(t.clientY - startY);
+    if(dx>6 || dy>6) moved=true;
+    b.style.left = (t.clientX - offsetX) + "px";
+    b.style.top  = (t.clientY - offsetY) + "px";
+  }, {passive:true});
+
+  document.addEventListener("touchend", ()=>{
+    if(!isDragging) return;
+    isDragging=false;
+    b.style.transition="";
+    if(!moved) b.remove();
+  });
+
+  // pop on click (desktop)
+  b.addEventListener("click", ()=> b.remove());
+
+  // remove when animation ends
+  b.addEventListener("animationend", ()=> b.remove());
+
+  document.body.appendChild(b);
+}
+
+function createBubbles(){
+  for(let i=0;i<MAX_BUBBLES;i++) spawnOneBubble();
+  setInterval(()=>{
+    const current = document.querySelectorAll(".bubble").length;
+    const needed = MAX_BUBBLES - current;
+    for(let i=0;i<needed;i++) spawnOneBubble();
+  }, 1100);
+}
+
+/* --- Underwater touch ripples (only below surface line) --- */
+function makeRipple(x,y){
+  const r = document.createElement("div");
+  r.className = "touch-ripple";
+  r.style.left = x + "px";
+  r.style.top  = y + "px";
+  document.body.appendChild(r);
+  setTimeout(()=> r.remove(), 900);
+}
+document.addEventListener("pointerdown", (e)=>{
+  // ignore clicks on UI
+  if(e.target.closest(".card, button, input, .upload-box, .carousel, .topbar")) return;
+
+  // only make ripples in lower part of screen (underwater)
+  const h = window.innerHeight;
+  if(e.clientY < h * 0.34) return;
+
+  makeRipple(e.clientX, e.clientY);
+  setTimeout(()=> makeRipple(e.clientX + 12, e.clientY + 5), 90);
+  setTimeout(()=> makeRipple(e.clientX - 10, e.clientY + 7), 160);
+});
+
+/* --- Build everything --- */
+function buildPond2(){
+  buildSeaweed();
+
+  // lotus pads positions
+  const pad1 = makeLotusPad(16, 120);
+  const pad2 = makeLotusPad(62, 92);
+
+  // frogs on pads
+  makeFrog(pad1, 42, 4);
+  makeFrog(pad2, 54, 6);
+
+  // fish (3–5)
+  createFish("#F2C94C", 56, "right");  // yellow
+  createFish("#F2994A", 62, "left");   // orange
+  createFish("#EB5757", 50, "right");  // red
+  createFish("#56CCF2", 68, "left");   // blue-ish
+  createFish("#6FCF97", 72, "right");  // green-ish
+
+  // bubbles
+  createBubbles();
+}
+buildPond2();
+</script>
+
+</body>
+</html>

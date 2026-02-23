@@ -10,18 +10,14 @@
 
 <style>
   :root{
-    /* LOCKED “anime pond” water tones (based on your chosen image) */
     --surfaceA:#69d6b7;
     --surfaceB:#32b99a;
-
     --underA:#2aa98d;
     --underB:#167d73;
 
     --glass: rgba(255,255,255,0.14);
-    --glass2: rgba(255,255,255,0.10);
     --border: rgba(255,255,255,0.22);
     --text: rgba(255,255,255,0.92);
-
     --shadow: 0 14px 40px rgba(0,0,0,0.35);
   }
 
@@ -31,18 +27,19 @@
     font-family: 'Poppins', system-ui, Arial, sans-serif;
     overflow-x:hidden;
     background: #0b1a17;
+    color: var(--text);
   }
 
   /* =============== TOP BAR =============== */
   .topbar{
     position:fixed;
     top:12px; left:12px; right:12px;
-    z-index:50;
+    z-index:80;
     display:flex;
     align-items:center;
     justify-content:space-between;
     gap:12px;
-    pointer-events:none; /* allow pond interactions behind except buttons */
+    pointer-events:none;
   }
   .topbar .pill{
     pointer-events:auto;
@@ -55,7 +52,6 @@
     border: 1px solid rgba(255,255,255,0.14);
     box-shadow: 0 10px 25px rgba(0,0,0,0.25);
     backdrop-filter: blur(8px);
-    color: var(--text);
     font-weight:700;
     font-size:14px;
   }
@@ -82,7 +78,7 @@
   .intro{
     position:fixed;
     inset:0;
-    z-index:45;
+    z-index:75;
     display:flex;
     align-items:flex-start;
     justify-content:center;
@@ -97,13 +93,11 @@
     background: rgba(0,0,0,0.30);
     border: 1px solid rgba(255,255,255,0.14);
     backdrop-filter: blur(8px);
-    color: rgba(255,255,255,0.95);
     box-shadow: 0 18px 55px rgba(0,0,0,0.35);
     animation: introFade 6.5s ease forwards;
   }
   .introBox .line1{ font-size: 20px; font-weight: 800; letter-spacing: 0.3px; }
   .introBox .line2{ margin-top:6px; font-size: 14px; opacity: 0.92; font-weight: 600; }
-
   @keyframes introFade{
     0%   { opacity:0; transform: translateY(-6px); }
     10%  { opacity:1; transform: translateY(0); }
@@ -117,18 +111,14 @@
     inset:0;
     z-index:0;
     overflow:hidden;
-    /* IMPORTANT: keep everything fixed -> no scroll “fish move” issue */
   }
 
-  /* Surface region */
   .surface{
     position:absolute;
     top:0; left:0; right:0;
     height:34vh;
     background: linear-gradient(to bottom, var(--surfaceA), var(--surfaceB));
   }
-
-  /* Soft shimmer on surface */
   .surface::after{
     content:"";
     position:absolute;
@@ -140,34 +130,35 @@
     filter: blur(1px);
     opacity:0.65;
     animation: shimmer 7s ease-in-out infinite alternate;
+    pointer-events:none;
   }
   @keyframes shimmer{
     from { transform: translateX(-10px) translateY(0px); }
     to   { transform: translateX(10px) translateY(-6px); }
   }
 
-  /* Waterline — make it NATURAL, not a sharp line */
+  /* Clear (but soft) split */
   .waterline{
     position:absolute;
     top:34vh; left:0; right:0;
-    height:40px;
-    background:
-      linear-gradient(to bottom,
-        rgba(255,255,255,0.22),
-        rgba(255,255,255,0.10),
+    height:54px;
+    background: linear-gradient(to bottom,
+        rgba(255,255,255,0.26),
+        rgba(255,255,255,0.12),
         rgba(255,255,255,0.00));
-    filter: blur(0.3px);
-    opacity:0.85;
+    opacity:0.90;
+    filter: blur(0.4px);
+    pointer-events:none;
   }
   .waterline::after{
     content:"";
     position:absolute;
-    inset:-20px 0 0 0;
+    inset:-18px 0 0 0;
     background:
       repeating-linear-gradient(90deg,
-        rgba(255,255,255,0.14) 0 22px,
-        rgba(255,255,255,0.02) 22px 52px);
-    opacity:0.35;
+        rgba(255,255,255,0.16) 0 20px,
+        rgba(255,255,255,0.02) 20px 56px);
+    opacity:0.32;
     filter: blur(1px);
     animation: surfaceWaves 4.6s linear infinite;
   }
@@ -176,17 +167,15 @@
     to   { transform: translateX(120px); }
   }
 
-  /* Underwater region */
   .underwater{
     position:absolute;
     top:34vh; left:0; right:0; bottom:0;
-    background: radial-gradient(circle at 50% 0%,
-      rgba(255,255,255,0.12),
-      rgba(255,255,255,0) 45%),
+    background:
+      radial-gradient(circle at 50% 0%,
+        rgba(255,255,255,0.12),
+        rgba(255,255,255,0) 45%),
       linear-gradient(to bottom, var(--underA), var(--underB));
   }
-
-  /* Underwater haze */
   .underwater::before{
     content:"";
     position:absolute;
@@ -199,10 +188,10 @@
     pointer-events:none;
   }
 
-  /* =============== SEAWEED (SIDES + BASE) =============== */
+  /* =============== SEAWEED (ANCHORED) =============== */
   .weed{
     position:absolute;
-    bottom:-10px;
+    bottom:-12px;
     width:16px;
     border-radius: 14px 14px 10px 10px;
     background: linear-gradient(to top, rgba(6,58,47,0.9), rgba(20,110,86,0.95));
@@ -215,17 +204,7 @@
     to   { transform: rotate(5deg); }
   }
 
-  /* left cluster */
-  .weed.left{ left: 4vw; }
-  .weed.left2{ left: 9vw; opacity:0.75; }
-  .weed.left3{ left: 13vw; opacity:0.65; }
-
-  /* right cluster */
-  .weed.right{ right: 4vw; }
-  .weed.right2{ right: 9vw; opacity:0.75; }
-  .weed.right3{ right: 13vw; opacity:0.65; }
-
-  /* =============== LOTUS PAD + LOTUS FLOWER (ANIME) =============== */
+  /* =============== LOTUS PAD + LOTUS FLOWER (KEEP) =============== */
   .pad{
     position:absolute;
     top:18vh;
@@ -238,12 +217,12 @@
     box-shadow: 0 14px 30px rgba(0,0,0,0.18);
     transform: rotate(-3deg);
     animation: padFloat 5.4s ease-in-out infinite alternate;
+    pointer-events:none;
   }
   @keyframes padFloat{
     from { transform: translateY(0) rotate(-3deg); }
     to   { transform: translateY(6px) rotate(-1deg); }
   }
-  /* notch */
   .pad::after{
     content:"";
     position:absolute;
@@ -274,7 +253,7 @@
     to   { transform: translateY(4px) rotate(12deg); }
   }
 
-  /* =============== FROG (ANIME-ish) =============== */
+  /* =============== FROG (KEEP, SMALL TWEAK ONLY) =============== */
   .frog{
     position:absolute;
     top:14vh;
@@ -286,6 +265,7 @@
     box-shadow: 0 18px 28px rgba(0,0,0,0.18);
     transform: rotate(-2deg);
     animation: frogBob 2.1s ease-in-out infinite;
+    pointer-events:none;
   }
   @keyframes frogBob{
     0%,100% { transform: translateY(0) rotate(-2deg); }
@@ -293,9 +273,9 @@
   }
   .frog .eye{
     position:absolute;
-    top:-10px;
-    width: 22px;
-    height: 22px;
+    top:-9px;                 /* slightly less “popped out” */
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
     background: linear-gradient(to bottom, #a7ff95, #55d86e);
     box-shadow: 0 10px 14px rgba(0,0,0,0.12);
@@ -308,8 +288,8 @@
     background: #18241f;
     box-shadow: inset 0 0 0 2px rgba(255,255,255,0.35);
   }
-  .frog .eye.left{ left:10px; }
-  .frog .eye.right{ right:10px; }
+  .frog .eye.left{ left:12px; }
+  .frog .eye.right{ right:12px; }
 
   .frog .mouth{
     position:absolute;
@@ -322,7 +302,6 @@
     opacity:0.75;
   }
 
-  /* Occasional head turn: subtle and frequent */
   .frog.turn{
     animation: frogBob 2.1s ease-in-out infinite, frogTurn 3.2s ease-in-out infinite;
     transform-origin: 50% 70%;
@@ -334,7 +313,6 @@
     100%    { transform: translateY(0) rotate(-2deg) rotateY(0deg); }
   }
 
-  /* Ripple around pad/frog */
   .ripple{
     position:absolute;
     top: 24vh;
@@ -346,108 +324,141 @@
     opacity:0.55;
     filter: blur(0.2px);
     animation: ripplePulse 2.4s ease-out infinite;
+    pointer-events:none;
   }
   @keyframes ripplePulse{
     0%   { transform: scale(0.85); opacity:0.55; }
     100% { transform: scale(1.18); opacity:0; }
   }
 
-  /* =============== FISH (UNDERWATER ONLY) =============== */
+  /* =============== FISH LAYER (ABOVE UI) =============== */
+  #fish-layer{
+    position:fixed;
+    inset:0;
+    z-index:60; /* ABOVE cards (uiWrap is 30) */
+    pointer-events:none;
+    overflow:hidden;
+  }
+
   .fish{
     position:absolute;
-    width: 74px;
-    height: 34px;
+    width: 86px;
+    height: 38px;
     border-radius: 999px;
-    top: 42vh; /* will be overridden per fish */
-    left: -120px;
-    z-index: 6;
+    left: -140px;
     filter: drop-shadow(0 10px 14px rgba(0,0,0,0.20));
     will-change: transform;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.15), rgba(0,0,0,0.08));
   }
-  /* body highlight */
-  .fish::before{
-    content:"";
+
+  .fish .body{
     position:absolute;
-    inset:6px 10px 10px 10px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.16);
-    filter: blur(0.2px);
+    inset:0;
+    border-radius:999px;
+    background: var(--c);
+    box-shadow: inset 0 4px 0 rgba(255,255,255,0.18);
+  }
+  .fish .shine{
+    position:absolute;
+    left:16px; top:8px;
+    width: 44px; height: 14px;
+    border-radius:999px;
+    background: rgba(255,255,255,0.18);
     opacity:0.65;
   }
-  /* tail */
-  .fish::after{
-    content:"";
+  .fish .tail{
     position:absolute;
-    left:-16px;
-    top:9px;
-    width: 22px;
+    left:-18px;
+    top:10px;
+    width: 24px;
     height: 18px;
-    background: inherit;
+    background: var(--c);
     clip-path: polygon(100% 50%, 0 0, 0 100%);
     border-radius: 6px;
     opacity:0.95;
   }
-  /* eye */
+  .fish .finTop{
+    position:absolute;
+    top:-8px;
+    left: 34px;
+    width: 18px;
+    height: 14px;
+    background: rgba(255,255,255,0.18);
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    border-radius: 4px;
+    opacity:0.9;
+  }
+  .fish .finSide{
+    position:absolute;
+    top: 18px;
+    left: 28px;
+    width: 14px;
+    height: 10px;
+    background: rgba(255,255,255,0.14);
+    clip-path: polygon(0 50%, 100% 0, 100% 100%);
+    border-radius: 4px;
+    opacity:0.9;
+  }
   .fish .eye{
     position:absolute;
-    right:12px;
-    top:12px;
+    right:14px;
+    top:14px;
     width: 8px;
     height: 8px;
     background: rgba(0,0,0,0.65);
     border-radius:50%;
     box-shadow: inset 0 0 0 2px rgba(255,255,255,0.45);
   }
-  /* TOP FIN */
-  .fish .fin{
+  .fish .mouth{
     position:absolute;
-    top:-8px;
-    left: 26px;
-    width: 18px;
-    height: 14px;
-    background: rgba(255,255,255,0.22);
-    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-    border-radius: 4px;
-    filter: blur(0.1px);
-    opacity:0.9;
+    right:6px;
+    top: 18px;
+    width: 8px;
+    height: 6px;
+    border-bottom: 2px solid rgba(0,0,0,0.20);
+    border-radius: 0 0 999px 999px;
+    opacity:0.7;
   }
 
-  /* Fish movement: use CSS keyframes = less JS lag */
   @keyframes swimRight {
-    from { transform: translateX(-140px); }
-    to   { transform: translateX(calc(100vw + 220px)); }
+    from { transform: translateX(-160px); }
+    to   { transform: translateX(calc(100vw + 260px)); }
   }
   @keyframes swimLeft {
-    from { transform: translateX(calc(100vw + 220px)) scaleX(-1); }
-    to   { transform: translateX(-140px) scaleX(-1); }
+    from { transform: translateX(calc(100vw + 260px)) scaleX(-1); }
+    to   { transform: translateX(-160px) scaleX(-1); }
   }
 
-  /* =============== BUBBLES (LIGHTWEIGHT) =============== */
+  /* =============== BUBBLES (UNDERWATER ONLY) =============== */
   .bubble{
     position:absolute;
     width: 10px;
     height: 10px;
     border-radius:50%;
-    background: rgba(255,255,255,0.38);
-    border: 1px solid rgba(255,255,255,0.20);
+    background: rgba(255,255,255,0.36);
+    border: 1px solid rgba(255,255,255,0.18);
     opacity:0.8;
-    filter: none;         /* IMPORTANT: no blur */
-    box-shadow: none;     /* IMPORTANT: no heavy glow */
-    z-index: 4;
+    box-shadow: none;
+    z-index: 2;
     cursor: pointer;
     will-change: transform, opacity;
     animation: bubbleUp linear forwards;
   }
   @keyframes bubbleUp{
     from { transform: translateY(0) scale(1); opacity:0.70; }
-    to   { transform: translateY(-90vh) scale(0.85); opacity:0; }
+    to   { transform: translateY(-70vh) scale(0.85); opacity:0; }
   }
 
-  /* =============== UI (TOP) =============== */
+  /* =============== UI =============== */
   .uiWrap{
     position:relative;
     z-index:30;
-    padding: 90px 14px 18px;
+    padding: 90px 14px 40px;
+  }
+
+  /* BIG spacer so cards sit mid-page (no overlap) */
+  .spacer{
+    height: 46vh;
   }
 
   .cards{
@@ -465,7 +476,6 @@
     box-shadow: var(--shadow);
     border-radius: 18px;
     backdrop-filter: blur(10px);
-    color: rgba(255,255,255,0.92);
     padding: 16px;
   }
   .card.small{ width: min(420px, 94vw); }
@@ -544,7 +554,6 @@
   .btn.green{ background: rgba(49, 190, 120, 0.35); }
   .btn.blue{ background: rgba(58, 152, 255, 0.30); }
 
-  /* Carousel */
   .carousel{
     margin-top: 12px;
     width: 100%;
@@ -576,9 +585,13 @@
   @media (max-width: 700px){
     .introBox .line1{ font-size: 18px; }
     .introBox .line2{ font-size: 13px; }
+
+    /* keep surface items still visible */
     .pad{ transform: scale(0.9) rotate(-3deg); left: 10vw; }
     .frog{ transform: scale(0.92) rotate(-2deg); left: 14vw; }
     .ripple{ left: 9vw; }
+
+    .spacer{ height: 44vh; }
   }
 </style>
 </head>
@@ -608,20 +621,20 @@
   <div class="waterline"></div>
   <div class="underwater"></div>
 
-  <!-- Seaweed clusters (underwater only visually; anchored sides/bottom) -->
-  <div class="weed left"  style="height:140px; top: calc(34vh + 12vh);"></div>
-  <div class="weed left2" style="height:190px; top: calc(34vh + 20vh); animation-duration:3.4s;"></div>
-  <div class="weed left3" style="height:120px; top: calc(34vh + 30vh); animation-duration:2.6s;"></div>
+  <!-- Seaweed (anchored) -->
+  <div class="weed" style="left:4vw;height:160px;animation-duration:3.1s;"></div>
+  <div class="weed" style="left:8vw;height:240px;opacity:0.78;animation-duration:3.7s;"></div>
+  <div class="weed" style="left:12vw;height:190px;opacity:0.65;animation-duration:2.8s;"></div>
 
-  <div class="weed right"  style="height:150px; top: calc(34vh + 14vh);"></div>
-  <div class="weed right2" style="height:210px; top: calc(34vh + 22vh); animation-duration:3.6s;"></div>
-  <div class="weed right3" style="height:130px; top: calc(34vh + 32vh); animation-duration:2.8s;"></div>
+  <div class="weed" style="right:4vw;height:170px;animation-duration:3.2s;"></div>
+  <div class="weed" style="right:8vw;height:260px;opacity:0.78;animation-duration:3.8s;"></div>
+  <div class="weed" style="right:12vw;height:200px;opacity:0.65;animation-duration:2.9s;"></div>
 
   <!-- Surface objects -->
   <div class="ripple"></div>
 
   <div class="pad">
-    <!-- 3D-ish lotus as SVG so it actually looks like lotus -->
+    <!-- lotus flower (unchanged) -->
     <svg class="lotus3d" viewBox="0 0 120 120" aria-hidden="true">
       <defs>
         <radialGradient id="p" cx="50%" cy="50%" r="50%">
@@ -634,7 +647,6 @@
           <stop offset="100%" stop-color="#ffcc45" stop-opacity="0.95"/>
         </radialGradient>
       </defs>
-      <!-- petals -->
       <g transform="translate(60 60)">
         <path d="M0,-44 C10,-30 10,-16 0,-6 C-10,-16 -10,-30 0,-44Z" fill="url(#p)"/>
         <path d="M34,-26 C28,-12 16,-4 4,-6 C6,-18 18,-30 34,-26Z" fill="url(#p)" opacity="0.95"/>
@@ -654,26 +666,29 @@
     <div class="eye right"></div>
     <div class="mouth"></div>
   </div>
+</div>
 
-  <!-- Underwater fish (ONLY below waterline) -->
-  <div class="fish" id="f1" style="top: calc(34vh + 10vh); background: #ff7b7b;">
-    <div class="fin"></div><div class="eye"></div>
+<!-- FISH OVERLAY -->
+<div id="fish-layer">
+  <div class="fish" id="f1" style="top: calc(34vh + 10vh); --c:#ff7b7b;">
+    <div class="body"></div><div class="shine"></div><div class="tail"></div><div class="finTop"></div><div class="finSide"></div><div class="eye"></div><div class="mouth"></div>
   </div>
-  <div class="fish" id="f2" style="top: calc(34vh + 18vh); background: #ffd16a;">
-    <div class="fin"></div><div class="eye"></div>
+  <div class="fish" id="f2" style="top: calc(34vh + 18vh); --c:#ffd16a;">
+    <div class="body"></div><div class="shine"></div><div class="tail"></div><div class="finTop"></div><div class="finSide"></div><div class="eye"></div><div class="mouth"></div>
   </div>
-  <div class="fish" id="f3" style="top: calc(34vh + 28vh); background: #70d6ff;">
-    <div class="fin"></div><div class="eye"></div>
+  <div class="fish" id="f3" style="top: calc(34vh + 30vh); --c:#70d6ff;">
+    <div class="body"></div><div class="shine"></div><div class="tail"></div><div class="finTop"></div><div class="finSide"></div><div class="eye"></div><div class="mouth"></div>
   </div>
-  <div class="fish" id="f4" style="top: calc(34vh + 38vh); background: #a8ff9c;">
-    <div class="fin"></div><div class="eye"></div>
+  <div class="fish" id="f4" style="top: calc(34vh + 42vh); --c:#a8ff9c;">
+    <div class="body"></div><div class="shine"></div><div class="tail"></div><div class="finTop"></div><div class="finSide"></div><div class="eye"></div><div class="mouth"></div>
   </div>
 </div>
 
 <!-- UI -->
 <div class="uiWrap">
-  <div class="cards">
+  <div class="spacer"></div>
 
+  <div class="cards">
     <div class="card">
       <div class="uploadBox" id="uploadBox">🌿 Select your algae photo to start!</div>
       <input type="file" id="imageUpload" accept="image/*" style="display:none;">
@@ -691,7 +706,6 @@
         <button class="btn blue explore">Explore Algae Around the World 🌍</button>
       </div>
     </div>
-
   </div>
 </div>
 
@@ -717,7 +731,7 @@ const algaeInfo = {
 async function loadModel(){
   model = await tf.loadLayersModel("my_model/model.json");
   const metadata = await fetch("my_model/metadata.json").then(res=>res.json());
-  classes = metadata.labels.map(l => l.trim().toLowerCase());
+  classes = metadata.labels.map(l => (l || "").trim().toLowerCase());
 }
 loadModel();
 
@@ -726,7 +740,7 @@ const uploadBox = document.getElementById("uploadBox");
 const imageUpload = document.getElementById("imageUpload");
 uploadBox.addEventListener("click", ()=> imageUpload.click());
 
-/* ===================== FISH ANIMATION (CSS ONLY) ===================== */
+/* ===================== FISH ANIMATION (CSS) ===================== */
 function startFish(){
   const f1 = document.getElementById("f1");
   const f2 = document.getElementById("f2");
@@ -740,13 +754,11 @@ function startFish(){
 }
 startFish();
 
-/* ===================== LIGHTWEIGHT BUBBLES (NO DRAG) ===================== */
+/* ===================== LIGHTWEIGHT BUBBLES (UNDERWATER ONLY) ===================== */
 const pond = document.getElementById("pond-layer");
-const MAX_BUBBLES = 10;                 // reduced
-let bubbleCount = 0;
+const MAX_BUBBLES = 8;
 
 function spawnBubble(){
-  // only spawn in underwater region
   const b = document.createElement("div");
   b.className = "bubble";
 
@@ -754,32 +766,27 @@ function spawnBubble(){
   b.style.width = size+"px";
   b.style.height = size+"px";
 
-  const left = Math.random()*window.innerWidth;
-  b.style.left = left+"px";
+  b.style.left = (Math.random()*window.innerWidth) + "px";
 
-  // start below, in underwater area
-  const startY = window.innerHeight + 30;
-  b.style.top = startY + "px";
+  // start somewhere in underwater region only
+  const topStart = (window.innerHeight * 0.55) + (Math.random() * window.innerHeight * 0.40);
+  b.style.top = topStart + "px";
 
-  const dur = 7 + Math.random()*6;
+  const dur = 6 + Math.random()*6;
   b.style.animationDuration = dur + "s";
 
-  // Slight opacity variation
   b.style.opacity = (0.45 + Math.random()*0.35).toFixed(2);
 
-  // Tap/click pop
   b.addEventListener("pointerdown", ()=> b.remove(), {passive:true});
-
   b.addEventListener("animationend", ()=> b.remove());
   pond.appendChild(b);
 }
 
-// maintain bubble count softly
 setInterval(()=>{
   const existing = pond.querySelectorAll(".bubble").length;
   const needed = MAX_BUBBLES - existing;
   for(let i=0;i<needed;i++) spawnBubble();
-}, 900);
+}, 950);
 
 /* ===================== STARS ===================== */
 const starsContainer = document.getElementById("stars");
@@ -847,16 +854,15 @@ function moveSlide(dir){
   imgs[carouselDiv.currentIndex].classList.add("active");
 }
 
-/* ===================== PREDICTION (PAUSE VISUALS DURING TFJS) ===================== */
+/* ===================== PREDICTION (PAUSE FISH DURING TFJS) ===================== */
 function pausePond(pause){
-  // Reduce workload while predicting
-  const fishes = document.querySelectorAll(".fish");
+  const fishes = document.querySelectorAll("#fish-layer .fish");
   fishes.forEach(f=>{
     f.style.animationPlayState = pause ? "paused" : "running";
   });
 }
 
-document.getElementById("imageUpload").addEventListener("change", async function(event){
+imageUpload.addEventListener("change", async (event)=>{
   const file = event.target.files[0];
   if(!file) return;
 
@@ -865,7 +871,7 @@ document.getElementById("imageUpload").addEventListener("change", async function
   const img = new Image();
   img.src = URL.createObjectURL(file);
 
-  img.onload = async function(){
+  img.onload = async ()=>{
     try{
       const tensor = tf.browser.fromPixels(img)
         .resizeNearestNeighbor([224,224])
@@ -883,12 +889,13 @@ document.getElementById("imageUpload").addEventListener("change", async function
 
       const predictionText = document.getElementById("prediction");
       const descriptionBox = document.getElementById("description");
-      const info = algaeInfo[predictedClass] || algaeInfo[predictedClass.toLowerCase()];
+      const info = algaeInfo[predictedClass];
 
       if(predictedClass === "unknown algae"){
         predictionText.innerHTML = "Prediction: <b>Unknown Algae</b>";
         descriptionBox.innerHTML = "<h3>🐟🌿 Hmm… this algae is not yet in our pond!</h3><p>If you know it, please contribute a photo 🌱💚</p>";
         createCarousel([]);
+        tensor.dispose(); prediction.dispose();
         pausePond(false);
         return;
       }
@@ -904,15 +911,16 @@ document.getElementById("imageUpload").addEventListener("change", async function
           "<h3>Habit</h3><ul>"+info.habit.map(x=>"<li>"+x+"</li>").join("")+"</ul>"+
           "<h3>Economic Importance</h3><ul>"+info.economic.map(x=>"<li>"+x+"</li>").join("")+"</ul>"+
           "<h3>Location</h3><ul>"+info.location.map(x=>"<li>"+x+"</li>").join("")+"</ul>";
-      }else{
+      } else {
         predictionText.innerHTML = "Confidence: "+confidence+"%";
         createCarousel([]);
         descriptionBox.innerHTML =
           "<h3>🐟🌿 Oops!</h3><p>Hmm… this algae is not yet in our pond! If you know it, please contribute 🌱💚</p>";
       }
 
+      tensor.dispose(); prediction.dispose();
       pausePond(false);
-    }catch(err){
+    } catch(err){
       pausePond(false);
       alert("Prediction error: " + err.message);
     }

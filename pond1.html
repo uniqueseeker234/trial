@@ -217,52 +217,47 @@
     to   { transform: translateY(6px); }
   }
 /* SIDE-VIEW LILY PAD (oval + thickness) */
+/* ROUND FLOATING LILY PAD (top-view, on-water look) */
 .padSide{
   position:absolute;
   left:0;
-  top:22px;                 /* adjust if needed */
-  width: 170px;             /* wider than height = perspective */
-  height: 70px;
+  top:34px;                 /* moves pad lower so it sits on surface */
+  width: 140px;             /* more round */
+  height: 92px;
   border-radius: 999px;
   background:
-    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.18), rgba(255,255,255,0) 55%),
-    linear-gradient(to bottom, #a6f39a, #47bf73);
-  box-shadow: 0 18px 28px rgba(0,0,0,0.18);
-  transform: rotate(-6deg);
-  overflow: visible;
+    radial-gradient(circle at 30% 28%, rgba(255,255,255,0.22), rgba(255,255,255,0) 52%),
+    radial-gradient(circle at 55% 70%, rgba(0,0,0,0.08), rgba(0,0,0,0) 55%),
+    linear-gradient(to bottom, #b7ff9f, #4bc777);
+  box-shadow:
+    0 16px 28px rgba(0,0,0,0.14);   /* lift */
+  transform: rotate(-10deg);
+  overflow:hidden;
 }
 
-/* underside thickness (gives side view) */
+/* dark rim edge (pad thickness illusion, not pill) */
 .padSide::before{
   content:"";
   position:absolute;
-  left:6px;
-  right:6px;
-  top:22px;                 /* where thickness starts */
-  height: 24px;             /* thickness amount */
+  inset: 6px;
   border-radius: 999px;
-  background: linear-gradient(to bottom, rgba(20,90,60,0.30), rgba(0,0,0,0));
-  filter: blur(0.2px);
-  opacity:0.85;
-  transform: translateY(26px);
-  z-index:-1;
+  box-shadow: inset 0 -12px 0 rgba(0,0,0,0.12);
+  opacity:0.75;
 }
 
-/* wedge cut (still works in side view) */
+/* water-contact shadow + faint reflection under pad */
 .padSide::after{
   content:"";
   position:absolute;
-  left: 36px;               /* move cut near left like cartoon */
-  top: 50%;
-  width: 65px;
-  height: 65px;
-  transform: translateY(-50%) rotate(18deg);
-  background: rgba(0,0,0,0.12);   /* looks like a bite */
-  clip-path: polygon(50% 55%, 0 0, 100% 0);
-  border-radius: 16px;
-  opacity:0.22;
+  left: 10px;
+  right: 10px;
+  bottom: -18px;            /* pushes it into the water */
+  height: 28px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 50% 50%, rgba(0,0,0,0.20), rgba(0,0,0,0) 70%);
+  filter: blur(2px);
+  opacity:0.45;
 }
-
   /* Frog (Pad A only) */
   .frog{
     position:absolute;

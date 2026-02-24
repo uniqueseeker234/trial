@@ -28,11 +28,11 @@
     margin:0;
     height:100%;
     font-family:'Poppins', system-ui, Arial, sans-serif;
-    overflow:hidden; /* no scroll */
+    overflow:hidden;
     background:#0b1a17;
   }
 
-  /* =============== TOP BAR (kept minimal) =============== */
+  /* =============== TOP BAR =============== */
   .topbar{
     position:fixed;
     top:12px; left:12px; right:12px;
@@ -79,7 +79,7 @@
   .btnTiny.secondary{ background: rgba(0,0,0,0.22); }
   .btnTiny:active{ transform: scale(0.98); }
 
-  /* =============== POND (FIXED BACKGROUND) =============== */
+  /* =============== POND =============== */
   #pond-layer{
     position:fixed;
     inset:0;
@@ -87,7 +87,7 @@
     overflow:hidden;
   }
 
-  /* surface is shorter so there is room */
+  /* Surface */
   .surface{
     position:absolute;
     top:0; left:0; right:0;
@@ -111,17 +111,24 @@
     to   { transform: translateX(10px) translateY(-6px); }
   }
 
+  /* ===== THE “3D WATER SPLIT” (NEW) ===== */
   .waterline{
     position:absolute;
     top:26vh; left:0; right:0;
-    height:42px;
+    height:54px;
+    pointer-events:none;
+    z-index:6;
+    /* bright lip + fade */
     background:
       linear-gradient(to bottom,
-        rgba(255,255,255,0.22),
-        rgba(255,255,255,0.10),
+        rgba(255,255,255,0.34),
+        rgba(255,255,255,0.16),
+        rgba(255,255,255,0.05),
         rgba(255,255,255,0.00));
-    opacity:0.85;
+    opacity:0.92;
+    filter: saturate(1.05);
   }
+  /* top shimmer streaks */
   .waterline::after{
     content:"";
     position:absolute;
@@ -130,16 +137,56 @@
       repeating-linear-gradient(90deg,
         rgba(255,255,255,0.12) 0 22px,
         rgba(255,255,255,0.02) 22px 52px);
-    opacity:0.30;
+    opacity:0.28;
     filter: blur(1px);
     animation: surfaceWaves 4.6s linear infinite;
-    pointer-events:none;
   }
   @keyframes surfaceWaves{
     from { transform: translateX(0); }
     to   { transform: translateX(120px); }
   }
 
+  /* the “lip shadow” under the split (makes depth) */
+  .waterLipShadow{
+    position:absolute;
+    top: calc(26vh + 12px);
+    left:-5vw; right:-5vw;
+    height:44px;
+    background:
+      radial-gradient(ellipse at 50% 0%,
+        rgba(0,0,0,0.28),
+        rgba(0,0,0,0.08) 42%,
+        rgba(0,0,0,0.00) 72%);
+    filter: blur(2px);
+    opacity:0.85;
+    z-index:4;
+    pointer-events:none;
+  }
+
+  /* refraction band: faint glassy distortion feel */
+  .refractionBand{
+    position:absolute;
+    top: calc(26vh - 10px);
+    left:0; right:0;
+    height:84px;
+    background:
+      radial-gradient(circle at 35% 35%, rgba(255,255,255,0.18), rgba(255,255,255,0) 55%),
+      radial-gradient(circle at 70% 55%, rgba(255,255,255,0.14), rgba(255,255,255,0) 58%),
+      linear-gradient(to bottom,
+        rgba(255,255,255,0.08),
+        rgba(255,255,255,0.00));
+    opacity:0.55;
+    filter: blur(1px);
+    z-index:5;
+    pointer-events:none;
+    animation: refract 6.5s ease-in-out infinite alternate;
+  }
+  @keyframes refract{
+    from { transform: translateX(-10px); }
+    to   { transform: translateX(10px); }
+  }
+
+  /* Underwater */
   .underwater{
     position:absolute;
     top:26vh; left:0; right:0; bottom:0;
@@ -159,7 +206,28 @@
     pointer-events:none;
   }
 
-  /* =============== SEAWEED (keep your good version) =============== */
+  /* caustics (soft moving light patterns underwater near top) */
+  .caustics{
+    position:absolute;
+    top: calc(26vh + 10px);
+    left:-10vw; right:-10vw;
+    height:200px;
+    background:
+      radial-gradient(circle at 20% 30%, rgba(255,255,255,0.11), rgba(255,255,255,0) 55%),
+      radial-gradient(circle at 55% 45%, rgba(255,255,255,0.08), rgba(255,255,255,0) 60%),
+      radial-gradient(circle at 80% 35%, rgba(255,255,255,0.10), rgba(255,255,255,0) 58%);
+    opacity:0.45;
+    filter: blur(2px);
+    pointer-events:none;
+    z-index:2;
+    animation: caust 7.5s ease-in-out infinite alternate;
+  }
+  @keyframes caust{
+    from { transform: translateX(-12px) translateY(0px); }
+    to   { transform: translateX(12px) translateY(8px); }
+  }
+
+  /* =============== SEAWEED =============== */
   .weed{
     position:absolute;
     bottom:-14px;
@@ -171,6 +239,7 @@
     animation: weedSway 3.4s ease-in-out infinite alternate;
     opacity:0.94;
     filter: drop-shadow(0 10px 10px rgba(0,0,0,0.15));
+    z-index:1;
   }
   .weed::before, .weed::after{
     content:"";
@@ -198,67 +267,66 @@
   .weed.right2{ right: 8.5vw; height:295px; opacity:0.80; animation-duration:4.2s; }
   .weed.right3{ right: 13.5vw; height:220px; opacity:0.70; animation-duration:3.7s; }
 
-  /* =============== TWO PADS (split like your circles) =============== */
+  /* =============== PADS =============== */
   .padWrapA, .padWrapB{
     position:absolute;
     top:7vh;
-    width: 160px;
-    height: 90px;
+    width: 170px;
+    height: 110px;
     z-index:14;
     pointer-events:none;
     animation: padDrift 6s ease-in-out infinite alternate;
-    opacity:0.95;
+    opacity:0.96;
   }
-  .padWrapA{ left:7vw; }     /* first green circle */
-  .padWrapB{ left:58vw; }    /* second green circle */
+  .padWrapA{ left:7vw; }
+  .padWrapB{ left:58vw; }
 
   @keyframes padDrift{
-    from { transform: translateY(0px); }
-    to   { transform: translateY(6px); }
+    from { transform: translateY(0px) rotate(-0.2deg); }
+    to   { transform: translateY(7px) rotate(0.2deg); }
   }
-/* SIDE-VIEW LILY PAD (oval + thickness) */
-/* ROUND FLOATING LILY PAD (top-view, on-water look) */
-.padSide{
-  position:absolute;
-  left:0;
-  top:34px;                 /* moves pad lower so it sits on surface */
-  width: 140px;             /* more round */
-  height: 92px;
-  border-radius: 999px;
-  background:
-    radial-gradient(circle at 30% 28%, rgba(255,255,255,0.22), rgba(255,255,255,0) 52%),
-    radial-gradient(circle at 55% 70%, rgba(0,0,0,0.08), rgba(0,0,0,0) 55%),
-    linear-gradient(to bottom, #b7ff9f, #4bc777);
-  box-shadow:
-    0 16px 28px rgba(0,0,0,0.14);   /* lift */
-  transform: rotate(-10deg);
-  overflow:hidden;
-}
 
-/* dark rim edge (pad thickness illusion, not pill) */
-.padSide::before{
-  content:"";
-  position:absolute;
-  inset: 6px;
-  border-radius: 999px;
-  box-shadow: inset 0 -12px 0 rgba(0,0,0,0.12);
-  opacity:0.75;
-}
+  /* Rounded lily pad with slight perspective + better “on water” contact */
+  .padSide{
+    position:absolute;
+    left:0;
+    top:34px;
+    width: 150px;
+    height: 96px;
+    border-radius: 999px;
+    background:
+      radial-gradient(circle at 30% 28%, rgba(255,255,255,0.22), rgba(255,255,255,0) 52%),
+      radial-gradient(circle at 60% 70%, rgba(0,0,0,0.10), rgba(0,0,0,0) 55%),
+      linear-gradient(to bottom, #b7ff9f, #4bc777);
+    box-shadow:
+      0 16px 28px rgba(0,0,0,0.14);
+    transform: rotate(-10deg) perspective(400px) rotateX(12deg);
+    overflow:hidden;
+  }
+  /* inner rim */
+  .padSide::before{
+    content:"";
+    position:absolute;
+    inset: 7px;
+    border-radius: 999px;
+    box-shadow: inset 0 -14px 0 rgba(0,0,0,0.14);
+    opacity:0.80;
+  }
+  /* water-contact shadow/reflection */
+  .padSide::after{
+    content:"";
+    position:absolute;
+    left: 10px;
+    right: 10px;
+    bottom: -20px;
+    height: 30px;
+    border-radius: 999px;
+    background: radial-gradient(circle at 50% 50%, rgba(0,0,0,0.22), rgba(0,0,0,0) 70%);
+    filter: blur(2px);
+    opacity:0.48;
+  }
 
-/* water-contact shadow + faint reflection under pad */
-.padSide::after{
-  content:"";
-  position:absolute;
-  left: 10px;
-  right: 10px;
-  bottom: -18px;            /* pushes it into the water */
-  height: 28px;
-  border-radius: 999px;
-  background: radial-gradient(circle at 50% 50%, rgba(0,0,0,0.20), rgba(0,0,0,0) 70%);
-  filter: blur(2px);
-  opacity:0.45;
-}
-  /* Frog (Pad A only) */
+  /* Frog */
   .frog{
     position:absolute;
     left: 18px;
@@ -305,13 +373,14 @@
     opacity:0.75;
   }
 
-  /* Lotus (Pad B only) */
-  .lotus3d{
+  /* Lotus (attached to pad) */
+  .lotusAnchor{
     position:absolute;
-    right: -6px;
-    top: -6px;
-    width: 86px;
-    height: 86px;
+    right: 6px;
+    top: 6px;
+    width: 92px;
+    height: 98px;
+    transform: rotate(10deg);
     filter: drop-shadow(0 16px 18px rgba(0,0,0,0.14));
     animation: lotusBob 4.2s ease-in-out infinite alternate;
   }
@@ -319,21 +388,40 @@
     from { transform: translateY(0) rotate(10deg); }
     to   { transform: translateY(4px) rotate(12deg); }
   }
+  .lotusStem{
+    position:absolute;
+    left: 40px;
+    bottom: 8px;
+    width: 10px;
+    height: 34px;
+    border-radius: 999px;
+    background: linear-gradient(to bottom, rgba(38,170,120,0.95), rgba(9,80,64,0.95));
+    transform: rotate(-12deg);
+    opacity:0.9;
+  }
+
+  .lotus3d{
+    position:absolute;
+    left: 2px;
+    top: -6px;
+    width: 86px;
+    height: 86px;
+  }
 
   /* =============== FISH LAYER (ABOVE UI) =============== */
   #fish-layer{
     position:fixed;
     inset:0;
-    z-index:80;           /* ABOVE UI */
+    z-index:80;
     pointer-events:none;
     overflow:hidden;
   }
 
   .fishWrap{
     position:absolute;
-    left:-240px;
-    width: 64px;
-    height: 34px;
+    left:-320px;
+    width: 98px;
+    height: 48px;
     will-change: transform;
   }
 
@@ -345,89 +433,108 @@
     will-change: transform;
   }
 
+  /* glossy belly */
   .fishBody::before{
     content:"";
     position:absolute;
-    inset:7px 12px 11px 12px;
+    inset:10px 16px 14px 18px;
     border-radius: 999px;
     background: rgba(255,255,255,0.16);
-    opacity:0.62;
+    opacity:0.58;
   }
 
-  /* BIGGER tail */
-  .fishBody::after{
-    content:"";
+  /* tail is now a real element (wiggles) */
+  .tail{
     position:absolute;
-    left:-26px;
-    top:6px;
-    width: 38px;
-    height: 24px;
+    left:-30px;
+    top: 12px;
+    width: 40px;
+    height: 26px;
     background: inherit;
     clip-path: polygon(100% 50%, 0 0, 0 100%);
     border-radius: 10px;
     opacity:0.98;
+    transform-origin: 95% 50%;
+    animation: tailWiggle 420ms ease-in-out infinite;
+  }
+  @keyframes tailWiggle{
+    0%,100% { transform: rotate(12deg); }
+    50%     { transform: rotate(-14deg); }
   }
 
-  /* more shark-like fin */
-  .fishBody .finTop{
+  /* fins slightly animated too */
+  .finTop{
     position:absolute;
-    top:-14px;
-    left: 26px;
-    width: 22px;
-    height: 22px;
+    top:-16px;
+    left: 42px;
+    width: 24px;
+    height: 24px;
     background: inherit;
     clip-path: polygon(50% 0%, 8% 100%, 92% 100%);
     opacity:0.95;
+    transform-origin: 50% 100%;
+    animation: finFlap 900ms ease-in-out infinite;
   }
-  .fishBody .finSide{
+  .finSide{
     position:absolute;
-    top: 16px;
-    left: 18px;
-    width: 18px;
-    height: 14px;
+    top: 22px;
+    left: 30px;
+    width: 20px;
+    height: 16px;
     background: inherit;
     clip-path: polygon(0% 50%, 100% 0%, 100% 100%);
     opacity:0.92;
+    transform-origin: 10% 50%;
+    animation: finFlap 980ms ease-in-out infinite;
   }
-  .fishBody .finBottom{
+  .finBottom{
     position:absolute;
-    top: 26px;
-    left: 32px;
-    width: 14px;
-    height: 10px;
+    top: 34px;
+    left: 50px;
+    width: 15px;
+    height: 11px;
     background: inherit;
     clip-path: polygon(50% 100%, 0% 0%, 100% 0%);
     opacity:0.82;
+    transform-origin: 50% 0%;
+    animation: finFlap 1050ms ease-in-out infinite;
+  }
+  @keyframes finFlap{
+    0%,100% { transform: rotate(6deg); }
+    50%     { transform: rotate(-8deg); }
   }
 
-  .fishBody .eye{
+  .eye{
     position:absolute;
-    right:10px;
-    top:12px;
+    right:14px;
+    top:18px;
     width: 7px;
     height: 7px;
     background: rgba(0,0,0,0.65);
     border-radius:50%;
     box-shadow: inset 0 0 0 2px rgba(255,255,255,0.45);
   }
-  .fishBody .smile{
+  .smile{
     position:absolute;
-    right: 6px;
-    top: 19px;
-    width: 10px;
-    height: 8px;
+    right: 9px;
+    top: 25px;
+    width: 11px;
+    height: 9px;
     border-bottom: 2px solid rgba(0,0,0,0.22);
     border-radius: 0 0 999px 999px;
     opacity:0.8;
   }
 
+  /* swim feels less “pulled”: slight vertical arc + easing */
   @keyframes swimRight {
-    from { transform: translateX(-260px); }
-    to   { transform: translateX(calc(100vw + 360px)); }
+    0%   { transform: translateX(-360px) translateY(0px); }
+    50%  { transform: translateX(50vw) translateY(-10px); }
+    100% { transform: translateX(calc(100vw + 440px)) translateY(0px); }
   }
   @keyframes swimLeft {
-    from { transform: translateX(calc(100vw + 360px)) scaleX(-1); }
-    to   { transform: translateX(-260px) scaleX(-1); }
+    0%   { transform: translateX(calc(100vw + 440px)) translateY(0px) scaleX(-1); }
+    50%  { transform: translateX(50vw) translateY(-10px) scaleX(-1); }
+    100% { transform: translateX(-360px) translateY(0px) scaleX(-1); }
   }
 
   /* =============== BUBBLES =============== */
@@ -447,7 +554,7 @@
     to   { transform: translateY(-92vh) scale(0.85); opacity:0; }
   }
 
-  /* =============== INTRO OVERLAY =============== */
+  /* =============== INTRO =============== */
   .introOverlay{
     position:fixed;
     inset:0;
@@ -484,7 +591,7 @@
     margin: 0;
   }
 
-  /* =============== UI (MINIMAL, LOWER, NO BIG HEADING) =============== */
+  /* =============== UI =============== */
   .uiWrap{
     position:fixed;
     left:0; right:0;
@@ -596,8 +703,14 @@
 <!-- POND VISUALS -->
 <div id="pond-layer">
   <div class="surface"></div>
+
+  <!-- NEW: refraction + lip shadow for depth -->
+  <div class="refractionBand"></div>
   <div class="waterline"></div>
+  <div class="waterLipShadow"></div>
+
   <div class="underwater"></div>
+  <div class="caustics"></div>
 
   <!-- Seaweed clusters -->
   <div class="weed left"></div>
@@ -618,84 +731,96 @@
     </div>
   </div>
 
-  <!-- PAD B (lotus only) -->
+  <!-- PAD B (lotus attached) -->
   <div class="padWrapB">
     <div class="padSide"></div>
 
-    <!-- lotus svg -->
-    <svg class="lotus3d" viewBox="0 0 120 120" aria-hidden="true">
-      <defs>
-        <radialGradient id="p" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="var(--lotusPetal1)" stop-opacity="0.95"/>
-          <stop offset="60%" stop-color="var(--lotusPetal2)" stop-opacity="0.95"/>
-          <stop offset="100%" stop-color="var(--lotusPetal3)" stop-opacity="0.95"/>
-        </radialGradient>
-        <radialGradient id="p2" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#fff0f7" stop-opacity="0.95"/>
-          <stop offset="70%" stop-color="#ff9fc6" stop-opacity="0.93"/>
-          <stop offset="100%" stop-color="#ff6ea8" stop-opacity="0.92"/>
-        </radialGradient>
-        <radialGradient id="c" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="var(--lotusCenter1)" stop-opacity="0.95"/>
-          <stop offset="100%" stop-color="var(--lotusCenter2)" stop-opacity="0.95"/>
-        </radialGradient>
-      </defs>
+    <div class="lotusAnchor">
+      <div class="lotusStem"></div>
 
-      <g transform="translate(60 60)">
-        <path d="M0,-44 C10,-30 10,-16 0,-6 C-10,-16 -10,-30 0,-44Z" fill="url(#p)"/>
-        <path d="M34,-26 C28,-12 16,-4 4,-6 C6,-18 18,-30 34,-26Z" fill="url(#p)"/>
-        <path d="M44,0 C30,10 16,10 6,2 C16,-10 30,-12 44,0Z" fill="url(#p)"/>
-        <path d="M34,26 C18,30 6,18 4,6 C16,4 28,12 34,26Z" fill="url(#p)"/>
-        <path d="M0,44 C-10,30 -10,16 0,6 C10,16 10,30 0,44Z" fill="url(#p)"/>
-        <path d="M-34,26 C-28,12 -16,4 -4,6 C-6,18 -18,30 -34,26Z" fill="url(#p)"/>
-        <path d="M-44,0 C-30,-10 -16,-10 -6,-2 C-16,10 -30,12 -44,0Z" fill="url(#p)"/>
-        <path d="M-34,-26 C-18,-30 -6,-18 -4,-6 C-16,-4 -28,-12 -34,-26Z" fill="url(#p)"/>
+      <!-- lotus svg -->
+      <svg class="lotus3d" viewBox="0 0 120 120" aria-hidden="true">
+        <defs>
+          <radialGradient id="p" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="var(--lotusPetal1)" stop-opacity="0.95"/>
+            <stop offset="60%" stop-color="var(--lotusPetal2)" stop-opacity="0.95"/>
+            <stop offset="100%" stop-color="var(--lotusPetal3)" stop-opacity="0.95"/>
+          </radialGradient>
+          <radialGradient id="p2" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#fff0f7" stop-opacity="0.95"/>
+            <stop offset="70%" stop-color="#ff9fc6" stop-opacity="0.93"/>
+            <stop offset="100%" stop-color="#ff6ea8" stop-opacity="0.92"/>
+          </radialGradient>
+          <radialGradient id="c" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="var(--lotusCenter1)" stop-opacity="0.95"/>
+            <stop offset="100%" stop-color="var(--lotusCenter2)" stop-opacity="0.95"/>
+          </radialGradient>
+        </defs>
 
-        <g transform="scale(0.72) rotate(18)">
-          <path d="M0,-44 C10,-30 10,-16 0,-6 C-10,-16 -10,-30 0,-44Z" fill="url(#p2)"/>
-          <path d="M34,-26 C28,-12 16,-4 4,-6 C6,-18 18,-30 34,-26Z" fill="url(#p2)"/>
-          <path d="M44,0 C30,10 16,10 6,2 C16,-10 30,-12 44,0Z" fill="url(#p2)"/>
-          <path d="M34,26 C18,30 6,18 4,6 C16,4 28,12 34,26Z" fill="url(#p2)"/>
-          <path d="M0,44 C-10,30 -10,16 0,6 C10,16 10,30 0,44Z" fill="url(#p2)"/>
-          <path d="M-34,26 C-28,12 -16,4 -4,6 C-6,18 -18,30 -34,26Z" fill="url(#p2)"/>
-          <path d="M-44,0 C-30,-10 -16,-10 -6,-2 C-16,10 -30,12 -44,0Z" fill="url(#p2)"/>
-          <path d="M-34,-26 C-18,-30 -6,-18 -4,-6 C-16,-4 -28,-12 -34,-26Z" fill="url(#p2)"/>
+        <g transform="translate(60 60)">
+          <path d="M0,-44 C10,-30 10,-16 0,-6 C-10,-16 -10,-30 0,-44Z" fill="url(#p)"/>
+          <path d="M34,-26 C28,-12 16,-4 4,-6 C6,-18 18,-30 34,-26Z" fill="url(#p)"/>
+          <path d="M44,0 C30,10 16,10 6,2 C16,-10 30,-12 44,0Z" fill="url(#p)"/>
+          <path d="M34,26 C18,30 6,18 4,6 C16,4 28,12 34,26Z" fill="url(#p)"/>
+          <path d="M0,44 C-10,30 -10,16 0,6 C10,16 10,30 0,44Z" fill="url(#p)"/>
+          <path d="M-34,26 C-28,12 -16,4 -4,6 C-6,18 -18,30 -34,26Z" fill="url(#p)"/>
+          <path d="M-44,0 C-30,-10 -16,-10 -6,-2 C-16,10 -30,12 -44,0Z" fill="url(#p)"/>
+          <path d="M-34,-26 C-18,-30 -6,-18 -4,-6 C-16,-4 -28,-12 -34,-26Z" fill="url(#p)"/>
+
+          <g transform="scale(0.72) rotate(18)">
+            <path d="M0,-44 C10,-30 10,-16 0,-6 C-10,-16 -10,-30 0,-44Z" fill="url(#p2)"/>
+            <path d="M34,-26 C28,-12 16,-4 4,-6 C6,-18 18,-30 34,-26Z" fill="url(#p2)"/>
+            <path d="M44,0 C30,10 16,10 6,2 C16,-10 30,-12 44,0Z" fill="url(#p2)"/>
+            <path d="M34,26 C18,30 6,18 4,6 C16,4 28,12 34,26Z" fill="url(#p2)"/>
+            <path d="M0,44 C-10,30 -10,16 0,6 C10,16 10,30 0,44Z" fill="url(#p2)"/>
+            <path d="M-34,26 C-28,12 -16,4 -4,6 C-6,18 -18,30 -34,26Z" fill="url(#p2)"/>
+            <path d="M-44,0 C-30,-10 -16,-10 -6,-2 C-16,10 -30,12 -44,0Z" fill="url(#p2)"/>
+            <path d="M-34,-26 C-18,-30 -6,-18 -4,-6 C-16,-4 -28,-12 -34,-26Z" fill="url(#p2)"/>
+          </g>
+
+          <circle r="12" fill="url(#c)"/>
         </g>
-
-        <circle r="12" fill="url(#c)"/>
-      </g>
-    </svg>
+      </svg>
+    </div>
   </div>
 </div>
 
-<!-- FISH LAYER (above cards) -->
+<!-- FISH LAYER -->
 <div id="fish-layer">
   <div class="fishWrap" id="fw1" style="top: calc(26vh + 12vh);">
     <div class="fishBody" id="fb1" style="background:#ff7b7b;">
-      <div class="finTop"></div><div class="finSide"></div><div class="finBottom"></div><div class="eye"></div><div class="smile"></div>
+      <div class="tail"></div>
+      <div class="finTop"></div><div class="finSide"></div><div class="finBottom"></div>
+      <div class="eye"></div><div class="smile"></div>
     </div>
   </div>
 
   <div class="fishWrap" id="fw2" style="top: calc(26vh + 20vh);">
     <div class="fishBody" id="fb2" style="background:#ffd16a;">
-      <div class="finTop"></div><div class="finSide"></div><div class="finBottom"></div><div class="eye"></div><div class="smile"></div>
+      <div class="tail"></div>
+      <div class="finTop"></div><div class="finSide"></div><div class="finBottom"></div>
+      <div class="eye"></div><div class="smile"></div>
     </div>
   </div>
 
   <div class="fishWrap" id="fw3" style="top: calc(26vh + 30vh);">
     <div class="fishBody" id="fb3" style="background:#70d6ff;">
-      <div class="finTop"></div><div class="finSide"></div><div class="finBottom"></div><div class="eye"></div><div class="smile"></div>
+      <div class="tail"></div>
+      <div class="finTop"></div><div class="finSide"></div><div class="finBottom"></div>
+      <div class="eye"></div><div class="smile"></div>
     </div>
   </div>
 
   <div class="fishWrap" id="fw4" style="top: calc(26vh + 40vh);">
     <div class="fishBody" id="fb4" style="background:#a8ff9c;">
-      <div class="finTop"></div><div class="finSide"></div><div class="finBottom"></div><div class="eye"></div><div class="smile"></div>
+      <div class="tail"></div>
+      <div class="finTop"></div><div class="finSide"></div><div class="finBottom"></div>
+      <div class="eye"></div><div class="smile"></div>
     </div>
   </div>
 </div>
 
-<!-- UI (APPEARS AFTER INTRO) -->
+<!-- UI -->
 <div class="uiWrap" id="ui">
   <div class="cards">
     <div class="card">
@@ -716,14 +841,11 @@
 </div>
 
 <script>
-  /* ===== INTRO TIMING (LONGER) ===== */
+  /* ===== INTRO TIMING ===== */
   const intro = document.getElementById("intro");
   const ui = document.getElementById("ui");
 
-  // show intro longer
   setTimeout(() => intro.classList.add("hide"), 2900);
-
-  // then show UI
   setTimeout(() => {
     intro.style.display = "none";
     ui.classList.add("show");
@@ -740,11 +862,12 @@
   const fb3 = document.getElementById("fb3");
   const fb4 = document.getElementById("fb4");
 
-  fw1.style.animation = "swimRight 15s linear infinite";
-  fw2.style.animation = "swimLeft  18s linear infinite";
-  fw3.style.animation = "swimRight 21s linear infinite";
-  fw4.style.animation = "swimLeft  24s linear infinite";
+  fw1.style.animation = "swimRight 16s cubic-bezier(.35,.05,.2,1) infinite";
+  fw2.style.animation = "swimLeft  19s cubic-bezier(.35,.05,.2,1) infinite";
+  fw3.style.animation = "swimRight 22s cubic-bezier(.35,.05,.2,1) infinite";
+  fw4.style.animation = "swimLeft  25s cubic-bezier(.35,.05,.2,1) infinite";
 
+  /* gentle body sway (keeps it alive but not robotic) */
   [fb1,fb2,fb3,fb4].forEach((body, idx)=>{
     body.animate(
       [
@@ -754,7 +877,7 @@
         { transform: "translateY(2px) rotate(-2deg)" },
         { transform: "translateY(0px) rotate(0deg)" },
       ],
-      { duration: 1100 + idx*120, iterations: Infinity, easing: "ease-in-out" }
+      { duration: 1200 + idx*130, iterations: Infinity, easing: "ease-in-out" }
     );
   });
 

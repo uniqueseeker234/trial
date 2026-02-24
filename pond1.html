@@ -129,63 +129,34 @@
     filter: saturate(1.05);
   }
   /* ===== STRONG 3D SPLIT (adds curved glass arc) ===== */
-.splitArc{
-  position:absolute;
-  top: calc(26vh - 14px);
-  left:-8vw; right:-8vw;
-  height: 70px;
-  z-index:2;
-  pointer-events:none;
-  opacity:0.95;
+  .waterline{
+  z-index: 10;
+}
 
-  /* The arc highlight + inner shadow gives “bowl / glass” feel */
+.waterline::before{
+  content:"";
+  position:absolute;
+  left:-10vw; right:-10vw;
+  top:-34px;
+  height:120px;
+  pointer-events:none;
+  opacity:0.92;
+
   background:
-    radial-gradient(ellipse at 50% 15%,
-      rgba(255,255,255,0.55) 0%,
+    radial-gradient(ellipse at 50% 20%,
+      rgba(255,255,255,0.52) 0%,
       rgba(255,255,255,0.22) 28%,
-      rgba(255,255,255,0.08) 45%,
+      rgba(255,255,255,0.08) 48%,
       rgba(255,255,255,0.00) 62%),
-    radial-gradient(ellipse at 50% 65%,
-      rgba(0,0,0,0.30) 0%,
-      rgba(0,0,0,0.14) 30%,
-      rgba(0,0,0,0.00) 62%);
-  filter: blur(0.2px);
-  transform: perspective(700px) rotateX(30deg);
+    radial-gradient(ellipse at 50% 78%,
+      rgba(0,0,0,0.34) 0%,
+      rgba(0,0,0,0.16) 32%,
+      rgba(0,0,0,0.00) 68%);
+
+  transform: perspective(800px) rotateX(28deg);
+  filter: blur(0.3px);
 }
 
-/* thicker “depth shadow” under split */
-.waterLipShadow{
-  position:absolute;
-  top: calc(26vh + 8px);
-  left:-8vw; right:-8vw;
-  height:72px;
-  background:
-    radial-gradient(ellipse at 50% 0%,
-      rgba(0,0,0,0.40),
-      rgba(0,0,0,0.18) 40%,
-      rgba(0,0,0,0.00) 75%);
-  filter: blur(2px);
-  opacity:0.9;
-  z-index:6;
-  pointer-events:none;
-}
-
-/* refraction band stronger */
-.refractionBand{
-  position:absolute;
-  top: calc(26vh - 6px);
-  left:-6vw; right:-6vw;
-  height: 110px;
-  z-index:6;
-  pointer-events:none;
-  opacity:0.7;
-  background:
-    radial-gradient(circle at 35% 45%, rgba(255,255,255,0.22), rgba(255,255,255,0) 58%),
-    radial-gradient(circle at 70% 55%, rgba(255,255,255,0.18), rgba(255,255,255,0) 60%),
-    linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0));
-  filter: blur(1px);
-  animation: refract 6.5s ease-in-out infinite alternate;
-}
   /* top shimmer streaks */
   .waterline::after{
     content:"";
@@ -204,45 +175,6 @@
     to   { transform: translateX(120px); }
   }
 
-  /* the “lip shadow” under the split (makes depth) */
-  .waterLipShadow{
-    position:absolute;
-    top: calc(26vh + 12px);
-    left:-5vw; right:-5vw;
-    height:44px;
-    background:
-      radial-gradient(ellipse at 50% 0%,
-        rgba(0,0,0,0.28),
-        rgba(0,0,0,0.08) 42%,
-        rgba(0,0,0,0.00) 72%);
-    filter: blur(2px);
-    opacity:0.85;
-    z-index:4;
-    pointer-events:none;
-  }
-
-  /* refraction band: faint glassy distortion feel */
-  .refractionBand{
-    position:absolute;
-    top: calc(26vh - 10px);
-    left:0; right:0;
-    height:84px;
-    background:
-      radial-gradient(circle at 35% 35%, rgba(255,255,255,0.18), rgba(255,255,255,0) 55%),
-      radial-gradient(circle at 70% 55%, rgba(255,255,255,0.14), rgba(255,255,255,0) 58%),
-      linear-gradient(to bottom,
-        rgba(255,255,255,0.08),
-        rgba(255,255,255,0.00));
-    opacity:0.55;
-    filter: blur(1px);
-    z-index:5;
-    pointer-events:none;
-    animation: refract 6.5s ease-in-out infinite alternate;
-  }
-  @keyframes refract{
-    from { transform: translateX(-10px); }
-    to   { transform: translateX(10px); }
-  }
 
   /* Underwater */
   .underwater{
@@ -761,12 +693,7 @@
 <!-- POND VISUALS -->
 <div id="pond-layer">
   <div class="surface"></div>
-
-  <div class="splitArc"></div>
-  <div class="refractionBand"></div
-  <div class="waterLipShadow"></div>
   <!-- NEW: refraction + lip shadow for depth -->
-
   <div class="underwater"></div>
   <div class="caustics"></div>
 

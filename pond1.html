@@ -168,65 +168,44 @@
 
   /* =============== SEAWEED (KEEP SIMPLE + ANIME-LIKE) =============== */
   /* (You said seaweed is perfect; I keep this style and just add more “leafy” blades) */
+/* =============== SEAWEED (MORE “LEAFY”, ANCHORED) =============== */
   .weed{
     position:absolute;
-    bottom:-10px;
+    bottom:-14px;                   /* anchored */
     width:18px;
-    border-radius: 16px 16px 10px 10px;
-    background: linear-gradient(to top, rgba(6,58,47,0.95), rgba(20,120,92,0.95));
+    height:220px;
+    border-radius: 30px;
+    background: linear-gradient(to top, rgba(5,45,38,0.95), rgba(34,175,135,0.92));
     transform-origin: bottom center;
-    animation: weedSway 2.8s ease-in-out infinite alternate;
-    opacity:0.92;
-    filter: drop-shadow(0 10px 12px rgba(0,0,0,0.14));
+    animation: weedSway 3.4s ease-in-out infinite alternate;
+    opacity:0.94;
+    filter: drop-shadow(0 10px 10px rgba(0,0,0,0.15));
   }
-  .weed::after{
+  .weed::before, .weed::after{
     content:"";
     position:absolute;
-    left: 6px;
-    bottom: 10px;
-    width: 8px;
-    height: 70%;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.10);
-    transform: skewX(-8deg);
-    opacity:0.35;
+    bottom:0;
+    width:16px;
+    height:200px;
+    background: inherit;
+    border-radius: 30px;
+    opacity:0.75;
   }
+  .weed::before{ left:-10px; transform: rotate(-6deg); }
+  .weed::after { right:-10px; transform: rotate(6deg); }
+
   @keyframes weedSway{
     from { transform: rotate(-5deg); }
     to   { transform: rotate(6deg); }
   }
 
-  /* left cluster */
-  .weed.left{ left: 4vw; }
-  .weed.left2{ left: 9vw; opacity:0.78; animation-duration:3.4s; }
-  .weed.left3{ left: 13vw; opacity:0.64; animation-duration:2.6s; }
+  .weed.left{ left: 3.5vw; height:230px; animation-duration:3.2s; }
+  .weed.left2{ left: 8.5vw; height:280px; opacity:0.80; animation-duration:4.0s; }
+  .weed.left3{ left: 13.5vw; height:210px; opacity:0.70; animation-duration:3.6s; }
 
-  /* right cluster */
-  .weed.right{ right: 4vw; }
-  .weed.right2{ right: 9vw; opacity:0.78; animation-duration:3.6s; }
-  .weed.right3{ right: 13vw; opacity:0.64; animation-duration:2.8s; }
-
-  /* extra “leaf” blades near bottom corners for anime feel */
-  .blade{
-    position:absolute;
-    bottom:-30px;
-    width: 26px;
-    height: 240px;
-    border-radius: 999px;
-    background: linear-gradient(to top, rgba(7,70,55,0.95), rgba(24,135,102,0.85));
-    transform-origin: bottom center;
-    opacity:0.45;
-    filter: blur(0.2px);
-    animation: bladeSway 3.8s ease-in-out infinite alternate;
-  }
-  @keyframes bladeSway{
-    from { transform: rotate(-8deg); }
-    to   { transform: rotate(10deg); }
-  }
-  .blade.b1{ left: 10vw; height: 260px; animation-duration:4.4s; }
-  .blade.b2{ left: 15vw; height: 220px; opacity:0.35; animation-duration:3.6s; }
-  .blade.b3{ right: 10vw; height: 270px; animation-duration:4.0s; }
-  .blade.b4{ right: 15vw; height: 210px; opacity:0.35; animation-duration:3.3s; }
+  .weed.right{ right: 3.5vw; height:240px; animation-duration:3.4s; }
+  .weed.right2{ right: 8.5vw; height:295px; opacity:0.80; animation-duration:4.2s; }
+  .weed.right3{ right: 13.5vw; height:220px; opacity:0.70; animation-duration:3.7s; }
 
   /* =============== LILY PAD (SIDE VIEW) =============== */
   .padWrap{
@@ -592,21 +571,14 @@
   <div class="waterline"></div>
   <div class="underwater"></div>
 
-  <!-- Seaweed clusters -->
-  <div class="weed left"  style="height:140px; top: calc(34vh + 12vh);"></div>
-  <div class="weed left2" style="height:190px; top: calc(34vh + 20vh);"></div>
-  <div class="weed left3" style="height:120px; top: calc(34vh + 30vh);"></div>
+<!-- Seaweed clusters (anchored bottom/sides) -->
+<div class="weed left"></div>
+<div class="weed left2"></div>
+<div class="weed left3"></div>
 
-  <div class="weed right"  style="height:150px; top: calc(34vh + 14vh);"></div>
-  <div class="weed right2" style="height:210px; top: calc(34vh + 22vh);"></div>
-  <div class="weed right3" style="height:130px; top: calc(34vh + 32vh);"></div>
-
-  <!-- extra leafy blades -->
-  <div class="blade b1"></div>
-  <div class="blade b2"></div>
-  <div class="blade b3"></div>
-  <div class="blade b4"></div>
-
+<div class="weed right"></div>
+<div class="weed right2"></div>
+<div class="weed right3"></div>
   <!-- Lily pad + frog + lotus -->
   <div class="padWrap">
     <div class="padSide"></div>

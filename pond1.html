@@ -299,21 +299,36 @@
   transform: rotate(-12deg) perspective(700px) rotateX(14deg);
 }
   /* Curved lily pad notch (safe method) */
+  /* ✅ V-cut notch (safe overlay method) */
+.padSide{
+  position: relative;     /* IMPORTANT */
+  overflow: hidden;       /* keeps notch clean */
+}
+
 .padSide::after{
   content:"";
   position:absolute;
 
-  right: 10px;
-  top: 8px;
+  /* position of the V cut */
+  right: 8px;
+  top: 6px;
 
-  width: 54px;
-  height: 54px;
-  border-radius: 50%;
+  width: 78px;
+  height: 78px;
 
+  /* water color so it looks like a cut */
   background: linear-gradient(to bottom, var(--surfaceA), var(--surfaceB));
 
+  /* V wedge shape */
+  clip-path: polygon(0% 50%, 100% 0%, 100% 100%);
+
+  /* soft shadow on the cut edge */
   box-shadow: inset 10px 0 14px rgba(0,0,0,0.14);
+
+  opacity: 1;
 }
+
+
 /* ✅ SAFE curved notch (keeps your 3D shading) */
   /* ✅ curved notch (safe size + safe position) */
 

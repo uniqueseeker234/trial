@@ -299,15 +299,16 @@
   transform: rotate(-12deg) perspective(700px) rotateX(14deg);
 
 /* ✅ SAFE curved notch (keeps your 3D shading) */
-  -webkit-mask:
-    radial-gradient(circle 38px at 102px 28px, transparent 98%, black 100%),
-    linear-gradient(black, black);
-  -webkit-mask-composite: destination-out;
+  /* ✅ curved notch (safe size + safe position) */
+-webkit-mask:
+  radial-gradient(circle 26px at 78% 22%, transparent 98%, black 100%),
+  linear-gradient(black, black);
+-webkit-mask-composite: destination-out;
 
-  mask:
-    radial-gradient(circle 38px at 102px 28px, transparent 98%, black 100%),
-    linear-gradient(black, black);
-  mask-composite: exclude;
+mask:
+  radial-gradient(circle 26px at 78% 22%, transparent 98%, black 100%),
+  linear-gradient(black, black);
+mask-composite: exclude;
 }
   /* Frog */
   .frog{

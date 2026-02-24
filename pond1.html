@@ -9,7 +9,6 @@
 
 <style>
   :root{
-    /* Water tones closer to your Pond-2 target teal */
     --surfaceA:#5FC2A7;
     --surfaceB:#3CC19E;
     --underA:#2aa98d;
@@ -31,7 +30,7 @@
     margin:0;
     height:100%;
     font-family:'Poppins', system-ui, Arial, sans-serif;
-    overflow:hidden;            /* ✅ NO SCROLL */
+    overflow:hidden;
     background:#0b1a17;
   }
 
@@ -48,7 +47,7 @@
   }
   .topbar .pill{
     pointer-events:auto;
-    padding:8px 12px;          /* slightly smaller */
+    padding:8px 12px;
     border-radius:14px;
     background: rgba(0,0,0,0.35);
     border: 1px solid rgba(255,255,255,0.14);
@@ -67,7 +66,6 @@
     gap:8px;
   }
 
-  /* ✅ OG-pond-ish small buttons */
   .btnTiny{
     border:none;
     cursor:pointer;
@@ -91,10 +89,11 @@
     overflow:hidden;
   }
 
+  /* ✅ surface cut shorter so UI has space */
   .surface{
     position:absolute;
     top:0; left:0; right:0;
-    height:34vh;
+    height:30vh; /* was 34vh */
     background: linear-gradient(to bottom, var(--surfaceA), var(--surfaceB));
   }
 
@@ -117,7 +116,7 @@
 
   .waterline{
     position:absolute;
-    top:34vh; left:0; right:0;
+    top:30vh; left:0; right:0; /* was 34vh */
     height:44px;
     background:
       linear-gradient(to bottom,
@@ -146,7 +145,7 @@
 
   .underwater{
     position:absolute;
-    top:34vh; left:0; right:0; bottom:0;
+    top:30vh; left:0; right:0; bottom:0; /* was 34vh */
     background:
       radial-gradient(circle at 50% 0%, rgba(255,255,255,0.12), rgba(255,255,255,0) 45%),
       linear-gradient(to bottom, var(--underA), var(--underB));
@@ -163,7 +162,7 @@
     pointer-events:none;
   }
 
-  /* =============== SEAWEED (ANCHORED) =============== */
+  /* =============== SEAWEED =============== */
   .weed{
     position:absolute;
     bottom:-14px;
@@ -202,99 +201,98 @@
   .weed.right2{ right: 8.5vw; height:295px; opacity:0.80; animation-duration:4.2s; }
   .weed.right3{ right: 13.5vw; height:220px; opacity:0.70; animation-duration:3.7s; }
 
-  /* =============== LILY PAD (CLEANER SIDE VIEW) =============== */
+  /* =============== LILY PAD + FROG + LOTUS (SMALLER + OUT OF UI WAY) =============== */
   .padWrap{
     position:absolute;
-    top:12vh;
-    left:10vw;
-    width: 280px;
-    height: 140px;
+    top:8vh;             /* was 12vh */
+    left:5vw;            /* was 10vw */
+    width: 200px;        /* was 280 */
+    height: 100px;       /* was 140 */
     z-index: 14;
     pointer-events:none;
     animation: padDrift 6s ease-in-out infinite alternate;
+    opacity:0.95;
   }
   @keyframes padDrift{
     from { transform: translateY(0px); }
-    to   { transform: translateY(8px); }
+    to   { transform: translateY(6px); }
   }
 
   .padSide{
     position:absolute;
     left:0;
-    top:34px;
-    width: 270px;
-    height: 90px;
+    top:26px;            /* adjusted */
+    width: 195px;
+    height: 64px;
     border-radius: 999px;
     background:
       radial-gradient(circle at 30% 30%, rgba(255,255,255,0.16), rgba(255,255,255,0) 55%),
       linear-gradient(to bottom, #a6f09b, #49bf76);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.18);
+    box-shadow: 0 18px 32px rgba(0,0,0,0.16);
     transform: rotate(-6deg);
     overflow:hidden;
   }
-  /* top lip */
   .padSide::before{
     content:"";
     position:absolute;
-    left: 14px;
-    right: 16px;
-    top: 9px;
-    height: 18px;
+    left: 12px;
+    right: 12px;
+    top: 7px;
+    height: 14px;
     border-radius: 999px;
     background: rgba(255,255,255,0.12);
-    opacity:0.65;
+    opacity:0.6;
   }
-  /* subtle layered “edge” */
   .padSide::after{
     content:"";
     position:absolute;
-    left: 10px;
-    right: 10px;
-    bottom: 10px;
-    height: 18px;
+    left: 9px;
+    right: 9px;
+    bottom: 8px;
+    height: 14px;
     border-radius: 999px;
     background: rgba(0,0,0,0.08);
-    opacity:0.35;
+    opacity:0.32;
     filter: blur(0.2px);
   }
 
-  /* =============== LOTUS (KEEP STYLE, BIGGER) =============== */
+  /* lotus smaller */
   .lotus3d{
     position:absolute;
-    right: -2px;
-    top: -2px;
-    width: 140px;
-    height: 140px;
-    filter: drop-shadow(0 18px 20px rgba(0,0,0,0.18));
+    right: -6px;
+    top: -6px;
+    width: 92px;     /* was 140 */
+    height: 92px;
+    filter: drop-shadow(0 16px 18px rgba(0,0,0,0.16));
     animation: lotusBob 4.2s ease-in-out infinite alternate;
   }
   @keyframes lotusBob{
     from { transform: translateY(0) rotate(10deg); }
-    to   { transform: translateY(5px) rotate(12deg); }
+    to   { transform: translateY(4px) rotate(12deg); }
   }
 
-  /* =============== FROG (SMALLER) =============== */
+  /* frog slightly smaller */
   .frog{
     position:absolute;
-    left: 30px;
-    top: 24px;
-    width: 64px;
-    height: 44px;
+    left: 18px;
+    top: 18px;
+    width: 52px;   /* was 64 */
+    height: 36px;  /* was 44 */
     border-radius: 999px;
     background: linear-gradient(to bottom, #8ef07a, #4bd06b);
-    box-shadow: 0 18px 28px rgba(0,0,0,0.14);
+    box-shadow: 0 16px 24px rgba(0,0,0,0.12);
     transform: rotate(-3deg);
     animation: frogBob 2.3s ease-in-out infinite;
   }
   @keyframes frogBob{
     0%,100% { transform: translateY(0) rotate(-3deg); }
-    50%     { transform: translateY(-5px) rotate(-2deg); }
+    50%     { transform: translateY(-4px) rotate(-2deg); }
   }
   .frog .eye{
     position:absolute;
-    top:-10px;
-    width: 20px;
-    height: 20px;
+    top:-9px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
     background: linear-gradient(to bottom, #b1ff9e, #58db72);
     box-shadow: 0 10px 14px rgba(0,0,0,0.10);
@@ -302,36 +300,35 @@
   .frog .eye::after{
     content:"";
     position:absolute;
-    inset:6px;
+    inset:5px;
     border-radius:50%;
     background: #18241f;
     box-shadow: inset 0 0 0 2px rgba(255,255,255,0.35);
   }
-  .frog .eye.left{ left:10px; }
-  .frog .eye.right{ right:10px; }
+  .frog .eye.left{ left:8px; }
+  .frog .eye.right{ right:8px; }
 
   .frog .mouth{
     position:absolute;
-    left: 16px;
-    right: 16px;
-    bottom: 12px;
-    height: 10px;
+    left: 12px;
+    right: 12px;
+    bottom: 9px;
+    height: 9px;
     border-bottom: 3px solid rgba(0,0,0,0.18);
     border-radius: 0 0 999px 999px;
     opacity:0.75;
   }
 
-  /* =============== FISH (FIXED: swim wrapper + wiggle body) =============== */
+  /* =============== FISH =============== */
   .fishWrap{
     position:absolute;
     left:-180px;
     width: 54px;
     height: 30px;
-    z-index: 70;            /* ✅ visible above UI */
+    z-index: 70;
     pointer-events:none;
     will-change: transform;
   }
-
   .fishBody{
     position:absolute;
     inset:0;
@@ -339,7 +336,6 @@
     filter: drop-shadow(0 12px 14px rgba(0,0,0,0.18));
     will-change: transform;
   }
-
   .fishBody::before{
     content:"";
     position:absolute;
@@ -348,7 +344,6 @@
     background: rgba(255,255,255,0.16);
     opacity:0.65;
   }
-
   .fishBody::after{
     content:"";
     position:absolute;
@@ -361,7 +356,6 @@
     border-radius: 8px;
     opacity:0.98;
   }
-
   .fishBody .finTop{
     position:absolute;
     top:-12px;
@@ -456,85 +450,138 @@
     to   { transform: scale(0.6); opacity:0; }
   }
 
-  /* =============== UI (NO SCROLL, FIXED POSITION) =============== */
+  /* =============== INTRO OVERLAY (WELCOME FIRST) =============== */
+  .introOverlay{
+    position:fixed;
+    inset:0;
+    z-index:120;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background: radial-gradient(circle at 50% 40%, rgba(255,255,255,0.08), rgba(0,0,0,0.55));
+    backdrop-filter: blur(2px);
+    pointer-events:none;
+    opacity:1;
+    transition: opacity 900ms ease;
+  }
+  .introOverlay.hide{
+    opacity:0;
+  }
+  .introCard{
+    width:min(760px, 92vw);
+    border-radius: 22px;
+    padding: 18px 18px 16px;
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.18);
+    box-shadow: 0 18px 50px rgba(0,0,0,0.35);
+    color: rgba(255,255,255,0.95);
+    text-align:center;
+  }
+  .introTitle{
+    font-weight: 900;
+    font-size: 30px;
+    letter-spacing: 0.2px;
+    margin: 0 0 6px;
+    text-shadow: 0 10px 28px rgba(0,0,0,0.25);
+  }
+  .introText{
+    font-size: 13.5px;
+    line-height: 1.5;
+    opacity:0.92;
+    margin: 0;
+  }
+
+  /* =============== UI (APPEARS AFTER INTRO) =============== */
   .uiWrap{
     position:fixed;
     left:0; right:0;
-    top: 58vh;               /* sits mid-lower like your earlier intent */
+    top: 62vh;              /* moved a bit down */
     transform: translateY(-50%);
     z-index:50;
     padding: 0 14px 18px;
-    pointer-events:none;     /* only cards/buttons clickable */
+    pointer-events:none;
+    opacity:0;
+    transform-origin:center;
+    transition: opacity 650ms ease, transform 650ms ease;
+  }
+  .uiWrap.show{
+    opacity:1;
+    transform: translateY(-50%) scale(1);
+    pointer-events:none;
   }
 
   .headingBig{
     width: min(860px, 94vw);
-    margin: 0 auto 14px;
+    margin: 0 auto 12px;
     color: rgba(255,255,255,0.95);
-    font-weight: 800;
+    font-weight: 900;
     letter-spacing: 0.3px;
     text-shadow: 0 10px 30px rgba(0,0,0,0.25);
-    font-size: 34px;
+    font-size: 30px;   /* smaller */
     pointer-events:none;
   }
 
   .cards{
     display:flex;
-    gap:14px;
+    gap:12px;
     justify-content:center;
     align-items:stretch;
     flex-wrap:wrap;
-    pointer-events:auto; /* ✅ allow clicks */
+    pointer-events:auto;
   }
 
   .card{
-    width: min(520px, 94vw);
+    width: min(500px, 94vw);
     background: rgba(255,255,255,0.10);
     border: 1px solid rgba(255,255,255,0.18);
     box-shadow: var(--shadow);
     border-radius: 18px;
     backdrop-filter: blur(10px);
     color: rgba(255,255,255,0.92);
-    padding: 16px;
+    padding: 14px;
   }
-  .card.small{ width: min(420px, 94vw); }
+  .card.small{ width: min(400px, 94vw); }
 
   .panelTitle{
-    font-size: 18px;
-    font-weight: 800;
-    margin: 0 0 8px;
+    font-size: 16px; /* smaller */
+    font-weight: 900;
+    margin: 0 0 7px;
   }
   .panelText{
-    font-size: 13.5px;
-    line-height: 1.45;
+    font-size: 12.8px;
+    line-height: 1.42;
     opacity:0.92;
   }
 
   .btnRow{
     display:flex;
-    gap:10px;
+    gap:8px;
     justify-content:center;
     flex-wrap:wrap;
-    margin-top: 12px;
+    margin-top: 10px;
   }
+  /* ✅ smaller UI buttons */
   .btn{
     border:none;
     cursor:pointer;
-    padding: 11px 13px;
-    border-radius: 14px;
-    font-weight: 800;
+    padding: 9px 11px;
+    border-radius: 13px;
+    font-weight: 900;
     letter-spacing: 0.2px;
     color: rgba(255,255,255,0.95);
     background: rgba(255,255,255,0.16);
     border: 1px solid rgba(255,255,255,0.18);
+    font-size: 12.5px;
+    line-height:1;
   }
-  .btn.green{ background: rgba(49, 190, 120, 0.35); }
-  .btn.blue{ background: rgba(58, 152, 255, 0.30); }
+  .btn.green{ background: rgba(49, 190, 120, 0.33); }
+  .btn.blue{ background: rgba(58, 152, 255, 0.28); }
+  .btn:active{ transform: scale(0.98); }
 
   @media (max-width: 700px){
-    .headingBig{ font-size: 30px; }
-    .padWrap{ left: 3vw; top: 10vh; transform: scale(0.92); }
-    .uiWrap{ top: 60vh; }
+    .headingBig{ font-size: 26px; }
+    .uiWrap{ top: 64vh; }
+    .padWrap{ left: 3vw; top: 7vh; transform: scale(0.95); }
   }
 </style>
 </head>
@@ -547,6 +594,17 @@
   <div class="right">
     <button class="btnTiny secondary" type="button">Pond 1</button>
     <button class="btnTiny" type="button">Pond 2</button>
+  </div>
+</div>
+
+<!-- INTRO OVERLAY (WELCOME FIRST) -->
+<div class="introOverlay" id="intro">
+  <div class="introCard">
+    <div class="introTitle">Welcome.</div>
+    <p class="introText">
+      Welcome to <b>UniqueSeeker’s Algal Pond</b>.<br/>
+      See if your algae is already here — or help the journal grow.
+    </p>
   </div>
 </div>
 
@@ -620,34 +678,34 @@
     </svg>
   </div>
 
-  <!-- Fish (wrap swims, body wiggles) -->
-  <div class="fishWrap" id="fw1" style="top: calc(34vh + 10vh);">
+  <!-- Fish (updated top positions for new 30vh split) -->
+  <div class="fishWrap" id="fw1" style="top: calc(30vh + 10vh);">
     <div class="fishBody" id="fb1" style="background:#ff7b7b;">
       <div class="finTop"></div><div class="finSide"></div><div class="finBottom"></div><div class="eye"></div><div class="smile"></div>
     </div>
   </div>
 
-  <div class="fishWrap" id="fw2" style="top: calc(34vh + 18vh);">
+  <div class="fishWrap" id="fw2" style="top: calc(30vh + 18vh);">
     <div class="fishBody" id="fb2" style="background:#ffd16a;">
       <div class="finTop"></div><div class="finSide"></div><div class="finBottom"></div><div class="eye"></div><div class="smile"></div>
     </div>
   </div>
 
-  <div class="fishWrap" id="fw3" style="top: calc(34vh + 28vh);">
+  <div class="fishWrap" id="fw3" style="top: calc(30vh + 28vh);">
     <div class="fishBody" id="fb3" style="background:#70d6ff;">
       <div class="finTop"></div><div class="finSide"></div><div class="finBottom"></div><div class="eye"></div><div class="smile"></div>
     </div>
   </div>
 
-  <div class="fishWrap" id="fw4" style="top: calc(34vh + 38vh);">
+  <div class="fishWrap" id="fw4" style="top: calc(30vh + 38vh);">
     <div class="fishBody" id="fb4" style="background:#a8ff9c;">
       <div class="finTop"></div><div class="finSide"></div><div class="finBottom"></div><div class="eye"></div><div class="smile"></div>
     </div>
   </div>
 </div>
 
-<!-- UI (DESIGN-ONLY) -->
-<div class="uiWrap">
+<!-- UI (APPEARS AFTER INTRO) -->
+<div class="uiWrap" id="ui">
   <div class="headingBig">UniqueSeeker’s Habitat</div>
 
   <div class="cards">
@@ -675,11 +733,27 @@
 </div>
 
 <script>
-  /* =============== FISH ANIMATION (FIXED) ===============
-     Swim on wrapper (transform)
-     Wiggle on body (transform)
-     ✅ No more transform overriding
+  /* =============== INTRO SEQUENCE ===============
+     1) show welcome
+     2) fade it out
+     3) reveal UI/cards
   */
+  const intro = document.getElementById("intro");
+  const ui = document.getElementById("ui");
+
+  // show intro for a moment, then fade
+  setTimeout(() => {
+    intro.classList.add("hide");
+  }, 1900);
+
+  // after fade completes, show UI and remove intro from hit-testing
+  setTimeout(() => {
+    intro.style.display = "none";
+    ui.classList.add("show");
+    // allow clicks only on cards/buttons (already pointer-events:auto there)
+  }, 2900);
+
+  /* =============== FISH ANIMATION =============== */
   const fw1 = document.getElementById("fw1");
   const fw2 = document.getElementById("fw2");
   const fw3 = document.getElementById("fw3");

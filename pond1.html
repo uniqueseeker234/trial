@@ -128,6 +128,64 @@
     opacity:0.92;
     filter: saturate(1.05);
   }
+  /* ===== STRONG 3D SPLIT (adds curved glass arc) ===== */
+.splitArc{
+  position:absolute;
+  top: calc(26vh - 14px);
+  left:-8vw; right:-8vw;
+  height: 120px;
+  z-index:7;
+  pointer-events:none;
+  opacity:0.95;
+
+  /* The arc highlight + inner shadow gives “bowl / glass” feel */
+  background:
+    radial-gradient(ellipse at 50% 15%,
+      rgba(255,255,255,0.55) 0%,
+      rgba(255,255,255,0.22) 28%,
+      rgba(255,255,255,0.08) 45%,
+      rgba(255,255,255,0.00) 62%),
+    radial-gradient(ellipse at 50% 65%,
+      rgba(0,0,0,0.30) 0%,
+      rgba(0,0,0,0.14) 30%,
+      rgba(0,0,0,0.00) 62%);
+  filter: blur(0.2px);
+  transform: perspective(700px) rotateX(30deg);
+}
+
+/* thicker “depth shadow” under split */
+.waterLipShadow{
+  position:absolute;
+  top: calc(26vh + 8px);
+  left:-8vw; right:-8vw;
+  height:72px;
+  background:
+    radial-gradient(ellipse at 50% 0%,
+      rgba(0,0,0,0.40),
+      rgba(0,0,0,0.18) 40%,
+      rgba(0,0,0,0.00) 75%);
+  filter: blur(2px);
+  opacity:0.9;
+  z-index:6;
+  pointer-events:none;
+}
+
+/* refraction band stronger */
+.refractionBand{
+  position:absolute;
+  top: calc(26vh - 6px);
+  left:-6vw; right:-6vw;
+  height: 110px;
+  z-index:6;
+  pointer-events:none;
+  opacity:0.7;
+  background:
+    radial-gradient(circle at 35% 45%, rgba(255,255,255,0.22), rgba(255,255,255,0) 58%),
+    radial-gradient(circle at 70% 55%, rgba(255,255,255,0.18), rgba(255,255,255,0) 60%),
+    linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0));
+  filter: blur(1px);
+  animation: refract 6.5s ease-in-out infinite alternate;
+}
   /* top shimmer streaks */
   .waterline::after{
     content:"";
@@ -704,6 +762,9 @@
 <div id="pond-layer">
   <div class="surface"></div>
 
+  <div class="splitArc"></div>
+  <div class="refractionBand"></div
+  <div class="waterLipShadow"></div>
   <!-- NEW: refraction + lip shadow for depth -->
   <div class="refractionBand"></div>
   <div class="waterline"></div>

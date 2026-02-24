@@ -326,14 +326,14 @@
   top: 56%;
   z-index: 10;
   /* notch size tuned for 140×115 pad */
-  width: 92px;
-  height: 62px;
+  width: 104px;
+  height: 74px;
 
   /* water color inside the cut */
   background: linear-gradient(to bottom, var(--surfaceA), var(--surfaceB));
 
   /* V wedge: left point is the TIP, right side goes beyond edge to hide rim */
-  clip-path: polygon(0% 50%, 120% 14%, 120% 86%);
+  clip-path: polygon(0% 50%, 150% 10%, 150% 90%);
 
   /* round the V slightly (natural lily notch) */
   border-radius: 18px;
@@ -344,7 +344,7 @@
     inset -3px 0 0 rgba(255,255,255,0.10);
 
   /* IMPORTANT: do NOT shift X, because left edge = tip */
-  transform: translate(0, -50%);
+  transform: translate(-10px, -50%);
 
   opacity: 1;
 }

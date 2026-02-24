@@ -276,34 +276,6 @@
     to   { transform: translateY(7px) rotate(0.2deg); }
   }
 
-  /* Rounded lily pad with slight perspective + better “on water” contact */
- /* ===== FINAL ROUND LILY PAD SHAPE ===== */
-/* ===== LILY PAD SHAPE (flat disk + rim + notch) ===== */
-.padSide{
-  position:absolute;
-  left:0;
-  top:34px;
-
-  width: 138px;
-  height: 112px;               /* slightly oval like real pads, but not pill */
-  border-radius: 999px;
-
-  background:
-    radial-gradient(circle at 30% 25%, rgba(255,255,255,0.16), rgba(255,255,255,0) 55%),
-    radial-gradient(circle at 60% 75%, rgba(0,0,0,0.10), rgba(0,0,0,0) 58%),
-    linear-gradient(to bottom, #b7ff9f, #4bc777);
-
-  /* makes it feel FLAT, not balloon */
-  box-shadow:
-    0 14px 22px rgba(0,0,0,0.14),
-    inset 0 10px 0 rgba(255,255,255,0.06),
-    inset 0 -10px 0 rgba(0,0,0,0.12);
-
-  transform: rotate(-12deg) perspective(700px) rotateX(14deg);
-  overflow:hidden;
-}
-
-/* NOTCH (key lily pad feature) */
 /* ===== FINAL LILY PAD WITH REAL V CUT ===== */
 .padSide{
   position:absolute;
@@ -326,23 +298,16 @@
 
   transform: rotate(-12deg) perspective(700px) rotateX(14deg);
 
-clip-path: polygon(
-  0% 0%,
-  100% 0%,
-  100% 100%,
-  0% 100%,
+/* ✅ SAFE curved notch (keeps your 3D shading) */
+  -webkit-mask:
+    radial-gradient(circle 38px at 102px 28px, transparent 98%, black 100%),
+    linear-gradient(black, black);
+  -webkit-mask-composite: destination-out;
 
-  /* go up left side */
-  0% 58%,
-
-  /* small notch (mouth) */
-  54% 58%,
-  66% 48%,   /* V tip (not too deep) */
-  54% 38%,
-
-  /* continue up */
-  0% 38%
-);
+  mask:
+    radial-gradient(circle 38px at 102px 28px, transparent 98%, black 100%),
+    linear-gradient(black, black);
+  mask-composite: exclude;
 }
   /* Frog */
   .frog{

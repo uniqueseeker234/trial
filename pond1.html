@@ -216,23 +216,51 @@
     from { transform: translateY(0px); }
     to   { transform: translateY(6px); }
   }
+/* SIDE-VIEW LILY PAD (oval + thickness) */
 .padSide{
   position:absolute;
   left:0;
-  top:0;
-  width:115px;
-  height:115px;
-  border-radius:50%;
+  top:22px;                 /* adjust if needed */
+  width: 170px;             /* wider than height = perspective */
+  height: 70px;
+  border-radius: 999px;
   background:
-    radial-gradient(circle at 35% 35%, rgba(255,255,255,0.18), rgba(255,255,255,0) 55%),
-    linear-gradient(145deg, #9ff58a, #3ebf6c);
-  box-shadow: 0 14px 28px rgba(0,0,0,0.18);
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.18), rgba(255,255,255,0) 55%),
+    linear-gradient(to bottom, #a6f39a, #47bf73);
+  box-shadow: 0 18px 28px rgba(0,0,0,0.18);
+  transform: rotate(-6deg);
+  overflow: visible;
+}
 
-  -webkit-mask:
-    radial-gradient(circle at center, black 98%, transparent 100%),
-    conic-gradient(from 45deg at center, transparent 0deg 35deg, black 35deg 360deg);
-  -webkit-mask-composite: destination-in;
-  mask-composite: intersect;
+/* underside thickness (gives side view) */
+.padSide::before{
+  content:"";
+  position:absolute;
+  left:6px;
+  right:6px;
+  top:22px;                 /* where thickness starts */
+  height: 24px;             /* thickness amount */
+  border-radius: 999px;
+  background: linear-gradient(to bottom, rgba(20,90,60,0.30), rgba(0,0,0,0));
+  filter: blur(0.2px);
+  opacity:0.85;
+  transform: translateY(26px);
+  z-index:-1;
+}
+
+/* wedge cut (still works in side view) */
+.padSide::after{
+  content:"";
+  position:absolute;
+  left: 36px;               /* move cut near left like cartoon */
+  top: 50%;
+  width: 65px;
+  height: 65px;
+  transform: translateY(-50%) rotate(18deg);
+  background: rgba(0,0,0,0.12);   /* looks like a bite */
+  clip-path: polygon(50% 55%, 0 0, 100% 0);
+  border-radius: 16px;
+  opacity:0.22;
 }
 
   /* Frog (Pad A only) */

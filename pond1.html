@@ -309,33 +309,34 @@
 /* lily pad notch hole (transparent) */
 /* ✅ Natural lily-pad notch (rounded V, still safe) */
 /* ✅ Deeper + lower V cut, tip aimed toward pad center */
+/* ✅ Slim real lily-pad V notch (like your red mark) */
 .padSide::after{
   content:"";
   position:absolute;
 
-  /* pull it further to the rim so base green strip disappears */
-  right: -2px;
+  /* keep it on the right edge */
+  right: -6px;
+  top: 18px;
 
-  /* move it down */
-  top: 22px;
+  /* wide enough to reach inward, but slim opening */
+  width: 105px;
+  height: 105px;
 
-  /* bigger so the tip reaches the center */
-  width: 96px;
-  height: 96px;
-
-  /* water color */
   background: linear-gradient(to bottom, var(--surfaceA), var(--surfaceB));
 
-  /* V wedge: tip on LEFT, opening to the RIGHT */
-  clip-path: polygon(0% 50%, 100% 0%, 100% 100%);
+  /* SLIM V: tip at left, thin opening at right */
+  clip-path: polygon(
+    0% 50%,     /* tip (toward center) */
+    100% 38%,   /* upper edge (small opening) */
+    88% 50%,    /* inner rim point to keep it narrow */
+    100% 62%    /* lower edge */
+  );
 
-  /* soften edges a bit */
-  border-radius: 18px;
+  border-radius: 22px;
 
-  /* cut rim depth */
+  /* very soft rim so it doesn't look like a hard cut ridge */
   box-shadow:
-    inset 14px 0 18px rgba(0,0,0,0.20),
-    inset -3px 0 0 rgba(255,255,255,0.08);
+    inset 10px 0 12px rgba(0,0,0,0.12);
 
   opacity: 1;
 }

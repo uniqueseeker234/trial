@@ -307,41 +307,33 @@
 
 /* ✅ Natural lily-pad notch (rounded V, still safe) */
 /* lily pad notch hole (transparent) */
-/* lily pad notch hole (transparent) */
+/* ✅ Natural lily-pad notch (rounded V, still safe) */
 .padSide::after{
   content:"";
   position:absolute;
+
   right: 16px;
-  top: 10px;
-  width: 62px;
-  height: 62px;
+  top: 8px;
 
-  /* the hole itself */
-  background: transparent;
+  width: 60px;
+  height: 60px;
 
-  /* V wedge */
-  clip-path: polygon(0% 50%, 100% 10%, 100% 90%);
-}
+  /* water color */
+  background: linear-gradient(to bottom, var(--surfaceA), var(--surfaceB));
 
-/* shadow rim for realistic cut edge */
-.padSide::before{
-  content:"";
-  position:absolute;
-  right: 16px;
-  top: 10px;
-  width: 62px;
-  height: 62px;
-
+  /* Start as a V wedge */
   clip-path: polygon(0% 50%, 100% 10%, 100% 90%);
 
-  /* soft edge shadow */
-  box-shadow: inset 10px 0 14px rgba(0,0,0,0.22);
+  /* ROUND the V edges (this is the key) */
+  border-radius: 22px;
 
-  /* important: only show shadow, not a filled shape */
-  background: transparent;
-  pointer-events:none;
+  /* Rim shadow so it looks like a cut edge */
+  box-shadow:
+    inset 12px 0 16px rgba(0,0,0,0.18),
+    inset -2px 0 0 rgba(255,255,255,0.10);
+
+  opacity: 1;
 }
-
   /* Frog */
   .frog{
     position:absolute;

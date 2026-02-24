@@ -310,34 +310,30 @@
 /* ✅ Natural lily-pad notch (rounded V, still safe) */
 /* ✅ Deeper + lower V cut, tip aimed toward pad center */
 /* ✅ Slim real lily-pad V notch (like your red mark) */
+/* ✅ Slim real lily-pad V notch (short + natural) */
 .padSide::after{
   content:"";
   position:absolute;
 
-  /* keep it on the right edge */
-  right: -6px;
-  top: 18px;
+  right: -2px;     /* keep on rim */
+  top: 34px;       /* move DOWN (your request) */
 
-  /* wide enough to reach inward, but slim opening */
-  width: 105px;
-  height: 105px;
+  width: 78px;     /* smaller so it's not a long line */
+  height: 78px;
 
   background: linear-gradient(to bottom, var(--surfaceA), var(--surfaceB));
 
-  /* SLIM V: tip at left, thin opening at right */
+  /* tighter V, tip points inward */
   clip-path: polygon(
-    0% 50%,     /* tip (toward center) */
-    100% 38%,   /* upper edge (small opening) */
-    88% 50%,    /* inner rim point to keep it narrow */
-    100% 62%    /* lower edge */
+    6% 50%,      /* tip (towards center) */
+    100% 44%,    /* upper edge */
+    86% 50%,     /* tighten near rim */
+    100% 56%     /* lower edge */
   );
 
-  border-radius: 22px;
+  border-radius: 18px;
 
-  /* very soft rim so it doesn't look like a hard cut ridge */
-  box-shadow:
-    inset 10px 0 12px rgba(0,0,0,0.12);
-
+  box-shadow: inset 8px 0 10px rgba(0,0,0,0.10);
   opacity: 1;
 }
   /* Frog */

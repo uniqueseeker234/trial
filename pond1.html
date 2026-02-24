@@ -308,29 +308,34 @@
 /* ✅ Natural lily-pad notch (rounded V, still safe) */
 /* lily pad notch hole (transparent) */
 /* ✅ Natural lily-pad notch (rounded V, still safe) */
+/* ✅ Deeper + lower V cut, tip aimed toward pad center */
 .padSide::after{
   content:"";
   position:absolute;
 
-  right: 16px;
-  top: 8px;
+  /* pull it further to the rim so base green strip disappears */
+  right: -2px;
 
-  width: 60px;
-  height: 60px;
+  /* move it down */
+  top: 22px;
+
+  /* bigger so the tip reaches the center */
+  width: 96px;
+  height: 96px;
 
   /* water color */
   background: linear-gradient(to bottom, var(--surfaceA), var(--surfaceB));
 
-  /* Start as a V wedge */
-  clip-path: polygon(0% 50%, 100% 10%, 100% 90%);
+  /* V wedge: tip on LEFT, opening to the RIGHT */
+  clip-path: polygon(0% 50%, 100% 0%, 100% 100%);
 
-  /* ROUND the V edges (this is the key) */
-  border-radius: 22px;
+  /* soften edges a bit */
+  border-radius: 18px;
 
-  /* Rim shadow so it looks like a cut edge */
+  /* cut rim depth */
   box-shadow:
-    inset 12px 0 16px rgba(0,0,0,0.18),
-    inset -2px 0 0 rgba(255,255,255,0.10);
+    inset 14px 0 18px rgba(0,0,0,0.20),
+    inset -3px 0 0 rgba(255,255,255,0.08);
 
   opacity: 1;
 }

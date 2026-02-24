@@ -297,19 +297,26 @@
     inset 0 -10px 0 rgba(0,0,0,0.12);
 
   transform: rotate(-12deg) perspective(700px) rotateX(14deg);
+}
+  /* Curved lily pad notch (safe method) */
+.padSide::after{
+  content:"";
+  position:absolute;
 
+  right: 10px;
+  top: 8px;
+
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+
+  background: linear-gradient(to bottom, var(--surfaceA), var(--surfaceB));
+
+  box-shadow: inset 10px 0 14px rgba(0,0,0,0.14);
+}
 /* ✅ SAFE curved notch (keeps your 3D shading) */
   /* ✅ curved notch (safe size + safe position) */
--webkit-mask:
-  radial-gradient(circle 26px at 78% 22%, transparent 98%, black 100%),
-  linear-gradient(black, black);
--webkit-mask-composite: destination-out;
 
-mask:
-  radial-gradient(circle 26px at 78% 22%, transparent 98%, black 100%),
-  linear-gradient(black, black);
-mask-composite: exclude;
-}
   /* Frog */
   .frog{
     position:absolute;

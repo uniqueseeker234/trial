@@ -304,27 +304,40 @@
 }
 
 /* NOTCH (key lily pad feature) */
-.padSide::after{
-  content:"";
+/* ===== FINAL LILY PAD WITH REAL V CUT ===== */
+.padSide{
   position:absolute;
+  left:0;
+  top:34px;
 
-  /* place notch on upper-right */
-  right: 10px;
-  top: 6px;
+  width: 140px;
+  height: 115px;
 
-  width: 62px;
-  height: 62px;
   border-radius: 50%;
 
-  /* this makes it look like a cut + shadow */
   background:
-    radial-gradient(circle at 35% 35%,
-      rgba(0,0,0,0.26),
-      rgba(0,0,0,0.14) 55%,
-      rgba(0,0,0,0.00) 72%);
+    radial-gradient(circle at 30% 25%, rgba(255,255,255,0.18), rgba(255,255,255,0) 55%),
+    radial-gradient(circle at 60% 75%, rgba(0,0,0,0.10), rgba(0,0,0,0) 60%),
+    linear-gradient(to bottom, #b7ff9f, #4bc777);
 
-  transform: rotate(18deg);
-  opacity: 1;
+  box-shadow:
+    0 14px 22px rgba(0,0,0,0.14),
+    inset 0 -10px 0 rgba(0,0,0,0.12);
+
+  transform: rotate(-12deg) perspective(700px) rotateX(14deg);
+
+  /* THIS creates the V notch */
+  clip-path: polygon(
+    0% 0%,
+    100% 0%,
+    100% 100%,
+    0% 100%,
+    0% 60%,
+    65% 60%,
+    55% 40%,
+    65% 20%,
+    0% 20%
+  );
 }
   /* Frog */
   .frog{

@@ -305,25 +305,30 @@
   overflow: hidden;       /* keeps notch clean */
 }
 
+/* ✅ Natural lily-pad notch (rounded V, still safe) */
 .padSide::after{
   content:"";
   position:absolute;
 
-  /* position of the V cut */
   right: 16px;
-  top: 6px;
+  top: 8px;
 
-  width: 58px;
-  height: 58px;
+  width: 60px;
+  height: 60px;
 
-  /* water color so it looks like a cut */
+  /* water color */
   background: linear-gradient(to bottom, var(--surfaceA), var(--surfaceB));
 
-  /* V wedge shape */
-  clip-path: polygon(0% 50%, 100% 0%, 100% 100%);
+  /* Start as a V wedge */
+  clip-path: polygon(0% 50%, 100% 10%, 100% 90%);
 
-  /* soft shadow on the cut edge */
-  box-shadow: inset 10px 0 14px rgba(0,0,0,0.14);
+  /* ROUND the V edges (this is the key) */
+  border-radius: 22px;
+
+  /* Rim shadow so it looks like a cut edge */
+  box-shadow:
+    inset 12px 0 16px rgba(0,0,0,0.18),
+    inset -2px 0 0 rgba(255,255,255,0.10);
 
   opacity: 1;
 }

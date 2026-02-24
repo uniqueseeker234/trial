@@ -297,9 +297,9 @@
   box-shadow:
     0 14px 22px rgba(0,0,0,0.14),
     inset 0 10px 0 rgba(255,255,255,0.06),
-    inset 0 -14px 0 rgba(0,0,0,0.14);
+    inset 0 -10px 0 rgba(0,0,0,0.12);
 
-  transform: rotate(-12deg) perspective(700px) rotateX(18deg);
+  transform: rotate(-12deg) perspective(700px) rotateX(14deg);
   overflow:hidden;
 }
 
@@ -307,14 +307,24 @@
 .padSide::after{
   content:"";
   position:absolute;
-  right: 18px;
-  top: 10px;
-  width: 52px;
-  height: 52px;
+
+  /* place notch on upper-right */
+  right: 10px;
+  top: 6px;
+
+  width: 62px;
+  height: 62px;
   border-radius: 50%;
-  background: rgba(0,0,0,0.18);
+
+  /* this makes it look like a cut + shadow */
+  background:
+    radial-gradient(circle at 35% 35%,
+      rgba(0,0,0,0.26),
+      rgba(0,0,0,0.14) 55%,
+      rgba(0,0,0,0.00) 72%);
+
   transform: rotate(18deg);
-  opacity:0.92;
+  opacity: 1;
 }
   /* Frog */
   .frog{

@@ -306,33 +306,40 @@
 }
 
 /* ✅ Natural lily-pad notch (rounded V, still safe) */
+/* lily pad notch hole (transparent) */
 .padSide::after{
   content:"";
   position:absolute;
-
   right: 16px;
-  top: 8px;
+  top: 10px;
+  width: 62px;
+  height: 62px;
 
-  width: 60px;
-  height: 60px;
+  /* the hole itself */
+  background: transparent;
 
-  /* water color */
-  background: linear-gradient(to bottom, var(--surfaceA), var(--surfaceB));
-
-  /* Start as a V wedge */
+  /* V wedge */
   clip-path: polygon(0% 50%, 100% 10%, 100% 90%);
-
-  /* ROUND the V edges (this is the key) */
-  border-radius: 22px;
-
-  /* Rim shadow so it looks like a cut edge */
-  box-shadow:
-    inset 12px 0 16px rgba(0,0,0,0.18),
-    inset -2px 0 0 rgba(255,255,255,0.10);
-
-  opacity: 1;
 }
 
+/* shadow rim for realistic cut edge */
+.padSide::before{
+  content:"";
+  position:absolute;
+  right: 16px;
+  top: 10px;
+  width: 62px;
+  height: 62px;
+
+  clip-path: polygon(0% 50%, 100% 10%, 100% 90%);
+
+  /* soft edge shadow */
+  box-shadow: inset 10px 0 14px rgba(0,0,0,0.22);
+
+  /* important: only show shadow, not a filled shape */
+  background: transparent;
+  pointer-events:none;
+}
 
 /* ✅ SAFE curved notch (keeps your 3D shading) */
   /* ✅ curved notch (safe size + safe position) */

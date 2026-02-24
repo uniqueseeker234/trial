@@ -91,6 +91,10 @@
 
   /* =============== POND (FIXED BACKGROUND) =============== */
   #pond-layer{
+    #pond-layer{
+  transform: translateZ(0);
+  will-change: transform;
+}
     position:fixed;
     inset:0;
     z-index:0;
@@ -181,7 +185,10 @@
     transform-origin: bottom center;
     animation: weedSway 3.4s ease-in-out infinite alternate;
     opacity:0.94;
-    filter: drop-shadow(0 10px 10px rgba(0,0,0,0.15));
+    box-shadow: 0 10px 10px rgba(0,0,0,0.15);
+will-change: transform;
+transform: translateZ(0);
+backface-visibility: hidden;
   }
   .weed::before, .weed::after{
     content:"";

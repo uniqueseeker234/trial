@@ -12,6 +12,9 @@
     /* Water tones (keep your teal-green vibe) */
     --surfaceA:#69d6b7;
     --surfaceB:#32b99a;
+
+    --vh: 1vh; /* mobile viewport fix */
+    
     --underA:#2aa98d;
     --underB:#167d73;
 
@@ -97,7 +100,7 @@
   .surface{
     position:absolute;
     top:0; left:0; right:0;
-    height:34vh;
+    height: calc(var(--vh) * 34);
     background: linear-gradient(to bottom, var(--surfaceA), var(--surfaceB));
   }
 
@@ -120,7 +123,7 @@
 
   .waterline{
     position:absolute;
-    top:34vh; left:0; right:0;
+    top: calc(var(--vh) * 34);
     height:44px;
     background:
       linear-gradient(to bottom,
@@ -149,7 +152,7 @@
 
   .underwater{
     position:absolute;
-    top:34vh; left:0; right:0; bottom:0;
+    top: calc(var(--vh) * 34);
     background:
       radial-gradient(circle at 50% 0%, rgba(255,255,255,0.12), rgba(255,255,255,0) 45%),
       linear-gradient(to bottom, var(--underA), var(--underB));
@@ -755,6 +758,20 @@
       if(Math.random() < 0.55) spawnTrailNearFish(fish);
     });
   }, 240);
+
+  /* ===== LOCK MOBILE VH (FIX STRETCH ON SCROLL) ===== */
+(function lockVH(){
+  function setVH(){
+    document.documentElement.style.setProperty(
+      '--vh',
+      (window.innerHeight * 0.01) + 'px'
+    );
+  }
+  setVH();
+  window.addEventListener('resize', setVH);
+  window.addEventListener('orientationchange', setVH);
+})();
+  
 </script>
 
 </body>

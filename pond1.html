@@ -326,28 +326,22 @@
 
   transform: rotate(-12deg) perspective(700px) rotateX(14deg);
 
-  clip-path: polygon(
+clip-path: polygon(
   0% 0%,
   100% 0%,
   100% 100%,
   0% 100%,
 
-  /* left side back up */
-  0% 62%,
+  /* go up left side */
+  0% 58%,
 
-  /* V mouth (two corners) */
-  62% 62%,
-  62% 50%,
+  /* small notch (mouth) */
+  54% 58%,
+  66% 48%,   /* V tip (not too deep) */
+  54% 38%,
 
-  /* V point (deep point) */
-  78% 38%,
-
-  /* back to mouth on top */
-  62% 26%,
-  62% 14%,
-
-  /* back to left edge */
-  0% 14%
+  /* continue up */
+  0% 38%
 );
 }
   /* Frog */

@@ -341,52 +341,94 @@
   opacity: 1;
 }
   /* Frog */
-  .frog{
-    position:absolute;
-    left: 18px;
-    top: 22px;
-    width: 46px;
-    height: 32px;
-    border-radius: 999px;
-    background: linear-gradient(to bottom, #8ef07a, #4bd06b);
-    box-shadow: 0 16px 24px rgba(0,0,0,0.10);
-    transform: rotate(-3deg);
-    animation: frogBob 2.3s ease-in-out infinite;
-  }
-  @keyframes frogBob{
-    0%,100% { transform: translateY(0) rotate(-3deg); }
-    50%     { transform: translateY(-3px) rotate(-2deg); }
-  }
-  .frog .eye{
-    position:absolute;
-    top:-9px;
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    background: linear-gradient(to bottom, #b1ff9e, #58db72);
-    box-shadow: 0 10px 14px rgba(0,0,0,0.10);
-  }
-  .frog .eye::after{
-    content:"";
-    position:absolute;
-    inset:5px;
-    border-radius:50%;
-    background: #18241f;
-    box-shadow: inset 0 0 0 2px rgba(255,255,255,0.35);
-  }
-  .frog .eye.left{ left:7px; }
-  .frog .eye.right{ right:7px; }
-  .frog .mouth{
-    position:absolute;
-    left: 11px;
-    right: 11px;
-    bottom: 8px;
-    height: 9px;
-    border-bottom: 3px solid rgba(0,0,0,0.18);
-    border-radius: 0 0 999px 999px;
-    opacity:0.75;
-  }
+/* ===== FROG (more real seated look) ===== */
+.frog{
+  position:absolute;
+  left: 12px;
+  top: 18px;
 
+  width: 66px;
+  height: 42px;
+
+  border-radius: 44px 44px 36px 36px;
+
+  background:
+    radial-gradient(circle at 50% 70%, rgba(255,255,255,0.18), rgba(255,255,255,0) 60%),
+    linear-gradient(to bottom, #8ef07a, #39c965);
+
+  box-shadow:
+    inset 0 -7px 0 rgba(0,0,0,0.14),
+    0 14px 20px rgba(0,0,0,0.14);
+
+  transform: rotate(-3deg);
+  animation: frogBreath 3.4s ease-in-out infinite;
+}
+
+@keyframes frogBreath{
+  0%,100% { transform: rotate(-3deg) translateY(0) scale(1); }
+  50%     { transform: rotate(-3deg) translateY(-2px) scale(1.03); }
+}
+
+/* thighs (gives “sitting” posture) */
+.frog .thigh{
+  position:absolute;
+  bottom:1px;
+  width: 26px;
+  height: 18px;
+  border-radius: 999px;
+  background: linear-gradient(to bottom, #7eea6e, #2fb85b);
+  box-shadow: inset 0 -4px 0 rgba(0,0,0,0.10);
+  z-index:1;
+  opacity:0.98;
+}
+.frog .thigh.left{ left:-7px; transform: rotate(-16deg); }
+.frog .thigh.right{ right:-7px; transform: rotate(16deg); }
+
+/* belly patch */
+.frog .belly{
+  position:absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 7px;
+  height: 16px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.15);
+}
+
+/* eyes (bigger + attached) */
+.frog .eye{
+  position:absolute;
+  top:-7px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(to bottom, #b9ffab, #58db72);
+  box-shadow: 0 10px 14px rgba(0,0,0,0.10);
+}
+
+.frog .eye::after{
+  content:"";
+  position:absolute;
+  inset:6px;
+  border-radius:50%;
+  background:#18241f;
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,0.35);
+}
+
+.frog .eye.left{ left:4px; }
+.frog .eye.right{ right:4px; }
+
+/* mouth */
+.frog .mouth{
+  position:absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 10px;
+  height: 10px;
+  border-bottom: 3px solid rgba(0,0,0,0.16);
+  border-radius: 0 0 999px 999px;
+  opacity:0.75;
+}
   /* Lotus (attached to pad) */
   .lotusAnchor{
     position:absolute;
@@ -734,6 +776,9 @@
   <div class="padWrapA">
     <div class="padSide"></div>
     <div class="frog">
+      <div class="thigh left"></div>
+       <div class="thigh right"></div>
+      <div class="belly"></div>
       <div class="eye left"></div>
       <div class="eye right"></div>
       <div class="mouth"></div>

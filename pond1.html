@@ -805,13 +805,16 @@
 
 /* Mobile: put frog very near pad A (right side) */
 @media (max-width: 520px){
+  /* anchor frog near Pad A */
+  #padA{ position: relative; }
+
   .frogNearPadA{
-    left: 78%;
-    top: 122px;
+    left: calc(50% + 110px); /* move to right of padA */
+    top: 70px;               /* move down a bit */
     transform: translateX(-50%);
     z-index: 14;
-    
   }
+}
 </style>
 </head>
 
@@ -854,7 +857,7 @@
   <div class="weed right3"></div>
 
   <!-- PAD A (frog only) -->
-  <div class="padWrapA">
+  <div class="padWrapA"id="padA">
     <div class="padSide"></div>
   </div>
   

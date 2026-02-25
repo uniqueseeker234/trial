@@ -649,12 +649,12 @@
 @media (max-width: 700px){
   .padWrapA{
     left: 6vw;
-    top: 6.5vh;
+    top: 6.6vh;
     --padScale: 0.96;
   }
   .padWrapB{
     left: 56vw;
-    top: 6.8vh;
+    top: 6.6vh;
     --padScale: 0.96;
   }
   .uiWrap{ top: 40vh; }
@@ -683,7 +683,7 @@
   width: 84px;
   height: 64px;
 
-  z-index: 15;
+  z-index: 13;
   pointer-events:none;
 }
 
@@ -730,7 +730,8 @@
 
 /* Eyes (white + outline, like cartoon) */
 .frogPeek .frogEye{
-  position:absolute;
+  z-index: 3;
+  position:relative;
   top: -12px;
 
   width: 30px;

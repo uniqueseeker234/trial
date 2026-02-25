@@ -776,6 +776,24 @@
     .padWrapB{ left:56vw; top:6.8vh; transform: scale(0.96); }
     .uiWrap{ top: 40vh; }
   }
+
+  /* --- FIX: bring eyes above head shading --- */
+.frogHead{ 
+  position: relative; 
+  overflow: visible !important; 
+}
+
+.frogEye{ 
+  z-index: 50; 
+}
+
+.frogMouth{ 
+  z-index: 40; 
+}
+
+.frogHands{ 
+  z-index: 30; 
+}
 </style>
 </head>
 
@@ -822,8 +840,8 @@
     <div class="padSide"></div>
     <div class="frog">
   <div class="frogHead">
-    <div class="frogEye left"><span class="pupil"></span></div>
-    <div class="frogEye right"><span class="pupil"></span></div>
+    <div class="frogEye left"></div>
+    <div class="frogEye right"></div>
 
     <div class="frogMouth"></div>
     <div class="frogHands">

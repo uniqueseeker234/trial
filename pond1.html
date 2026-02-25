@@ -346,121 +346,119 @@
 /* ===== FROG (clean anime) ===== */
 .frog{
   position:absolute;
-  left: 34px;          /* keep your position */
-  top: 8px;           /* adjust if needed */
-  z-index: 12;
-  transform: translateZ(0);
+  left: 72px;     /* adjust if needed */
+  top: 10px;      /* adjust if needed */
+  transform: scale(0.62);  /* MAIN size control */
+  transform-origin: top left;
+  z-index: 8;
+  pointer-events:none;
+}
+/* =========================
+   FROG – Clean Pond Version
+   ========================= */
+
+.frog{
+  position:absolute;
+  left: 72px;          /* adjust if needed */
+  top: 12px;           /* adjust if needed */
+  transform: scale(0.60);
+  transform-origin: top left;
+  z-index: 10;
   pointer-events:none;
 }
 
+/* HEAD */
 .frogHead{
-  position:relative;
-  width: 190px;
-  height: 130px;
-  border-radius: 80px;
-  background: radial-gradient(circle at 35% 25%, #7dff9c, #34cf6b 55%, #1aa85a 100%);
+  position: relative;
+  width: 140px;
+  height: 105px;
+  border-radius: 70px 70px 55px 55px;
+  background: radial-gradient(circle at 35% 30%, #6cff7a 0%, #33c553 60%, #1b8f3a 100%);
   box-shadow:
-    0 14px 22px rgba(0,0,0,0.20),
-    inset 0 10px 18px rgba(255,255,255,0.20),
-    inset 0 -18px 22px rgba(0,0,0,0.18);
+    0 16px 28px rgba(0,0,0,0.18),
+    inset 0 12px 18px rgba(255,255,255,0.18),
+    inset 0 -18px 20px rgba(0,0,0,0.15);
 }
 
-/* softer cheeks so it feels less “plastic” */
-.frogHead::after{
-  content:"";
-  position:absolute;
-  left: 18px; right: 18px;
-  bottom: 18px;
-  height: 60px;
-  border-radius: 50px;
-  background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.14), rgba(255,255,255,0));
-  opacity: .9;
-}
-
-/* eyes */
+/* EYES */
 .frogEye{
   position:absolute;
-  top: -18px;
-  width: 70px;
-  height: 70px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #8bffab, #2ccc67 60%, #19a95a 100%);
+  top: -12px;
+  background: radial-gradient(circle at 35% 35%, #7dff8d 0%, #2fb94a 65%, #1a7f33 100%);
   box-shadow:
-    0 10px 16px rgba(0,0,0,0.18),
-    inset 0 10px 12px rgba(255,255,255,0.18);
+    0 8px 14px rgba(0,0,0,0.18),
+    inset 0 -8px 12px rgba(0,0,0,0.15);
 }
-.frogEye.left{ left: 22px; }
-.frogEye.right{ right: 22px; }
 
-/* pupil looks more natural */
+.frogEye.left{ left: 26px; }
+.frogEye.right{ right: 26px; }
+
+/* PUPIL */
 .frogEye .pupil{
   position:absolute;
-  left: 28px;
-  top: 26px;
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #2b2b2b, #090909);
-  box-shadow: 0 0 0 6px rgba(255,255,255,0.06) inset;
+  top: 16px;
+  left: 16px;
+  background: #0e1a14;
 }
 
-/* mouth (was missing visually) */
+/* tiny highlight */
+.frogEye::after{
+  content:"";
+  position:absolute;
+  width: 8px;
+  height: 8px;
+  border-radius:50%;
+  top: 8px;
+  left: 10px;
+  background: rgba(255,255,255,0.55);
+}
+
+/* MOUTH */
 .frogMouth{
   position:absolute;
-  left: 38px;
-  right: 38px;
-  top: 64px;
-  height: 30px;
-  border-radius: 0 0 40px 40px;
-  border-bottom: 6px solid rgba(0,0,0,0.18);
-  opacity: .9;
-}
-.frogMouth::after{
-  content:"";
-  position:absolute;
-  left: 18px;
-  right: 18px;
-  top: 10px;
-  height: 10px;
-  border-radius: 20px;
-  background: rgba(255,255,255,0.08);
+  left: 50%;
+  top: 60px;
+  width: 86px;
+  height: 42px;
+  transform: translateX(-50%);
+  border-bottom: 5px solid rgba(0,0,0,0.20);
+  border-radius: 0 0 60px 60px;
+  opacity: 0.9;
 }
 
-/* hands — move DOWN so they sit on pad, not on face */
+/* HANDS CONTAINER */
 .frogHands{
   position:absolute;
-  left: 26px;
-  right: 26px;
-  bottom: -18px;
-  height: 42px;
-  z-index: 3;
+  left: 50%;
+  top: 72px;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 40px;
+  display:flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
+/* HANDS */
 .frogHands .hand{
-  position:absolute;
-  width: 78px;
-  height: 44px;
-  border-radius: 30px;
-  background: radial-gradient(circle at 30% 25%, #72ff97, #2ccc67 65%, #1aa85a);
+  width: 50px;
+  height: 20px;
+  border-radius: 999px;
+  background: linear-gradient(to bottom, #4ff06a, #26a942);
   box-shadow:
-    0 10px 14px rgba(0,0,0,0.18),
-    inset 0 8px 10px rgba(255,255,255,0.14);
-  opacity: .98;
+    inset 0 -6px 10px rgba(0,0,0,0.15),
+    0 4px 8px rgba(0,0,0,0.12);
+  transform: rotate(-8deg);
 }
-.frogHands .hand.left{ left: 0; transform: rotate(-8deg); }
-.frogHands .hand.right{ right: 0; transform: rotate(8deg); }
 
-/* tiny finger bumps */
-.frogHands .hand::after{
-  content:"";
-  position:absolute;
-  left: 10px;
-  right: 10px;
-  bottom: 6px;
-  height: 10px;
-  border-radius: 20px;
-  background: rgba(0,0,0,0.06);
-  filter: blur(.2px);
+.frogHands .hand.right{
+  transform: rotate(8deg);
 }
   /* Lotus (attached to pad) */
   .lotusAnchor{

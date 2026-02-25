@@ -662,104 +662,128 @@
    FROG (peek from water)
    ========================= */
 
+/* =========================
+   FROG (cartoon round head peek)
+   ========================= */
+
 .frogPeek{
   position:absolute;
 
-  /* Move these 2 to position frog anywhere */
-  left: 120px;
-  top: 120px;
+  /* move frog */
+  left: 260px;
+  top: 175px;
 
-  width: 88px;
-  height: 62px;
+  width: 84px;
+  height: 64px;
 
   z-index: 40;
   pointer-events:none;
 }
 
-/* Waterline mask: hides lower part so frog looks inside water */
+/* Waterline mask (hide bottom of head) */
 .frogPeek::after{
   content:"";
   position:absolute;
-  left:-10px;
-  right:-10px;
+  left:-12px;
+  right:-12px;
 
-  /* waterline height (increase to hide more of head) */
-  top: 36px;
+  /* waterline height */
+  top: 40px;
 
   height: 40px;
 
-  background: linear-gradient(to bottom, rgba(0,0,0,0.00), rgba(0,0,0,0.10));
-  backdrop-filter: blur(0.5px);
+  background: linear-gradient(to bottom, rgba(0,0,0,0.00), rgba(0,0,0,0.12));
   border-radius: 999px;
 
-  /* subtle water surface highlight */
   box-shadow:
-    inset 0 2px 0 rgba(255,255,255,0.12),
+    inset 0 2px 0 rgba(255,255,255,0.10),
     0 10px 18px rgba(0,0,0,0.10);
 }
 
-/* Frog head */
+/* Round cartoon head */
 .frogPeek .frogHead{
   position:absolute;
-  left: 50%;
+  left:50%;
   top: 6px;
   transform: translateX(-50%);
 
-  width: 88px;
-  height: 62px;
-  border-radius: 26px;
+  width: 84px;
+  height: 60px;
 
-  background: radial-gradient(circle at 30% 25%, rgba(255,255,255,0.26), rgba(255,255,255,0.00) 55%),
-              linear-gradient(135deg, rgba(0,0,0,0.10), rgba(0,0,0,0.00) 45%),
-              #43d35b;
+  /* rounder = more cartoon */
+  border-radius: 999px;
+
+  background: radial-gradient(circle at 35% 25%, rgba(255,255,255,0.22), rgba(255,255,255,0.00) 55%),
+              linear-gradient(to bottom, #56ea71, #39c95c);
 
   box-shadow:
     0 10px 18px rgba(0,0,0,0.18),
-    inset 0 -10px 18px rgba(0,0,0,0.14);
+    inset 0 -10px 16px rgba(0,0,0,0.14);
 }
 
-/* Eyes (less bulged, more cute) */
+/* Eyes (white + outline, like cartoon) */
 .frogPeek .frogEye{
   position:absolute;
-  top: -10px;
+  top: -12px;
+
   width: 30px;
   height: 30px;
   border-radius: 50%;
 
-  background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.24), rgba(255,255,255,0.00) 55%),
-              #49e063;
+  background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.95), rgba(255,255,255,0.90));
+  border: 3px solid rgba(0,0,0,0.22);
 
   box-shadow:
-    0 10px 14px rgba(0,0,0,0.18),
-    inset 0 -10px 14px rgba(0,0,0,0.14);
+    0 10px 14px rgba(0,0,0,0.16),
+    inset 0 -10px 12px rgba(0,0,0,0.08);
 }
 
 .frogPeek .frogEye.left{ left: 12px; }
 .frogPeek .frogEye.right{ right: 12px; }
 
-/* Pupil */
+/* pupils (slightly up-right like your cartoon) */
 .frogPeek .pupil{
   position:absolute;
-  left: 52%;
-  top: 56%;
+  left: 62%;
+  top: 48%;
   transform: translate(-50%,-50%);
-  width: 10px;
-  height: 10px;
+
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
-  background: rgba(0,0,0,0.75);
+  background: rgba(0,0,0,0.82);
 }
 
-/* Mouth (simple, visible) */
+/* small nostrils (two dots) */
+.frogPeek .frogHead::before,
+.frogPeek .frogHead::after{
+  content:"";
+  position:absolute;
+  top: 26px;
+
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.16);
+}
+
+.frogPeek .frogHead::before{ left: 38px; }
+.frogPeek .frogHead::after{ left: 46px; }
+
+/* smile (cartoon line) */
 .frogPeek .frogMouth{
   position:absolute;
   left: 50%;
-  top: 30px;
+  top: 33px;
   transform: translateX(-50%);
+
   width: 46px;
-  height: 22px;
+  height: 18px;
+
   border-bottom: 4px solid rgba(0,0,0,0.18);
-  border-radius: 0 0 28px 28px;
-  opacity: 0.9;
+  border-radius: 0 0 30px 30px;
+
+  opacity: 0.95;
 }
 </style>
 </head>

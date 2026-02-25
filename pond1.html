@@ -275,13 +275,12 @@
 @keyframes padDrift{
     from { transform: translateY(0px) rotate(-0.25deg) scale(var(--padScale, 1)) scaleY(0.992); }
     to   { transform: translateY(7px) rotate(0.25deg)  scale(var(--padScale, 1)) scaleY(1); }
-  }
-  to   { transform: translateY(7px) rotate(0.2deg)  scale(var(--padScale, 1)); }
-}
+  } 
 /* ===== FINAL LILY PAD WITH REAL V CUT ===== */
 .padSide{
   position:absolute;
   left:0;
+  overflow:hidden;
   top:34px;
 
   width: 140px;
@@ -299,13 +298,7 @@
     inset 0 -10px 0 rgba(0,0,0,0.12);
 
   transform: rotate(-12deg) perspective(700px) rotateX(14deg);
-}
-  /* Curved lily pad notch (safe method) */
-  /* ✅ V-cut notch (safe overlay method) */
-.padSide{
-  position: relative;     /* IMPORTANT */
-  overflow: hidden;       /* keeps notch clean */
-}
+} 
 
 /* ✅ Natural lily-pad notch (rounded V, still safe) */
 /* lily pad notch hole (transparent) */
@@ -313,11 +306,7 @@
 /* ✅ Deeper + lower V cut, tip aimed toward pad center */
 /* ✅ Slim real lily-pad V notch (like your red mark) */
 /* ✅ Slim real lily-pad V notch (short + natural) */
-/* ✅ Center-tip V notch (tip exactly at pad center, slightly lower) */
-.padSide{
-  position: relative;
-  overflow: hidden; /* important: hides any outside parts cleanly */
-}
+/* ✅ Center-tip V notch (tip exactly at pad center, slightly lower) */ 
 
 .padSide::after{
   content:"";

@@ -272,11 +272,10 @@
   .padWrapA{ left:7vw; }
   .padWrapB{ left:58vw; }
 
-  @keyframes padDrift{
-    from { transform: translateY(0px) rotate(-0.2deg); }
-    to   { transform: translateY(7px) rotate(0.2deg); }
-  }
-
+@keyframes padDrift{
+  from { transform: translateY(0px) rotate(-0.2deg) scale(var(--padScale, 1)); }
+  to   { transform: translateY(7px) rotate(0.2deg)  scale(var(--padScale, 1)); }
+}
 /* ===== FINAL LILY PAD WITH REAL V CUT ===== */
 .padSide{
   position:absolute;
@@ -647,12 +646,19 @@
     user-select:none;
   }
 
-  @media (max-width: 700px){
-    .padWrapA{ left:6vw; top:6.5vh; transform: scale(0.96); }
-    .padWrapB{ left:56vw; top:6.8vh; transform: scale(0.96); }
-    .uiWrap{ top: 40vh; }
+@media (max-width: 700px){
+  .padWrapA{
+    left: 6vw;
+    top: 6.5vh;
+    --padScale: 0.96;
   }
-
+  .padWrapB{
+    left: 56vw;
+    top: 6.8vh;
+    --padScale: 0.96;
+  }
+  .uiWrap{ top: 40vh; }
+}
   /* --- FIX: bring eyes above head shading --- */
 /* =========================
    FROG (final stable block)
@@ -786,35 +792,27 @@
 
   opacity: 0.95;
 }
-  /* IMPORTANT: surface must be the positioning reference */
-.surface{
-  position: relative;
+  /* === Frog anchored to Pad A (desktop + mobile stable) === */
+.padWrapA{ overflow: visible; }
+
+.padWrapA .frogPeek{
+  position:absolute;
+  right: -40px;   /* frog sits to the right of Pad A */
+  top: 22px;
+  z-index: 15;
+  pointer-events:none;
 }
 
-/* Frog is now independent from pad */
-.frogNearPadA{
-  position: absolute;
-
-  /* Desktop default position (near pad A right side) */
-  left: 265px;
-  top: 92px;
-
-  z-index: 14; /* above water surface visuals */
-  pointer-events: none;
-}
-
-/* Mobile: put frog very near pad A (right side) */
+/* Mobile tweak */
 @media (max-width: 520px){
-  /* anchor frog near Pad A */
-  #padA{ position: relative; }
-
-  .frogNearPadA{
-    left: calc(50% + 110px); /* move to right of padA */
-    top: 70px;               /* move down a bit */
-    transform: translateX(-50%);
-    z-index: 14;
+  .padWrapA .frogPeek{
+    right: -28px;
+    top: 18px;
+    transform: scale(0.95);
+    transform-origin: left center;
   }
-}
+}/* IMPORTANT: surface must be the positioning reference */
+
 </style>
 </head>
 
@@ -859,19 +857,20 @@
   <!-- PAD A (frog only) -->
   <div class="padWrapA"id="padA">
     <div class="padSide"></div>
-  </div>
-  
-  <div class="frogPeek frogNearPadA">
+       <div class="frogPeek">
   <div class="frogHead">
     <div class="frogEye left"><span class="pupil"></span></div>
     <div class="frogEye right"><span class="pupil"></span></div>
     <div class="frogMouth"></div>
   </div>
 </div>
+  </div>
+  
+
   <!-- PAD B (lotus attached) -->
   <div class="padWrapB">
     <div class="padSide"></div>
-
+ 
     <div class="lotusAnchor">
       <div class="lotusStem"></div>
 

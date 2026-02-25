@@ -344,122 +344,143 @@
 /* ===== FROG (more real seated look) ===== */
 /* ===== FROG (more natural, still cute) ===== */
 /* ===== FROG (clean anime) ===== */
-.frog{
-  position:absolute;
-  left: 72px;     /* adjust if needed */
-  top: 10px;      /* adjust if needed */
-  transform: scale(0.62);  /* MAIN size control */
-  transform-origin: top left;
-  z-index: 8;
-  pointer-events:none;
-}
 /* =========================
-   FROG – Clean Pond Version
+   FROG v2 — Cute + Realistic
+   (works with your HTML)
    ========================= */
 
 .frog{
   position:absolute;
-  left: 72px;          /* adjust if needed */
-  top: 12px;           /* adjust if needed */
-  transform: scale(0.60);
-  transform-origin: top left;
-  z-index: 10;
+  left: 72px;     /* move frog on pad */
+  top: 6px;       /* move up/down */
+  z-index: 20;
   pointer-events:none;
+
+  transform: scale(0.52);   /* make smaller */
+  transform-origin: top left;
 }
 
-/* HEAD */
+/* HEAD SHAPE (more frog-like, wider) */
 .frogHead{
   position: relative;
-  width: 140px;
+  width: 150px;
   height: 105px;
-  border-radius: 70px 70px 55px 55px;
-  background: radial-gradient(circle at 35% 30%, #6cff7a 0%, #33c553 60%, #1b8f3a 100%);
+  border-radius: 85px 85px 70px 70px;
+  background: radial-gradient(circle at 35% 25%, #7dff8f 0%, #39cc5a 55%, #1f8b3b 100%);
   box-shadow:
-    0 16px 28px rgba(0,0,0,0.18),
-    inset 0 12px 18px rgba(255,255,255,0.18),
-    inset 0 -18px 20px rgba(0,0,0,0.15);
+    0 18px 28px rgba(0,0,0,0.18),
+    inset 0 10px 18px rgba(255,255,255,0.16),
+    inset 0 -18px 22px rgba(0,0,0,0.18);
 }
 
-/* EYES */
-.frogEye{
-  position:absolute;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  top: -12px;
-  background: radial-gradient(circle at 35% 35%, #7dff8d 0%, #2fb94a 65%, #1a7f33 100%);
-  box-shadow:
-    0 8px 14px rgba(0,0,0,0.18),
-    inset 0 -8px 12px rgba(0,0,0,0.15);
-}
-
-.frogEye.left{ left: 26px; }
-.frogEye.right{ right: 26px; }
-
-/* PUPIL */
-.frogEye .pupil{
-  position:absolute;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  top: 16px;
-  left: 16px;
-  background: #0e1a14;
-}
-
-/* tiny highlight */
-.frogEye::after{
+/* LITTLE CHEEK SHADING (adds face realism) */
+.frogHead::after{
   content:"";
   position:absolute;
-  width: 8px;
-  height: 8px;
-  border-radius:50%;
-  top: 8px;
-  left: 10px;
-  background: rgba(255,255,255,0.55);
-}
-
-/* MOUTH */
-.frogMouth{
-  position:absolute;
   left: 50%;
-  top: 60px;
-  width: 86px;
-  height: 42px;
-  transform: translateX(-50%);
-  border-bottom: 5px solid rgba(0,0,0,0.20);
-  border-radius: 0 0 60px 60px;
+  top: 50%;
+  width: 120px;
+  height: 70px;
+  transform: translate(-50%,-35%);
+  border-radius: 999px;
+  background: radial-gradient(circle at 50% 35%, rgba(255,255,255,0.12), rgba(255,255,255,0) 65%);
   opacity: 0.9;
 }
 
-/* HANDS CONTAINER */
+/* EYE BUMPS (attach to head, not floating balls) */
+.frogEye{
+  position:absolute;
+  width: 46px;
+  height: 46px;
+  top: -10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #8cff9a 0%, #35c655 70%, #1b7d33 100%);
+  box-shadow:
+    0 8px 12px rgba(0,0,0,0.16),
+    inset 0 -10px 14px rgba(0,0,0,0.15);
+}
+
+/* Place eyes closer + more natural */
+.frogEye.left{ left: 32px; }
+.frogEye.right{ right: 32px; }
+
+/* pupil (smaller + slightly inward) */
+.frogEye .pupil{
+  position:absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background:#0c1411;
+  top: 19px;
+  left: 19px;
+}
+
+/* subtle eye highlight */
+.frogEye::after{
+  content:"";
+  position:absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  top: 10px;
+  left: 12px;
+  background: rgba(255,255,255,0.45);
+}
+
+/* MOUTH — real frog smile (not too cartoony) */
+.frogMouth{
+  position:absolute;
+  left: 50%;
+  top: 62px;
+  width: 92px;
+  height: 40px;
+  transform: translateX(-50%);
+  border-bottom: 4px solid rgba(0,0,0,0.22);
+  border-radius: 0 0 70px 70px;
+  opacity: 0.95;
+}
+
+/* tiny nostrils */
+.frogMouth::before,
+.frogMouth::after{
+  content:"";
+  position:absolute;
+  width: 10px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.12);
+  top: -10px;
+}
+.frogMouth::before{ left: 26px; }
+.frogMouth::after{ right: 26px; }
+
+/* HANDS (smaller + sitting on pad edge) */
 .frogHands{
   position:absolute;
   left: 50%;
-  top: 72px;
+  top: 78px;
   transform: translateX(-50%);
   width: 120px;
-  height: 40px;
+  height: 34px;
   display:flex;
   justify-content: space-between;
   align-items: center;
+  opacity: 0.95;
 }
 
-/* HANDS */
 .frogHands .hand{
-  width: 50px;
-  height: 20px;
+  width: 46px;
+  height: 18px;
   border-radius: 999px;
-  background: linear-gradient(to bottom, #4ff06a, #26a942);
+  background: linear-gradient(to bottom, #56f076, #2cab45);
   box-shadow:
-    inset 0 -6px 10px rgba(0,0,0,0.15),
+    inset 0 -6px 10px rgba(0,0,0,0.14),
     0 4px 8px rgba(0,0,0,0.12);
-  transform: rotate(-8deg);
 }
 
-.frogHands .hand.right{
-  transform: rotate(8deg);
-}
+/* angle hands slightly */
+.frogHands .hand.left{ transform: rotate(-10deg); }
+.frogHands .hand.right{ transform: rotate(10deg); }
   /* Lotus (attached to pad) */
   .lotusAnchor{
     position:absolute;
@@ -812,7 +833,6 @@
     <div class="frogEye right"><span class="pupil"></span></div>
 
     <div class="frogMouth"></div>
-
     <div class="frogHands">
       <span class="hand left"></span>
       <span class="hand right"></span>

@@ -793,25 +793,26 @@
   opacity: 0.95;
 }
   /* === Frog anchored to Pad A (desktop + mobile stable) === */
-.padWrapA{ overflow: visible; }
+/* Frog attached to Pad B (stable on all screens) */
+.padWrapB{ overflow: visible; }
 
-.padWrapA .frogPeek{
+.padWrapB .frogPeek{
   position:absolute;
-  right: -40px;   /* frog sits to the right of Pad A */
-  top: 22px;
-  z-index: 15;
+  left:-46px;      /* frog sits to LEFT of pad B */
+  top:16px;        /* vertical align */
+  z-index:15;      /* above waterline */
   pointer-events:none;
 }
 
 /* Mobile tweak */
-@media (max-width: 520px){
-  .padWrapA .frogPeek{
-    right: -28px;
-    top: 18px;
+@media (max-width:520px){
+  .padWrapB .frogPeek{
+    left:-40px;
+    top:14px;
     transform: scale(0.95);
     transform-origin: left center;
   }
-}/* IMPORTANT: surface must be the positioning reference */
+}
 
 </style>
 </head>
@@ -857,7 +858,13 @@
   <!-- PAD A (frog only) -->
   <div class="padWrapA"id="padA">
     <div class="padSide"></div>
-       <div class="frogPeek">
+      
+  
+
+  <!-- PAD B (lotus attached) -->
+  <div class="padWrapB">
+    <div class="padSide"></div>
+     <div class="frogPeek">
   <div class="frogHead">
     <div class="frogEye left"><span class="pupil"></span></div>
     <div class="frogEye right"><span class="pupil"></span></div>
@@ -865,11 +872,6 @@
   </div>
 </div>
   </div>
-  
-
-  <!-- PAD B (lotus attached) -->
-  <div class="padWrapB">
-    <div class="padSide"></div>
  
     <div class="lotusAnchor">
       <div class="lotusStem"></div>

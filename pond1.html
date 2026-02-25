@@ -343,112 +343,146 @@
   /* Frog */
 /* ===== FROG (more real seated look) ===== */
 /* ===== FROG (more natural, still cute) ===== */
+/* ===== FROG (clean anime) ===== */
 .frog{
   position:absolute;
-  left: 18px;
-  top: 22px;
-  width: 92px;
+  left: 34px;          /* keep your position */
+  top: 18px;           /* adjust if needed */
+  z-index: 9;
+  transform: scale(1);
+}
+
+.frogHead{
+  position:relative;
+  width: 180px;
+  height: 120px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 35% 25%, rgba(255,255,255,0.35), rgba(255,255,255,0) 55%),
+              linear-gradient(180deg, #55e07a 0%, #2fbf62 100%);
+  box-shadow:
+    0 18px 28px rgba(0,0,0,0.18),
+    inset 0 10px 18px rgba(255,255,255,0.14),
+    inset 0 -12px 18px rgba(0,0,0,0.10);
+}
+
+/* Eyes (less artificial) */
+.frogEye{
+  position:absolute;
+  top: -18px;
+  width: 62px;
   height: 62px;
-  z-index: 8;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #63f08a 0%, #39c86a 100%);
+  box-shadow:
+    0 10px 16px rgba(0,0,0,0.16),
+    inset 0 10px 12px rgba(255,255,255,0.14),
+    inset 0 -10px 10px rgba(0,0,0,0.08);
+}
+.frogEye.left{ left: 30px; }
+.frogEye.right{ right: 30px; }
+
+/* Pupils + tiny highlight */
+.frogEye .pupil{
+  position:absolute;
+  left: 50%;
+  top: 52%;
+  width: 16px;
+  height: 16px;
+  transform: translate(-50%,-50%);
+  border-radius: 999px;
+  background: rgba(0,0,0,0.78);
+}
+.frogEye .pupil::after{
+  content:"";
+  position:absolute;
+  left: 3px;
+  top: 3px;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.85);
+}
+
+/* Soft eyelid (makes it feel alive) */
+.frogEye::after{
+  content:"";
+  position:absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 22px;
+  border-radius: 999px 999px 18px 18px;
+  background: rgba(0,0,0,0.08);
+  filter: blur(0.2px);
+}
+
+/* Mouth (visible, subtle smile) */
+.frogMouth{
+  position:absolute;
+  left: 50%;
+  top: 64px;
+  width: 92px;
+  height: 44px;
+  transform: translateX(-50%);
+  border-radius: 0 0 999px 999px;
+  background: rgba(255,255,255,0.10);
+  box-shadow:
+    inset 0 -8px 12px rgba(0,0,0,0.08),
+    inset 0 6px 10px rgba(255,255,255,0.10);
+  opacity: 0.95;
+}
+
+/* smile line */
+.frogMouth::after{
+  content:"";
+  position:absolute;
+  left: 50%;
+  bottom: 12px;
+  width: 62px;
+  height: 18px;
+  transform: translateX(-50%);
+  border-bottom: 3px solid rgba(0,0,0,0.18);
+  border-radius: 0 0 999px 999px;
+}
+
+/* Hands (match head shading, no weird glass) */
+.frogHands{
+  position:absolute;
+  left: 50%;
+  top: 72px;
+  width: 150px;
+  height: 54px;
+  transform: translateX(-50%);
   pointer-events:none;
 }
 
-/* Head (round + soft) */
-.frog .head{
+.frogHands .hand{
   position:absolute;
-  left: 50%;
-  top: 10px;
-  width: 86px;
-  height: 48px;
-  transform: translateX(-50%);
+  width: 72px;
+  height: 34px;
   border-radius: 999px;
-  background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.22), rgba(255,255,255,0) 55%),
-              linear-gradient(to bottom, #7df07a, #2bb85b);
+  background: linear-gradient(180deg, #57e57f 0%, #2fbf62 100%);
   box-shadow:
-    inset 0 -10px 0 rgba(0,0,0,0.10),
-    0 10px 18px rgba(0,0,0,0.16);
+    0 10px 14px rgba(0,0,0,0.14),
+    inset 0 8px 10px rgba(255,255,255,0.12),
+    inset 0 -8px 10px rgba(0,0,0,0.08);
+  opacity: 0.96;
 }
 
-/* slight “mouth” curve */
-.frog .mouth{
-  position:absolute;
-  left:50%;
-  top: 33px;
-  width: 42px;
-  height: 18px;
-  transform: translateX(-50%);
-  border-radius: 0 0 999px 999px;
-  background: rgba(255,255,255,0.14);
-  box-shadow: inset 0 6px 0 rgba(0,0,0,0.06);
-  opacity:0.9;
-}
+.frogHands .hand.left{ left: 0; transform: rotate(-8deg); }
+.frogHands .hand.right{ right: 0; transform: rotate(8deg); }
 
-/* Eye bumps */
-.frog .eye{
-  position:absolute;
-  top: 2px;
-  width: 22px;
-  height: 22px;
-  border-radius: 999px;
-  background: linear-gradient(to bottom, #86ff86, #2fbf5f);
-  box-shadow: inset 0 -5px 0 rgba(0,0,0,0.10);
-}
-.frog .eye.left{ left: 18px; }
-.frog .eye.right{ right: 18px; }
-
-/* pupils */
-.frog .eye::after{
+/* tiny finger bumps */
+.frogHands .hand::after{
   content:"";
   position:absolute;
-  left: 58%;
-  top: 52%;
-  width: 6px;
-  height: 6px;
-  transform: translate(-50%,-50%);
-  border-radius: 999px;
-  background: rgba(0,0,0,0.65);
-}
-
-/* Forearms (slimmer) */
-.frog .arm{
-  position:absolute;
-  top: 38px;
-  width: 34px;
+  left: 14px;
+  bottom: -6px;
+  width: 44px;
   height: 16px;
   border-radius: 999px;
-  background: linear-gradient(to bottom, #6fe96f, #26b457);
-  box-shadow: inset 0 -5px 0 rgba(0,0,0,0.10);
-  opacity:0.98;
-}
-.frog .arm.left{ left: 10px; transform: rotate(6deg); }
-.frog .arm.right{ right: 10px; transform: rotate(-6deg); }
-
-/* small “hands” */
-.frog .arm::after{
-  content:"";
-  position:absolute;
-  bottom: -3px;
-  right: 4px;
-  width: 14px;
-  height: 8px;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.10);
-  box-shadow: inset 0 -2px 0 rgba(0,0,0,0.08);
-}
-
-/* optional: tiny body behind head (very subtle) */
-.frog .body{
-  position:absolute;
-  left:50%;
-  top: 36px;
-  width: 60px;
-  height: 30px;
-  transform: translateX(-50%);
-  border-radius: 999px;
-  background: linear-gradient(to bottom, rgba(90,220,120,0.9), rgba(35,160,85,0.9));
-  box-shadow: inset 0 -8px 0 rgba(0,0,0,0.10);
-  opacity:0.75;
-  z-index:-1;
+  background: rgba(255,255,255,0.08);
+  filter: blur(0.2px);
 }
   /* Lotus (attached to pad) */
   .lotusAnchor{
@@ -797,15 +831,18 @@
   <div class="padWrapA">
     <div class="padSide"></div>
     <div class="frog">
-      <div class="body"></div>
-       <div class="head"></div>
-      <div class="eye left"></div>
-      <div class="eye right"></div>
-      <div class="mouth"></div>
-       <div class="arm left"></div>
-       <div class="arm right"></div>
+  <div class="frogHead">
+    <div class="frogEye left"><span class="pupil"></span></div>
+    <div class="frogEye right"><span class="pupil"></span></div>
+
+    <div class="frogMouth"></div>
+
+    <div class="frogHands">
+      <span class="hand left"></span>
+      <span class="hand right"></span>
     </div>
   </div>
+</div>
 
   <!-- PAD B (lotus attached) -->
   <div class="padWrapB">

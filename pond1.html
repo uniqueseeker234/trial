@@ -786,6 +786,32 @@
 
   opacity: 0.95;
 }
+  /* IMPORTANT: surface must be the positioning reference */
+.surface{
+  position: relative;
+}
+
+/* Frog is now independent from pad */
+.frogNearPadA{
+  position: absolute;
+
+  /* Desktop default position (near pad A right side) */
+  left: 265px;
+  top: 92px;
+
+  z-index: 14; /* above water surface visuals */
+  pointer-events: none;
+}
+
+/* Mobile: put frog very near pad A (right side) */
+@media (max-width: 520px){
+  .frogNearPadA{
+    left: 78%;
+    top: 122px;
+    transform: translateX(-50%);
+    z-index: 14;
+    
+  }
 </style>
 </head>
 
@@ -830,7 +856,9 @@
   <!-- PAD A (frog only) -->
   <div class="padWrapA">
     <div class="padSide"></div>
-  <div class="frogPeek">
+  </div>
+  
+  <div class="frogPeek frogNearPadA">
   <div class="frogHead">
     <div class="frogEye left"><span class="pupil"></span></div>
     <div class="frogEye right"><span class="pupil"></span></div>

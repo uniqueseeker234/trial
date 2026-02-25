@@ -261,7 +261,7 @@
   /* =============== PADS =============== */
   .padWrapA, .padWrapB{
     position:absolute;
-    top:7vh;
+    top: 5.8vh;
     width: 170px;
     height: 110px;
     z-index:14;
@@ -273,8 +273,12 @@
   .padWrapB{ left:58vw; }
 
 @keyframes padDrift{
-    from { transform: translateY(0px) rotate(-0.25deg) scale(var(--padScale, 1)) scaleY(0.992); }
-    to   { transform: translateY(7px) rotate(0.25deg)  scale(var(--padScale, 1)) scaleY(1); }
+    0%   { transform: translateY(0px) rotate(-0.25deg) scaleX(1.008) scaleY(0.985); }
+    55%  { transform: translateY(4px) rotate(0deg)      scaleX(1.000) scaleY(0.998); }
+    100% { transform: translateY(7px) rotate(0.25deg)  scaleX(0.996) scaleY(1.000); }
+  }
+
+to   { transform: translateY(7px) rotate(0.25deg)  scale(var(--padScale, 1)) scaleY(1); }
   } 
 /* ===== FINAL LILY PAD WITH REAL V CUT ===== */
 .padSide{
@@ -331,6 +335,25 @@
   transform: translate(0, -50%);
   opacity: 1;
 }
+
+/* extra “alive” feel: subtle darkening + thickness change while pads bob */
+.padSide::before{
+  content:"";
+  position:absolute;
+  left:10px;
+  right:16px;
+  bottom:10px;
+  height:30px;
+  border-radius:999px;
+  background: radial-gradient(circle at 50% 60%, rgba(0,0,0,0.22), rgba(0,0,0,0) 72%);
+  opacity:0.12;
+  pointer-events:none;
+  animation: padSinkShade 6s ease-in-out infinite alternate;
+}
+@keyframes padSinkShade{
+  from{ transform: translateY(0px) scaleX(1.02); opacity:0.08; }
+  to  { transform: translateY(6px) scaleX(0.96); opacity:0.18; }
+}
   /* Frog */
 /* ===== FROG (more real seated look) ===== */
 /* ===== FROG (more natural, still cute) ===== */
@@ -343,40 +366,46 @@
   /* Lotus (attached to pad) */
   .lotusAnchor{
     position:absolute;
-    right: 6px;
-    top: 2px;
-    width: 108px;
+    right: 8px;
+    top: 4px;
+    width: 104px;
     height: 112px;
     transform: rotate(10deg);
     filter: drop-shadow(0 16px 18px rgba(0,0,0,0.14));
     animation: lotusBob 4.2s ease-in-out infinite alternate;
   }
+  .lotusAnchor--white{
+    right: 4px;
+    top: 8px;
+    transform: rotate(-8deg);
+    animation-duration: 4.6s;
+  }
   @keyframes lotusBob{
     from { transform: translateY(0) rotate(10deg); }
-    to   { transform: translateY(4px) rotate(12deg); }
-  }
-  .lotusStem{
-    position:absolute;
-    left: 52px;
-    bottom: 14px;
-    width: 10px;
-    height: 18px;           /* shorter stalk */
-    border-radius: 999px;
-    background: linear-gradient(to bottom, rgba(38,170,120,0.95), rgba(9,80,64,0.95));
-    transform: rotate(-12deg);
-    opacity:0.9;
+    to   { transform: translateY(3px) rotate(12deg); }
   }
 
-  
-/* White lotus variant (duplicate flower) */
-.lotusAnchor--white{ right: 2px; top: 6px; transform: rotate(-8deg); opacity:0.95; }
-.lotus3d--white{ filter: drop-shadow(0 14px 16px rgba(0,0,0,0.10)); }
-.lotus3d{
+  /* stem connects pad -> flower (no floating) */
+  .lotusStem{
     position:absolute;
-    left: 0px;
-    top: -12px;
-    width: 104px;          /* bigger flower */
-    height: 104px;
+    left: 48px;
+    bottom: 10px;
+    width: 10px;
+    height: 56px;
+    border-radius: 999px;
+    background: linear-gradient(to bottom, rgba(38,170,120,0.95), rgba(9,80,64,0.95));
+    transform: rotate(-10deg);
+    opacity:0.92;
+    box-shadow: inset 0 -8px 10px rgba(0,0,0,0.18);
+  }
+
+  /* bigger flower, slightly lower so it covers the pad rim */
+  .lotus3d{
+    position:absolute;
+    left: 2px;
+    top: -22px;
+    width: 98px;
+    height: 98px;
   }
 
   /* =============== FISH LAYER (ABOVE UI) =============== */
@@ -746,6 +775,7 @@
   border-radius: 50%;
   transform: translate(-50%,-50%);
   background: rgba(0,0,0,0.85);
+  animation: frogPupil 4.8s infinite;
 }
 
 /* blink (eye close/open) */
@@ -758,7 +788,12 @@
   transform: translateY(120%);
   animation: frogBlink 4.8s infinite;
 }
-@keyframes frogBlink{
+@keyframes frogPupil{
+    0%, 92%, 100% { opacity: 1; }
+    94%, 96%      { opacity: 0; }
+  }
+
+  @keyframes frogBlink{
   0%,92%,100% { transform: translateY(120%); }
   94%,96%     { transform: translateY(0%); }
 }

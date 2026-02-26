@@ -665,16 +665,9 @@
   }
 
 @media (max-width: 700px){
-  .padWrapA{
-    left: 6vw;
-    top: 6.6vh;
-    --padScale: 0.96;
-  }
-  .padWrapB{
-    left: 56vw;
-    top: 6.6vh;
-    --padScale: 0.96;
-  }
+  .padWrapA{ left:6vw; top: var(--padsTop); transform: scale(0.96); }
+  .padWrapB{ left:56vw; top: var(--padsTop); transform: scale(0.96); }
+}
   .uiWrap{ top: 40vh; }
 }
   /* --- FIX: bring eyes above head shading --- */

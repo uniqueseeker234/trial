@@ -3,239 +3,271 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Dive Transition Test</title>
-
+<title>Dive Scroll Transition</title>
 <style>
-:root{
-  --surfaceA:#5FC2A7;
-  --surfaceB:#3CC19E;
-  --underA:#2aa98d;
-  --underB:#146f6a;
-  --ink: rgba(255,255,255,0.92);
-  --shadow: 0 18px 60px rgba(0,0,0,0.45);
-}
+  :root{
+    --surfaceA:#5FC2A7;
+    --surfaceB:#3CC19E;
+    --underA:#2aa98d;
+    --underB:#146f6a;
+    --deep:#083b46;
+    --ink: rgba(255,255,255,0.92);
+    --shadow: 0 18px 60px rgba(0,0,0,0.45);
+  }
 
-html,body{
-  height:100%;
-  margin:0;
-  background:#07131d;
-  overflow:hidden;
-  font-family:system-ui, Arial;
-}
+  html,body{ margin:0; height:100%; background:#07131d; font-family:system-ui, Arial; }
+  body{ overflow-x:hidden; }
 
-.stage{position:relative;width:100%;height:100%;}
+  /* Tall track (the “world” you fall through) */
+  .track{
+    position:relative;
+    height: 260vh; /* <-- increase for longer fall */
+  }
 
-/* CAMERA WRAPPER (moves down like you're diving) */
-.camera{
-  position:absolute; inset:0;
-  transform: translateY(0) scale(1);
-  transform-origin: 50% 35%;
-  will-change: transform, filter;
-  animation: cameraDive 1400ms cubic-bezier(.15,.9,.2,1) forwards;
-}
+  /* Sticky viewport = camera window */
+  .camera{
+    position:sticky;
+    top:0;
+    height:100vh;
+    overflow:hidden;
+  }
 
-/* BACKGROUND shifts upward as you go down */
-.bg{
-  position:absolute;inset:-8%;
-  background:
-    radial-gradient(1200px 800px at 50% -10%, rgba(255,255,255,0.22), transparent 55%),
-    linear-gradient(180deg, var(--surfaceA) 0%, var(--surfaceB) 40%, var(--underA) 68%, var(--underB) 100%);
-  transform: translateY(0) scale(1.04);
-  will-change: transform, filter;
-  animation:diveBG 1400ms cubic-bezier(.15,.9,.2,1) forwards;
-}
+  /* Background changes as you scroll (we also animate it slightly) */
+  .bg{
+    position:absolute; inset:-12%;
+    background:
+      radial-gradient(1200px 800px at 50% -10%, rgba(255,255,255,0.22), transparent 55%),
+      linear-gradient(180deg,
+        var(--surfaceA) 0%,
+        var(--surfaceB) 28%,
+        var(--underA) 55%,
+        var(--underB) 78%,
+        var(--deep) 100%);
+    transform: translateY(var(--bgShift, 0px)) scale(1.08);
+    filter: saturate(1.12) brightness(var(--bri, 1));
+    will-change: transform, filter;
+  }
 
-/* Surface line passes upward (you cross surface) */
-.surfaceLine{
-  position:absolute;
-  left:-10%; right:-10%;
-  top:38%;
-  height:14px;
-  background:linear-gradient(90deg, transparent, rgba(255,255,255,0.85), transparent);
-  opacity:0.9;
-  filter: blur(1px);
-  will-change: transform, opacity;
-  animation:surfacePass 1400ms cubic-bezier(.15,.9,.2,1) forwards;
-}
+  /* Surface line that moves out of view quickly */
+  .surfaceLine{
+    position:absolute; left:-10%; right:-10%;
+    top: 42%;
+    height: 14px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent);
+    opacity: var(--lineOp, 0.95);
+    transform: translateY(var(--lineY, 0px));
+    filter: blur(1px);
+    will-change: transform, opacity;
+  }
 
-/* Depth vignette */
-.vignette{
-  position:absolute; inset:0;
-  background: radial-gradient(closest-side at 50% 40%, transparent 55%, rgba(0,0,0,0.42) 100%);
-  opacity: 0.75;
-  pointer-events:none;
-}
+  /* Caustics shimmer */
+  .caustics{
+    position:absolute; inset:-30%;
+    background:
+      repeating-radial-gradient(circle at 20% 30%, rgba(255,255,255,0.08) 0 6px, transparent 6px 20px),
+      repeating-radial-gradient(circle at 70% 60%, rgba(255,255,255,0.06) 0 7px, transparent 7px 22px);
+    mix-blend-mode: overlay;
+    opacity: var(--cOp, 0.0);
+    transform: translateY(var(--cY, 0px)) rotate(-3deg) scale(1.08);
+    filter: blur(1px);
+    pointer-events:none;
+  }
 
-/* Bubbles */
-.bubbles{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
-.bubble{
-  position:absolute;
-  bottom:-18vh;
-  border-radius:50%;
-  background: radial-gradient(circle at 30% 30%,
+  .vignette{
+    position:absolute; inset:0;
+    background: radial-gradient(closest-side at 50% 40%, transparent 52%, rgba(0,0,0,0.46) 100%);
+    opacity: 0.78;
+    pointer-events:none;
+  }
+
+  /* Bubbles float up while you “fall” down */
+  .bubbles{ position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+  .bubble{
+    position:absolute;
+    bottom:-20vh;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%,
       rgba(255,255,255,0.95),
       rgba(255,255,255,0.18) 55%,
       rgba(255,255,255,0.07) 100%);
-  opacity:0;
-  filter: blur(var(--blur));
-  will-change: transform, opacity;
-  animation: bubbleUp var(--dur) linear forwards;
-}
-
-/* Center message */
-.center{
-  position:absolute;inset:0;
-  display:flex;align-items:center;justify-content:center;
-  z-index:5;
-}
-.card{
-  padding:14px 18px;
-  border-radius:18px;
-  background:rgba(255,255,255,0.12);
-  border:1px solid rgba(255,255,255,0.18);
-  box-shadow:var(--shadow);
-  color:var(--ink);
-  backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px);
-  opacity:0;
-  transform: translateY(8px) scale(0.98);
-  animation:textIn 520ms ease-out 220ms forwards, textOut 520ms ease-in 900ms forwards;
-}
-
-/* Replay */
-.replay{
-  position:absolute;
-  bottom:26px;
-  left:50%;
-  transform:translateX(-50%);
-  padding:10px 18px;
-  border:none;
-  border-radius:999px;
-  background:#ffffff22;
-  color:white;
-  cursor:pointer;
-  backdrop-filter:blur(8px);
-  -webkit-backdrop-filter:blur(8px);
-  z-index:6;
-}
-
-@keyframes cameraDive{
-  0%{
-    transform: translateY(0) scale(1) rotate(0deg);
-    filter: blur(0px);
+    filter: blur(var(--blur));
+    opacity: 0;
+    animation: bubbleUp var(--dur) linear infinite;
+    animation-delay: var(--delay);
+    will-change: transform, opacity;
   }
-  35%{
-    transform: translateY(5%) scale(1.03) rotate(-0.4deg);
-    filter: blur(0.6px);
+
+  @keyframes bubbleUp{
+    0%{ opacity: 0; transform: translate3d(0,0,0) scale(var(--s)); }
+    10%{ opacity: var(--op); }
+    100%{ opacity: 0; transform: translate3d(var(--drift), -150vh, 0) scale(calc(var(--s) * 1.18)); }
   }
-  100%{
-    transform: translateY(14%) scale(1.08) rotate(-0.9deg);
-    filter: blur(1px);
+
+  /* Text card */
+  .center{
+    position:absolute; inset:0;
+    display:grid; place-items:center;
+    z-index:4;
   }
-}
-
-@keyframes diveBG{
-  0%{ transform: translateY(0) scale(1.04); filter: saturate(1.05) brightness(1); }
-  55%{ filter: saturate(1.12) brightness(0.97); }
-  100%{ transform: translateY(-14%) scale(1.08); filter: saturate(1.22) brightness(0.92); }
-}
-
-@keyframes surfacePass{
-  0%{ transform: translateY(0); opacity: 0.95; }
-  45%{ opacity: 0.85; }
-  100%{ transform: translateY(-34vh); opacity: 0; }
-}
-
-@keyframes bubbleUp{
-  0%{
-    opacity:0;
-    transform: translate3d(0, 0, 0) scale(var(--s));
+  .card{
+    padding: 14px 18px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.18);
+    box-shadow: var(--shadow);
+    color: var(--ink);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    text-align:center;
+    opacity: var(--tOp, 0);
+    transform: translateY(var(--tY, 8px)) scale(var(--tS, .98));
+    transition: opacity 240ms ease, transform 240ms ease;
   }
-  8%{ opacity: var(--op); }
-  100%{
-    opacity:0;
-    transform: translate3d(var(--drift), -140vh, 0) scale(calc(var(--s) * 1.15));
+  .title{ font-weight: 800; }
+  .sub{ font-size: 13px; opacity: .9; margin-top: 4px; }
+
+  /* Controls */
+  .controls{
+    position:fixed; left:50%; bottom:18px;
+    transform: translateX(-50%);
+    display:flex; gap:10px;
+    z-index:10;
   }
-}
+  .btn{
+    padding:10px 16px;
+    border:none;
+    border-radius:999px;
+    background:#ffffff22;
+    color:white;
+    cursor:pointer;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
 
-@keyframes textIn{
-  from{opacity:0; transform: translateY(10px) scale(0.98);}
-  to{opacity:1; transform: translateY(0) scale(1);}
-}
-@keyframes textOut{
-  from{opacity:1; transform: translateY(0) scale(1);}
-  to{opacity:0; transform: translateY(-6px) scale(0.98);}
-}
-
-/* Reduced motion support */
-@media (prefers-reduced-motion: reduce){
-  .camera,.bg,.surfaceLine,.card{ animation:none !important; }
-  .bubble{ display:none !important; }
-}
+  /* Reduce motion */
+  @media (prefers-reduced-motion: reduce){
+    .bubble{ animation:none !important; display:none; }
+  }
 </style>
 </head>
-
 <body>
-<div class="stage">
+
+<div class="track" id="track">
   <div class="camera" id="camera">
-    <div class="bg"></div>
-    <div class="surfaceLine"></div>
+    <div class="bg" id="bg"></div>
+    <div class="caustics" id="caustics"></div>
+    <div class="surfaceLine" id="surfaceLine"></div>
     <div class="bubbles" id="bubbles"></div>
     <div class="vignette"></div>
-  </div>
 
-  <div class="center">
-    <div class="card">Diving into the Algal Pond…</div>
+    <div class="center">
+      <div class="card" id="card">
+        <div class="title">Falling into the Algal Pond…</div>
+        <div class="sub">Just a second — going underwater.</div>
+      </div>
+    </div>
   </div>
+</div>
 
-  <button class="replay" onclick="location.reload()">Replay</button>
+<div class="controls">
+  <button class="btn" id="replay">Replay</button>
+  <button class="btn" id="stop">Stop</button>
 </div>
 
 <script>
-const wrap = document.getElementById("bubbles");
-const rnd = (a,b)=> a + Math.random()*(b-a);
+  const bubblesWrap = document.getElementById("bubbles");
+  const bg = document.getElementById("bg");
+  const caustics = document.getElementById("caustics");
+  const surfaceLine = document.getElementById("surfaceLine");
+  const card = document.getElementById("card");
 
-// More bubbles + bigger foreground ones
-const COUNT = 46;
+  const rnd=(a,b)=>a+Math.random()*(b-a);
 
-for(let i=0;i<COUNT;i++){
-  const b = document.createElement("div");
-  b.className = "bubble";
+  // Create BIG bubbles + normal bubbles
+  const COUNT = 54;
+  for(let i=0;i<COUNT;i++){
+    const b = document.createElement("div");
+    b.className = "bubble";
 
-  // Make a mix: some small, some big (foreground)
-  const isBig = Math.random() < 0.35;      // 35% big bubbles
-  const size = isBig ? rnd(22, 54) : rnd(10, 26);
+    const isBig = Math.random() < 0.38;
+    const size = isBig ? rnd(26, 70) : rnd(10, 28);
+    b.style.width = size+"px";
+    b.style.height = size+"px";
+    b.style.left = rnd(-10, 110)+"vw";
 
-  b.style.width = size + "px";
-  b.style.height = size + "px";
-  b.style.left = rnd(-8, 108) + "vw";
+    const dur = isBig ? rnd(1.0, 1.55) : rnd(1.3, 2.2);
+    b.style.setProperty("--dur", dur+"s");
 
-  // Foreground bubbles rise faster + more visible
-  const dur = isBig ? rnd(650, 980) : rnd(900, 1350);
-  b.style.setProperty("--dur", dur + "ms");
+    b.style.setProperty("--delay", rnd(0, 1.0)+"s");
+    b.style.setProperty("--drift", (isBig ? rnd(-60,60) : rnd(-34,34))+"px");
+    b.style.setProperty("--s", (isBig ? rnd(1.0,1.9) : rnd(0.75,1.25)));
+    b.style.setProperty("--op", (isBig ? rnd(0.65,0.92) : rnd(0.35,0.65)));
+    b.style.setProperty("--blur", (isBig ? rnd(0.6,2.0) : rnd(0.2,1.0))+"px");
 
-  // Drift sideways to feel like we're moving against them
-  const drift = isBig ? rnd(-48, 48) : rnd(-28, 28);
-  b.style.setProperty("--drift", drift + "px");
+    bubblesWrap.appendChild(b);
+  }
 
-  // Scale baseline
-  const scale = isBig ? rnd(1.0, 1.8) : rnd(0.75, 1.25);
-  b.style.setProperty("--s", scale);
+  // Auto-scroll down (the “fall”)
+  let raf = null;
+  let running = true;
 
-  // Opacity
-  const op = isBig ? rnd(0.65, 0.9) : rnd(0.35, 0.65);
-  b.style.setProperty("--op", op);
+  function startAutoScroll(){
+    running = true;
+    const startY = window.scrollY;
+    const maxY = document.documentElement.scrollHeight - window.innerHeight;
+    const target = Math.min(maxY, startY + window.innerHeight * 2.4); // fall distance
 
-  // Blur: bigger bubbles slightly blurrier (near camera)
-  const blur = isBig ? rnd(0.6, 1.8) : rnd(0.2, 1.0);
-  b.style.setProperty("--blur", blur + "px");
+    const duration = 1400; // ms
+    const t0 = performance.now();
 
-  // Stagger
-  const delay = rnd(0, 520);
-  b.style.animationDelay = delay + "ms";
+    function easeInOut(t){
+      return t<0.5 ? 2*t*t : 1 - Math.pow(-2*t+2,2)/2;
+    }
 
-  wrap.appendChild(b);
-}
+    function tick(now){
+      if(!running) return;
+      const t = Math.min(1, (now - t0) / duration);
+      const e = easeInOut(t);
+      const y = startY + (target - startY) * e;
+      window.scrollTo(0, y);
+
+      // Update visuals based on progress
+      const p = e; // 0..1
+      bg.style.setProperty("--bgShift", (-p*120) + "px");     // background shifts
+      bg.style.setProperty("--bri", (1 - p*0.10).toFixed(3)); // slightly darker
+      surfaceLine.style.setProperty("--lineY", (-p*320) + "px");
+      surfaceLine.style.setProperty("--lineOp", (1 - p*1.1).toFixed(3));
+      caustics.style.setProperty("--cOp", (p < 0.65 ? (p/0.65)*0.38 : 0.22).toFixed(3));
+      caustics.style.setProperty("--cY", (p*60) + "px");
+
+      // Text shows early then fades
+      const tShow = p < 0.75 ? 1 : Math.max(0, 1 - (p-0.75)/0.25);
+      card.style.setProperty("--tOp", tShow.toFixed(3));
+      card.style.setProperty("--tY", (8 - p*14) + "px");
+      card.style.setProperty("--tS", (0.98 + p*0.03).toFixed(3));
+
+      if(t < 1) raf = requestAnimationFrame(tick);
+    }
+    raf = requestAnimationFrame(tick);
+  }
+
+  function stopAutoScroll(){
+    running = false;
+    if(raf) cancelAnimationFrame(raf);
+  }
+
+  // Buttons
+  document.getElementById("replay").addEventListener("click", ()=>{
+    stopAutoScroll();
+    window.scrollTo(0,0);
+    // small delay so scroll reset is visible
+    setTimeout(()=> startAutoScroll(), 60);
+  });
+  document.getElementById("stop").addEventListener("click", stopAutoScroll);
+
+  // Start
+  window.scrollTo(0,0);
+  startAutoScroll();
 </script>
 </body>
 </html>

@@ -1,1 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dive Transition</title>
+  <style>
+    :root{
+      --surfaceA:#5FC2A7;
+      --surfaceB:#3CC19E;
+      --underA:#2aa98d;
+      --underB:#146f6a;
+      --ink: rgba(255,255,255,0.92);
+      --shadow: 0 18px 60px rgba(0,0,0,0.45);
+    }
 
+    html,body{height:100%; margin:0; background:#07131d; overflow:hidden; font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial;}
+    .stage{position:relative; width:100%; height:100%;}
+
+    /* Background: starts at surface, becomes underwater */
+    .bg{
+      position:absolute; inset:0;
+      background:
+        radial-gradient(1200px 800px at 50% -10%, rgba(255,255,255,0.22), transparent 55%),
+        linear-gradient(180deg, var(--surfaceA) 0%, var(--surfaceB) 40%, var(--underA) 68%, var(--underB) 100%);
+      transform: translateY(0) scale(1.02);
+      filter: saturate(1.05);
+      will-change: transform, filter;
+      animation: diveBG 1050ms cubic-bezier(.2,.9,.2,1) forwards;
+    }
+
+    /* Light caustics shimmer */
+    .caustics{
+      position:absolute; inset:-25%;
+      background:
+        repeating-radial-gradient(circle at 20% 30%, rgba(255,255,255,0.08) 0 6px, transparent 6px 20px),
+        repeating-radial-gradient(circle at 70% 60%, rgba(255,255,255,0.06) 0 7px, transparent 7px 22px);
+      mix-blend-mode: overlay;
+      opacity: 0.0;
+      transform: translateY(-6%) rotate(-4deg);
+      filter: blur(1px);
+      animation: causticsIn 1050ms ease-out forwards;
+      pointer-events:none;
+    }
+
+    /* “Surface line” that quickly passes upward as you dive */
+    .surfaceLine{
+      position:absolute; left:-5%; right:-5%;
+      top: 36%;
+      height: 10px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.75), transparent);
+      opacity: 0.85;
+      filter: blur(1px);
+      transform: translateY(0);
+      animation: surfacePass 1050ms cubic-bezier(.2,.9,.2,1) forwards;
+      pointer-events:none;
+    }
+
+    /* Vignette + depth */
+    .vignette{
+      position:absolute; inset:0;
+      background: radial-gradient(closest-side at 50% 45%, transparent 55%, rgba(0,0,0,0.35) 100%);
+      opacity: 0.65;
+      pointer-events:none;
+    }
+
+    /* Bubbles */
+    .bubbles{ position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+    .bubble{
+      position:absolute;
+      bottom:-12vh;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.85), rgba(255,255,255,0.12) 55%, rgba(255,255,255,0.05) 100%);
+      box-shadow: 0 8px 22px rgba(255,255,255,0.08);
+      opacity: 0;
+      transform: translateX(0) translateY(0) scale(1);
+      animation: bubbleUp var(--dur) linear forwards;
+    }
+
+    /* Center message */
+    .center{
+      position:absolute; inset:0;
+      display:grid; place-items:center;
+      z-index:5;
+    }
+    .card{
+      padding: 14px 18px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.18);
+      box-shadow: var(--shadow);
+      color: var(--ink);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      text-align:center;
+      transform: translateY(0);
+      opacity: 0;
+      animation: textIn 420ms ease-out 120ms forwards, textOut 520ms ease-in 700ms forwards;
+    }
+    .card .title{ font-weight: 750; letter-spacing: .2px; }
+    .card .sub{ font-size: 13px; opacity:.9; margin-top:4px; }
+
+    /* Slight “camera drop” */
+    .camera{
+      position:absolute; inset:0;
+      transform: translateY(0);
+      will-change: transform;
+      animation: cameraDrop 1050ms cubic-bezier(.2,.9,.2,1) forwards;
+    }
+
+    @keyframes diveBG{
+      0%{ transform: translateY(0) scale(1.02); filter: blur(0px) saturate(1.05) brightness(1); }
+      45%{ filter: blur(1.4px) saturate(1.05) brightness(0.98); }
+      100%{ transform: translateY(-12%) scale(1.06); filter: blur(0.8px) saturate(1.2) brightness(0.92); }
+    }
+    @keyframes cameraDrop{
+      0%{ transform: translateY(0); }
+      100%{ transform: translateY(8%); }
+    }
+    @keyframes surfacePass{
+      0%{ transform: translateY(0); opacity: 0.9; }
+      55%{ opacity: 0.75; }
+      100%{ transform: translateY(-26vh); opacity: 0; }
+    }
+    @keyframes causticsIn{
+      0%{ opacity:0; transform: translateY(-8%) rotate(-4deg) scale(1.05); }
+      60%{ opacity:0.35; }
+      100%{ opacity:0.22; transform: translateY(3%) rotate(-2deg) scale(1.08); }
+    }
+    @keyframes bubbleUp{
+      0%{ opacity:0; transform: translateX(0) translateY(0) scale(var(--s)); }
+      8%{ opacity:0.65; }
+      100%{
+        opacity:0;
+        transform: translateX(var(--drift)) translateY(-120vh) scale(calc(var(--s) * 1.1));
+      }
+    }
+    @keyframes textIn{
+      from{ opacity:0; transform: translateY(10px) scale(0.98); }
+      to{ opacity:1; transform: translateY(0) scale(1); }
+    }
+    @keyframes textOut{
+      from{ opacity:1; transform: translateY(0) scale(1); }
+      to{ opacity:0; transform: translateY(-6px) scale(0.98); }
+    }
+
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce){
+      .bg,.camera,.surfaceLine,.caustics,.card{ animation:none !important; }
+      .bubble{ animation:none !important; display:none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <div class="camera">
+      <div class="bg"></div>
+      <div class="caustics"></div>
+      <div class="surfaceLine"></div>
+      <div class="bubbles" id="bubbles"></div>
+      <div class="vignette"></div>
+    </div>
+
+    <div class="center">
+      <div class="card">
+        <div class="title">Diving into the Algal Pond…</div>
+        <div class="sub">Hold tight — entering underwater.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ====== SETTINGS ======
+    const NEXT_PAGE = "pond2.html";   // <-- change to your real main page filename
+    const DURATION_MS = 1050;         // total transition time
+    const BUBBLE_COUNT = 26;
+
+    // Spawn bubbles
+    const wrap = document.getElementById("bubbles");
+    const rnd = (a,b)=> a + Math.random()*(b-a);
+
+    for(let i=0;i<BUBBLE_COUNT;i++){
+      const b = document.createElement("div");
+      b.className = "bubble";
+
+      const size = rnd(6, 16);
+      b.style.width = size + "px";
+      b.style.height = size + "px";
+
+      b.style.left = rnd(-5, 105) + "vw";
+
+      const dur = rnd(650, 1200);
+      b.style.setProperty("--dur", dur + "ms");
+
+      const drift = rnd(-24, 24);
+      b.style.setProperty("--drift", drift + "px");
+
+      const scale = rnd(0.8, 1.5);
+      b.style.setProperty("--s", scale);
+
+      const delay = rnd(0, 420);
+      b.style.animationDelay = delay + "ms";
+
+      wrap.appendChild(b);
+    }
+
+    // Redirect after animation completes
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if(reducedMotion){
+      // instant if user prefers reduced motion
+      window.location.replace(NEXT_PAGE);
+    } else {
+      setTimeout(() => window.location.replace(NEXT_PAGE), DURATION_MS);
+    }
+  </script>
+</body>
+</html>

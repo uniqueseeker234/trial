@@ -4,6 +4,10 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Dive Scroll Transition</title>
+
+<!-- Prefetch Pond2 so it loads smoother after dive -->
+<link rel="prefetch" href="pond2.html" as="document">
+
 <style>
   :root{
     --surfaceA:#5FC2A7;
@@ -18,13 +22,12 @@
   html,body{ margin:0; height:100%; background:#07131d; font-family:system-ui, Arial; }
   body{ overflow-x:hidden; }
 
-  /* Tall track (the “world” you fall through) */
+  /* Taller = longer fall */
   .track{
     position:relative;
-    height: 260vh; /* <-- increase for longer fall */
+    height: 420vh; /* ✅ increased */
   }
 
-  /* Sticky viewport = camera window */
   .camera{
     position:sticky;
     top:0;
@@ -32,7 +35,6 @@
     overflow:hidden;
   }
 
-  /* Background changes as you scroll (we also animate it slightly) */
   .bg{
     position:absolute; inset:-12%;
     background:
@@ -48,7 +50,6 @@
     will-change: transform, filter;
   }
 
-  /* Surface line that moves out of view quickly */
   .surfaceLine{
     position:absolute; left:-10%; right:-10%;
     top: 42%;
@@ -60,7 +61,6 @@
     will-change: transform, opacity;
   }
 
-  /* Caustics shimmer */
   .caustics{
     position:absolute; inset:-30%;
     background:
@@ -80,7 +80,6 @@
     pointer-events:none;
   }
 
-  /* Bubbles float up while you “fall” down */
   .bubbles{ position:absolute; inset:0; pointer-events:none; overflow:hidden; }
   .bubble{
     position:absolute;
@@ -100,10 +99,9 @@
   @keyframes bubbleUp{
     0%{ opacity: 0; transform: translate3d(0,0,0) scale(var(--s)); }
     10%{ opacity: var(--op); }
-    100%{ opacity: 0; transform: translate3d(var(--drift), -150vh, 0) scale(calc(var(--s) * 1.18)); }
+    100%{ opacity: 0; transform: translate3d(var(--drift), -170vh, 0) scale(calc(var(--s) * 1.18)); }
   }
 
-  /* Text card */
   .center{
     position:absolute; inset:0;
     display:grid; place-items:center;
@@ -126,7 +124,7 @@
   .title{ font-weight: 800; }
   .sub{ font-size: 13px; opacity: .9; margin-top: 4px; }
 
-  /* Controls */
+  /* Bottom controls */
   .controls{
     position:fixed; left:50%; bottom:18px;
     transform: translateX(-50%);
@@ -144,7 +142,13 @@
     -webkit-backdrop-filter: blur(8px);
   }
 
-  /* Reduce motion */
+  /* The redirect button appears after the fall */
+  .enter{
+    display:none;
+    background:#ffffff33;
+  }
+  .enter.show{ display:inline-block; }
+
   @media (prefers-reduced-motion: reduce){
     .bubble{ animation:none !important; display:none; }
   }
@@ -163,7 +167,7 @@
     <div class="center">
       <div class="card" id="card">
         <div class="title">Falling into the Algal Pond…</div>
-        <div class="sub">Just a second — going underwater.</div>
+        <div class="sub">Almost there — going deeper.</div>
       </div>
     </div>
   </div>
@@ -172,81 +176,107 @@
 <div class="controls">
   <button class="btn" id="replay">Replay</button>
   <button class="btn" id="stop">Stop</button>
+  <button class="btn enter" id="enterBtn">Enter Pond</button>
 </div>
 
 <script>
+  // ===== SETTINGS YOU CAN TWEAK =====
+  const NEXT_PAGE = "pond2.html";   // <-- change if your pond file name differs
+  const FALL_SCREENS = 3.6;         // ✅ more scroll distance (screens)
+  const DURATION_MS = 2400;         // ✅ slower (less “fast & laggy”)
+  const AUTO_REDIRECT = false;      // set true if you want auto-jump after fall
+  const AUTO_REDIRECT_DELAY = 500;  // ms after fall finishes
+
+  // Stronger prefetch (fetch Pond2 early)
+  // This can help reduce the lag when pond2 loads.
+  fetch(NEXT_PAGE, { cache: "force-cache" }).catch(()=>{});
+
   const bubblesWrap = document.getElementById("bubbles");
   const bg = document.getElementById("bg");
   const caustics = document.getElementById("caustics");
   const surfaceLine = document.getElementById("surfaceLine");
   const card = document.getElementById("card");
+  const enterBtn = document.getElementById("enterBtn");
 
   const rnd=(a,b)=>a+Math.random()*(b-a);
 
-  // Create BIG bubbles + normal bubbles
-  const COUNT = 54;
+  // Bubbles (big + normal)
+  const COUNT = 56;
   for(let i=0;i<COUNT;i++){
     const b = document.createElement("div");
     b.className = "bubble";
 
-    const isBig = Math.random() < 0.38;
-    const size = isBig ? rnd(26, 70) : rnd(10, 28);
+    const isBig = Math.random() < 0.40;
+    const size = isBig ? rnd(28, 78) : rnd(10, 28);
     b.style.width = size+"px";
     b.style.height = size+"px";
     b.style.left = rnd(-10, 110)+"vw";
 
-    const dur = isBig ? rnd(1.0, 1.55) : rnd(1.3, 2.2);
+    const dur = isBig ? rnd(1.0, 1.7) : rnd(1.4, 2.4);
     b.style.setProperty("--dur", dur+"s");
-
-    b.style.setProperty("--delay", rnd(0, 1.0)+"s");
-    b.style.setProperty("--drift", (isBig ? rnd(-60,60) : rnd(-34,34))+"px");
-    b.style.setProperty("--s", (isBig ? rnd(1.0,1.9) : rnd(0.75,1.25)));
+    b.style.setProperty("--delay", rnd(0, 1.2)+"s");
+    b.style.setProperty("--drift", (isBig ? rnd(-70,70) : rnd(-38,38))+"px");
+    b.style.setProperty("--s", (isBig ? rnd(1.0,2.0) : rnd(0.75,1.25)));
     b.style.setProperty("--op", (isBig ? rnd(0.65,0.92) : rnd(0.35,0.65)));
-    b.style.setProperty("--blur", (isBig ? rnd(0.6,2.0) : rnd(0.2,1.0))+"px");
+    b.style.setProperty("--blur", (isBig ? rnd(0.6,2.2) : rnd(0.2,1.0))+"px");
 
     bubblesWrap.appendChild(b);
   }
 
-  // Auto-scroll down (the “fall”)
+  // Auto scroll fall
   let raf = null;
   let running = true;
 
+  function easeInOut(t){
+    return t<0.5 ? 2*t*t : 1 - Math.pow(-2*t+2,2)/2;
+  }
+
   function startAutoScroll(){
     running = true;
+    enterBtn.classList.remove("show");
+
     const startY = window.scrollY;
     const maxY = document.documentElement.scrollHeight - window.innerHeight;
-    const target = Math.min(maxY, startY + window.innerHeight * 2.4); // fall distance
+    const target = Math.min(maxY, startY + window.innerHeight * FALL_SCREENS);
 
-    const duration = 1400; // ms
     const t0 = performance.now();
-
-    function easeInOut(t){
-      return t<0.5 ? 2*t*t : 1 - Math.pow(-2*t+2,2)/2;
-    }
 
     function tick(now){
       if(!running) return;
-      const t = Math.min(1, (now - t0) / duration);
+
+      const t = Math.min(1, (now - t0) / DURATION_MS);
       const e = easeInOut(t);
       const y = startY + (target - startY) * e;
       window.scrollTo(0, y);
 
-      // Update visuals based on progress
-      const p = e; // 0..1
-      bg.style.setProperty("--bgShift", (-p*120) + "px");     // background shifts
-      bg.style.setProperty("--bri", (1 - p*0.10).toFixed(3)); // slightly darker
-      surfaceLine.style.setProperty("--lineY", (-p*320) + "px");
-      surfaceLine.style.setProperty("--lineOp", (1 - p*1.1).toFixed(3));
+      const p = e;
+
+      // visuals based on progress
+      bg.style.setProperty("--bgShift", (-p*180) + "px");
+      bg.style.setProperty("--bri", (1 - p*0.12).toFixed(3));
+
+      surfaceLine.style.setProperty("--lineY", (-p*380) + "px");
+      surfaceLine.style.setProperty("--lineOp", (1 - p*1.15).toFixed(3));
+
       caustics.style.setProperty("--cOp", (p < 0.65 ? (p/0.65)*0.38 : 0.22).toFixed(3));
-      caustics.style.setProperty("--cY", (p*60) + "px");
+      caustics.style.setProperty("--cY", (p*70) + "px");
 
-      // Text shows early then fades
-      const tShow = p < 0.75 ? 1 : Math.max(0, 1 - (p-0.75)/0.25);
+      // text fades late
+      const tShow = p < 0.80 ? 1 : Math.max(0, 1 - (p-0.80)/0.20);
       card.style.setProperty("--tOp", tShow.toFixed(3));
-      card.style.setProperty("--tY", (8 - p*14) + "px");
-      card.style.setProperty("--tS", (0.98 + p*0.03).toFixed(3));
+      card.style.setProperty("--tY", (8 - p*16) + "px");
+      card.style.setProperty("--tS", (0.98 + p*0.035).toFixed(3));
 
-      if(t < 1) raf = requestAnimationFrame(tick);
+      if(t < 1){
+        raf = requestAnimationFrame(tick);
+      } else {
+        // finished fall
+        enterBtn.classList.add("show");
+
+        if(AUTO_REDIRECT){
+          setTimeout(()=> window.location.href = NEXT_PAGE, AUTO_REDIRECT_DELAY);
+        }
+      }
     }
     raf = requestAnimationFrame(tick);
   }
@@ -260,10 +290,14 @@
   document.getElementById("replay").addEventListener("click", ()=>{
     stopAutoScroll();
     window.scrollTo(0,0);
-    // small delay so scroll reset is visible
     setTimeout(()=> startAutoScroll(), 60);
   });
   document.getElementById("stop").addEventListener("click", stopAutoScroll);
+
+  // Redirect button
+  enterBtn.addEventListener("click", ()=>{
+    window.location.href = NEXT_PAGE;
+  });
 
   // Start
   window.scrollTo(0,0);

@@ -19,7 +19,7 @@
 html,body{
   margin:0;
   height:100%;
-  background:#07131d;
+  background:var(--deep); /* ✅ match deep water */
   font-family:system-ui, Arial;
 }
 
@@ -30,6 +30,7 @@ body{
 .track{
   position:relative;
   height:420vh;
+  background:var(--deep); /* ✅ match deep water */
 }
 
 .camera{
@@ -37,6 +38,7 @@ body{
   top:0;
   height:100vh;
   overflow:hidden;
+  background:var(--deep); /* ✅ match deep water */
 }
 
 .bg{
@@ -123,14 +125,12 @@ body{
   pointer-events:none;
   transition:opacity 400ms ease;
 }
-.fadeOut.show{
-  opacity:1;
-}
+.fadeOut.show{ opacity:1; }
 </style>
 </head>
 <body>
 
-<div class="track">
+<div class="track" id="track">
   <div class="camera">
     <div class="bg" id="bg"></div>
     <div class="caustics" id="caustics"></div>
@@ -143,17 +143,19 @@ body{
 <div class="fadeOut" id="fade"></div>
 
 <script>
-const NEXT_PAGE = "pond2.html";   // change if needed
+const NEXT_PAGE = "pond2.html";
 const DURATION = 2400;
 const FALL_SCREENS = 3.6;
 
-fetch(NEXT_PAGE,{cache:"force-cache"}).catch(()=>{});
+// Pre-warm Pond2 (helps reduce lag)
+fetch(NEXT_PAGE, { cache:"force-cache" }).catch(()=>{});
 
-const bg=document.getElementById("bg");
-const caustics=document.getElementById("caustics");
-const surfaceLine=document.getElementById("surfaceLine");
-const bubblesWrap=document.getElementById("bubbles");
-const fade=document.getElementById("fade");
+const track = document.getElementById("track");
+const bg = document.getElementById("bg");
+const caustics = document.getElementById("caustics");
+const surfaceLine = document.getElementById("surfaceLine");
+const bubblesWrap = document.getElementById("bubbles");
+const fade = document.getElementById("fade");
 
 const rnd=(a,b)=>a+Math.random()*(b-a);
 
@@ -179,17 +181,26 @@ function easeInOut(t){
   return t<0.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
 }
 
+// IMPORTANT: never reach the sticky release point
+function computeSafeTarget(){
+  const viewport = window.innerHeight;
+  const trackHeight = track.getBoundingClientRect().height;
+
+  // Sticky releases at (trackHeight - viewport). Stay well above that.
+  const SAFE_BEFORE_RELEASE = Math.max(900, Math.round(viewport * 0.9)); // adaptive
+  const safeMax = Math.max(0, (trackHeight - viewport) - SAFE_BEFORE_RELEASE);
+
+  return Math.min(safeMax, viewport * FALL_SCREENS);
+}
+
 window.scrollTo(0,0);
-const startY=0;
-const maxY = document.documentElement.scrollHeight - window.innerHeight;
-const SAFETY_PX = 800; // important buffer
-const target = Math.min(maxY - SAFETY_PX, window.innerHeight * FALL_SCREENS);
-const t0=performance.now();
+let target = computeSafeTarget();
+const t0 = performance.now();
 
 function tick(now){
   const t=Math.min(1,(now-t0)/DURATION);
   const e=easeInOut(t);
-  const y=startY+(target-startY)*e;
+  const y=target*e;
   window.scrollTo(0,y);
 
   bg.style.setProperty("--bgShift",(-e*180)+"px");
@@ -206,6 +217,11 @@ function tick(now){
     setTimeout(()=>window.location.href=NEXT_PAGE,400);
   }
 }
+
+// Recompute if desktop viewport changes (resize / zoom)
+window.addEventListener("resize", ()=>{
+  target = computeSafeTarget();
+});
 
 requestAnimationFrame(tick);
 </script>

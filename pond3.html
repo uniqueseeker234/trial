@@ -851,7 +851,46 @@
     transform-origin: left center;
   }
 }
+.earthOrb{
+  position:absolute;
+  right: 18px;
+  top: 18px;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow:
+    0 0 18px rgba(120,180,255,0.45),
+    inset -12px 0 22px rgba(0,0,0,0.55);
+}
 
+/* Texture layer */
+.earthOrb::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background-image: url("assets/earth_texture.jpg"); /* change name if needed */
+  background-size: cover;
+  background-repeat: repeat-x;
+  animation: rotateEarth 25s linear infinite;
+}
+
+/* Day/Night shading */
+.earthOrb::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(circle at 70% 50%,
+      rgba(0,0,0,0.0) 40%,
+      rgba(0,0,0,0.55) 70%);
+}
+
+/* Smooth horizontal spin */
+@keyframes rotateEarth{
+  from{ background-position: 0 0; }
+  to{ background-position: -1000px 0; }
+}
 </style>
 </head>
 

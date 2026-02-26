@@ -160,7 +160,9 @@ const fade = document.getElementById("fade");
 const rnd=(a,b)=>a+Math.random()*(b-a);
 
 // bubbles
-for(let i=0;i<60;i++){
+const isMobile = matchMedia("(max-width: 768px)").matches;
+const COUNT = isMobile ? 60 : 38; // desktop lighter
+for(let i=0;i<COUNT;i++){
   const b=document.createElement("div");
   b.className="bubble";
   const big=Math.random()<0.4;
@@ -173,7 +175,7 @@ for(let i=0;i<60;i++){
   b.style.setProperty("--drift",(big?rnd(-70,70):rnd(-38,38))+"px");
   b.style.setProperty("--s",(big?rnd(1.0,2.0):rnd(0.75,1.25)));
   b.style.setProperty("--op",(big?rnd(0.65,0.92):rnd(0.35,0.65)));
-  b.style.setProperty("--blur",(big?rnd(0.6,2.2):rnd(0.2,1.0))+"px");
+  b.style.setProperty("--blur",(big?rnd(0.4,1.4):rnd(0.1,0.7))+"px");
   bubblesWrap.appendChild(b);
 }
 
@@ -201,7 +203,11 @@ function tick(now){
   const t=Math.min(1,(now-t0)/DURATION);
   const e=easeInOut(t);
   const y=target*e;
-  window.scrollTo(0,y);
+  const nowMs = performance.now();
+if (!tick.last || nowMs - tick.last > 16) { // ~60fps cap
+  window.scrollTo(0, y);
+  tick.last = nowMs;
+}
 
   bg.style.setProperty("--bgShift",(-e*180)+"px");
   bg.style.setProperty("--bri",(1-e*0.12).toFixed(3));

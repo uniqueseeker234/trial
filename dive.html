@@ -181,8 +181,9 @@ function easeInOut(t){
 
 window.scrollTo(0,0);
 const startY=0;
-const maxY=document.documentElement.scrollHeight-window.innerHeight;
-const target=Math.min(maxY,window.innerHeight*FALL_SCREENS);
+const maxY = document.documentElement.scrollHeight - window.innerHeight;
+const SAFETY_PX = 800; // important buffer
+const target = Math.min(maxY - SAFETY_PX, window.innerHeight * FALL_SCREENS);
 const t0=performance.now();
 
 function tick(now){

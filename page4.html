@@ -537,48 +537,53 @@
     .hanger{height:340px}
     .preview224 .polaroid .frame{align-self:flex-start; margin-left:auto; margin-right:auto}
   }
-// Temporary uploader for testing PhotoHouse without Page 3
-const tmpPhotoInput = document.getElementById("tmpPhotoInput");
-const btnAddPhoto = document.getElementById("btnAddPhoto");
+// Temporary Photo Upload (SAFE VERSION)
+document.addEventListener("DOMContentLoaded", function(){
 
-btnAddPhoto?.addEventListener("click", () => tmpPhotoInput.click());
+  const tmpPhotoInput = document.getElementById("tmpPhotoInput");
+  const btnAddPhoto = document.getElementById("btnAddPhoto");
 
-tmpPhotoInput?.addEventListener("change", (e) => {
-  const file = e.target.files?.[0];
-  if (!file) return;
-
-  if (file.size > 10 * 1024 * 1024) {
-    alert("Image too large. Please choose one under 10MB.");
-    tmpPhotoInput.value = "";
+  if (!tmpPhotoInput || !btnAddPhoto) {
+    console.log("Temporary upload elements not found.");
     return;
   }
 
-  const r = new FileReader();
-  r.onload = () => {
-    // Save it the same way Page 3 would do
-    localStorage.setItem(KEY_INPUT, r.result);
+  btnAddPhoto.addEventListener("click", function(){
+    tmpPhotoInput.click();
+  });
 
-    // Load it immediately into the editor
-    imgReady = false;
-    img.onload = () => {
-      imgReady = true;
-      // reset view so user starts clean
-      sliders.zoom.value = 1;
-      sliders.bright.value = 0;
-      sliders.contrast.value = 1.0;
-      sliders.denoise.value = 0;
-      sliders.sharpen.value = 0;
-      panX = 0; panY = 0;
-      rotation = 0;
+  tmpPhotoInput.addEventListener("change", function(e){
+    const file = e.target.files[0];
+    if (!file) return;
 
-      sizeBigCanvas();
-      renderAll();
-      setStep(0);
+    const reader = new FileReader();
+
+    reader.onload = function(){
+      imgReady = false;
+
+      img.onload = function(){
+        imgReady = true;
+
+        sliders.zoom.value = 1;
+        sliders.bright.value = 0;
+        sliders.contrast.value = 1.0;
+        sliders.denoise.value = 0;
+        sliders.sharpen.value = 0;
+        panX = 0;
+        panY = 0;
+        rotation = 0;
+
+        sizeBigCanvas();
+        renderAll();
+        setStep(0);
+      };
+
+      img.src = reader.result;
     };
-    img.src = r.result;
-  };
-  r.readAsDataURL(file);
-});
+
+    reader.readAsDataURL(file);
+  });
+    
 </style>
 </head>
 
@@ -595,7 +600,6 @@ tmpPhotoInput?.addEventListener("change", (e) => {
     </div>
   <div class="actions">
   <input id="tmpPhotoInput" type="file" accept="image/*" hidden>
-
   <button class="btn" id="btnAddPhoto">Add Photo (temporary)</button>
   <button class="btn" id="btnSkip">Skip guide</button>
   <button class="btn" id="btnReset">Reset</button>

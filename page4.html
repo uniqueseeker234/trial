@@ -537,7 +537,48 @@
     .hanger{height:340px}
     .preview224 .polaroid .frame{align-self:flex-start; margin-left:auto; margin-right:auto}
   }
+// Temporary uploader for testing PhotoHouse without Page 3
+const tmpPhotoInput = document.getElementById("tmpPhotoInput");
+const btnAddPhoto = document.getElementById("btnAddPhoto");
 
+btnAddPhoto?.addEventListener("click", () => tmpPhotoInput.click());
+
+tmpPhotoInput?.addEventListener("change", (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  if (file.size > 10 * 1024 * 1024) {
+    alert("Image too large. Please choose one under 10MB.");
+    tmpPhotoInput.value = "";
+    return;
+  }
+
+  const r = new FileReader();
+  r.onload = () => {
+    // Save it the same way Page 3 would do
+    localStorage.setItem(KEY_INPUT, r.result);
+
+    // Load it immediately into the editor
+    imgReady = false;
+    img.onload = () => {
+      imgReady = true;
+      // reset view so user starts clean
+      sliders.zoom.value = 1;
+      sliders.bright.value = 0;
+      sliders.contrast.value = 1.0;
+      sliders.denoise.value = 0;
+      sliders.sharpen.value = 0;
+      panX = 0; panY = 0;
+      rotation = 0;
+
+      sizeBigCanvas();
+      renderAll();
+      setStep(0);
+    };
+    img.src = r.result;
+  };
+  r.readAsDataURL(file);
+});
 </style>
 </head>
 
@@ -552,12 +593,15 @@
         <p id="subtitle">Developing algae photos for Uniqueseeker’s Pond</p>
       </div>
     </div>
-    <div class="actions">
-      <button class="btn" id="btnSkip">Skip guide</button>
-      <button class="btn" id="btnReset">Reset</button>
-      <button class="btn primary" id="btnAuto">Auto Improve</button>
-      <button class="btn primary" id="btnDevelop">Develop → Analyze</button>
-    </div>
+  <div class="actions">
+  <input id="tmpPhotoInput" type="file" accept="image/*" hidden>
+
+  <button class="btn" id="btnAddPhoto">Add Photo (temporary)</button>
+  <button class="btn" id="btnSkip">Skip guide</button>
+  <button class="btn" id="btnReset">Reset</button>
+  <button class="btn primary" id="btnAuto">Auto Improve</button>
+  <button class="btn primary" id="btnDevelop">Develop → Analyze</button>
+</div>
   </div>
 
   <div class="main">
@@ -705,7 +749,7 @@
    SETTINGS YOU CAN CHANGE LATER
 ========================= */
 const WORKROOM_NAME = "Uniqueseeker’s Project Mate"; // change anytime
-const PAGE5_URL = "page5.html"; // your model-running page
+const PAGE5_URL = "page4.html"; // your model-running page
 const KEY_INPUT = "pond2_upload_image";    // set in Page 3
 const KEY_OUTPUT = "pond2_enhanced_224";   // read in Page 5
 

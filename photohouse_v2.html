@@ -527,7 +527,13 @@
   .photoCard{
     height: 240px;
   }
-
+/* Mobile-only: topbar should scroll (no masking the clip) */
+@media (max-width: 980px){
+  .topbar{
+    position: static;     /* remove sticky */
+    top: auto;
+  }
+}
 }
 </style>
 </head>

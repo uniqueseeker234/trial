@@ -1,172 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pond 2 – Structural Glass Build</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Pond 2 • Surface Rim Only</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet"/>
 
 <style>
 :root{
-  --bg:#07131f;
+  --shuttleH:20vh;
   --surfaceA:#5FC2A7;
   --surfaceB:#3CC19E;
   --underA:#2aa98d;
   --underB:#146f6a;
-
-  --tankW:min(980px,96vw);
-  --tankH:60vh;
-  --radius:30px;
 }
 
-/* ================== GLOBAL ================== */
 html,body{
   margin:0;
   height:100%;
-  background:var(--bg);
-  font-family:system-ui;
-  overflow-x:hidden;
+  overflow:hidden;
+  font-family:'Poppins',sans-serif;
+  background:#0b1a17;
 }
 
-/* ================== SHUTTLE TOP (UNCHANGED STRUCTURE) ================== */
+/* ================= SHUTTLE ================= */
 #shuttleTop{
   position:fixed;
-  top:0; left:0; right:0;
-  height:20vh;
-  background:linear-gradient(to bottom,#101826,#060b13);
-  border-bottom:1px solid rgba(255,255,255,0.1);
-  z-index:200;
-}
-
-/* ================== TANK WRAPPER ================== */
-.surfaceTankWrapper{
-  padding-top:22vh;
-  display:flex;
-  justify-content:center;
-}
-
-/* ================== STRUCTURAL GLASS ================== */
-.surfaceTank{
-  position:relative;
-  width:var(--tankW);
-  height:var(--tankH);
-  border-radius:var(--radius);
-
-  background:rgba(255,255,255,0.05);
-  border:4px solid rgba(255,255,255,0.45);
-
-  box-shadow:
-    0 60px 120px rgba(0,0,0,0.55),
-    inset 0 20px 30px rgba(255,255,255,0.18),
-    inset 0 -40px 50px rgba(0,0,0,0.35);
-
-  overflow:hidden;
-}
-
-/* Interior Glass Depth */
-.surfaceInside{
-  position:absolute;
-  inset:22px 22px 34px 22px;
-  border-radius:calc(var(--radius) - 22px);
-  overflow:hidden;
-
-  background:
-    radial-gradient(1000px 300px at 50% 0%, rgba(255,255,255,0.18), transparent 60%),
-    linear-gradient(180deg,var(--surfaceA),var(--surfaceB));
-}
-
-/* Bottom Seam */
-.surfaceTank::after{
-  content:"";
-  position:absolute;
-  left:8%;
-  right:8%;
-  bottom:18px;
-  height:22px;
-  border-radius:999px;
-  background:rgba(255,255,255,0.18);
-  box-shadow:
-    inset 0 4px 8px rgba(255,255,255,0.45),
-    inset 0 -6px 10px rgba(0,0,0,0.35);
-  opacity:0.85;
-}
-
-/* ================== WATER ================== */
-.surface{
-  position:absolute;
   top:0;
   left:0;
   right:0;
-  height:40%;
-  background:linear-gradient(to bottom,var(--surfaceA),var(--surfaceB));
+  height:var(--shuttleH);
+  background:linear-gradient(to bottom,#111a24,#0b131b);
+  z-index:100;
 }
 
+/* ================= POND ================= */
+#pond-layer{
+  position:fixed;
+  inset:0;
+  overflow:hidden;
+}
+
+/* Surface */
+.surface{
+  position:absolute;
+  top:calc(var(--shuttleH) + 7vh);
+  left:50%;
+  transform:translateX(-50%);
+  width:min(980px,96vw);
+  height:26vh;
+  background:linear-gradient(to bottom,var(--surfaceA),var(--surfaceB));
+  z-index:5;
+}
+
+/* NEW: Surface Rim Only */
+.surfaceRim{
+  position:absolute;
+  top:calc(var(--shuttleH) + 7vh);
+  left:50%;
+  transform:translateX(-50%);
+  width:min(980px,96vw);
+  height:26vh;
+  border-radius:18px;
+  pointer-events:none;
+  z-index:8;
+}
+
+.surfaceRim::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:18px;
+  box-shadow:
+    inset 0 0 0 2px rgba(255,255,255,0.35),
+    inset 0 0 25px rgba(255,255,255,0.10);
+}
+
+.surfaceRim::after{
+  content:"";
+  position:absolute;
+  inset:-6px;
+  border-radius:24px;
+  box-shadow:0 25px 45px rgba(0,0,0,0.35);
+  opacity:.8;
+}
+
+/* Underwater */
 .underwater{
   position:absolute;
-  top:40%;
-  left:0; right:0; bottom:0;
+  top:calc(var(--shuttleH) + 7vh + 26vh);
+  left:50%;
+  transform:translateX(-50%);
+  width:min(980px,96vw);
+  bottom:0;
   background:linear-gradient(to bottom,var(--underA),var(--underB));
 }
 
-/* ================== PADS ================== */
-.pad{
+/* Simple fish demo */
+.fish{
   position:absolute;
-  width:160px;
-  height:110px;
-  border-radius:999px;
-  background: radial-gradient(circle at 30% 30%, #c6fbca, #68dd82 58%, #2ca85c 100%);
-  box-shadow:0 18px 30px rgba(0,0,0,0.25);
+  width:60px;
+  height:30px;
+  background:#ff7b7b;
+  border-radius:30px;
+  top:60%;
+  left:-80px;
+  animation:swim 15s linear infinite;
 }
 
-.pad.left{left:8%; top:20%; transform:rotate(-12deg);}
-.pad.right{right:8%; top:20%; transform:rotate(12deg);}
-
-/* ================== FROG ================== */
-.frog{
-  position:absolute;
-  left:50%;
-  top:22%;
-  transform:translateX(-50%);
-  width:90px;
-  height:80px;
-  border-radius:999px;
-  background: radial-gradient(circle at 30% 30%, #6fe37b, #2ebd46 75%);
+@keyframes swim{
+  from{transform:translateX(0);}
+  to{transform:translateX(110vw);}
 }
 
-.frog::before,.frog::after{
-  content:"";
-  position:absolute;
-  top:-14px;
-  width:30px;height:30px;border-radius:50%;
-  background:white;
-}
-.frog::before{left:10px;}
-.frog::after{right:10px;}
-
-/* ================== RESPONSIVE ================== */
-@media(max-width:700px){
-  :root{
-    --tankH:55vh;
-  }
-}
 </style>
 </head>
+
 <body>
 
 <div id="shuttleTop"></div>
 
-<div class="surfaceTankWrapper">
-  <div class="surfaceTank">
-    <div class="surfaceInside">
+<div id="pond-layer">
 
-      <div class="surface"></div>
-      <div class="underwater"></div>
+  <div class="surface"></div>
+  <div class="surfaceRim"></div>
+  <div class="underwater"></div>
 
-      <div class="pad left"></div>
-      <div class="pad right"></div>
-      <div class="frog"></div>
+  <div class="fish"></div>
 
-    </div>
-  </div>
 </div>
 
 </body>

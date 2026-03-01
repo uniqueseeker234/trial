@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Pond Archive • Algal Database</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg0:#05070b;
+  --bg1:#071018;
+  --glass: rgba(255,255,255,0.06);
+  --glass2: rgba(255,255,255,0.10);
+  --border: rgba(255,255,255,0.14);
+  --text: rgba(230,255,250,0.88);
+  --muted: rgba(230,255,250,0.62);
+  --dim: rgba(230,255,250,0.38);
+
+  --tealA:#5FC2A7;   /* pond teal */
+  --tealB:#3CC19E;
+  --cyan:#52e6ff;
+  --warn:#ffcc66;
+  --bad:#ff6b6b;
+
+  --shadow: 0 18px 70px rgba(0,0,0,0.65);
+  --radius: 18px;
+}
+
+*{box-sizing:border-box;}
+html,body{
+  height:100%;
+  margin:0;
+  font-family:Inter,system-ui;
+  background:
+    radial-gradient(1200px 900px at 70% -10%, rgba(95,194,167,0.18), transparent 60%),
+    radial-gradient(900px 700px at 10% 110%, rgba(82,230,255,0.10), transparent 55%),
+    linear-gradient(180deg,var(--bg0),var(--bg1));
+  color:var(--text);
+  overflow:hidden;
+}
+
+/* subtle "star noise" */
+body:before{
+  content:"";
+  position:fixed; inset:0;
+  background-image:
+    radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.18) 0, transparent 60%),
+    radial-gradient(1px 1px at 30% 80%, rgba(255,255,255,0.14) 0, transparent 60%),
+    radial-gradient(1px 1px at 55% 35%, rgba(255,255,255,0.10) 0, transparent 60%),
+    radial-gradient(1px 1px at 80% 60%, rgba(255,255,255,0.14) 0, transparent 60%),
+    radial-gradient(1px 1px at 92% 18%, rgba(255,255,255,0.10) 0, transparent 60%);
+  opacity:0.7;
+  pointer-events:none;
+}
+
+.wrap{
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  padding:18px;
+  gap:14px;
+}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:14px 18px;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  background:var(--glass);
+  backdrop-filter:blur(14px);
+}
+
+.title{
+  font-family:Orbitron;
+  font-size:18px;
+  letter-spacing:1px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.dot{
+  width:8px; height:8px; border-radius:50%;
+  background: radial-gradient(circle, var(--cyan), rgba(82,230,255,0.15));
+  box-shadow: 0 0 18px rgba(82,230,255,0.45);
+  animation:pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse{ 0%,100%{ transform:scale(0.9); opacity:0.7;} 50%{ transform:scale(1.15); opacity:1;} }
+
+.status{
+  font-size:13px;
+  color:var(--muted);
+  white-space:nowrap;
+}
+
+.grid{
+  flex:1;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+}
+
+.panel{
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  background:var(--glass);
+  backdrop-filter:blur(18px);
+  box-shadow:var(--shadow);
+  padding:18px;
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+}
+
+.panel h2{
+  font-family:Orbitron;
+  font-size:15px;
+  margin:0 0 12px 0;
+  letter-spacing:1px;
+  color:var(--tealA);
+}
+
+.image-box{
+  flex:1;
+  border-radius:12px;
+  background:rgba(0,0,0,0.45);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  overflow:hidden;
+  min-height:240px;
+  border:1px solid rgba(255,255,255,0.10);
+}
+
+.image-box img{
+  max-width:90%;
+  max-height:90%;
+  border-radius:10px;
+  filter: saturate(1.02) contrast(1.02);
+}
+
+/* GRID SCAN OVERLAY */
+.grid-overlay{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  opacity:0.55;
+  background:
+    linear-gradient(to right, rgba(82,230,255,0.12) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(95,194,167,0.10) 1px, transparent 1px);
+  background-size: 26px 26px;
+  mix-blend-mode: screen;
+  transform: translateZ(0);
+  animation: gridDrift 6s linear infinite;
+}
+@keyframes gridDrift{
+  0%{ background-position: 0 0, 0 0; }
+  100%{ background-position: 120px 0, 0 120px; }
+}
+
+/* faint vignette */
+.vignette{
+  position:absolute; inset:0;
+  pointer-events:none;
+  background: radial-gradient(60% 60% at 50% 50%, transparent 35%, rgba(0,0,0,0.55) 100%);
+}
+
+/* scan line + glow sweep */
+.scan-line{
+  position:absolute;
+  left:0; right:0;
+  height:2px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+  filter: drop-shadow(0 0 10px rgba(82,230,255,0.6));
+  animation:scan 3.2s linear infinite;
+}
+@keyframes scan{
+  0%{ top:-10%; opacity:0.2; }
+  10%{ opacity:1; }
+  90%{ opacity:1; }
+  100%{ top:110%; opacity:0.2; }
+}
+
+/* scanning "brackets" */
+.bracket{
+  position:absolute;
+  width:28px; height:28px;
+  border:2px solid rgba(82,230,255,0.45);
+  border-radius:6px;
+  opacity:0.85;
+  filter: drop-shadow(0 0 12px rgba(82,230,255,0.25));
+}
+.b1{ top:14px; left:14px; border-right:none; border-bottom:none; }
+.b2{ top:14px; right:14px; border-left:none; border-bottom:none; }
+.b3{ bottom:14px; left:14px; border-right:none; border-top:none; }
+.b4{ bottom:14px; right:14px; border-left:none; border-top:none; }
+
+.logs{
+  margin-top:12px;
+  font-size:12px;
+  color:var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  line-height:1.55;
+  height: 86px;
+  overflow:hidden;
+  border-top:1px solid rgba(255,255,255,0.08);
+  padding-top:10px;
+}
+
+.logline{
+  opacity:0.92;
+}
+.logline.dim{ opacity:0.55; }
+
+/* Right side result */
+.result-card{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  justify-content:center;
+}
+
+.species{
+  font-size:22px;
+  font-weight:700;
+  color:var(--tealA);
+  letter-spacing:0.2px;
+}
+
+.subrow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  color:var(--muted);
+  font-size:13px;
+}
+
+.badge{
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,0.14);
+  background:rgba(255,255,255,0.06);
+  color:var(--muted);
+  font-size:12px;
+  white-space:nowrap;
+}
+
+.confidence-bar{
+  height:10px;
+  border-radius:6px;
+  background:rgba(255,255,255,0.08);
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,0.10);
+}
+
+.confidence-fill{
+  height:100%;
+  width:72%;
+  background:linear-gradient(90deg,var(--tealA),var(--tealB));
+}
+
+.traits{
+  font-size:13px;
+  color:var(--muted);
+  line-height:1.65;
+}
+
+.actions{
+  display:flex;
+  gap:10px;
+  margin-top:10px;
+}
+
+.btn{
+  flex:1;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,0.05);
+  color:var(--text);
+  font-size:13px;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.btn:hover{ background:rgba(255,255,255,0.12); }
+
+.btn.primary{
+  background:linear-gradient(90deg,var(--tealA),var(--tealB));
+  border:none;
+  color:#00110d;
+  font-weight:800;
+}
+
+.footer-note{
+  text-align:center;
+  font-size:12px;
+  color:var(--muted);
+  margin-top:4px;
+}
+
+@media(max-width:900px){
+  html,body{ overflow:auto; }
+  .wrap{ min-height:100%; }
+  .grid{ grid-template-columns:1fr; }
+  .panel{ min-height: 420px; }
+}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="title"><span class="dot"></span> ALGAE DATABASE • POND ARCHIVE</div>
+    <div class="status">Mission Elythera Identification Console • Connected</div>
+  </div>
+
+  <div class="grid">
+
+    <!-- LEFT PANEL -->
+    <div class="panel">
+      <h2>Scan Bay</h2>
+
+      <div class="image-box" id="scanBox">
+        <!-- Replace this with your enhanced image automatically later -->
+        <img id="preview" src="assets/images/sample_algae.jpg" alt="Enhanced Image">
+
+        <!-- scanning overlays -->
+        <div class="grid-overlay" aria-hidden="true"></div>
+        <div class="vignette" aria-hidden="true"></div>
+        <div class="scan-line" aria-hidden="true"></div>
+        <div class="bracket b1" aria-hidden="true"></div>
+        <div class="bracket b2" aria-hidden="true"></div>
+        <div class="bracket b3" aria-hidden="true"></div>
+        <div class="bracket b4" aria-hidden="true"></div>
+      </div>
+
+      <div class="logs" id="logBox">
+        <div class="logline">> extracting morphological features...</div>
+        <div class="logline">> generating embedding vector (2048d)...</div>
+        <div class="logline">> comparing with Kerala Common 50 clusters...</div>
+        <div class="logline dim">> classifier softmax ready...</div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="panel">
+      <h2>Database Console</h2>
+
+      <div class="result-card">
+        <div class="species" id="speciesName">Spirogyra sp.</div>
+
+        <div class="subrow">
+          <div id="confidenceText">Confidence: 72%</div>
+          <div class="badge" id="pondId">Pond-ID: KS50-023</div>
+        </div>
+
+        <div class="confidence-bar" aria-label="confidence bar">
+          <div class="confidence-fill" id="confidenceFill" style="width:72%"></div>
+        </div>
+
+        <div class="traits" id="traits">
+          Filamentous structure detected<br>
+          Chloroplast spiral morphology match<br>
+          Freshwater similarity cluster: High
+        </div>
+
+        <div class="actions">
+          <button class="btn primary" id="openCardBtn" type="button">Open Species Card</button>
+          <button class="btn" id="tryAgainBtn" type="button">Try Again</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer-note">
+    Archive Node 01 • Advanced morphology scan active
+  </div>
+
+</div>
+
+<script>
+/*
+  ✅ Will this work with your trained model?
+  - This file is the UI/layout + scanning effects.
+  - To actually run your model, you must CONNECT a prediction function:
+      (A) call your backend API (Flask/FastAPI) OR
+      (B) run TFJS in-browser.
+  - The UI already has elements (speciesName, confidenceFill, traits) ready to update.
+
+  Below is a SAFE placeholder "hook" you can wire later.
+*/
+
+// 1) Optional: auto-load enhanced image from PhotoHouse via sessionStorage
+// In PhotoHouse, you can do:
+//   sessionStorage.setItem("enhancedImageDataURL", dataURL);
+//   location.href = "page5_predict_v2.html";
+(function loadEnhancedImage(){
+  const dataURL = sessionStorage.getItem("enhancedImageDataURL");
+  if(dataURL){
+    const img = document.getElementById("preview");
+    img.src = dataURL;
+  }
+})();
+
+// 2) Buttons (for now just navigation placeholders)
+document.getElementById("tryAgainBtn").addEventListener("click", () => {
+  // change this to your actual PhotoHouse filename
+  window.location.href = "photohouse_v2.html";
+});
+
+document.getElementById("openCardBtn").addEventListener("click", () => {
+  // later: route to the species page based on prediction label
+  alert("Next step: open the Species Card page (we’ll wire this after model result).");
+});
+
+// 3) Example: function you will connect to your model/API
+async function runPredictionPlaceholder(){
+  // This is ONLY a demo that updates UI after 1.2s.
+  await new Promise(r => setTimeout(r, 1200));
+
+  // Example "result"
+  const label = "Spirogyra sp.";
+  const confidence = 0.72;
+
+  // Update UI
+  document.getElementById("speciesName").textContent = label;
+  document.getElementById("confidenceText").textContent = "Confidence: " + Math.round(confidence*100) + "%";
+  document.getElementById("confidenceFill").style.width = Math.round(confidence*100) + "%";
+}
+runPredictionPlaceholder();
+</script>
+</body>
+</html>

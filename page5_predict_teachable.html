@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Pond Archive • Algal Database</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg0:#05070b;
+  --bg1:#071018;
+  --glass: rgba(255,255,255,0.06);
+  --border: rgba(255,255,255,0.14);
+  --text: rgba(230,255,250,0.88);
+  --muted: rgba(230,255,250,0.62);
+  --dim: rgba(230,255,250,0.38);
+
+  --tealA:#5FC2A7;
+  --tealB:#3CC19E;
+  --cyan:#52e6ff;
+
+  --shadow: 0 18px 70px rgba(0,0,0,0.65);
+  --radius: 18px;
+}
+
+*{box-sizing:border-box;}
+html,body{
+  height:100%;
+  margin:0;
+  font-family:Inter,system-ui;
+  background:
+    radial-gradient(1200px 900px at 70% -10%, rgba(95,194,167,0.18), transparent 60%),
+    radial-gradient(900px 700px at 10% 110%, rgba(82,230,255,0.10), transparent 55%),
+    linear-gradient(180deg,var(--bg0),var(--bg1));
+  color:var(--text);
+  overflow:hidden;
+}
+body:before{
+  content:"";
+  position:fixed; inset:0;
+  background-image:
+    radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.18) 0, transparent 60%),
+    radial-gradient(1px 1px at 30% 80%, rgba(255,255,255,0.14) 0, transparent 60%),
+    radial-gradient(1px 1px at 55% 35%, rgba(255,255,255,0.10) 0, transparent 60%),
+    radial-gradient(1px 1px at 80% 60%, rgba(255,255,255,0.14) 0, transparent 60%),
+    radial-gradient(1px 1px at 92% 18%, rgba(255,255,255,0.10) 0, transparent 60%);
+  opacity:0.7;
+  pointer-events:none;
+}
+
+.wrap{
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  padding:18px;
+  gap:14px;
+}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:14px 18px;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  background:var(--glass);
+  backdrop-filter:blur(14px);
+}
+
+.title{
+  font-family:Orbitron;
+  font-size:18px;
+  letter-spacing:1px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.dot{
+  width:8px; height:8px; border-radius:50%;
+  background: radial-gradient(circle, var(--cyan), rgba(82,230,255,0.15));
+  box-shadow: 0 0 18px rgba(82,230,255,0.45);
+  animation:pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse{ 0%,100%{ transform:scale(0.9); opacity:0.7;} 50%{ transform:scale(1.15); opacity:1;} }
+
+.status{
+  font-size:13px;
+  color:var(--muted);
+  white-space:nowrap;
+}
+
+.grid{
+  flex:1;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+}
+
+.panel{
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  background:var(--glass);
+  backdrop-filter:blur(18px);
+  box-shadow:var(--shadow);
+  padding:18px;
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+}
+
+.panel h2{
+  font-family:Orbitron;
+  font-size:15px;
+  margin:0 0 12px 0;
+  letter-spacing:1px;
+  color:var(--tealA);
+}
+
+.image-box{
+  flex:1;
+  border-radius:12px;
+  background:rgba(0,0,0,0.45);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  overflow:hidden;
+  min-height:240px;
+  border:1px solid rgba(255,255,255,0.10);
+}
+
+.image-box img{
+  max-width:90%;
+  max-height:90%;
+  border-radius:10px;
+  filter: saturate(1.02) contrast(1.02);
+}
+
+.grid-overlay{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  opacity:0.55;
+  background:
+    linear-gradient(to right, rgba(82,230,255,0.12) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(95,194,167,0.10) 1px, transparent 1px);
+  background-size: 26px 26px;
+  mix-blend-mode: screen;
+  animation: gridDrift 6s linear infinite;
+}
+@keyframes gridDrift{
+  0%{ background-position: 0 0, 0 0; }
+  100%{ background-position: 120px 0, 0 120px; }
+}
+.vignette{
+  position:absolute; inset:0;
+  pointer-events:none;
+  background: radial-gradient(60% 60% at 50% 50%, transparent 35%, rgba(0,0,0,0.55) 100%);
+}
+.scan-line{
+  position:absolute;
+  left:0; right:0;
+  height:2px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+  filter: drop-shadow(0 0 10px rgba(82,230,255,0.6));
+  animation:scan 3.2s linear infinite;
+}
+@keyframes scan{
+  0%{ top:-10%; opacity:0.2; }
+  10%{ opacity:1; }
+  90%{ opacity:1; }
+  100%{ top:110%; opacity:0.2; }
+}
+.bracket{
+  position:absolute;
+  width:28px; height:28px;
+  border:2px solid rgba(82,230,255,0.45);
+  border-radius:6px;
+  opacity:0.85;
+  filter: drop-shadow(0 0 12px rgba(82,230,255,0.25));
+}
+.b1{ top:14px; left:14px; border-right:none; border-bottom:none; }
+.b2{ top:14px; right:14px; border-left:none; border-bottom:none; }
+.b3{ bottom:14px; left:14px; border-right:none; border-top:none; }
+.b4{ bottom:14px; right:14px; border-left:none; border-top:none; }
+
+.logs{
+  margin-top:12px;
+  font-size:12px;
+  color:var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  line-height:1.55;
+  height: 94px;
+  overflow:hidden;
+  border-top:1px solid rgba(255,255,255,0.08);
+  padding-top:10px;
+}
+.logline{ opacity:0.92; }
+.logline.dim{ opacity:0.55; }
+
+.result-card{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  justify-content:center;
+}
+
+.species{
+  font-size:22px;
+  font-weight:800;
+  color:var(--tealA);
+  letter-spacing:0.2px;
+}
+
+.subrow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  color:var(--muted);
+  font-size:13px;
+}
+
+.badge{
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,0.14);
+  background:rgba(255,255,255,0.06);
+  color:var(--muted);
+  font-size:12px;
+  white-space:nowrap;
+}
+
+.confidence-bar{
+  height:10px;
+  border-radius:6px;
+  background:rgba(255,255,255,0.08);
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,0.10);
+}
+
+.confidence-fill{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,var(--tealA),var(--tealB));
+  transition: width 400ms ease;
+}
+
+.traits{
+  font-size:13px;
+  color:var(--muted);
+  line-height:1.65;
+  min-height: 70px;
+}
+
+.actions{
+  display:flex;
+  gap:10px;
+  margin-top:10px;
+}
+
+.btn{
+  flex:1;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,0.05);
+  color:var(--text);
+  font-size:13px;
+  cursor:pointer;
+  transition:0.2s;
+}
+.btn:hover{ background:rgba(255,255,255,0.12); }
+
+.btn.primary{
+  background:linear-gradient(90deg,var(--tealA),var(--tealB));
+  border:none;
+  color:#00110d;
+  font-weight:900;
+}
+
+.small{
+  font-size:12px;
+  color:var(--dim);
+  line-height:1.5;
+  margin-top:10px;
+}
+
+.footer-note{
+  text-align:center;
+  font-size:12px;
+  color:var(--muted);
+  margin-top:4px;
+}
+
+@media(max-width:900px){
+  html,body{ overflow:auto; }
+  .wrap{ min-height:100%; }
+  .grid{ grid-template-columns:1fr; }
+  .panel{ min-height: 440px; }
+}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="title"><span class="dot"></span> ALGAE DATABASE • POND ARCHIVE</div>
+    <div class="status" id="netStatus">Loading model…</div>
+  </div>
+
+  <div class="grid">
+
+    <!-- LEFT PANEL -->
+    <div class="panel">
+      <h2>Scan Bay</h2>
+
+      <div class="image-box" id="scanBox">
+        <img id="preview" src="assets/images/sample_algae.jpg" alt="Enhanced Image">
+        <div class="grid-overlay" aria-hidden="true"></div>
+        <div class="vignette" aria-hidden="true"></div>
+        <div class="scan-line" aria-hidden="true"></div>
+        <div class="bracket b1" aria-hidden="true"></div>
+        <div class="bracket b2" aria-hidden="true"></div>
+        <div class="bracket b3" aria-hidden="true"></div>
+        <div class="bracket b4" aria-hidden="true"></div>
+      </div>
+
+      <div class="logs" id="logBox">
+        <div class="logline">> initializing scan bay…</div>
+        <div class="logline dim">> waiting for enhanced image…</div>
+        <div class="logline dim">> model: not loaded yet</div>
+        <div class="logline dim">> prediction: pending</div>
+      </div>
+
+      <div class="small">
+        Model folder expected: <b>./my_model</b> (Teachable Machine export)<br>
+        Files needed: <span style="color:var(--muted)">model.json</span> and <span style="color:var(--muted)">metadata.json</span>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="panel">
+      <h2>Database Console</h2>
+
+      <div class="result-card">
+        <div class="species" id="speciesName">Scanning…</div>
+
+        <div class="subrow">
+          <div id="confidenceText">Confidence: —</div>
+          <div class="badge" id="pondId">Pond-ID: —</div>
+        </div>
+
+        <div class="confidence-bar" aria-label="confidence bar">
+          <div class="confidence-fill" id="confidenceFill"></div>
+        </div>
+
+        <div class="traits" id="traits">
+          Awaiting model output…
+        </div>
+
+        <div class="actions">
+          <button class="btn primary" id="openCardBtn" type="button" disabled>Open Species Card</button>
+          <button class="btn" id="tryAgainBtn" type="button">Try Again</button>
+        </div>
+
+        <div class="small" id="hint">
+          Tip: If confidence is low, go back to PhotoHouse and crop/adjust.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer-note">
+    Archive Node 01 • Advanced morphology scan active
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
+
+<script>
+/*
+  ✅ Teachable Machine connection (Image model)
+  Put your exported model in:  my_model/
+    - model.json
+    - metadata.json
+    - (and the weight shard files)
+
+  IMPORTANT:
+  Browsers block model file loading if you open HTML via file://
+  Run a local server (no GitHub needed):
+    1) Keep this html + my_model folder in SAME folder
+    2) Open terminal in that folder
+    3) Run:  python -m http.server 8000
+    4) Open: http://localhost:8000/page5_predict_teachable.html
+*/
+
+const MODEL_DIR = "my_model/";
+const modelURL = MODEL_DIR + "model.json";
+const metadataURL = MODEL_DIR + "metadata.json";
+
+const UNKNOWN_THRESHOLD = 0.55; // adjust later
+
+let model = null;
+
+const el = (id) => document.getElementById(id);
+const logBox = el("logBox");
+
+function addLog(text, dim=false){
+  const div = document.createElement("div");
+  div.className = "logline" + (dim ? " dim" : "");
+  div.textContent = text;
+  logBox.appendChild(div);
+  while(logBox.children.length > 6) logBox.removeChild(logBox.firstChild);
+}
+
+function setStatus(text){ el("netStatus").textContent = text; }
+
+function setResult(label, confidence, topList){
+  const pct = Math.round(confidence * 100);
+  el("speciesName").textContent = label;
+  el("confidenceText").textContent = "Confidence: " + (isFinite(pct) ? pct + "%" : "—");
+  el("confidenceFill").style.width = (isFinite(pct) ? pct : 0) + "%";
+
+  el("pondId").textContent = label === "Unknown" ? "Pond-ID: UNKNOWN" : "Pond-ID: KS50-" + String(Math.min(50, Math.max(1, (pct||1)%50))).padStart(3,"0");
+
+  if(topList && topList.length){
+    el("traits").innerHTML = topList.map(p => `${p.className}: <b>${Math.round(p.probability*100)}%</b>`).join("<br>");
+  }else{
+    el("traits").textContent = "—";
+  }
+
+  const openBtn = el("openCardBtn");
+  openBtn.disabled = (label === "Unknown");
+  openBtn.textContent = (label === "Unknown") ? "Unknown • Add to Pond" : "Open Species Card";
+}
+
+(function loadEnhancedImage(){
+  const dataURL = sessionStorage.getItem("enhancedImageDataURL");
+  if(dataURL){
+    el("preview").src = dataURL;
+    addLog("> enhanced image received ✔");
+    return;
+  }
+  addLog("> no enhanced image found (using sample)", true);
+})();
+
+async function loadModel(){
+  try{
+    setStatus("Loading model…");
+    addLog("> loading Teachable Machine model…");
+    model = await tmImage.load(modelURL, metadataURL);
+    addLog("> model loaded ✔");
+    setStatus("Model ready • Connected");
+  }catch(err){
+    console.error(err);
+    setStatus("Model load failed");
+    addLog("> ERROR: could not load model", false);
+    addLog("> open via http:// (not file://)", true);
+    el("speciesName").textContent = "Model Load Failed";
+    el("traits").textContent = "Make sure my_model/ is beside this HTML and run: python -m http.server 8000";
+  }
+}
+
+async function predictFromPreview(){
+  if(!model) return;
+  const img = el("preview");
+  if(!img.complete) await new Promise(r => img.onload = r);
+
+  addLog("> extracting features…");
+  addLog("> generating embedding vector…", true);
+
+  const preds = await model.predict(img, false);
+  preds.sort((a,b) => b.probability - a.probability);
+
+  const best = preds[0] || { className:"Unknown", probability:0 };
+  const bestLabel = best.className || "Unknown";
+  const bestProb = best.probability || 0;
+
+  addLog("> top match: " + bestLabel + " (" + Math.round(bestProb*100) + "%)");
+  addLog("> similarity gate: " + (bestProb < UNKNOWN_THRESHOLD ? "UNKNOWN" : "KNOWN"), bestProb < UNKNOWN_THRESHOLD);
+
+  const finalLabel = (bestProb < UNKNOWN_THRESHOLD) ? "Unknown" : bestLabel;
+  setResult(finalLabel, bestProb, preds.slice(0, Math.min(5, preds.length)));
+
+  setStatus("Scan complete • Ready");
+}
+
+el("tryAgainBtn").addEventListener("click", () => {
+  window.location.href = "photohouse_v2.html";
+});
+
+el("openCardBtn").addEventListener("click", () => {
+  const label = el("speciesName").textContent;
+  if(label === "Unknown"){
+    alert("Unknown / low confidence. Next: send user to 'Add to the Pond' flow.");
+    return;
+  }
+  alert("Next: open Species Card page for: " + label);
+});
+
+(async function init(){
+  await loadModel();
+  if(model){
+    setStatus("Scanning…");
+    await predictFromPreview();
+  }
+})();
+</script>
+</body>
+</html>

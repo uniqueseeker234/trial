@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pond 2 – Upgraded Rectangle Aquarium</title>
+
+<style>
+body{
+  margin:0;
+  background:#000;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  overflow:hidden;
+  perspective:1400px;
+  font-family:system-ui;
+}
+
+.info{
+  position:absolute;
+  top:20px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.2);
+  padding:12px 20px;
+  border-radius:20px;
+  color:#fff;
+  font-size:14px;
+  backdrop-filter:blur(6px);
+}
+
+.scene{
+  width:380px;
+  height:500px;
+  transform-style:preserve-3d;
+  transform:rotateX(18deg) rotateY(-20deg);
+  transition:transform 0.1s linear;
+}
+
+.tank{
+  width:100%;
+  height:100%;
+  position:relative;
+  transform-style:preserve-3d;
+}
+
+/* Outer Glass */
+.glass{
+  position:absolute;
+  width:100%;
+  height:100%;
+  background:linear-gradient(to bottom,#1a3f3f,#0c1e1e);
+  border-radius:30px;
+  box-shadow:
+    inset 0 0 40px rgba(255,255,255,0.08),
+    0 40px 80px rgba(0,0,0,0.6);
+}
+
+/* Inner Glass Thickness */
+.inner-glass{
+  position:absolute;
+  width:94%;
+  height:94%;
+  top:3%;
+  left:3%;
+  background:linear-gradient(to bottom,#134444,#082121);
+  border-radius:24px;
+  transform:translateZ(-20px);
+}
+
+/* Water Volume */
+.water{
+  position:absolute;
+  width:94%;
+  height:70%;
+  left:3%;
+  bottom:3%;
+  background:linear-gradient(to bottom,#5FC2A7,#1c6f63);
+  border-radius:24px;
+  transform:translateZ(-10px);
+  box-shadow:inset 0 20px 40px rgba(255,255,255,0.1);
+}
+
+/* Water Surface Shine */
+.surface{
+  position:absolute;
+  width:94%;
+  height:4%;
+  left:3%;
+  top:23%;
+  background:rgba(255,255,255,0.12);
+  border-radius:24px;
+  transform:translateZ(-9px);
+}
+
+/* Rim */
+.rim{
+  position:absolute;
+  width:100%;
+  height:6%;
+  top:0;
+  background:linear-gradient(to bottom,#2d2d2d,#111);
+  border-radius:30px 30px 0 0;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="info">
+Curved 3D Tank • Drag to rotate • No underside • No zoom
+</div>
+
+<div class="scene" id="scene">
+  <div class="tank">
+    <div class="glass"></div>
+    <div class="inner-glass"></div>
+    <div class="water"></div>
+    <div class="surface"></div>
+    <div class="rim"></div>
+  </div>
+</div>
+
+<script>
+const scene = document.getElementById("scene");
+
+let rotateX = 18;
+let rotateY = -20;
+let isDown = false;
+
+document.addEventListener("mousedown", () => isDown = true);
+document.addEventListener("mouseup", () => isDown = false);
+
+document.addEventListener("mousemove", (e)=>{
+  if(!isDown) return;
+  rotateY += e.movementX * 0.3;
+  rotateX -= e.movementY * 0.3;
+
+  // Limit rotation (no underside)
+  rotateX = Math.max(5, Math.min(40, rotateX));
+
+  scene.style.transform =
+    `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+});
+</script>
+
+</body>
+</html>

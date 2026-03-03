@@ -1,0 +1,1115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Pond • Page 5 • Algal Database Scan</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<!-- TFJS (same approach as your old working file) -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
+// --- Cache control: prevent stale images causing auto-scan ---
+try{
+  const fromPhotoHouse = document.referrer.toLowerCase().includes("photohouse");
+  if(!fromPhotoHouse){
+    sessionStorage.removeItem("enhancedImageDataURL");
+  }
+}catch(e){ /* ignore */ }
+
+
+<style>
+:root{
+  --bg0:#05070b;
+  --bg1:#071018;
+  --glass: rgba(255,255,255,0.06);
+  --glass2: rgba(255,255,255,0.10);
+  --border: rgba(255,255,255,0.14);
+  --text: rgba(230,255,250,0.88);
+  --muted: rgba(230,255,250,0.62);
+  --dim: rgba(230,255,250,0.38);
+
+  --tealA:#5FC2A7;  /* your pond teal */
+  --tealB:#3CC19E;
+  --cyan:#52e6ff;
+
+  --shadow: 0 18px 70px rgba(0,0,0,0.65);
+  --radius: 18px;
+}
+
+*{box-sizing:border-box;}
+html,body{
+  height:100%;
+  margin:0;
+  font-family:Inter,system-ui;
+  background:
+    radial-gradient(1200px 900px at 70% -10%, rgba(95,194,167,0.18), transparent 60%),
+    radial-gradient(900px 700px at 10% 110%, rgba(82,230,255,0.10), transparent 55%),
+    linear-gradient(180deg,var(--bg0),var(--bg1));
+  color:var(--text);
+  overflow:hidden;
+}
+body:before{
+  content:"";
+  position:fixed; inset:0;
+  background-image:
+    radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.18) 0, transparent 60%),
+    radial-gradient(1px 1px at 30% 80%, rgba(255,255,255,0.14) 0, transparent 60%),
+    radial-gradient(1px 1px at 55% 35%, rgba(255,255,255,0.10) 0, transparent 60%),
+    radial-gradient(1px 1px at 80% 60%, rgba(255,255,255,0.14) 0, transparent 60%),
+    radial-gradient(1px 1px at 92% 18%, rgba(255,255,255,0.10) 0, transparent 60%);
+  opacity:0.7;
+  pointer-events:none;
+}
+
+.wrap{
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  padding:18px;
+  gap:14px;
+}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:14px 18px;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  background:var(--glass);
+  backdrop-filter:blur(14px);
+}
+
+.title{
+  font-family:Orbitron;
+  font-size:18px;
+  letter-spacing:1px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.dot{
+  width:8px; height:8px; border-radius:50%;
+  background: radial-gradient(circle, var(--cyan), rgba(82,230,255,0.15));
+  box-shadow: 0 0 18px rgba(82,230,255,0.45);
+  animation:pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse{ 0%,100%{ transform:scale(0.9); opacity:0.7;} 50%{ transform:scale(1.15); opacity:1;} }
+
+.status{
+  font-size:13px;
+  color:var(--muted);
+  white-space:nowrap;
+}
+
+.grid{
+  flex:1;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+  min-height:0;
+}
+
+.panel{
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  background:var(--glass);
+  backdrop-filter:blur(18px);
+  box-shadow:var(--shadow);
+  padding:18px;
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+}
+
+.panel h2{
+  font-family:Orbitron;
+  font-size:15px;
+  margin:0 0 12px 0;
+  letter-spacing:1px;
+  color:var(--tealA);
+}
+
+/* LEFT: scan bay */
+.image-box{
+  flex:1;
+  border-radius:12px;
+  background:rgba(0,0,0,0.45);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  overflow:hidden;
+  min-height:240px;
+  border:1px solid rgba(255,255,255,0.10);
+}
+.image-box img{
+  max-width:90%;
+  max-height:90%;
+  border-radius:10px;
+  filter: saturate(1.02) contrast(1.02);
+}
+.grid-overlay{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  opacity:0.55;
+  background:
+    linear-gradient(to right, rgba(82,230,255,0.12) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(95,194,167,0.10) 1px, transparent 1px);
+  background-size: 26px 26px;
+  mix-blend-mode: screen;
+  animation: gridDrift 6s linear infinite;
+}
+@keyframes gridDrift{
+  0%{ background-position: 0 0, 0 0; }
+  100%{ background-position: 120px 0, 0 120px; }
+}
+.vignette{
+  position:absolute; inset:0;
+  pointer-events:none;
+  background: radial-gradient(60% 60% at 50% 50%, transparent 35%, rgba(0,0,0,0.55) 100%);
+}
+.scan-line{
+  position:absolute;
+  left:0; right:0;
+  height:2px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+  filter: drop-shadow(0 0 10px rgba(82,230,255,0.6));
+  animation:scan 3.2s linear infinite;
+}
+@keyframes scan{
+  0%{ top:-10%; opacity:0.2; }
+  10%{ opacity:1; }
+  90%{ opacity:1; }
+  100%{ top:110%; opacity:0.2; }
+}
+.bracket{
+  position:absolute;
+  width:28px; height:28px;
+  border:2px solid rgba(82,230,255,0.45);
+  border-radius:6px;
+  opacity:0.85;
+  filter: drop-shadow(0 0 12px rgba(82,230,255,0.25));
+}
+.b1{ top:14px; left:14px; border-right:none; border-bottom:none; }
+.b2{ top:14px; right:14px; border-left:none; border-bottom:none; }
+.b3{ bottom:14px; left:14px; border-right:none; border-top:none; }
+.b4{ bottom:14px; right:14px; border-left:none; border-top:none; }
+
+.logs{
+  margin-top:12px;
+  font-size:12px;
+  color:var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  line-height:1.55;
+  height: 108px;
+  overflow:hidden;
+  border-top:1px solid rgba(255,255,255,0.08);
+  padding-top:10px;
+}
+.logline{ opacity:0.92; }
+.logline.dim{ opacity:0.55; }
+
+/* RIGHT: result + description */
+.species{
+  font-size:22px;
+  font-weight:800;
+  color:var(--tealA);
+  letter-spacing:0.2px;
+}
+.subrow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  color:var(--muted);
+  font-size:13px;
+  margin-top:8px;
+}
+.badge{
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,0.14);
+  background:rgba(255,255,255,0.06);
+  color:var(--muted);
+  font-size:12px;
+  white-space:nowrap;
+}
+.confidence-bar{
+  margin-top:10px;
+  height:10px;
+  border-radius:6px;
+  background:rgba(255,255,255,0.08);
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,0.10);
+}
+.confidence-fill{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,var(--tealA),var(--tealB));
+  transition: width 500ms ease;
+}
+
+.desc{
+  margin-top:12px;
+  font-size: 13.5px;
+  color: rgba(230,255,250,0.80);
+  line-height: 1.45;
+  overflow:auto;
+  padding-right:6px;
+  border-top:1px solid rgba(255,255,255,0.08);
+  padding-top:10px;
+  flex:1;
+  min-height:0;
+}
+.desc h3{
+  margin: 10px 0 6px;
+  font-size: 13px;
+  opacity:0.95;
+  font-family: Orbitron, Inter, system-ui;
+  letter-spacing:0.6px;
+  color: rgba(230,255,250,0.92);
+}
+.desc ul{ margin: 6px 0 0 18px; padding:0; }
+
+/* Carousel (copied behavior) */
+.carousel{
+  margin-top: 12px;
+  width: 100%;
+  max-width: 320px;
+  position:relative;
+}
+.carousel img{
+  width:100%;
+  display:none;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.14);
+}
+.carousel img.active{ display:block; }
+.carousel button{
+  position:absolute;
+  top:50%;
+  transform: translateY(-50%);
+  border:none;
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.12);
+  color:white;
+  padding: 6px 10px;
+  border-radius: 12px;
+  cursor:pointer;
+}
+.prev{ left:8px; }
+.next{ right:8px; }
+
+.actions{
+  display:flex;
+  gap:10px;
+  margin-top:12px;
+}
+.btn{
+  flex:1;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,0.05);
+  color:var(--text);
+  font-size:13px;
+  cursor:pointer;
+  transition:0.2s;
+}
+.btn:hover{ background:rgba(255,255,255,0.12); }
+.btn.primary{
+  background:linear-gradient(90deg,var(--tealA),var(--tealB));
+  border:none;
+  color:#00110d;
+  font-weight:900;
+}
+
+.small{
+  font-size:12px;
+  color:var(--dim);
+  line-height:1.5;
+  margin-top:10px;
+}
+
+.footer-note{
+  text-align:center;
+  font-size:12px;
+  color:var(--muted);
+  margin-top:4px;
+}
+
+
+.controls{
+  margin-top:12px;
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+.fileInput{
+  flex:1;
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.22);
+  color: var(--muted);
+  font-size:12px;
+}
+.fileInput::file-selector-button{
+  margin-right:10px;
+  padding:8px 12px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  cursor:pointer;
+}
+.fileInput::file-selector-button:hover{
+  background: rgba(255,255,255,0.12);
+}
+.autoHint{
+  white-space:nowrap;
+  font-size:12px;
+  color: var(--dim);
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.10);
+  background: rgba(0,0,0,0.18);
+}
+
+/* Ensure uploaded image is always visible */
+.image-box img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  border-radius:10px;
+  padding:10px;
+  position:relative;
+  z-index:1;
+}
+.grid-overlay{ z-index:3; }
+.vignette{ z-index:4; }
+.scan-line{ z-index:5; }
+.bracket{ z-index:6; }
+
+
+/* Split description: left (habit+economic) / right (location) */
+.descGrid{
+  display:grid;
+  grid-template-columns: 1fr 0.9fr;
+  gap:14px;
+  align-items:start;
+}
+.descCol{ min-width:0; }
+.descCol.right{
+  border-left:1px solid rgba(255,255,255,0.08);
+  padding-left:14px;
+}
+
+.mediaToggle{
+  display:flex;
+  gap:10px;
+  margin-top:12px;
+  margin-bottom:10px;
+}
+.mediaToggle .btn{ flex:1; }
+
+
+/* ===== Welcome Overlay ===== */
+.overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(1200px 700px at 50% 30%, rgba(0,255,200,0.08), rgba(0,0,0,0.78));backdrop-filter:blur(10px);z-index:9999;}
+.overlayCard{width:min(980px,92vw);border-radius:22px;border:1px solid rgba(255,255,255,0.14);background:linear-gradient(180deg, rgba(10,22,26,0.86), rgba(7,14,18,0.72));box-shadow:0 30px 80px rgba(0,0,0,0.55);display:grid;grid-template-columns:0.9fr 1.1fr;overflow:hidden;}
+.overlayLeft{display:flex;align-items:flex-end;justify-content:center;padding:26px 10px 0 10px;background:radial-gradient(800px 520px at 50% 20%, rgba(95,194,167,0.18), rgba(0,0,0,0));}
+.overlayChar{width:min(360px,40vw);height:auto;filter:drop-shadow(0 24px 40px rgba(0,0,0,0.65));}
+.overlayRight{padding:28px 26px;}
+.overlayTag{display:inline-block;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(197,255,243,0.72);border:1px solid rgba(95,194,167,0.28);padding:8px 12px;border-radius:999px;background:rgba(0,0,0,0.18);}
+.overlayTitle{margin:14px 0 8px 0;font-size:30px;letter-spacing:0.02em;}
+.overlayText{margin:0 0 16px 0;color:rgba(255,255,255,0.84);line-height:1.5;}
+.overlayBtn{width:220px;max-width:100%;}
+.overlayHint{margin-top:12px;font-size:12px;color:rgba(255,255,255,0.55);}
+
+/* ===== Guide Widget ===== */
+.guide{position:fixed;left:18px;bottom:18px;display:flex;gap:12px;align-items:flex-end;z-index:9000;}
+.guideAvatar{width:64px;height:64px;object-fit:cover;border-radius:18px;border:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.25);box-shadow:0 14px 40px rgba(0,0,0,0.45);}
+.guideBubble{max-width:360px;border-radius:18px;border:1px solid rgba(255,255,255,0.14);background:rgba(10,18,22,0.76);backdrop-filter:blur(10px);padding:12px 14px;box-shadow:0 18px 55px rgba(0,0,0,0.52);}
+.guideName{font-family:Orbitron,Inter,system-ui;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(95,194,167,0.9);margin-bottom:6px;}
+.guideMsg{color:rgba(255,255,255,0.86);font-size:13px;line-height:1.35;}
+.guideActions{margin-top:10px;display:flex;gap:10px;}
+.guideActions .btn{flex:1;}
+
+/* ===== Contribute Modal ===== */
+.modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.65);backdrop-filter:blur(6px);z-index:9998;}
+.modalCard{width:min(520px,92vw);border-radius:18px;border:1px solid rgba(255,255,255,0.14);background:linear-gradient(180deg, rgba(12,20,24,0.92), rgba(7,14,18,0.80));box-shadow:0 26px 80px rgba(0,0,0,0.6);padding:18px 18px 16px 18px;}
+.modalTitle{font-family:Orbitron,Inter,system-ui;color:rgba(95,194,167,0.95);letter-spacing:0.08em;margin-bottom:10px;}
+.modalText{color:rgba(255,255,255,0.82);margin-bottom:8px;}
+.modalEmail{font-weight:700;padding:10px 12px;border-radius:12px;border:1px solid rgba(95,194,167,0.20);background:rgba(0,0,0,0.22);color:rgba(230,255,250,0.92);word-break:break-all;}
+.modalBtns{margin-top:12px;display:flex;gap:10px;}
+.modalHint{margin-top:10px;font-size:12px;color:rgba(255,255,255,0.55);}
+
+
+/* Welcome typewriter */
+.typingCursor{
+  display:inline-block;
+  width:10px;
+  margin-left:4px;
+  color: rgba(95,194,167,0.9);
+  animation: blink 1s steps(2,end) infinite;
+}
+@keyframes blink{ 50%{ opacity:0; } }
+
+@media(max-width:900px){.overlayCard{grid-template-columns:1fr;}.overlayLeft{display:none;}.overlayRight{padding:22px 18px;}.guide{left:12px;bottom:12px;}.guideAvatar{width:56px;height:56px;border-radius:16px;}}
+
+@media(max-width:900px){
+  .descGrid{ grid-template-columns: 1fr; }
+  .descCol.right{
+    border-left:none;
+    padding-left:0;
+    border-top:1px solid rgba(255,255,255,0.08);
+    padding-top:12px;
+  }
+}
+
+@media(max-width:900px){
+  html,body{ overflow:auto; }
+  .wrap{ min-height:100%; }
+  .grid{ grid-template-columns:1fr; }
+  .panel{ min-height: 520px; }
+}
+</style>
+</head>
+
+<body>
+
+  <!-- Mareoj Velith Welcome Overlay -->
+  <div id="welcomeOverlay" class="overlay">
+    <div class="overlayCard">
+      <div class="overlayLeft">
+        <img class="overlayChar" src="mareoj%20velith.png" alt="Mareoj Velith">
+      </div>
+      <div class="overlayRight">
+        <div class="overlayTag">Habitat Engineer • Pond Archive</div>
+        <h2 class="overlayTitle">Mareoj Velith</h2>
+        <p class="overlayText" id="welcomeText">Oh welcome dear explorer. I have received your image from PhotoHouse and I was waiting for you. Let’s start.</p>
+        <button id="startBtn" class="btn primary overlayBtn" type="button">Start</button>
+        <div class="overlayHint">Tip: If you opened this page directly, upload an image below to begin scanning.</div>
+      </div>
+    </div>
+  </div>
+
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="title"><span class="dot"></span> ALGAE DATABASE • POND ARCHIVE</div>
+    <div class="status" id="netStatus">Initializing…</div>
+  </div>
+
+  <div class="grid">
+
+    <!-- LEFT -->
+    <div class="panel">
+      <h2>Scan Bay</h2>
+
+      <div class="image-box" id="scanBox">
+        <img id="preview" src="" alt="">
+        <div class="grid-overlay" aria-hidden="true"></div>
+        <div class="vignette" aria-hidden="true"></div>
+        <div class="scan-line" aria-hidden="true"></div>
+        <div class="bracket b1" aria-hidden="true"></div>
+        <div class="bracket b2" aria-hidden="true"></div>
+        <div class="bracket b3" aria-hidden="true"></div>
+        <div class="bracket b4" aria-hidden="true"></div>
+      </div>
+
+
+      <div class="controls">
+        <input type="file" id="uploadInput" accept="image/*" class="fileInput">
+        <div class="autoHint">Auto-scan on upload</div>
+      </div>
+
+      <div class="logs" id="logBox">
+        <div class="logline">> preparing archive console…</div>
+        <div class="logline dim">> loading model + metadata…</div>
+        <div class="logline dim">> waiting for enhanced image…</div>
+        <div class="logline dim">> scan: pending</div>
+      </div>
+</div>
+
+    <!-- RIGHT -->
+    <div class="panel">
+      <h2>Database Console</h2>
+
+      <div>
+        <div class="species" id="speciesName">Scanning…</div>
+
+        <div class="subrow">
+          <div id="confidenceText">Confidence: —</div>
+          <div class="badge" id="pondId">Pond-ID: —</div>
+        </div>
+
+        <div class="confidence-bar" aria-label="confidence bar">
+          <div class="confidence-fill" id="confidenceFill"></div>
+        </div>
+
+        <div class="mediaToggle">
+  <button class="btn primary" id="showImageBtn" type="button" style="display:none;">Show Image</button>
+  <button class="btn" id="showDescBtn" type="button" style="display:none;">Show Description</button>
+</div>
+
+<div id="imagePane">
+  <div class="carousel" id="carousel"></div>
+</div>
+
+<div id="descPane" style="display:none;">
+  <div id="description" class="desc">Waiting for model output…</div>
+</div>
+
+        <div class="actions">
+          <button class="btn primary" id="openCardBtn" type="button" disabled>Open Species Card</button>
+          <button class="btn" id="backBtn" type="button">Back to PhotoHouse</button>
+        </div>
+
+        <div class="small" id="hint">
+          Tip: Low confidence? Go back and crop/adjust in PhotoHouse.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer-note">
+    Page 5 • Advanced morphology scan active
+  </div>
+
+</div>
+
+
+<script>
+/* ===================== CLEAN PAGE 5 SCRIPT (AUTO-SCAN ON UPLOAD) ===================== */
+let model;
+let classes = [];
+const CONFIDENCE_THRESHOLD = 0.65;
+
+
+let modelReadyPromise = null;
+let hasInboundImage = false;
+// --- Mareoj guide state ---
+let lastResultType = "none"; // none | known | unknown
+let scanInProgress = false;
+let hasShownDescOnce = false;
+
+const EMAIL_TO = "uniqueseekers123@gmail.com";
+
+
+function sleep(ms){ return new Promise(r=>setTimeout(r, ms)); }
+
+function typeWords(el, text, speed=120){
+  if(!el) return;
+  el.innerHTML = "";
+  const words = text.split(" ");
+  let i = 0;
+  const cursor = document.createElement("span");
+  cursor.className = "typingCursor";
+  cursor.textContent = "▍";
+  el.appendChild(cursor);
+  const tick = () => {
+    if(i >= words.length){ cursor.remove(); return; }
+    const word = words[i++];
+    cursor.insertAdjacentText("beforebegin", (i===1? "" : " ") + word);
+    setTimeout(tick, speed);
+  };
+  setTimeout(tick, 240);
+}
+
+async function flashGuide(msg, ms=1500){
+  setGuide(msg, true);
+  await sleep(ms);
+}
+
+function showOutro(customText){
+  const ov = document.getElementById("outroOverlay");
+  const t = document.getElementById("outroText");
+  if(customText && t) t.textContent = customText;
+  if(ov) ov.style.display = "flex";
+}
+
+function hideOutro(){
+  const ov = document.getElementById("outroOverlay");
+  if(ov) ov.style.display = "none";
+}
+
+function showImageMode(){
+  const imagePane = document.getElementById("imagePane");
+  const descPane = document.getElementById("descPane");
+  if(imagePane) imagePane.style.display = "block";
+  if(descPane) descPane.style.display = "none";
+  const showImg = document.getElementById("showImageBtn");
+  const showDesc = document.getElementById("showDescBtn");
+  if(showImg) showImg.style.display = "none";
+  if(showDesc) showDesc.style.display = "inline-flex";
+}
+
+function showDescMode(){
+  const imagePane = document.getElementById("imagePane");
+  const descPane = document.getElementById("descPane");
+  if(imagePane) imagePane.style.display = "none";
+  if(descPane) descPane.style.display = "block";
+  const showImg = document.getElementById("showImageBtn");
+  const showDesc = document.getElementById("showDescBtn");
+  if(showImg) showImg.style.display = "inline-flex";
+  if(showDesc) showDesc.style.display = "none";
+}
+
+function resetMedia(){
+  const showImg = document.getElementById("showImageBtn");
+  const showDesc = document.getElementById("showDescBtn");
+  if(showImg){ showImg.style.display = "none"; showImg.disabled = false; }
+  if(showDesc){ showDesc.style.display = "none"; showDesc.disabled = false; }
+  const imagePane = document.getElementById("imagePane");
+  const descPane = document.getElementById("descPane");
+  if(imagePane) imagePane.style.display = "block";
+  if(descPane) descPane.style.display = "none";
+}
+function isMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent); }
+
+function setGuide(message, show=false){
+  const gw=document.getElementById("guideWidget");
+  const gm=document.getElementById("guideMsg");
+  if(!gw||!gm) return;
+  gm.textContent=message;
+  gw.style.display=show?"flex":"none";
+}
+function setContributeVisible(v){
+  const ga=document.getElementById("guideActions");
+  if(!ga) return;
+  ga.style.display=v?"flex":"none";
+}
+function openContribute(){
+  const subject=encodeURIComponent("New algae contribution to Pond Archive");
+  const body=encodeURIComponent("Hi Uniqueseeker team,\n\nI found a new algae via Pond Page 5.\n\nDetails (optional):\n- Name (if known):\n- Location:\n- Notes:\n\nI am attaching the enhanced image from PhotoHouse.\n\nThanks!");
+  const mailto=`mailto:${EMAIL_TO}?subject=${subject}&body=${body}`;
+  if(isMobile()){ window.location.href=mailto; }
+  else{
+    const modal=document.getElementById("contributeModal");
+    if(modal) modal.style.display="flex";
+  }
+}
+function closeContributeModal(){
+  const modal=document.getElementById("contributeModal");
+  if(modal) modal.style.display="none";
+}
+function showWelcome(){
+  const ov = document.getElementById("welcomeOverlay");
+  if(ov) ov.style.display = "flex";
+  const wt = document.getElementById("welcomeText");
+  if(wt){
+    const msg = "Oh welcome dear explorer. I have received your image from PhotoHouse and I was waiting for you. Let’s start.";
+    typeWords(wt, msg, 120);
+  }
+}
+function hideWelcome(){
+  const ov=document.getElementById("welcomeOverlay");
+  if(!ov) return;
+  ov.style.opacity="0";
+  ov.style.pointerEvents="none";
+  setTimeout(()=>{ov.style.display="none";},250);
+}
+
+const algaeInfo = {
+  "spirogyra": {
+    images:["images/spirogyra1.jpg","images/spirogyra2.jpg"],
+    habit:["Filamentous freshwater green algae","Forms floating slimy masses","Has spiral chloroplasts"],
+    economic:["Produces oxygen in ponds","Used in biological research"],
+    location:["Found in freshwater ponds","Common in slow-moving water bodies"]
+  },
+  "cladophora": {
+    images:["images/cladophora1.jpg","images/cladophora2.jpg","images/cladophora3.jpg"],
+    habit:["Branched filamentous green algae","Attaches to submerged surfaces","Forms dense green mats"],
+    economic:["Provides shelter for aquatic organisms","Indicates nutrient pollution levels"],
+    location:["Freshwater & marine habitats","Common in nutrient-rich environments"]
+  },
+  "oedogonium": {
+    images:["images/oedogonium1.jpg","images/oedogonium2.jpg"],
+    habit:["Filamentous green algae with basal holdfast","Grows in mats or attached filaments","Prefers calm water"],
+    economic:["Used in research and water quality monitoring","Oxygen producer in water bodies"],
+    location:["Freshwater ponds and slow streams","Common in nutrient-rich ponds"]
+  },
+  "volvox": {
+    images:["images/volvox1.jpg","images/volvox2.jpg"],
+    habit:["Spherical colonial green algae","Colonies with flagella","Forms motile spheres"],
+    economic:["Used in biological experiments","Oxygen producer"],
+    location:["Freshwater ponds and lakes","Common in nutrient-rich water"]
+  },
+  "nostoc": {
+    images:["images/nostoc1.jpg","images/nostoc2.jpg"],
+    habit:["Cyanobacteria forming colonies","Gelatinous colonies","Filamentous structure"],
+    economic:["Nitrogen fixation","Used in research"],
+    location:["Freshwater and moist soils","Found on rocks and soil surfaces"]
+  },
+  "pediastrum": {
+    images:["images/pediastrum1.jpg","images/pediastrum2.jpg"],
+    habit:["Colonial green algae","Flat star-like colonies","Planktonic in water"],
+    economic:["Used in ecological studies","Indicator of water quality"],
+    location:["Freshwater ponds","Common in nutrient-rich water"]
+  },
+  "cosmarium": {
+    images:["images/cosmarium1.jpg","images/cosmarium2.jpg"],
+    habit:["Single-celled green algae with semicells","Desmids are symmetrical","Often found in colonies"],
+    economic:["Used in ecological studies","Indicator of water quality"],
+    location:["Freshwater habitats","Ponds and lakes with clean water"]
+  },
+  "noctiluca": {
+    images:["images/noctiluca1.jpg","images/noctiluca2.jpg"],
+    habit:["Bioluminescent marine plankton","Single-celled","Motile with flagella"],
+    economic:["Indicators of marine water health","Can cause red tides"],
+    location:["Marine environments","Coastal waters worldwide"]
+  },
+  "staurastrum": {
+    images:["images/staurastrum1.jpg","images/staurastrum2.jpg"],
+    habit:["Single-celled desmid","Star-shaped cells","Free-floating"],
+    economic:["Used in water quality studies","Indicator species"],
+    location:["Freshwater ponds","Clean, slow-moving waters"]
+  },
+  "scenedesmus": {
+    images:["images/scenedesmus1.jpg","images/scenedesmus2.jpg"],
+    habit:["Colonial green algae","Forms four-cell colonies","Common planktonic algae"],
+    economic:["Used in biofuel research","Indicator of water quality"],
+    location:["Freshwater ponds","Often in nutrient-rich waters"]
+  }
+};
+
+const el = (id)=>document.getElementById(id);
+const logBox = el("logBox");
+
+function addLog(text, dim=false){
+  const div = document.createElement("div");
+  div.className = "logline" + (dim ? " dim" : "");
+  div.textContent = text;
+  logBox.appendChild(div);
+  while(logBox.children.length > 7) logBox.removeChild(logBox.firstChild);
+}
+function setStatus(text){ el("netStatus").textContent = text; }
+
+// --- Media toggle (Image <-> Description) ---
+function setPanes(showDesc){
+  const imagePane = document.getElementById("imagePane");
+  const descPane = document.getElementById("descPane");
+  const showDescBtn = document.getElementById("showDescBtn");
+  const showImageBtn = document.getElementById("showImageBtn");
+  if(!imagePane || !descPane || !showDescBtn || !showImageBtn) return;
+
+  if(showDesc){
+    imagePane.style.display = "none";
+    descPane.style.display = "block";
+    showDescBtn.style.display = "none";
+    showImageBtn.style.display = "block";
+    if(lastResultType==="known"){
+      hasShownDescOnce = true;
+      setGuide("We can check some of its features by using Show Description.", true);
+    }
+  }else{
+    imagePane.style.display = "block";
+    descPane.style.display = "none";
+    showDescBtn.style.display = "block";
+    showImageBtn.style.display = "none";
+  }
+}
+
+(function bindMediaButtons(){
+  const showDescBtn = document.getElementById("showDescBtn");
+  const showImageBtn = document.getElementById("showImageBtn");
+  if(showDescBtn){
+    showDescBtn.addEventListener("click", ()=> setPanes(true));
+  }
+  if(showImageBtn){
+    showImageBtn.addEventListener("click", ()=> setPanes(false));
+  }
+})();
+
+
+function createCarousel(images){
+  const carouselDiv = el("carousel");
+  carouselDiv.innerHTML="";
+  if(!images || images.length===0) return;
+
+  images.forEach((src,i)=>{
+    const img = document.createElement("img");
+    img.src = src;
+    if(i===0) img.classList.add("active");
+    carouselDiv.appendChild(img);
+  });
+
+  const prevBtn = document.createElement("button");
+  prevBtn.className="prev";
+  prevBtn.innerHTML="&#10094;";
+  prevBtn.onclick=()=>moveSlide(-1);
+
+  const nextBtn = document.createElement("button");
+  nextBtn.className="next";
+  nextBtn.innerHTML="&#10095;";
+  nextBtn.onclick=()=>moveSlide(1);
+
+  carouselDiv.appendChild(prevBtn);
+  carouselDiv.appendChild(nextBtn);
+  carouselDiv.currentIndex=0;
+}
+function moveSlide(dir){
+  const carouselDiv = el("carousel");
+  const imgs = carouselDiv.querySelectorAll("img");
+  if(!imgs.length) return;
+  imgs[carouselDiv.currentIndex].classList.remove("active");
+  carouselDiv.currentIndex = (carouselDiv.currentIndex + dir + imgs.length) % imgs.length;
+  imgs[carouselDiv.currentIndex].classList.add("active");
+}
+
+function prettyName(slug){
+  if(!slug) return "Unknown";
+  if(slug === "unknown algae") return "Unknown Algae";
+  return slug.charAt(0).toUpperCase() + slug.slice(1);
+}
+
+function resolveURL(rel){
+  return new URL(rel, window.location.href).toString();
+}
+
+async function loadModel(){
+  try{
+    setStatus("Loading model…");
+    addLog("> loading TFJS model…");
+    const modelURL = resolveURL("my_model/model.json");
+    const metadataURL = resolveURL("my_model/metadata.json");
+
+    model = await tf.loadLayersModel(modelURL);
+    const metadata = await fetch(metadataURL).then(res=>res.json());
+    classes = (metadata.labels || []).map(l => String(l).trim().toLowerCase());
+
+    addLog("> metadata loaded ✔");
+    addLog("> model ready ✔");
+    setStatus("Model ready • Connected");
+    return true;
+  }catch(err){
+    console.error(err);
+    setStatus("Model load failed");
+    addLog("> ERROR: model load failed", false);
+    addLog("> check: my_model/ beside this page", true);
+    el("speciesName").textContent = "Model Load Failed";
+    el("description").innerHTML =
+      "<h3>Fix</h3><ul>" +
+      "<li>Ensure <b>my_model</b> is deployed beside this HTML.</li>" +
+      "<li>Ensure <b>model.json</b>, <b>metadata.json</b>, and weights exist.</li>" +
+      "<li>Test opening <b>/my_model/model.json</b> in browser.</li>" +
+      "</ul>";
+    return false;
+  }
+}
+
+function setUIUnknown(confidencePct){
+  el("speciesName").textContent = "Unknown Algae";
+  el("confidenceText").textContent = "Confidence: " + confidencePct + "%";
+  el("confidenceFill").style.width = confidencePct + "%";
+  el("pondId").textContent = "Pond-ID: UNKNOWN";
+
+  createCarousel([]);
+  el("description").innerHTML =
+    "<h3>🐟🌿 Hmm…</h3>" +
+    "<p>This algae is not yet in our pond! If you know it, please contribute 🌱💚</p>";
+
+  const openBtn = el("openCardBtn");
+  openBtn.disabled = false;
+  openBtn.textContent = "Open Species Card";
+  const showImg = document.getElementById("showImageBtn");
+  const showDesc = document.getElementById("showDescBtn");
+  if(showImg) showImg.style.display = "inline-flex";
+  if(showDesc) showDesc.style.display = "none";
+  showImageMode();
+  const sdb = document.getElementById("showDescBtn");
+  if(sdb){ sdb.disabled = false; }
+  setPanes(false);
+}
+
+async function predictFromPreview(){
+  if(!model) return;
+
+  const img = el("preview");
+  if(!img || !img.src){
+    addLog("> no image loaded", true);
+  }
+  if(!img.complete) await new Promise(r => img.onload = r);
+
+  resetMedia();
+  setStatus("Scanning…");
+  scanInProgress = true;
+  setGuide("The scanning is under progress…", true);
+  setContributeVisible(false);
+  const sdb = document.getElementById("showDescBtn");
+  if(sdb){ sdb.disabled = true; }
+  setPanes(false);
+  addLog("> extracting features…");
+  addLog("> resizing to 224×224…", true);
+
+  const tensor = tf.browser.fromPixels(img)
+    .resizeNearestNeighbor([224,224])
+    .toFloat()
+    .div(255.0)
+    .expandDims();
+
+  const prediction = model.predict(tensor);
+  const data = await prediction.data();
+
+  const maxValue = Math.max(...data);
+  const index = data.indexOf(maxValue);
+  const predictedClass = (classes[index] || "").toLowerCase();
+  const confidencePct = (maxValue*100).toFixed(2);
+
+    if(predictedClass === "unknown algae"){
+    addLog("> result: UNKNOWN (explicit class)", true);
+    setUIUnknown(confidencePct);
+  }else if(maxValue >= CONFIDENCE_THRESHOLD && algaeInfo[predictedClass]){
+    addLog("> result: KNOWN ✔");
+    setUIKnown(predictedClass, confidencePct, algaeInfo[predictedClass]);
+  }else{
+    addLog("> result: LOW CONFIDENCE (treat as unknown)", true);
+    setUIUnknown(confidencePct);
+  }
+
+  tensor.dispose();
+  prediction.dispose();
+  setStatus("Scan complete • Ready");
+}
+
+/* Auto-load from PhotoHouse session if present */
+(function loadEnhancedImageFromPhotoHouse(){
+  const dataURL = sessionStorage.getItem("enhancedImageDataURL");
+  if(dataURL){ hasInboundImage = true; }
+  if(dataURL){
+    el("preview").src = dataURL;
+    addLog("> enhanced image received ✔");
+  } else {
+    addLog("> waiting for upload…", true);
+  }
+})();
+
+/* Auto-scan on upload */
+const uploadInput = el("uploadInput");
+if(uploadInput){
+  uploadInput.addEventListener("change", (event) => {
+    const file = event.target.files && event.target.files[0];
+    if(!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const dataURL = e.target.result;
+      el("preview").src = dataURL;
+      try{ }catch(_){}
+      addLog("> image loaded ✔");
+      await predictFromPreview();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+document.addEventListener("DOMContentLoaded", ()=>{
+  const startBtn = document.getElementById("startBtn");
+  if(startBtn){
+    startBtn.addEventListener("click", async ()=>{
+      hideWelcome();
+      try{ if(modelReadyPromise) await modelReadyPromise; }catch(e){ console.error(e); }
+      if(hasInboundImage){
+        try{ await predictFromPreview(); }catch(e){ console.error(e); }
+      }
+    });
+  }
+
+  const contributeBtn = document.getElementById("contributeBtn");
+  if(contributeBtn){ contributeBtn.addEventListener("click", ()=> openContribute()); }
+
+  const closeModalBtn = document.getElementById("closeModalBtn");
+  if(closeModalBtn){ closeModalBtn.addEventListener("click", ()=> closeContributeModal()); }
+
+  const copyEmailBtn = document.getElementById("copyEmailBtn");
+  if(copyEmailBtn){
+    copyEmailBtn.addEventListener("click", async ()=>{
+      try{
+        await navigator.clipboard.writeText(EMAIL_TO);
+        copyEmailBtn.textContent = "Copied!";
+        setTimeout(()=>{ copyEmailBtn.textContent = "Copy Email"; }, 1200);
+      }catch(e){
+        alert("Copy failed. Email: " + EMAIL_TO);
+      }
+    });
+  }
+
+  const backBtn = document.getElementById("backBtn");
+  if(backBtn){
+    backBtn.addEventListener("click", ()=>{ window.location.href = "photohouse_v2.html"; });
+  }
+
+  const openCardBtn = document.getElementById("openCardBtn");
+  if(openCardBtn){
+    openCardBtn.addEventListener("click", ()=>{
+      const label = document.getElementById("speciesName").textContent;
+      if(String(label).toLowerCase().includes("unknown")){ openContribute(); return; }
+      alert("Next: open Species Card page for: " + label + " (wire real pages next).");
+    });
+  }
+});
+  }
+  alert("Next: open Species Card page for: " + label + " (wire real pages next).");
+});
+
+(async function init(){
+  showWelcome();
+  modelReadyPromise = loadModel();
+  const ok = await modelReadyPromise;
+  if(ok){ setStatus("Ready • Upload an image"); }
+})();;
+</script>
+
+
+  <!-- Mareoj Guide Widget -->
+  <div id="guideWidget" class="guide" style="display:none;">
+    <img class="guideAvatar" src="mareoj%20velith.png" alt="Mareoj Velith">
+    <div class="guideBubble">
+      <div class="guideName">Mareoj</div>
+      <div class="guideMsg" id="guideMsg">Loading…</div>
+      <div class="guideActions" id="guideActions" style="display:none;">
+        <button class="btn primary" id="contributeBtn" type="button">Contribute</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Desktop Contribute Modal -->
+  <div id="contributeModal" class="modal" style="display:none;">
+    <div class="modalCard">
+      <div class="modalTitle">Contribute this new algae</div>
+      <div class="modalText">Please send your image + details to:</div>
+      <div class="modalEmail" id="emailText">uniqueseekers123@gmail.com</div>
+      <div class="modalBtns">
+        <button class="btn" id="copyEmailBtn" type="button">Copy Email</button>
+        <button class="btn primary" id="closeModalBtn" type="button">Close</button>
+      </div>
+      <div class="modalHint">Desktop tip: attach your PhotoHouse enhanced image in the email.</div>
+    </div>
+  </div>
+
+
+  <!-- Mareoj Outro Overlay -->
+  <div id="outroOverlay" class="overlay" style="display:none;">
+    <div class="overlayCard">
+      <div class="overlayLeft">
+        <img class="overlayChar" src="mareoj%20velith.png" alt="Mareoj Velith">
+      </div>
+      <div class="overlayRight">
+        <div class="overlayTag">Pond Archive • Farewell</div>
+        <h2 class="overlayTitle">Farewell, Explorer</h2>
+        <p class="overlayText" id="outroText">Thanks for visiting our mini pond. Farewell now, explorer. More things are there for you to checkout.</p>
+        <button id="outroCloseBtn" class="btn primary overlayBtn" type="button">Continue</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

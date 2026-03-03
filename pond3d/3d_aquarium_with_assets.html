@@ -1,0 +1,692 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>3D Aquarium • Pond Assets Preview</title>
+  <style>
+    :root{
+      --bg1:#f6f7fb;
+      --bg2:#eef1f8;
+      --ink:#0c1222;
+      --muted:#4b5565;
+      --glass:rgba(255,255,255,0.18);
+      --border:rgba(255,255,255,0.35);
+    }
+    html,body{height:100%; margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;}
+    body{
+      background: radial-gradient(1200px 700px at 30% 10%, var(--bg1), var(--bg2));
+      color:var(--ink);
+      overflow:hidden;
+    }
+    #hud{
+      position:fixed; left:16px; top:16px; z-index:10;
+      padding:12px 14px; border-radius:14px;
+      background: rgba(255,255,255,0.6);
+      backdrop-filter: blur(10px);
+      border:1px solid rgba(0,0,0,0.08);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.12);
+      max-width:min(520px, calc(100vw - 32px));
+    }
+    #hud h1{font-size:14px; margin:0 0 6px 0; letter-spacing:.2px;}
+    #hud p{margin:0; font-size:12.5px; line-height:1.35; color:var(--muted);}
+    #hud code{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
+    #legend{
+      margin-top:10px; display:grid; gap:8px;
+      grid-template-columns: 1fr 1fr;
+      font-size:12px; color:var(--muted);
+    }
+    .pill{
+      display:flex; gap:8px; align-items:center;
+      padding:8px 10px; border-radius:999px;
+      background: rgba(255,255,255,0.55);
+      border:1px solid rgba(0,0,0,0.07);
+    }
+    .dot{width:10px;height:10px;border-radius:50%;}
+    #loading{
+      position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+      background: radial-gradient(1000px 600px at 50% 30%, rgba(255,255,255,0.95), rgba(245,247,252,0.92));
+      z-index:20;
+    }
+    .card{
+      width:min(520px, calc(100vw - 36px));
+      padding:18px 18px 16px;
+      border-radius:18px;
+      background: rgba(255,255,255,0.75);
+      border:1px solid rgba(0,0,0,0.08);
+      box-shadow: 0 22px 70px rgba(0,0,0,0.12);
+    }
+    .bar{
+      height:10px; border-radius:999px;
+      background: rgba(0,0,0,0.08);
+      overflow:hidden;
+      margin-top:12px;
+    }
+    .bar > i{display:block; height:100%; width:0%; background: rgba(20, 140, 120, 0.85);}
+    .small{margin-top:10px; font-size:12px; color:var(--muted); line-height:1.35;}
+    canvas{display:block;}
+    a{color:inherit;}
+  </style>
+</head>
+<body>
+  <div id="hud">
+    <h1>3D Aquarium (Rectangular) • Asset Check</h1>
+    <p>
+      Put these files in the <b>same folder</b> as this HTML:
+      <br><code>frog.glb</code>, <code>lotus_flower_with_lillypad.glb</code>, <code>koi_fish.glb</code>, <code>underwater_plant_pack.glb</code>
+      <br>Drag to orbit • Scroll to zoom • Right-drag to pan
+    </p>
+    <div id="legend">
+      <div class="pill"><span class="dot" style="background:#ff9acb"></span>Pink lotus</div>
+      <div class="pill"><span class="dot" style="background:#ffffff; border:1px solid rgba(0,0,0,0.2)"></span>White lotus</div>
+      <div class="pill"><span class="dot" style="background:#f59e0b"></span>Koi (gold)</div>
+      <div class="pill"><span class="dot" style="background:#111827"></span>Koi (dark)</div>
+    </div>
+  </div>
+
+  <div id="loading">
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+        <div>
+          <div style="font-weight:700; font-size:14px;">Loading aquarium & models…</div>
+          <div class="small">If models don’t appear, open this page using a local server (see note below).</div>
+        </div>
+        <div style="font-size:12px; color:var(--muted); text-align:right;">
+          <div id="pct">0%</div>
+          <div id="file">Preparing…</div>
+        </div>
+      </div>
+      <div class="bar"><i id="fill"></i></div>
+      <div class="small">
+        Tip (Android/Chrome): local file loading may be blocked. Use a simple local server:
+        <br>• VS Code Live Server, or
+        <br>• Python: <code>python -m http.server</code> then open <code>http://localhost:8000</code>
+      </div>
+    </div>
+  </div>
+
+<script type="module">
+  import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
+  import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js";
+  import { GLTFLoader } from "https://unpkg.com/three@0.160.0/examples/jsm/loaders/GLTFLoader.js";
+
+  // ====== Basics ======
+  const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.08;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  document.body.appendChild(renderer.domElement);
+
+  const scene = new THREE.Scene();
+
+  const camera = new THREE.PerspectiveCamera(48, window.innerWidth/window.innerHeight, 0.02, 200);
+  camera.position.set(2.6, 1.6, 3.2);
+
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.target.set(0, 0.55, 0);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  controls.maxPolarAngle = Math.PI * 0.495;
+
+  // ====== Lighting ======
+  const hemi = new THREE.HemisphereLight(0xffffff, 0x6a7a92, 0.75);
+  scene.add(hemi);
+
+  const key = new THREE.DirectionalLight(0xffffff, 1.25);
+  key.position.set(3.5, 5.5, 2.0);
+  key.castShadow = true;
+  key.shadow.mapSize.set(2048, 2048);
+  key.shadow.camera.near = 0.1;
+  key.shadow.camera.far = 30;
+  key.shadow.camera.left = -5;
+  key.shadow.camera.right = 5;
+  key.shadow.camera.top = 5;
+  key.shadow.camera.bottom = -5;
+  scene.add(key);
+
+  const fill = new THREE.DirectionalLight(0xffffff, 0.45);
+  fill.position.set(-4.0, 3.0, -3.0);
+  scene.add(fill);
+
+  // Subtle fog for depth
+  scene.fog = new THREE.Fog(0xf1f4fa, 4.5, 18);
+
+  // ====== Aquarium dimensions ======
+  // You can change these later.
+  const TANK = {
+    w: 3.2,  // width (x)
+    h: 1.9,  // height (y)
+    d: 2.2,  // depth (z)
+    glass: 0.03,
+    waterFill: 0.78 // 0..1
+  };
+
+  // ====== Aquarium (glass + frame) ======
+  const tankGroup = new THREE.Group();
+  scene.add(tankGroup);
+
+  // Outer glass box
+  const glassMat = new THREE.MeshPhysicalMaterial({
+    color: 0xffffff,
+    transmission: 0.92,
+    transparent: true,
+    opacity: 1.0,
+    roughness: 0.08,
+    metalness: 0.0,
+    ior: 1.45,
+    thickness: 0.35,
+    specularIntensity: 0.85,
+    envMapIntensity: 0.9,
+    clearcoat: 0.9,
+    clearcoatRoughness: 0.08
+  });
+
+  const glassGeo = new THREE.BoxGeometry(TANK.w, TANK.h, TANK.d);
+  const glass = new THREE.Mesh(glassGeo, glassMat);
+  glass.castShadow = false;
+  glass.receiveShadow = false;
+  tankGroup.add(glass);
+
+  // Inner "cutout" to make it feel hollow (slightly smaller, render backfaces)
+  const innerGeo = new THREE.BoxGeometry(TANK.w - TANK.glass*2, TANK.h - TANK.glass*2, TANK.d - TANK.glass*2);
+  const innerMat = glassMat.clone();
+  innerMat.side = THREE.BackSide;
+  innerMat.transmission = 0.94;
+  innerMat.roughness = 0.06;
+  const innerGlass = new THREE.Mesh(innerGeo, innerMat);
+  tankGroup.add(innerGlass);
+
+  // Subtle dark rim frame
+  const rim = new THREE.Mesh(
+    new THREE.BoxGeometry(TANK.w + 0.02, TANK.h + 0.02, TANK.d + 0.02),
+    new THREE.MeshStandardMaterial({ color: 0x1f2a3a, roughness: 0.55, metalness: 0.2, transparent:true, opacity:0.18 })
+  );
+  tankGroup.add(rim);
+
+  // ====== Water volume ======
+  const waterH = (TANK.h - TANK.glass*2) * TANK.waterFill;
+  const waterGeo = new THREE.BoxGeometry(TANK.w - TANK.glass*2 - 0.02, waterH, TANK.d - TANK.glass*2 - 0.02);
+
+  const waterMat = new THREE.MeshPhysicalMaterial({
+    color: new THREE.Color("#39c0a4"),
+    transmission: 0.78,
+    transparent: true,
+    opacity: 0.72,
+    roughness: 0.12,
+    metalness: 0.0,
+    ior: 1.33,
+    thickness: 0.55,
+    specularIntensity: 0.6,
+    envMapIntensity: 0.75
+  });
+
+  const water = new THREE.Mesh(waterGeo, waterMat);
+  water.position.y = -TANK.h/2 + TANK.glass + waterH/2;
+  tankGroup.add(water);
+
+  // Water surface (slight shimmer)
+  const surfGeo = new THREE.PlaneGeometry(TANK.w - TANK.glass*2 - 0.03, TANK.d - TANK.glass*2 - 0.03, 96, 96);
+  const surfMat = new THREE.MeshStandardMaterial({
+    color: new THREE.Color("#5fc2a7"),
+    roughness: 0.35,
+    metalness: 0.02,
+    transparent: true,
+    opacity: 0.55
+  });
+  const surface = new THREE.Mesh(surfGeo, surfMat);
+  surface.rotation.x = -Math.PI/2;
+  surface.position.y = water.position.y + waterH/2 + 0.005;
+  tankGroup.add(surface);
+
+  // ====== Sand/soil base ======
+  function makeSandTexture(size=512){
+    const c = document.createElement("canvas");
+    c.width = c.height = size;
+    const ctx = c.getContext("2d");
+    ctx.fillStyle = "#b79a74";
+    ctx.fillRect(0,0,size,size);
+
+    // speckles
+    for(let i=0;i<9000;i++){
+      const x = Math.random()*size, y=Math.random()*size;
+      const r = Math.random()*1.6 + 0.4;
+      const g = 150 + Math.random()*40;
+      const b = 110 + Math.random()*35;
+      const a = 0.06 + Math.random()*0.08;
+      ctx.fillStyle = `rgba(${g},${b},${Math.floor(b*0.85)},${a})`;
+      ctx.beginPath();
+      ctx.arc(x,y,r,0,Math.PI*2);
+      ctx.fill();
+    }
+    // darker grains
+    for(let i=0;i<2200;i++){
+      const x = Math.random()*size, y=Math.random()*size;
+      const r = Math.random()*1.8 + 0.6;
+      ctx.fillStyle = `rgba(60,40,20,${0.05 + Math.random()*0.09})`;
+      ctx.beginPath();
+      ctx.arc(x,y,r,0,Math.PI*2);
+      ctx.fill();
+    }
+
+    const tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(2.2, 1.6);
+    tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    return tex;
+  }
+
+  const sandTex = makeSandTexture();
+  const sandMat = new THREE.MeshStandardMaterial({
+    map: sandTex,
+    color: 0xffffff,
+    roughness: 0.95,
+    metalness: 0.0
+  });
+
+  const sandGeo = new THREE.BoxGeometry(TANK.w - TANK.glass*2 - 0.05, 0.14, TANK.d - TANK.glass*2 - 0.05);
+  const sand = new THREE.Mesh(sandGeo, sandMat);
+  sand.position.y = -TANK.h/2 + TANK.glass + 0.07;
+  sand.receiveShadow = true;
+  tankGroup.add(sand);
+
+  // Soft shadow catcher under aquarium
+  const floor = new THREE.Mesh(
+    new THREE.PlaneGeometry(20, 20),
+    new THREE.ShadowMaterial({ opacity: 0.18 })
+  );
+  floor.rotation.x = -Math.PI/2;
+  floor.position.y = -TANK.h/2 - 0.02;
+  floor.receiveShadow = true;
+  scene.add(floor);
+
+  // Position tank nicely
+  tankGroup.position.y = 0.55;
+
+  // ====== Loading UI ======
+  const loadingEl = document.getElementById("loading");
+  const pctEl = document.getElementById("pct");
+  const fileEl = document.getElementById("file");
+  const fillEl = document.getElementById("fill");
+
+  function setProgress(pct, label){
+    const p = Math.max(0, Math.min(100, pct));
+    pctEl.textContent = `${Math.round(p)}%`;
+    fillEl.style.width = `${p}%`;
+    if(label) fileEl.textContent = label;
+  }
+
+  // ====== GLB Loader ======
+  const loader = new GLTFLoader();
+
+  // Small helper to clone glTF scenes safely
+  function cloneGltfScene(src){
+    // Simple deep clone for most glTFs (works well for static models)
+    const clone = src.clone(true);
+    const srcSkinned = new Map();
+    src.traverse(o => { if(o.isSkinnedMesh) srcSkinned.set(o.name, o); });
+    if(srcSkinned.size){
+      // If any skinned meshes exist, keep animations separate (we are not relying on them now).
+      // This is a best-effort clone.
+      clone.traverse(o => {
+        if(o.isSkinnedMesh && srcSkinned.has(o.name)){
+          o.skeleton = srcSkinned.get(o.name).skeleton;
+        }
+      });
+    }
+    return clone;
+  }
+
+  // Tint helper (works even if textures exist)
+  function tintObject(root, tintHex, predicate=null){
+    const tint = new THREE.Color(tintHex);
+    root.traverse((obj)=>{
+      if(!obj.isMesh) return;
+      const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+      for(const m of mats){
+        if(!m) continue;
+        if(predicate && !predicate(obj, m)) continue;
+
+        // Multiply base color (keeps texture details)
+        if(m.color){
+          // blend toward tint rather than fully replace
+          const base = m.color.clone();
+          m.color = base.lerp(tint, 0.55);
+          m.needsUpdate = true;
+        }
+      }
+    });
+  }
+
+  // Basic "green/petal" separation attempt:
+  // If mesh/material is already green-ish, treat it as pad/leaf and don't tint when coloring the flower.
+  function looksGreenish(color){
+    // heuristic: green channel strongest
+    return color && color.g > color.r * 1.08 && color.g > color.b * 1.08;
+  }
+
+  function flowerPredicate(mesh, mat){
+    // tint only non-green parts (petals/center), keep leaves/pad green
+    if(!mat || !mat.color) return true;
+    return !looksGreenish(mat.color);
+  }
+
+  function fishPredicate(mesh, mat){
+    // tint everything on fish (fine)
+    return true;
+  }
+
+  // ====== Load all assets ======
+  const assets = [
+    { key:"lotus", url:"lotus_flower_with_lillypad.glb", label:"Lotus + pad" },
+    { key:"fish",  url:"koi_fish.glb",                 label:"Koi fish" },
+    { key:"frog",  url:"frog.glb",                      label:"Frog" },
+    { key:"plants",url:"underwater_plant_pack.glb",     label:"Underwater plants" }
+  ];
+
+  const loaded = {};
+  let done = 0;
+
+  async function loadOne(a){
+    return new Promise((resolve, reject)=>{
+      fileEl.textContent = `Loading ${a.label}…`;
+      loader.load(a.url, (gltf)=>{
+        resolve(gltf);
+      }, (ev)=>{
+        if(ev.total){
+          // overall progress (rough)
+          const partial = (done + ev.loaded/ev.total) / assets.length;
+          setProgress(partial*100, `Loading ${a.label}…`);
+        }
+      }, (err)=>{
+        reject(err);
+      });
+    });
+  }
+
+  function fitInsideTank(obj, targetMax=0.85){
+    // scale model to fit nicely (based on bounding box)
+    const box = new THREE.Box3().setFromObject(obj);
+    const size = new THREE.Vector3();
+    box.getSize(size);
+    const maxDim = Math.max(size.x, size.y, size.z) || 1;
+    const s = targetMax / maxDim;
+    obj.scale.setScalar(s);
+    // re-center
+    box.setFromObject(obj);
+    const center = new THREE.Vector3();
+    box.getCenter(center);
+    obj.position.sub(center);
+  }
+
+  function setShadows(obj, cast=true, receive=false){
+    obj.traverse((m)=>{
+      if(m.isMesh){
+        m.castShadow = cast;
+        m.receiveShadow = receive;
+        if(m.material){
+          const mats = Array.isArray(m.material) ? m.material : [m.material];
+          mats.forEach(mat=>{
+            if(!mat) return;
+            // better look in water/glass
+            if("metalness" in mat) mat.metalness = Math.min(mat.metalness ?? 0, 0.15);
+            if("roughness" in mat) mat.roughness = Math.min(mat.roughness ?? 0.6, 0.85);
+          });
+        }
+      }
+    });
+  }
+
+  function makeUnderwaterGroup(){
+    const g = new THREE.Group();
+    // A very subtle underwater haze box (inside water only)
+    const hazeMat = new THREE.MeshBasicMaterial({ color:0x2aa98d, transparent:true, opacity:0.06, side:THREE.BackSide, depthWrite:false });
+    const hazeGeo = new THREE.BoxGeometry(TANK.w - TANK.glass*2 - 0.03, waterH, TANK.d - TANK.glass*2 - 0.03);
+    const haze = new THREE.Mesh(hazeGeo, hazeMat);
+    haze.position.copy(water.position);
+    g.add(haze);
+    return g;
+  }
+
+  const underwaterGroup = makeUnderwaterGroup();
+  tankGroup.add(underwaterGroup);
+
+  // ====== Build scene after loads ======
+  async function main(){
+    try{
+      for(const a of assets){
+        const gltf = await loadOne(a);
+        loaded[a.key] = gltf;
+        done++;
+        setProgress(done/assets.length*100, `Loaded ${a.label}`);
+      }
+
+      // Hide loader
+      setProgress(100, "Done");
+      setTimeout(()=>{ loadingEl.style.display="none"; }, 250);
+
+      // --- Lotus (2 variants) ---
+      const lotusSrc = loaded.lotus.scene;
+
+      const lotusPink = cloneGltfScene(lotusSrc);
+      const lotusWhite = cloneGltfScene(lotusSrc);
+
+      // Normalize scale
+      fitInsideTank(lotusPink, 0.75);
+      lotusWhite.scale.copy(lotusPink.scale);
+
+      // Place on sand (slightly above)
+      lotusPink.position.set(-0.55, sand.position.y + 0.10, 0.15);
+      lotusWhite.position.set(0.55,  sand.position.y + 0.10, -0.20);
+
+      // Tint petals: pink and white
+      tintObject(lotusPink, "#ff9acb", flowerPredicate);
+      tintObject(lotusWhite, "#ffffff", flowerPredicate);
+
+      setShadows(lotusPink, true, false);
+      setShadows(lotusWhite, true, false);
+
+      underwaterGroup.add(lotusPink);
+      underwaterGroup.add(lotusWhite);
+
+      // --- Frog (1) ---
+      const frog = cloneGltfScene(loaded.frog.scene);
+      fitInsideTank(frog, 0.38);
+      setShadows(frog, true, false);
+
+      // Put frog on the pink lotus pad area (slightly above)
+      frog.position.set(lotusPink.position.x + 0.05, lotusPink.position.y + 0.20, lotusPink.position.z + 0.05);
+      frog.rotation.y = Math.PI * 0.15;
+      underwaterGroup.add(frog);
+
+      // --- Seaweed / plants pack (place 3-5 pieces) ---
+      const plantsSrc = loaded.plants.scene;
+      const plantInstances = [];
+
+      // Build a list of mesh groups (children) to pick from
+      const plantCandidates = [];
+      plantsSrc.traverse((o)=>{
+        if(o.isMesh){
+          // capture parent group for better structure
+          if(o.parent && o.parent !== plantsSrc) plantCandidates.push(o.parent);
+        }
+      });
+
+      function uniqueByUUID(arr){
+        const seen = new Set();
+        const out = [];
+        for(const x of arr){
+          if(!x || seen.has(x.uuid)) continue;
+          seen.add(x.uuid);
+          out.push(x);
+        }
+        return out;
+      }
+      const candidates = uniqueByUUID(plantCandidates).slice(0, 10);
+
+      // Make 6 instances (we can adjust later)
+      const plantPositions = [
+        [-1.15, 0.0, -0.55],
+        [-1.05, 0.0,  0.65],
+        [-0.10, 0.0, -0.85],
+        [ 0.10, 0.0,  0.85],
+        [ 1.10, 0.0, -0.55],
+        [ 1.15, 0.0,  0.60],
+      ];
+
+      for(let i=0;i<plantPositions.length;i++){
+        const pick = candidates[i % Math.max(1,candidates.length)] || plantsSrc;
+        const p = cloneGltfScene(pick);
+
+        fitInsideTank(p, 0.55);
+        p.position.set(plantPositions[i][0], sand.position.y + 0.09, plantPositions[i][2]);
+        p.rotation.y = (i*0.9) % (Math.PI*2);
+        p.scale.multiplyScalar(0.55 + (i%3)*0.10);
+
+        // color variety
+        const greens = ["#2fa46a", "#1f8f67", "#2aa98d", "#2f9f90", "#3aa86f"];
+        tintObject(p, greens[i % greens.length], (mesh, mat)=>{
+          // tint anything already greenish, keep occasional brown stems intact
+          if(!mat || !mat.color) return true;
+          return looksGreenish(mat.color) || mat.color.g > 0.25;
+        });
+
+        setShadows(p, true, false);
+        underwaterGroup.add(p);
+        plantInstances.push(p);
+      }
+
+      // --- Fish (2 or 3) ---
+      const fishSrc = loaded.fish.scene;
+      const fishA = cloneGltfScene(fishSrc);
+      const fishB = cloneGltfScene(fishSrc);
+      const fishC = cloneGltfScene(fishSrc);
+
+      // Scale fish consistently
+      fitInsideTank(fishA, 0.55);
+      fishB.scale.copy(fishA.scale);
+      fishC.scale.copy(fishA.scale);
+
+      // Tint variations
+      tintObject(fishA, "#f59e0b", fishPredicate); // gold
+      tintObject(fishB, "#ffffff", fishPredicate); // white
+      tintObject(fishC, "#111827", fishPredicate); // dark
+
+      setShadows(fishA, true, false);
+      setShadows(fishB, true, false);
+      setShadows(fishC, true, false);
+
+      underwaterGroup.add(fishA, fishB, fishC);
+
+      // Fish swim paths
+      const fishSwimmers = [
+        { obj: fishA, rX: 0.95, rZ: 0.55, y: water.position.y + waterH*0.15, speed: 0.55, phase: 0.0 },
+        { obj: fishB, rX: 0.70, rZ: 0.95, y: water.position.y + waterH*0.05, speed: 0.42, phase: 2.2 },
+        { obj: fishC, rX: 1.05, rZ: 0.75, y: water.position.y + waterH*0.25, speed: 0.36, phase: 4.1 },
+      ];
+
+      // Final: keep everything within inner bounds
+      const clampX = (TANK.w - TANK.glass*2) * 0.45;
+      const clampZ = (TANK.d - TANK.glass*2) * 0.45;
+
+      // Gentle caustic-ish light (fake)
+      const caustic = new THREE.SpotLight(0xffffff, 0.55, 10, Math.PI/4, 0.55, 1.0);
+      caustic.position.set(0.3, tankGroup.position.y + TANK.h/2 + 1.2, 0.0);
+      caustic.target.position.set(0.0, tankGroup.position.y + 0.2, 0.0);
+      scene.add(caustic);
+      scene.add(caustic.target);
+
+      // Animation
+      const clock = new THREE.Clock();
+
+      function animate(){
+        requestAnimationFrame(animate);
+        controls.update();
+
+        const t = clock.getElapsedTime();
+
+        // Water surface subtle wave
+        const pos = surface.geometry.attributes.position;
+        for(let i=0;i<pos.count;i++){
+          const x = pos.getX(i);
+          const z = pos.getY(i); // because plane is in XZ, but stored as XY before rotation
+          const w1 = Math.sin(t*0.9 + x*2.2) * 0.006;
+          const w2 = Math.cos(t*0.7 + z*2.0) * 0.006;
+          pos.setZ(i, w1+w2);
+        }
+        pos.needsUpdate = true;
+        surface.geometry.computeVertexNormals();
+
+        // Seaweed sway (group rotation + small bending)
+        plantInstances.forEach((p, idx)=>{
+          const s = 0.10 + idx*0.02;
+          p.rotation.z = Math.sin(t*0.9 + idx) * 0.08;
+          p.rotation.x = Math.cos(t*0.7 + idx*1.7) * 0.03;
+          p.position.y = sand.position.y + 0.09 + Math.sin(t*1.1 + idx)*0.006;
+          p.scale.setScalar(p.scale.x * (1.0 + Math.sin(t*0.6+idx)*0.0006)); // tiny "breath"
+        });
+
+        // Frog idle: tiny breathing + blink-like head bob
+        frog.position.y = (lotusPink.position.y + 0.20) + Math.sin(t*1.4) * 0.006;
+        frog.rotation.y = Math.PI * 0.15 + Math.sin(t*0.6) * 0.03;
+
+        // Fish swim
+        fishSwimmers.forEach((sw, i)=>{
+          const ang = t*sw.speed + sw.phase;
+          const x = Math.cos(ang) * sw.rX;
+          const z = Math.sin(ang) * sw.rZ;
+          const y = sw.y + Math.sin(t*1.3 + i*1.8) * 0.04;
+
+          sw.obj.position.set(
+            THREE.MathUtils.clamp(x, -clampX, clampX),
+            y,
+            THREE.MathUtils.clamp(z, -clampZ, clampZ)
+          );
+
+          // Face direction of travel (tangent)
+          const dx = -Math.sin(ang) * sw.rX;
+          const dz =  Math.cos(ang) * sw.rZ;
+          sw.obj.rotation.y = Math.atan2(dx, dz);
+
+          // Tail wag (simple whole-body yaw wiggle)
+          sw.obj.rotation.y += Math.sin(t*6.0 + i) * 0.12;
+          sw.obj.rotation.z = Math.sin(t*3.5 + i*1.4) * 0.03;
+        });
+
+        renderer.render(scene, camera);
+      }
+      animate();
+
+    }catch(e){
+      console.error(e);
+      setProgress(100, "Error");
+      document.getElementById("file").textContent = "Failed to load one or more .glb files.";
+      document.getElementById("pct").textContent = "—";
+      document.getElementById("fill").style.width = "100%";
+      const msg = document.createElement("div");
+      msg.className = "small";
+      msg.style.marginTop = "10px";
+      msg.innerHTML = `
+        <b>Fix:</b> Make sure this HTML and the .glb files are in the same folder.<br/>
+        If you're opening as a file on Android, use a local server (VS Code Live Server or Python http.server).<br/>
+        <div style="margin-top:6px; opacity:.85;"><code>${String(e).replaceAll("<","&lt;")}</code></div>
+      `;
+      document.querySelector("#loading .card").appendChild(msg);
+    }
+  }
+
+  main();
+
+  // Resize
+  window.addEventListener("resize", ()=>{
+    camera.aspect = window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+</script>
+</body>
+</html>

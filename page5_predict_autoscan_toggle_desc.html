@@ -518,6 +518,10 @@ body:before{
 
 
 <script>
+  // Clear old cached image unless coming from PhotoHouse
+if (!document.referrer.includes("photohouse")) {
+  sessionStorage.removeItem("enhancedImageDataURL");
+}
 /* ===================== CLEAN PAGE 5 SCRIPT (AUTO-SCAN ON UPLOAD) ===================== */
 let model;
 let classes = [];
@@ -846,7 +850,12 @@ el("openCardBtn").addEventListener("click", ()=>{
   }
   alert("Next: open Species Card page for: " + label + " (wire real pages next).");
 });
-
+// Force reload if page restored from browser memory cache
+window.addEventListener("pageshow", function (event) {
+  if (event.persisted) {
+    window.location.reload();
+  }
+});
 (async function init(){
   const ok = await loadModel();
   if(ok){

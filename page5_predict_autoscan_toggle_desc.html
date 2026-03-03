@@ -850,14 +850,10 @@ el("openCardBtn").addEventListener("click", ()=>{
 (async function init(){
   const ok = await loadModel();
   if(ok){
-    const img = el("preview");
-    if(img && img.src){
-      await predictFromPreview();
-    } else {
-      setStatus("Ready • Upload an image");
-    }
+    setStatus("Ready • Upload an image");
   }
 })();
+
 </script>
 
 </body>

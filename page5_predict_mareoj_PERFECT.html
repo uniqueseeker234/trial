@@ -1,0 +1,1028 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Pond • Page 5 • Mareoj Console</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<!-- TFJS (same approach as your old working file) -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
+
+<style>
+:root{
+  --bg0:#05070b;
+  --bg1:#071018;
+  --glass: rgba(255,255,255,0.06);
+  --glass2: rgba(255,255,255,0.10);
+  --border: rgba(255,255,255,0.14);
+  --text: rgba(230,255,250,0.88);
+  --muted: rgba(230,255,250,0.62);
+  --dim: rgba(230,255,250,0.38);
+
+  --tealA:#5FC2A7;  /* your pond teal */
+  --tealB:#3CC19E;
+  --cyan:#52e6ff;
+
+  --shadow: 0 18px 70px rgba(0,0,0,0.65);
+  --radius: 18px;
+}
+
+*{box-sizing:border-box;}
+html,body{
+  height:100%;
+  margin:0;
+  font-family:"Poppins", system-ui, -apple-system, Segoe UI, Arial;
+  background:
+    radial-gradient(1200px 900px at 70% -10%, rgba(95,194,167,0.18), transparent 60%),
+    radial-gradient(900px 700px at 10% 110%, rgba(82,230,255,0.10), transparent 55%),
+    linear-gradient(180deg,var(--bg0),var(--bg1));
+  color:var(--text);
+  overflow:hidden;
+}
+body:before{
+  content:"";
+  position:fixed; inset:0;
+  background-image:
+    radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.18) 0, transparent 60%),
+    radial-gradient(1px 1px at 30% 80%, rgba(255,255,255,0.14) 0, transparent 60%),
+    radial-gradient(1px 1px at 55% 35%, rgba(255,255,255,0.10) 0, transparent 60%),
+    radial-gradient(1px 1px at 80% 60%, rgba(255,255,255,0.14) 0, transparent 60%),
+    radial-gradient(1px 1px at 92% 18%, rgba(255,255,255,0.10) 0, transparent 60%);
+  opacity:0.7;
+  pointer-events:none;
+}
+
+.wrap{
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  padding:18px;
+  gap:14px;
+}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:14px 18px;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  background:var(--glass);
+  backdrop-filter:blur(14px);
+}
+
+.title{
+  font-family:Orbitron;
+  font-size:18px;
+  letter-spacing:1px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.dot{
+  width:8px; height:8px; border-radius:50%;
+  background: radial-gradient(circle, var(--cyan), rgba(82,230,255,0.15));
+  box-shadow: 0 0 18px rgba(82,230,255,0.45);
+  animation:pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse{ 0%,100%{ transform:scale(0.9); opacity:0.7;} 50%{ transform:scale(1.15); opacity:1;} }
+
+.status{
+  font-size:13px;
+  color:var(--muted);
+  white-space:nowrap;
+}
+
+.grid{
+  flex:1;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+  min-height:0;
+}
+
+.panel{
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  background:var(--glass);
+  backdrop-filter:blur(18px);
+  box-shadow:var(--shadow);
+  padding:18px;
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+}
+
+.panel h2{
+  font-family:Orbitron;
+  font-size:15px;
+  margin:0 0 12px 0;
+  letter-spacing:1px;
+  color:var(--tealA);
+}
+
+/* LEFT: scan bay */
+.image-box{
+  flex:1;
+  border-radius:12px;
+  background:rgba(0,0,0,0.45);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  overflow:hidden;
+  min-height:240px;
+  border:1px solid rgba(255,255,255,0.10);
+}
+.image-box img{
+  max-width:90%;
+  max-height:90%;
+  border-radius:10px;
+  filter: saturate(1.02) contrast(1.02);
+}
+.grid-overlay{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  opacity:0.55;
+  background:
+    linear-gradient(to right, rgba(82,230,255,0.12) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(95,194,167,0.10) 1px, transparent 1px);
+  background-size: 26px 26px;
+  mix-blend-mode: screen;
+  animation: gridDrift 6s linear infinite;
+}
+@keyframes gridDrift{
+  0%{ background-position: 0 0, 0 0; }
+  100%{ background-position: 120px 0, 0 120px; }
+}
+.vignette{
+  position:absolute; inset:0;
+  pointer-events:none;
+  background: radial-gradient(60% 60% at 50% 50%, transparent 35%, rgba(0,0,0,0.55) 100%);
+}
+.scan-line{
+  position:absolute;
+  left:0; right:0;
+  height:2px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+  filter: drop-shadow(0 0 10px rgba(82,230,255,0.6));
+  animation:scan 3.2s linear infinite;
+}
+@keyframes scan{
+  0%{ top:-10%; opacity:0.2; }
+  10%{ opacity:1; }
+  90%{ opacity:1; }
+  100%{ top:110%; opacity:0.2; }
+}
+.bracket{
+  position:absolute;
+  width:28px; height:28px;
+  border:2px solid rgba(82,230,255,0.45);
+  border-radius:6px;
+  opacity:0.85;
+  filter: drop-shadow(0 0 12px rgba(82,230,255,0.25));
+}
+.b1{ top:14px; left:14px; border-right:none; border-bottom:none; }
+.b2{ top:14px; right:14px; border-left:none; border-bottom:none; }
+.b3{ bottom:14px; left:14px; border-right:none; border-top:none; }
+.b4{ bottom:14px; right:14px; border-left:none; border-top:none; }
+
+.logs{
+  margin-top:12px;
+  font-size:12px;
+  color:var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  line-height:1.55;
+  height: 108px;
+  overflow:hidden;
+  border-top:1px solid rgba(255,255,255,0.08);
+  padding-top:10px;
+}
+.logline{ opacity:0.92; }
+.logline.dim{ opacity:0.55; }
+
+/* RIGHT: result + description */
+.species{
+  font-size:22px;
+  font-weight:800;
+  color:var(--tealA);
+  letter-spacing:0.2px;
+}
+.subrow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  color:var(--muted);
+  font-size:13px;
+  margin-top:8px;
+}
+.badge{
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,0.14);
+  background:rgba(255,255,255,0.06);
+  color:var(--muted);
+  font-size:12px;
+  white-space:nowrap;
+}
+.confidence-bar{
+  margin-top:10px;
+  height:10px;
+  border-radius:6px;
+  background:rgba(255,255,255,0.08);
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,0.10);
+}
+.confidence-fill{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,var(--tealA),var(--tealB));
+  transition: width 500ms ease;
+}
+
+.desc{
+  margin-top:12px;
+  font-size: 13.5px;
+  color: rgba(230,255,250,0.80);
+  line-height: 1.45;
+  overflow:auto;
+  padding-right:6px;
+  border-top:1px solid rgba(255,255,255,0.08);
+  padding-top:10px;
+  flex:1;
+  min-height:0;
+}
+.desc h3{
+  margin: 10px 0 6px;
+  font-size: 13px;
+  opacity:0.95;
+  font-family: Orbitron, Inter, system-ui;
+  letter-spacing:0.6px;
+  color: rgba(230,255,250,0.92);
+}
+.desc ul{ margin: 6px 0 0 18px; padding:0; }
+
+/* Carousel (copied behavior) */
+.carousel{
+  margin-top: 12px;
+  width: 100%;
+  max-width: 320px;
+  position:relative;
+}
+.carousel img{
+  width:100%;
+  display:none;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.14);
+}
+.carousel img.active{ display:block; }
+.carousel button{
+  position:absolute;
+  top:50%;
+  transform: translateY(-50%);
+  border:none;
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.12);
+  color:white;
+  padding: 6px 10px;
+  border-radius: 12px;
+  cursor:pointer;
+}
+.prev{ left:8px; }
+.next{ right:8px; }
+
+.actions{
+  display:flex;
+  gap:10px;
+  margin-top:12px;
+}
+.btn{
+  flex:1;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,0.05);
+  color:var(--text);
+  font-size:13px;
+  cursor:pointer;
+  transition:0.2s;
+}
+.btn:hover{ background:rgba(255,255,255,0.12); }
+.btn.primary{
+  background:linear-gradient(90deg,var(--tealA),var(--tealB));
+  border:none;
+  color:#00110d;
+  font-weight:900;
+}
+
+.small{
+  font-size:12px;
+  color:var(--dim);
+  line-height:1.5;
+  margin-top:10px;
+}
+
+.footer-note{
+  text-align:center;
+  font-size:12px;
+  color:var(--muted);
+  margin-top:4px;
+}
+
+
+.controls{
+  margin-top:12px;
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+.fileInput{
+  flex:1;
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.22);
+  color: var(--muted);
+  font-size:12px;
+}
+.fileInput::file-selector-button{
+  margin-right:10px;
+  padding:8px 12px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  cursor:pointer;
+}
+.fileInput::file-selector-button:hover{
+  background: rgba(255,255,255,0.12);
+}
+.autoHint{
+  white-space:nowrap;
+  font-size:12px;
+  color: var(--dim);
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.10);
+  background: rgba(0,0,0,0.18);
+}
+
+/* Ensure uploaded image is always visible */
+.image-box img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  border-radius:10px;
+  padding:10px;
+  position:relative;
+  z-index:1;
+}
+.grid-overlay{ z-index:3; }
+.vignette{ z-index:4; }
+.scan-line{ z-index:5; }
+.bracket{ z-index:6; }
+
+
+/* Split description: left (habit+economic) / right (location) */
+.descGrid{
+  display:grid;
+  grid-template-columns: 1fr 0.9fr;
+  gap:14px;
+  align-items:start;
+}
+.descCol{ min-width:0; }
+.descCol.right{
+  border-left:1px solid rgba(255,255,255,0.08);
+  padding-left:14px;
+}
+
+.mediaToggle{
+  display:flex;
+  gap:10px;
+  margin-top:12px;
+  margin-bottom:10px;
+}
+.mediaToggle .btn{ flex:1; }
+
+@media(max-width:900px){
+  .descGrid{ grid-template-columns: 1fr; }
+  .descCol.right{
+    border-left:none;
+    padding-left:0;
+    border-top:1px solid rgba(255,255,255,0.08);
+    padding-top:12px;
+  }
+}
+
+@media(max-width:900px){
+  html,body{ overflow:auto; }
+  .wrap{ min-height:100%; }
+  .grid{ grid-template-columns:1fr; }
+  .panel{ min-height: 520px; }
+}
+
+/* Overlays + modal */
+.overlay{
+  position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+  background: radial-gradient(900px 600px at 50% 20%, rgba(0,0,0,0.55), rgba(0,0,0,0.82));
+  z-index:9999;
+}
+.overlayCard{
+  width:min(980px, 92vw);
+  display:grid;
+  grid-template-columns: 340px 1fr;
+  gap:22px;
+  padding:22px;
+  border-radius:18px;
+  background: rgba(14,22,25,0.86);
+  border: 1px solid rgba(255,255,255,0.10);
+  box-shadow: 0 26px 90px rgba(0,0,0,0.55);
+  backdrop-filter: blur(10px);
+}
+.overlayLeft{
+  border-radius:16px;
+  background: rgba(0,0,0,0.38);
+  border: 1px solid rgba(255,255,255,0.08);
+  overflow:hidden;
+  display:flex; align-items:flex-end; justify-content:center;
+}
+.overlayChar{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position: 50% 12%;
+}
+.overlayRight{ padding:6px 6px 6px 0; }
+.overlayTag{
+  display:inline-flex;
+  padding:6px 10px;
+  border-radius:999px;
+  background: rgba(95,194,167,0.10);
+  border: 1px solid rgba(95,194,167,0.28);
+  color: rgba(166,255,232,0.9);
+  font-size:12px;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+}
+.overlayTitle{
+  margin:14px 0 8px;
+  font-size:34px;
+  letter-spacing:0.02em;
+}
+.overlayText{
+  margin:0;
+  color: rgba(255,255,255,0.90);
+  font-size:15.5px;
+  line-height:1.55;
+  min-height: 70px;
+}
+.overlayHint{
+  margin-top:10px;
+  color: rgba(255,255,255,0.62);
+  font-size:12.5px;
+}
+.overlayBtn{ margin-top:14px; width:min(260px, 100%); }
+
+.modal{
+  position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+  background: rgba(0,0,0,0.72);
+  z-index:10000;
+}
+.modalCard{
+  width:min(520px, 92vw);
+  background: rgba(14,22,25,0.92);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius:16px;
+  padding:18px;
+  box-shadow: 0 22px 70px rgba(0,0,0,0.55);
+}
+.modalTitle{ font-size:18px; font-weight:700; margin-bottom:10px; }
+.modalText{ color: rgba(255,255,255,0.80); margin-bottom:8px; }
+.modalEmail{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  padding:10px 12px;
+  border-radius:12px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  margin-bottom:12px;
+}
+.modalRow{ display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap; }
+
+/* Typewriter cursor */
+.typingCursor{
+  display:inline-block;
+  width:10px;
+  margin-left:4px;
+  color: rgba(95,194,167,0.9);
+  animation: blink 1s steps(2,end) infinite;
+}
+@keyframes blink{ 50%{ opacity:0; } }
+
+/* Improve guide */
+.guideAvatar{
+  object-position: 50% 18% !important;
+}
+.guideMsg{ font-size:14.5px !important; line-height:1.4 !important; color: rgba(255,255,255,0.90) !important; }
+
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="title"><span class="dot"></span> ALGAE DATABASE • POND ARCHIVE</div>
+    <div class="status" id="netStatus">Initializing…</div>
+  </div>
+
+  <div class="grid">
+
+    <!-- LEFT -->
+    <div class="panel">
+      <h2>Scan Bay</h2>
+
+      <div class="image-box" id="scanBox">
+        <img id="preview" src="" alt="">
+        <div class="grid-overlay" aria-hidden="true"></div>
+        <div class="vignette" aria-hidden="true"></div>
+        <div class="scan-line" aria-hidden="true"></div>
+        <div class="bracket b1" aria-hidden="true"></div>
+        <div class="bracket b2" aria-hidden="true"></div>
+        <div class="bracket b3" aria-hidden="true"></div>
+        <div class="bracket b4" aria-hidden="true"></div>
+      </div>
+
+
+      <div class="controls">
+        <input type="file" id="uploadInput" accept="image/*" class="fileInput">
+        <div class="autoHint">Auto-scan on upload</div>
+      </div>
+
+      <div class="logs" id="logBox">
+        <div class="logline">> preparing archive console…</div>
+        <div class="logline dim">> loading model + metadata…</div>
+        <div class="logline dim">> waiting for enhanced image…</div>
+        <div class="logline dim">> scan: pending</div>
+      </div>
+</div>
+
+    <!-- RIGHT -->
+    <div class="panel">
+      <h2>Database Console</h2>
+
+      <div>
+        <div class="species" id="speciesName">Scanning…</div>
+
+        <div class="subrow">
+          <div id="confidenceText">Confidence: —</div>
+          <div class="badge" id="pondId">Pond-ID: —</div>
+        </div>
+
+        <div class="confidence-bar" aria-label="confidence bar">
+          <div class="confidence-fill" id="confidenceFill"></div>
+        </div>
+
+        <div class="mediaToggle">
+  <button class="btn" id="showImageBtn" type="button" style="display:none;">Show Image</button>
+  <button class="btn primary" id="showDescBtn" type="button" disabled>Show Description</button>
+</div>
+
+<div id="imagePane">
+  <div class="carousel" id="carousel"></div>
+</div>
+
+<div id="descPane" style="display:none;">
+  <div id="description" class="desc">Waiting for model output…</div>
+</div>
+
+        <div class="actions">
+          <button class="btn primary" id="openCardBtn" type="button" disabled>Open Species Card</button>
+<button class="btn primary" id="contributeBtn" type="button" style="display:none; margin-top:10px;">Contribute</button>
+          <button class="btn" id="backBtn" type="button">Back to PhotoHouse</button>
+        </div>
+
+        <div class="small" id="hint">
+          Tip: Low confidence? Go back and crop/adjust in PhotoHouse.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer-note">
+    Page 5 • Advanced morphology scan active
+  </div>
+
+</div>
+
+
+
+<script>
+/* Page 5 • Mareoj Console — clean state machine */
+const MODEL_URL = "my_model/model.json";
+const METADATA_URL = "my_model/metadata.json";
+const CONFIDENCE_THRESHOLD = 0.65;
+const EMAIL_TO = "uniqueseekers123@gmail.com";
+
+let model = null;
+let labels = [];
+let modelReadyPromise = null;
+
+let hasInboundImage = false;   // came from PhotoHouse (sessionStorage)
+let scanToken = 0;
+let lastResultType = "none";   // none | known | unknown
+
+const el = (id)=>document.getElementById(id);
+
+function isMobile(){
+  return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(navigator.userAgent);
+}
+
+function setStatus(text){
+  const s = el("statusRight");
+  if(s) s.textContent = text;
+}
+
+function setGuide(msg, sticky=false){
+  const wrap = el("guide");
+  const txt = el("guideText");
+  if(!wrap || !txt) return;
+  txt.textContent = msg;
+  wrap.classList.add("show");
+  if(!sticky){
+    setTimeout(()=>wrap.classList.remove("show"), 2600);
+  }
+}
+
+function sleep(ms){ return new Promise(r=>setTimeout(r, ms)); }
+
+function typeWords(target, text, speed=120){
+  if(!target) return;
+  target.innerHTML = "";
+  const words = text.split(" ");
+  let i = 0;
+  const cursor = document.createElement("span");
+  cursor.className = "typingCursor";
+  cursor.textContent = "▍";
+  target.appendChild(cursor);
+  const tick = ()=>{
+    if(i >= words.length){ cursor.remove(); return; }
+    const w = words[i++];
+    cursor.insertAdjacentText("beforebegin", (i===1? "" : " ") + w);
+    setTimeout(tick, speed);
+  };
+  setTimeout(tick, 220);
+}
+
+function showWelcome(){
+  const ov = el("welcomeOverlay");
+  if(ov) ov.style.display = "flex";
+  const wt = el("welcomeText");
+  const msg = "Oh welcome dear explorer. I have received your image from PhotoHouse and I was waiting for you. Let’s start.";
+  typeWords(wt, msg, 120);
+}
+
+function hideWelcome(){
+  const ov = el("welcomeOverlay");
+  if(ov) ov.style.display = "none";
+}
+
+function showOutro(text){
+  const ov = el("outroOverlay");
+  const t = el("outroText");
+  if(t && text) t.textContent = text;
+  if(ov) ov.style.display = "flex";
+}
+
+function hideOutro(){
+  const ov = el("outroOverlay");
+  if(ov) ov.style.display = "none";
+}
+
+function openContribute(){
+  const mailto = `mailto:${EMAIL_TO}?subject=New%20Algae%20Contribution&body=Hi%20Uniqueseeker%2C%0A%0AI%20found%20a%20new%20algae%20(Unknown%20prediction).%20I%20am%20attaching%20the%20image%20and%20details.%0A%0AThanks!`;
+  if(isMobile()){
+    window.location.href = mailto;
+  }else{
+    const modal = el("contributeModal");
+    if(modal) modal.style.display = "flex";
+  }
+  showOutro("Thanks for helping the pond grow. Farewell now, explorer. More things are there for you to checkout.");
+}
+
+function closeContributeModal(){
+  const modal = el("contributeModal");
+  if(modal) modal.style.display = "none";
+}
+
+function showPane(which){
+  const imagePane = el("imagePane");
+  const descPane = el("descPane");
+  if(imagePane) imagePane.style.display = (which==="image") ? "block" : "none";
+  if(descPane) descPane.style.display = (which==="desc") ? "block" : "none";
+}
+
+function resetButtons(){
+  const showImg = el("showImageBtn");
+  const showDesc = el("showDescBtn");
+  const contrib = el("contributeBtn");
+  if(showImg) showImg.style.display = "none";
+  if(showDesc) showDesc.style.display = "none";
+  if(contrib) contrib.style.display = "none";
+  showPane("image");
+}
+
+async function loadModel(){
+  try{
+    setStatus("Initializing…");
+    // Teachable Machine lib (already included in base HTML)
+    model = await tmImage.load(MODEL_URL, METADATA_URL);
+    labels = model.getClassLabels();
+    setStatus("Ready • Upload an image");
+    return true;
+  }catch(err){
+    console.error(err);
+    setStatus("Model load failed");
+    setGuide("Model not loading. Check my_model paths.", true);
+    return false;
+  }
+}
+
+function setPreviewFromDataURL(dataURL){
+  const img = el("preview");
+  if(!img) return;
+  img.src = dataURL;
+  img.onload = ()=>{ /* no-op */ };
+}
+
+function readInboundFromPhotoHouse(){
+  // If PhotoHouse sent an image, it is stored under enhancedImageDataURL.
+  const dataURL = sessionStorage.getItem("enhancedImageDataURL");
+  if(dataURL){
+    hasInboundImage = true;
+    // IMPORTANT: remove it immediately so refresh won't re-use cached image
+    sessionStorage.removeItem("enhancedImageDataURL");
+    setPreviewFromDataURL(dataURL);
+    setGuide("Enhanced image received ✓", false);
+  }
+}
+
+function handleFileUpload(file){
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    const dataURL = reader.result;
+    hasInboundImage = false; // user manual upload
+    setPreviewFromDataURL(dataURL);
+    runScan(); // scan only on upload
+  };
+  reader.readAsDataURL(file);
+}
+
+async function runScan(){
+  if(!model){
+    try{ if(modelReadyPromise) await modelReadyPromise; }catch(e){}
+  }
+  if(!model){
+    setGuide("Model not ready yet.", true);
+    return;
+  }
+
+  const img = el("preview");
+  if(!img || !img.src){
+    setGuide("Upload an image to begin scan.", false);
+    return;
+  }
+
+  const token = ++scanToken;
+  lastResultType = "none";
+  resetButtons();
+
+  setStatus("Scanning…");
+  setGuide("The scanning is under progress…", true);
+
+  // Slight delay to feel like scanning
+  await sleep(220);
+
+  try{
+    const prediction = await model.predict(img, false);
+    if(token !== scanToken) return; // stale scan
+
+    // Find best class
+    let best = prediction[0];
+    for(const p of prediction){
+      if(p.probability > best.probability) best = p;
+    }
+    const conf = best.probability;
+
+    // Update UI
+    el("speciesName").textContent = best.className;
+    el("confValue").textContent = (conf*100).toFixed(2) + "%";
+    el("pondId").textContent = "Pond-ID: " + String(best.className).toUpperCase().replace(/\s+/g,"_");
+
+    // Small toast then decision
+    setGuide("Ohoo! The results are out.", false);
+    await sleep(1200);
+    if(token !== scanToken) return;
+
+    if(String(best.className).toLowerCase().includes("unknown") || conf < CONFIDENCE_THRESHOLD){
+      // UNKNOWN
+      lastResultType = "unknown";
+      el("speciesName").textContent = "Unknown Algae";
+      el("pondId").textContent = "Pond-ID: UNKNOWN";
+      const contrib = el("contributeBtn");
+      if(contrib) contrib.style.display = "inline-flex";
+      setGuide("Oh! Found a new algae. Please add it to the pond by using Contribute option.", true);
+
+      // Hide image/desc buttons
+      const showImg = el("showImageBtn");
+      const showDesc = el("showDescBtn");
+      if(showImg) showImg.style.display = "none";
+      if(showDesc) showDesc.style.display = "none";
+
+      // Make Open Species Card behave as contribute for unknown
+      el("openCardBtn").textContent = "Unknown • Add to Pond";
+      setStatus("Scan complete • Unknown");
+      return;
+    }
+
+    // KNOWN
+    lastResultType = "known";
+    el("openCardBtn").textContent = "Open Species Card";
+    setStatus("Scan complete • Ready");
+
+    // Prepare image pane (keep predicted image)
+    const resultImg = el("resultImg");
+    if(resultImg) resultImg.src = img.src;
+
+    // Show buttons
+    const showImg = el("showImageBtn");
+    if(showImg) showImg.style.display = "inline-flex";
+    const showDesc = el("showDescBtn");
+    if(showDesc) showDesc.style.display = "none";
+
+    setGuide("Let’s check out some images to confirm.", true);
+
+  }catch(err){
+    console.error(err);
+    setStatus("Scan failed");
+    setGuide("Scan error. Check console.", true);
+  }
+}
+
+/* Buttons flow */
+function onShowImage(){
+  if(lastResultType !== "known") return;
+  showPane("image");
+  // show description button now
+  const showDesc = el("showDescBtn");
+  if(showDesc) showDesc.style.display = "inline-flex";
+  const showImg = el("showImageBtn");
+  if(showImg) showImg.style.display = "none";
+  setGuide("Let’s check out some images to confirm.", true);
+}
+
+function onShowDesc(){
+  if(lastResultType !== "known") return;
+  showPane("desc");
+  const showImg = el("showImageBtn");
+  if(showImg) showImg.style.display = "inline-flex";
+  const showDesc = el("showDescBtn");
+  if(showDesc) showDesc.style.display = "none";
+  setGuide("We can check some of its features by using Show Description.", true);
+  // farewell overlay after a short pause
+  setTimeout(()=>showOutro("Thanks for visiting our mini pond. Farewell now, explorer. More things are there for you to checkout."), 900);
+}
+
+document.addEventListener("DOMContentLoaded", ()=>{
+  // Fix "cache": do NOT load any stale image unless sessionStorage has inbound from PhotoHouse.
+  // We already remove it after reading.
+  showWelcome();
+
+  modelReadyPromise = loadModel();
+
+  readInboundFromPhotoHouse();
+
+  const startBtn = el("startBtn");
+  if(startBtn){
+    startBtn.addEventListener("click", async ()=>{
+      hideWelcome();
+      try{ await modelReadyPromise; }catch(e){}
+      if(hasInboundImage){
+        runScan(); // scan only if photohouse image exists
+      }
+    });
+  }
+
+  const outroCloseBtn = el("outroCloseBtn");
+  if(outroCloseBtn) outroCloseBtn.addEventListener("click", hideOutro);
+
+  const fileInput = el("fileInput");
+  if(fileInput){
+    fileInput.addEventListener("change", (e)=>{
+      const f = e.target.files && e.target.files[0];
+      if(f) handleFileUpload(f);
+      // reset input so selecting same file again triggers change
+      fileInput.value = "";
+    });
+  }
+
+  const showImageBtn = el("showImageBtn");
+  if(showImageBtn) showImageBtn.addEventListener("click", onShowImage);
+
+  const showDescBtn = el("showDescBtn");
+  if(showDescBtn) showDescBtn.addEventListener("click", onShowDesc);
+
+  const contributeBtn = el("contributeBtn");
+  if(contributeBtn) contributeBtn.addEventListener("click", openContribute);
+
+  const closeModalBtn = el("closeModalBtn");
+  if(closeModalBtn) closeModalBtn.addEventListener("click", closeContributeModal);
+
+  const copyEmailBtn = el("copyEmailBtn");
+  if(copyEmailBtn){
+    copyEmailBtn.addEventListener("click", async ()=>{
+      try{
+        await navigator.clipboard.writeText(EMAIL_TO);
+        copyEmailBtn.textContent = "Copied!";
+        setTimeout(()=>copyEmailBtn.textContent="Copy Email", 1200);
+      }catch(e){
+        alert("Email: " + EMAIL_TO);
+      }
+    });
+  }
+
+  // Open species card button (placeholder)
+  const openCardBtn = el("openCardBtn");
+  if(openCardBtn){
+    openCardBtn.addEventListener("click", ()=>{
+      if(lastResultType === "unknown"){
+        openContribute();
+      }else{
+        alert("Species card page will open here (next step).");
+      }
+    });
+  }
+
+  // Back to photohouse
+  const backBtn = el("backBtn");
+  if(backBtn){
+    backBtn.addEventListener("click", ()=> window.location.href = "photohouse_v2.html");
+  }
+});
+</script>
+
+
+
+<!-- Mareoj Welcome Overlay -->
+<div id="welcomeOverlay" class="overlay">
+  <div class="overlayCard">
+    <div class="overlayLeft">
+      <img class="overlayChar" src="mareoj%20velith.png" alt="Mareoj Velith">
+    </div>
+    <div class="overlayRight">
+      <div class="overlayTag">HABITAT ENGINEER • POND ARCHIVE</div>
+      <h2 class="overlayTitle">Mareoj Velith</h2>
+      <p class="overlayText" id="welcomeText"></p>
+      <button id="startBtn" class="btn primary overlayBtn" type="button">Start</button>
+      <div class="overlayHint">Tip: If you opened this page directly, upload an image after pressing Start.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Mareoj Outro Overlay -->
+<div id="outroOverlay" class="overlay" style="display:none;">
+  <div class="overlayCard">
+    <div class="overlayLeft">
+      <img class="overlayChar" src="mareoj%20velith.png" alt="Mareoj Velith">
+    </div>
+    <div class="overlayRight">
+      <div class="overlayTag">POND ARCHIVE • FAREWELL</div>
+      <h2 class="overlayTitle">Farewell, Explorer</h2>
+      <p class="overlayText" id="outroText">Thanks for visiting our mini pond. Farewell now, explorer. More things are there for you to checkout.</p>
+      <button id="outroCloseBtn" class="btn primary overlayBtn" type="button">Continue</button>
+    </div>
+  </div>
+</div>
+
+<!-- Contribute Modal (Desktop) -->
+<div id="contributeModal" class="modal" style="display:none;">
+  <div class="modalCard">
+    <div class="modalTitle">Contribute New Algae</div>
+    <div class="modalText">Please send the image + details to:</div>
+    <div class="modalEmail" id="modalEmail">uniqueseekers123@gmail.com</div>
+    <div class="modalRow">
+      <button id="copyEmailBtn" class="btn primary" type="button">Copy Email</button>
+      <button id="closeModalBtn" class="btn" type="button">Close</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

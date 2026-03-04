@@ -593,6 +593,103 @@ body:before{
   .descGrid{ grid-template-columns:1fr; }
   .descCol.right{ border-left:none; padding-left:0; border-top:1px solid rgba(255,255,255,0.08); padding-top:12px; }
 }
+  /* =========================
+   MOBILE FIXES (DO NOT AFFECT DESKTOP)
+   ========================= */
+@media (max-width: 900px){
+
+  /* overall spacing */
+  body{
+    overflow-x:hidden;
+  }
+
+  .wrap, .container, .shell{
+    padding: 12px !important;
+  }
+
+  /* stack layout: Scan Bay then Database Console */
+  .grid, .mainGrid{
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  /* keep cards comfortable */
+  .card, .panel{
+    border-radius: 22px !important;
+  }
+
+  /* make scan grid area fixed & responsive */
+  .scanWindow, #scanWindow, .scanViewport{
+    height: 240px !important;       /* key fix */
+    min-height: 240px !important;
+    max-height: 240px !important;
+  }
+
+  /* uploaded image inside scan grid fits cleanly */
+  #scanPreview, #scanImage, .scanWindow img, .scanViewport img{
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+  }
+
+  /* tighten file row & buttons */
+  .fileRow, .controlsRow, .actionsRow{
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+
+  .btn, button{
+    width: 100% !important;
+    min-height: 46px !important;
+    font-size: 15px !important;
+    border-radius: 14px !important;
+  }
+
+  /* result images (2 reference photos) fit and do not become too tall */
+  .refGrid{
+    grid-template-columns: 1fr !important;
+  }
+  .refGrid img{
+    height: 170px !important;
+    object-fit: cover !important;
+  }
+
+  /* description area should scroll inside the box */
+  #descPane, .descPane{
+    max-height: 360px !important;
+    overflow: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* keep the bottom guide message ABOVE buttons (safe-area aware) */
+  .guideToast, #guideToast, .mareojToast{
+    position: fixed !important;
+    left: 12px !important;
+    right: 12px !important;
+    bottom: calc(12px + env(safe-area-inset-bottom)) !important;
+    max-width: none !important;
+    z-index: 9999 !important;
+  }
+
+  /* ensure action buttons are not hidden under guide */
+  .actionBar, .bottomActions, .footerActions{
+    padding-bottom: 90px !important; /* makes room for guide toast */
+  }
+
+  /* welcome overlay: smaller + no head cut feeling */
+  .welcomeCard, #welcomeCard{
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: left !important;
+  }
+  .welcomeCard img, #welcomeCard img{
+    width: 100% !important;
+    max-width: 320px !important;
+    height: auto !important;
+    object-fit: contain !important;
+    margin-bottom: 10px !important;
+  }
+}
 </style>
 </head>
 

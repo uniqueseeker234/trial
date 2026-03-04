@@ -690,6 +690,64 @@ body:before{
     margin-bottom: 10px !important;
   }
 }
+  @media (max-width: 900px){
+
+  /* Welcome / Outro overlay: make text always visible */
+  .welcomeCard, #welcomeCard,
+  .outroCard, #outroCard{
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:stretch !important;
+    gap:12px !important;
+    padding:16px !important;
+  }
+
+  .welcomeCard img, #welcomeCard img,
+  .outroCard img, #outroCard img{
+    width:100% !important;
+    max-width:340px !important;
+    margin:0 auto !important;
+    height:auto !important;
+    max-height:42vh !important;   /* prevents image from pushing text away */
+    object-fit:contain !important;
+  }
+
+  .welcomeCard .text, #welcomeCard .text,
+  .welcomeCard .welcomeText, #welcomeText,
+  .outroCard .text, #outroCard .text,
+  .outroCard .outroText, #outroText{
+    display:block !important;
+    opacity:1 !important;
+    visibility:visible !important;
+    position:relative !important;
+    z-index:2 !important;
+    color:rgba(235,255,250,0.92) !important;
+    font-size:15px !important;
+    line-height:1.5 !important;
+    padding:4px 2px !important;
+    overflow:visible !important;
+  }
+    @media (max-width: 900px){
+
+  /* Make Database Console fill the screen */
+  .dbCard, #dbCard,
+  .databaseConsole, #databaseConsole,
+  .rightCard, #rightCard{
+    min-height: 72vh !important;  /* fills most of the phone height */
+    height: auto !important;
+    display:flex !important;
+    flex-direction:column !important;
+  }
+
+  /* Make console inner content scroll INSIDE, so buttons always stay reachable */
+  .dbBody, #dbBody,
+  .databaseBody, #databaseBody,
+  .consoleBody, #consoleBody{
+    overflow:auto !important;
+    -webkit-overflow-scrolling: touch;
+    flex:1 1 auto !important;
+  }
+  }
 </style>
 </head>
 

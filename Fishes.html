@@ -3,20 +3,16 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Pond Containment Tank • v1 (GitHub Stable r128)</title>
+<title>Pond Containment Tank • v1.1 (GitHub Stable r128)</title>
 <style>
   :root{
     --bg0:#05070c;
     --bg1:#0b1020;
     --ink: rgba(255,255,255,.92);
     --muted: rgba(255,255,255,.72);
-    --tealA:#5FC2A7;
-    --tealB:#3CC19E;
   }
   html,body{
-    height:100%;
-    margin:0;
-    overflow:hidden;
+    height:100%; margin:0; overflow:hidden;
     background: radial-gradient(1200px 700px at 50% 20%, var(--bg1), var(--bg0));
     font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
   }
@@ -27,7 +23,7 @@
     backdrop-filter: blur(10px);
     border:1px solid rgba(255,255,255,.10);
     box-shadow:0 18px 60px rgba(0,0,0,.55);
-    max-width:min(720px,calc(100vw - 28px));
+    max-width:min(760px,calc(100vw - 28px));
     color:var(--ink);
   }
   #hud h1{font-size:13px;margin:0 0 6px;letter-spacing:.2px}
@@ -53,12 +49,12 @@
 </head>
 <body>
 <div id="hud">
-  <h1>Pond Containment Tank • v1</h1>
+  <h1>Pond Containment Tank • v1.1</h1>
   <p>
-    <b>GitHub stable (Three.js r128).</b> Put this HTML in the same folder as:
+    <b>GitHub stable (Three.js r128).</b> Keep in same folder:
     <br><code>frog.glb</code> <code>lotus_flower_with_lillypad.glb</code> <code>koi_fish.glb</code> <code>underwater_plant_pack.glb</code>
     <br>Drag = orbit • Scroll = zoom • Right-drag = pan
-    <br><span style="opacity:.92">Top layer: lotus + frog on water surface • Underwater: fish + seaweed</span>
+    <br><span style="opacity:.92">Top: lotus + frog on surface • Underwater: fish + plants</span>
   </p>
 </div>
 
@@ -75,11 +71,10 @@
       </div>
     </div>
     <div class="bar"><i id="fill"></i></div>
-    <div class="small">Tip: open <code>frog.glb</code> directly in browser to confirm it’s accessible.</div>
+    <div class="small">Tip: open <code>frog.glb</code> URL directly to confirm it’s accessible.</div>
   </div>
 </div>
 
-<!-- Stable non-module CDN (r128) -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
@@ -103,161 +98,144 @@
   renderer.setSize(innerWidth, innerHeight);
   renderer.outputEncoding = THREE.sRGBEncoding;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.15;
+  renderer.toneMappingExposure = 1.12;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   document.body.appendChild(renderer.domElement);
 
   const scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0x070a12, 7, 28);
+  scene.fog = new THREE.Fog(0x070a12, 10, 45);
 
-  const camera = new THREE.PerspectiveCamera(46, innerWidth/innerHeight, 0.02, 200);
-  camera.position.set(2.9, 1.85, 3.4);
+  const camera = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, 0.05, 200);
+  // START OUTSIDE (important!)
+  camera.position.set(6.0, 3.3, 6.2);
 
-  // Controls
   const controls = new THREE.OrbitControls(camera, renderer.domElement);
-  controls.target.set(0, 0.80, 0);
   controls.enableDamping = true;
   controls.dampingFactor = 0.08;
+  controls.target.set(0, 1.0, 0);
   controls.maxPolarAngle = Math.PI * 0.49;
 
-  // ===== Space-lab environment =====
-  const env = new THREE.Group();
-  scene.add(env);
+  // ===== Space-lab mood =====
+  scene.add(new THREE.HemisphereLight(0x9fdcff, 0x07101f, 0.55));
 
-  const floor = new THREE.Mesh(
-    new THREE.PlaneGeometry(30, 30),
-    new THREE.MeshStandardMaterial({ color:0x0b1220, roughness:0.95, metalness:0.18 })
-  );
-  floor.rotation.x = -Math.PI/2;
-  floor.position.y = -0.02;
-  floor.receiveShadow = true;
-  env.add(floor);
-
-  const wall = new THREE.Mesh(
-    new THREE.PlaneGeometry(30, 14),
-    new THREE.MeshStandardMaterial({ color:0x070b14, roughness:0.9, metalness:0.22 })
-  );
-  wall.position.set(0, 7, -9);
-  wall.receiveShadow = true;
-  env.add(wall);
-
-  function glowStrip(x,y,z,w,h,color,opacity){
-    const g = new THREE.Mesh(
-      new THREE.PlaneGeometry(w,h),
-      new THREE.MeshBasicMaterial({ color: color, transparent:true, opacity: opacity })
-    );
-    g.position.set(x,y,z);
-    env.add(g);
-    return g;
-  }
-  glowStrip(-5.5, 3.8, -8.99, 2.2, 0.22, 0x5FC2A7, 0.22);
-  glowStrip( 5.5, 2.8, -8.99, 2.2, 0.22, 0x3CC19E, 0.18);
-  glowStrip( 0.0, 6.2, -8.99, 4.2, 0.20, 0x8ab4ff, 0.10);
-
-  // Lights
-  scene.add(new THREE.HemisphereLight(0x9fdcff, 0x09101f, 0.55));
-
-  const key = new THREE.DirectionalLight(0xffffff, 1.15);
-  key.position.set(4.5, 6.5, 2.0);
+  const key = new THREE.DirectionalLight(0xffffff, 1.05);
+  key.position.set(6.0, 8.0, 4.0);
   key.castShadow = true;
   key.shadow.mapSize.set(2048,2048);
   key.shadow.camera.near = 0.1;
-  key.shadow.camera.far  = 30;
-  key.shadow.camera.left = -7;
-  key.shadow.camera.right= 7;
-  key.shadow.camera.top  = 7;
-  key.shadow.camera.bottom=-7;
+  key.shadow.camera.far  = 60;
+  key.shadow.camera.left = -12;
+  key.shadow.camera.right= 12;
+  key.shadow.camera.top  = 12;
+  key.shadow.camera.bottom=-12;
   scene.add(key);
 
   const rim = new THREE.DirectionalLight(0x7fe7d2, 0.55);
-  rim.position.set(-6.0, 3.6, -3.0);
+  rim.position.set(-8.0, 4.0, -2.0);
   scene.add(rim);
 
-  const topSpot = new THREE.SpotLight(0x8af6e4, 0.65, 18, Math.PI/5, 0.55, 1.1);
-  topSpot.position.set(0.0, 6.4, 0.0);
-  topSpot.target.position.set(0.0, 0.7, 0.0);
-  scene.add(topSpot);
-  scene.add(topSpot.target);
+  const floor = new THREE.Mesh(
+    new THREE.PlaneGeometry(60, 60),
+    new THREE.MeshStandardMaterial({ color:0x0b1220, roughness:0.95, metalness:0.20 })
+  );
+  floor.rotation.x = -Math.PI/2;
+  floor.position.y = 0;
+  floor.receiveShadow = true;
+  scene.add(floor);
 
-  // ===== Tank =====
-  const TANK = { w:3.25, h:1.95, d:2.25, glass:0.035, waterFill:0.80 };
-  const tankGroup = new THREE.Group();
-  tankGroup.position.y = 0.82;
-  scene.add(tankGroup);
+  // ===== Tank setup =====
+  const TANK = { w:3.25, h:1.95, d:2.25, glass:0.04, waterFill:0.80 };
+  const tank = new THREE.Group();
+  tank.position.set(0, 1.0, 0);
+  scene.add(tank);
 
-  // Metal frame
-  const frameMat = new THREE.MeshStandardMaterial({ color:0x0a0f1b, roughness:0.35, metalness:0.78 });
-  const frame = new THREE.Mesh(new THREE.BoxGeometry(TANK.w+0.12, TANK.h+0.12, TANK.d+0.12), frameMat);
-  frame.castShadow = true;
-  tankGroup.add(frame);
-
-  // Glass
+  // Glass (no solid blocking frame!)
   const glassMat = new THREE.MeshPhysicalMaterial({
-    color:0xffffff, transmission:0.94, transparent:true, opacity:1,
-    roughness:0.06, metalness:0, ior:1.48, thickness:0.40,
-    clearcoat:1.0, clearcoatRoughness:0.06
+    color:0xffffff,
+    transmission:0.98,
+    transparent:true,
+    opacity:1,
+    roughness:0.05,
+    metalness:0,
+    ior:1.48,
+    thickness:0.55,
+    clearcoat:1.0,
+    clearcoatRoughness:0.06
   });
-  tankGroup.add(new THREE.Mesh(new THREE.BoxGeometry(TANK.w, TANK.h, TANK.d), glassMat));
+  const glass = new THREE.Mesh(new THREE.BoxGeometry(TANK.w, TANK.h, TANK.d), glassMat);
+  tank.add(glass);
 
+  // Inner backfaces for proper refraction feel
   const innerMat = glassMat.clone();
   innerMat.side = THREE.BackSide;
-  innerMat.transmission = 0.96;
-  innerMat.roughness = 0.05;
-  tankGroup.add(new THREE.Mesh(
+  innerMat.roughness = 0.06;
+  const inner = new THREE.Mesh(
     new THREE.BoxGeometry(TANK.w - TANK.glass*2, TANK.h - TANK.glass*2, TANK.d - TANK.glass*2),
     innerMat
-  ));
+  );
+  tank.add(inner);
 
-  // Water (pond teal)
+  // Tank edge lines (gives “frame” without blocking)
+  const edge = new THREE.LineSegments(
+    new THREE.EdgesGeometry(new THREE.BoxGeometry(TANK.w, TANK.h, TANK.d)),
+    new THREE.LineBasicMaterial({ color:0x7fe7d2, transparent:true, opacity:0.35 })
+  );
+  tank.add(edge);
+
+  // Water volume (your pond teal)
   const waterH = (TANK.h - TANK.glass*2) * TANK.waterFill;
+  const waterMat = new THREE.MeshPhysicalMaterial({
+    color:new THREE.Color('#3CC19E'),
+    transmission:0.70,
+    transparent:true,
+    opacity:0.86,
+    roughness:0.10,
+    metalness:0,
+    ior:1.33,
+    thickness:0.9
+  });
   const water = new THREE.Mesh(
-    new THREE.BoxGeometry(TANK.w - TANK.glass*2 - 0.02, waterH, TANK.d - TANK.glass*2 - 0.02),
-    new THREE.MeshPhysicalMaterial({
-      color:new THREE.Color('#3CC19E'),
-      transmission:0.68,
-      transparent:true,
-      opacity:0.84,
-      roughness:0.10,
-      metalness:0,
-      ior:1.33,
-      thickness:0.65
-    })
+    new THREE.BoxGeometry(TANK.w - TANK.glass*2 - 0.03, waterH, TANK.d - TANK.glass*2 - 0.03),
+    waterMat
   );
   water.position.y = -TANK.h/2 + TANK.glass + waterH/2;
-  tankGroup.add(water);
+  tank.add(water);
 
-  // Surface (TOP layer)
-  const surfaceGeo = new THREE.PlaneGeometry(TANK.w - TANK.glass*2 - 0.03, TANK.d - TANK.glass*2 - 0.03, 110, 110);
-  const surface = new THREE.Mesh(
-    surfaceGeo,
-    new THREE.MeshStandardMaterial({ color:new THREE.Color('#5FC2A7'), roughness:0.25, metalness:0.02, transparent:true, opacity:0.55 })
-  );
+  // Surface plane (TOP LAYER)
+  const surfaceGeo = new THREE.PlaneGeometry(TANK.w - TANK.glass*2 - 0.05, TANK.d - TANK.glass*2 - 0.05, 110, 110);
+  const surfaceMat = new THREE.MeshStandardMaterial({
+    color:new THREE.Color('#5FC2A7'),
+    roughness:0.22, metalness:0.02,
+    transparent:true, opacity:0.50
+  });
+  const surface = new THREE.Mesh(surfaceGeo, surfaceMat);
   surface.rotation.x = -Math.PI/2;
-  surface.position.y = water.position.y + waterH/2 + 0.006;
-  tankGroup.add(surface);
+  surface.position.y = water.position.y + waterH/2 + 0.01;
+  tank.add(surface);
 
-  // Sand/soil
-  const sand = new THREE.Mesh(
-    new THREE.BoxGeometry(TANK.w - TANK.glass*2 - 0.05, 0.16, TANK.d - TANK.glass*2 - 0.05),
-    new THREE.MeshStandardMaterial({ color:0x6b5338, roughness:0.95, metalness:0.02 })
+  // Soil base
+  const soil = new THREE.Mesh(
+    new THREE.BoxGeometry(TANK.w - TANK.glass*2 - 0.06, 0.18, TANK.d - TANK.glass*2 - 0.06),
+    new THREE.MeshStandardMaterial({ color:0x6b5338, roughness:0.98, metalness:0.02 })
   );
-  sand.position.y = -TANK.h/2 + TANK.glass + 0.08;
-  sand.receiveShadow = true;
-  tankGroup.add(sand);
+  soil.position.y = -TANK.h/2 + TANK.glass + 0.09;
+  soil.receiveShadow = true;
+  tank.add(soil);
 
-  // Underwater group + haze
-  const underwaterGroup = new THREE.Group();
-  tankGroup.add(underwaterGroup);
+  // Underwater group
+  const underwater = new THREE.Group();
+  tank.add(underwater);
 
+  // Soft underwater haze
   const haze = new THREE.Mesh(
-    new THREE.BoxGeometry(TANK.w - TANK.glass*2 - 0.03, waterH, TANK.d - TANK.glass*2 - 0.03),
-    new THREE.MeshBasicMaterial({ color:0x136f6a, transparent:true, opacity:0.11, side:THREE.BackSide, depthWrite:false })
+    new THREE.BoxGeometry(TANK.w - TANK.glass*2 - 0.05, waterH, TANK.d - TANK.glass*2 - 0.05),
+    new THREE.MeshBasicMaterial({ color:0x136f6a, transparent:true, opacity:0.12, side:THREE.BackSide, depthWrite:false })
   );
   haze.position.copy(water.position);
-  underwaterGroup.add(haze);
+  underwater.add(haze);
 
-  // Helpers
+  // ===== Helpers =====
   const looksGreenish = (c) => c && (c.g > c.r*1.08) && (c.g > c.b*1.08);
   const flowerPredicate = (_,mat) => !(mat && mat.color && looksGreenish(mat.color));
 
@@ -279,18 +257,19 @@
     });
   }
 
-  function fitInside(obj, targetMax){
+  function fitCenter(obj, targetMax){
     const box = new THREE.Box3().setFromObject(obj);
     const size = new THREE.Vector3(); box.getSize(size);
     const maxDim = Math.max(size.x,size.y,size.z) || 1;
     const s = targetMax / maxDim;
     obj.scale.setScalar(s);
+    // center pivot
     box.setFromObject(obj);
     const center = new THREE.Vector3(); box.getCenter(center);
     obj.position.sub(center);
   }
 
-  // Loader
+  // ===== Loader =====
   const loader = new THREE.GLTFLoader();
   const assets = [
     {k:'lotus',  f:'lotus_flower_with_lillypad.glb'},
@@ -298,16 +277,15 @@
     {k:'fish',   f:'koi_fish.glb'},
     {k:'plants', f:'underwater_plant_pack.glb'}
   ];
+
   const loaded = {};
   let done = 0;
 
-  // Anim sets
   const plantInstances = [];
   const fishSwimmers = [];
-  let frogObj = null;
   let lotusPink = null;
+  let frogObj = null;
 
-  // Fish bounds
   const clampX = (TANK.w - TANK.glass*2) * 0.44;
   const clampZ = (TANK.d - TANK.glass*2) * 0.44;
   const clock = new THREE.Clock();
@@ -324,7 +302,7 @@
     controls.update();
     const t = clock.getElapsedTime();
 
-    // Surface waves
+    // Surface waves (gentle)
     const pos = surface.geometry.attributes.position;
     for(let i=0;i<pos.count;i++){
       const x = pos.getX(i);
@@ -336,20 +314,20 @@
     pos.needsUpdate = true;
     surface.geometry.computeVertexNormals();
 
-    // Plant sway
+    // Plants sway
     plantInstances.forEach((p,i) => {
       p.rotation.z = Math.sin(t*0.95 + i) * 0.10;
       p.rotation.x = Math.cos(t*0.70 + i*1.5) * 0.05;
-      p.position.y = sand.position.y + 0.10 + Math.sin(t*1.1+i) * 0.008;
+      p.position.y = soil.position.y + 0.10 + Math.sin(t*1.1+i) * 0.008;
     });
 
-    // Frog idle (surface)
+    // Frog idle on surface
     if(frogObj && lotusPink){
-      frogObj.position.y = lotusPink.position.y + 0.20 + Math.sin(t*1.4) * 0.006;
+      frogObj.position.y = lotusPink.position.y + 0.10 + Math.sin(t*1.4) * 0.005;
       frogObj.rotation.y = Math.PI*0.15 + Math.sin(t*0.6) * 0.03;
     }
 
-    // Fish swim
+    // Fish swim smoother
     fishSwimmers.forEach((sw,i) => {
       const ang = t*sw.speed + sw.phase;
       const x = Math.cos(ang) * sw.rX;
@@ -382,12 +360,13 @@
       setProgress(100, 'Done');
       setTimeout(() => loadingEl.style.display='none', 250);
 
-      // TOP: lotus + frog
+      // ===== TOP SURFACE: lotus + frog =====
       const lotusSrc = loaded.lotus.scene;
-      lotusPink = lotusSrc.clone(true);
-      const lotusWhite = lotusSrc.clone(true);
 
-      fitInside(lotusPink, 0.95);
+      const lotusWhite = lotusSrc.clone(true);
+      lotusPink = lotusSrc.clone(true);
+
+      fitCenter(lotusPink, 0.90);
       lotusWhite.scale.copy(lotusPink.scale);
 
       const surfY = surface.position.y;
@@ -397,57 +376,59 @@
       tint(lotusPink,  '#ff9acb', flowerPredicate);
       tint(lotusWhite, '#ffffff', flowerPredicate);
 
-      tankGroup.add(lotusPink, lotusWhite);
+      tank.add(lotusPink, lotusWhite);
 
       frogObj = loaded.frog.scene.clone(true);
-      fitInside(frogObj, 0.52);
-      frogObj.position.set(lotusPink.position.x+0.08, lotusPink.position.y + 0.20, lotusPink.position.z + 0.06);
+      // Make frog smaller to avoid “only head” look
+      fitCenter(frogObj, 0.28);
+      frogObj.position.set(lotusPink.position.x + 0.02, surfY + 0.10, lotusPink.position.z + 0.04);
       frogObj.rotation.y = Math.PI * 0.15;
-      tankGroup.add(frogObj);
+      tank.add(frogObj);
 
-      // UNDERWATER: seaweed (guaranteed visible)
+      // ===== UNDERWATER: plants (guaranteed visible) =====
       const plantsSrc = loaded.plants.scene;
       const plantPositions = [
         [-1.05, -0.55],
-        [-1.00,  0.65],
-        [-0.10, -0.85],
-        [ 0.15,  0.85],
+        [-0.95,  0.65],
+        [ 0.15, -0.85],
+        [ 0.35,  0.85],
         [ 1.05, -0.55],
       ];
       const greens = ['#2fa46a','#1f8f67','#2aa98d','#2f9f90','#3aa86f'];
 
       plantPositions.forEach((pz,i) => {
         const p = plantsSrc.clone(true);
-        fitInside(p, 0.90);
-        p.scale.multiplyScalar(0.70 + (i%3)*0.12);
-        p.position.set(pz[0], sand.position.y + 0.10, pz[1]);
+        fitCenter(p, 0.85);
+        p.scale.multiplyScalar(0.65 + (i%3)*0.12);
+        p.position.set(pz[0], soil.position.y + 0.10, pz[1]);
         p.rotation.y = (i*0.95) % (Math.PI*2);
         tint(p, greens[i%greens.length], (mesh,mat)=>!mat.color || looksGreenish(mat.color) || mat.color.g>0.22);
-        underwaterGroup.add(p);
+        underwater.add(p);
         plantInstances.push(p);
       });
 
-      // UNDERWATER: fish (bigger + smoother)
+      // ===== UNDERWATER: fish (bigger + better motion) =====
       const fishSrc = loaded.fish.scene;
+
       const fishA = fishSrc.clone(true);
       const fishB = fishSrc.clone(true);
       const fishC = fishSrc.clone(true);
 
-      fitInside(fishA, 0.85);
+      fitCenter(fishA, 0.95);
       fishB.scale.copy(fishA.scale);
       fishC.scale.copy(fishA.scale);
 
-      tint(fishA, '#f59e0b', null);
-      tint(fishB, '#ffffff', null);
-      tint(fishC, '#111827', null);
+      tint(fishA, '#f59e0b');   // gold
+      tint(fishB, '#ffffff');   // white
+      tint(fishC, '#111827');   // dark
 
-      underwaterGroup.add(fishA, fishB, fishC);
+      underwater.add(fishA, fishB, fishC);
 
       fishSwimmers.length = 0;
       fishSwimmers.push(
-        {obj:fishA, rX:1.10, rZ:0.70, y:water.position.y + waterH*0.02, speed:0.50, phase:0.0, bob:0.05},
-        {obj:fishB, rX:0.85, rZ:1.10, y:water.position.y - waterH*0.10, speed:0.42, phase:2.2, bob:0.045},
-        {obj:fishC, rX:1.20, rZ:0.90, y:water.position.y + waterH*0.10, speed:0.36, phase:4.1, bob:0.05}
+        {obj:fishA, rX:1.15, rZ:0.75, y:water.position.y + waterH*0.03, speed:0.50, phase:0.0, bob:0.05},
+        {obj:fishB, rX:0.90, rZ:1.10, y:water.position.y - waterH*0.10, speed:0.42, phase:2.2, bob:0.045},
+        {obj:fishC, rX:1.25, rZ:0.95, y:water.position.y + waterH*0.10, speed:0.36, phase:4.1, bob:0.05}
       );
 
       animate();

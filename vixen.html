@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Astrael • Morphological Algae Identifier</title>
+<style>
+  :root{
+    --bg0:#05060a;
+    --bg1:#070a14;
+    --cyan:#66f7ff;
+    --cyan2:#22d3ee;
+    --vio:#a78bfa;
+    --line:rgba(255,255,255,.10);
+    --glass:rgba(255,255,255,.06);
+    --text:rgba(255,255,255,.92);
+    --muted:rgba(255,255,255,.70);
+    --ok:#7CFFB2;
+    --warn:#FFD479;
+  }
+  html,body{height:100%;margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;background:radial-gradient(1200px 700px at 60% -10%, rgba(102,247,255,.16), transparent 55%),
+                                                radial-gradient(900px 600px at 10% 20%, rgba(167,139,250,.12), transparent 55%),
+                                                linear-gradient(180deg,var(--bg0),var(--bg1));color:var(--text);overflow-x:hidden;}
+  /* Subtle scanlines */
+  body:before{
+    content:"";
+    position:fixed; inset:0;
+    background:repeating-linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.04) 1px, transparent 1px, transparent 5px);
+    opacity:.07; pointer-events:none;
+    mix-blend-mode:overlay;
+  }
+  .wrap{max-width:1060px;margin:0 auto;padding:22px 16px 40px;}
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;gap:14px;
+    padding:14px 16px;border:1px solid var(--line);border-radius:16px;
+    background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+    box-shadow:0 20px 60px rgba(0,0,0,.45);
+    position:sticky; top:10px; z-index:10;
+    backdrop-filter: blur(10px);
+  }
+  .brand{display:flex;align-items:center;gap:12px;}
+  .sig{
+    width:42px;height:42px;border-radius:12px;
+    background:radial-gradient(circle at 30% 30%, rgba(102,247,255,.9), rgba(102,247,255,.2) 35%, rgba(167,139,250,.12) 70%, rgba(255,255,255,.06));
+    border:1px solid rgba(102,247,255,.25);
+    position:relative; overflow:hidden;
+  }
+  .sig:after{
+    content:""; position:absolute; inset:-40%;
+    background:conic-gradient(from 90deg, transparent, rgba(102,247,255,.35), transparent);
+    animation:spin 4s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .brand h1{margin:0;font-size:15px;letter-spacing:.12em;text-transform:uppercase}
+  .brand .sub{margin-top:2px;font-size:12px;color:var(--muted)}
+  .status{font-size:12px;color:var(--muted);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .chip{padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+  .chip b{color:var(--cyan)}
+  .grid{
+    display:grid; grid-template-columns: 1.05fr .95fr; gap:16px; margin-top:16px;
+  }
+  @media (max-width: 900px){ .grid{grid-template-columns:1fr;}}
+  .panel{
+    border:1px solid var(--line);
+    background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+    border-radius:18px;
+    box-shadow:0 18px 50px rgba(0,0,0,.45);
+    overflow:hidden;
+    position:relative;
+  }
+  .panel:before{
+    content:""; position:absolute; inset:-1px; border-radius:18px;
+    background:linear-gradient(120deg, rgba(102,247,255,.20), transparent 35%, rgba(167,139,250,.14), transparent 70%, rgba(102,247,255,.16));
+    opacity:.45; pointer-events:none;
+    mask:linear-gradient(#000, transparent 65%);
+  }
+  .panel .hd{
+    padding:14px 16px; border-bottom:1px solid var(--line);
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+  }
+  .panel .hd .t{font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:12px}
+  .panel .bd{padding:16px}
+  .msgRow{display:flex; gap:12px; align-items:flex-start;}
+  .vixen{
+    width:54px;height:54px;border-radius:16px;border:1px solid rgba(102,247,255,.25);
+    background:radial-gradient(circle at 30% 20%, rgba(102,247,255,.25), rgba(255,255,255,.04));
+    flex:0 0 auto; overflow:hidden; position:relative;
+  }
+  .vixen img{width:100%;height:100%;object-fit:cover;display:block;filter:drop-shadow(0 0 18px rgba(102,247,255,.25));}
+  .msgBox{flex:1}
+  .msg{font-size:14px;line-height:1.35}
+  .hint{margin-top:6px;color:var(--muted);font-size:12px}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  .btn{
+    cursor:pointer;border:1px solid rgba(102,247,255,.28);
+    background:linear-gradient(180deg, rgba(102,247,255,.14), rgba(255,255,255,.03));
+    color:var(--text);
+    padding:10px 14px;border-radius:14px;
+    box-shadow:0 10px 30px rgba(0,0,0,.35);
+    font-weight:650; letter-spacing:.02em;
+    transition:transform .08s ease, border-color .18s ease, filter .18s ease;
+  }
+  .btn:hover{transform:translateY(-1px);border-color:rgba(102,247,255,.45);filter:brightness(1.05)}
+  .btn.secondary{border-color:rgba(255,255,255,.12)}
+  .qTitle{font-size:14px;font-weight:750;margin:0 0 10px}
+  .options{
+    display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px;
+  }
+  @media (max-width:520px){ .options{grid-template-columns:1fr;}}
+  .opt{
+    border:1px solid var(--line); background:rgba(255,255,255,.03);
+    border-radius:16px; overflow:hidden; cursor:pointer;
+    transition:transform .08s ease, border-color .18s ease, background .18s ease;
+    position:relative;
+  }
+  .opt:hover{transform:translateY(-1px); border-color:rgba(102,247,255,.35); background:rgba(102,247,255,.05)}
+  .opt .img{
+    height:92px; background:linear-gradient(135deg, rgba(102,247,255,.16), rgba(167,139,250,.10));
+    display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,.8); font-weight:700;
+  }
+  .opt .lb{padding:10px 12px;font-size:13px;color:var(--text)}
+  .trail{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .tag{font-size:11px;padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--muted)}
+  .tag b{color:var(--cyan)}
+  .resultCard{
+    border:1px solid rgba(102,247,255,.22);
+    background:linear-gradient(180deg, rgba(102,247,255,.10), rgba(255,255,255,.02));
+    border-radius:18px; padding:14px 14px; margin-top:12px;
+  }
+  .rTop{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .rName{font-weight:900;font-size:15px;letter-spacing:.02em}
+  .bar{height:10px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:10px;border:1px solid var(--line)}
+  .bar > i{display:block;height:100%;width:40%;background:linear-gradient(90deg, rgba(102,247,255,.95), rgba(167,139,250,.75));}
+  .rMeta{color:var(--muted);font-size:12px;margin-top:8px;line-height:1.3}
+  .small{font-size:12px;color:var(--muted)}
+  .divider{height:1px;background:var(--line);margin:14px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand">
+      <div class="sig"></div>
+      <div>
+        <h1>ASTRAEL • MORPHOLOGICAL IDENTIFIER</h1>
+        <div class="sub">Advanced classification HUD • max 8 questions • Top-3 matching</div>
+      </div>
+    </div>
+    <div class="status">
+      <span class="chip">Phase: <b id="phase">Welcome</b></span>
+      <span class="chip">Q: <b id="qCount">0</b>/8</span>
+      <span class="chip">Signal: <b id="signal">Idle</b></span>
+    </div>
+  </div>
+
+  <div class="grid">
+    <!-- LEFT: Conversation / Guidance -->
+    <div class="panel">
+      <div class="hd">
+        <div class="t">Astrael Guidance</div>
+        <div class="small" id="timeHint">Protocol standby</div>
+      </div>
+      <div class="bd">
+        <div class="msgRow">
+          <div class="vixen" title="Drop vixen.png later">
+            <!-- Later replace src with vixen.png -->
+            <img id="vixenImg" alt="" style="display:none" />
+          </div>
+          <div class="msgBox">
+            <div class="msg" id="msg">
+              Welcome. Initiating <b>Morphology Protocol</b>. Answer a few questions and I’ll return the most probable algae.
+            </div>
+            <div class="hint" id="hint">
+              Click <b>Begin</b> to start. (We’ll add your Vixen cutout + timed voice lines later.)
+            </div>
+            <div class="actions">
+              <button class="btn" id="beginBtn">Begin Identification</button>
+              <button class="btn secondary" id="resetBtn" style="display:none">Reset</button>
+            </div>
+            <div class="trail" id="trail" style="display:none"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Question / Results -->
+    <div class="panel">
+      <div class="hd">
+        <div class="t" id="rightTitle">Question Console</div>
+        <div class="small" id="rightSub">Awaiting user input</div>
+      </div>
+      <div class="bd">
+        <div id="stage"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* -----------------------------
+   1) Question nodes (max 8)
+   Each answer triggers a "signal token"
+------------------------------ */
+const QUESTIONS = [
+  {
+    id:"habitat",
+    title:"Where did you collect it?",
+    answers:[
+      {label:"Pond / stagnant freshwater", token:"habitat:pond"},
+      {label:"River / stream (flowing)", token:"habitat:river"},
+      {label:"Sewage / drain (polluted)", token:"habitat:sewage"},
+      {label:"Backwater / estuary", token:"habitat:brackish"},
+      {label:"Sea / marine", token:"habitat:marine"},
+      {label:"Wet soil / rock surface", token:"habitat:soil"}
+    ]
+  },
+  {
+    id:"visibility",
+    title:"Can you see it with the naked eye?",
+    answers:[
+      {label:"Yes (macroscopic)", token:"size:macro"},
+      {label:"No (microscopic)", token:"size:micro"}
+    ]
+  },
+  {
+    id:"color",
+    title:"What is the dominant color?",
+    answers:[
+      {label:"Bright green", token:"color:green"},
+      {label:"Blue-green", token:"color:cyanobacteria"},
+      {label:"Brown / golden", token:"color:brown"},
+      {label:"Red / pink", token:"color:red"},
+      {label:"Yellow-green", token:"color:yellowgreen"}
+    ]
+  },
+  {
+    id:"form",
+    title:"Which structure matches best?",
+    answers:[
+      {label:"Single cells (separate)", token:"form:single"},
+      {label:"Colony (many together)", token:"form:colony"},
+      {label:"Filament (thread-like)", token:"form:filament"},
+      {label:"Sheet / blade (flat)", token:"form:sheet"},
+      {label:"Bushy / branched plant-like", token:"form:bushy"},
+      {label:"Jelly / mucilage mass", token:"form:jelly"}
+    ]
+  },
+  {
+    id:"branching",
+    title:"If filamentous: branched or unbranched?",
+    showIf: state => state.tokens.includes("form:filament"),
+    answers:[
+      {label:"Unbranched filament", token:"filament:unbranched"},
+      {label:"Branched filament", token:"filament:branched"},
+      {label:"Not sure", token:"filament:unknown"}
+    ]
+  },
+  {
+    id:"glide",
+    title:"If filamentous: does it glide/slide (movement)?",
+    showIf: state => state.tokens.includes("form:filament") && state.tokens.includes("color:cyanobacteria"),
+    answers:[
+      {label:"Yes, glides", token:"motility:glide"},
+      {label:"No / unsure", token:"motility:none"}
+    ]
+  },
+  {
+    id:"keyfeature",
+    title:"Select a key feature you can confirm",
+    answers:[
+      {label:"Spiral bands inside (spiral chloroplast)", token:"feat:spiral"},
+      {label:"Star-shaped chloroplast", token:"feat:star"},
+      {label:"Cap cells at ends (Oedogonium)", token:"feat:capcells"},
+      {label:"Bead-chain with special larger cells (heterocysts)", token:"feat:heterocyst"},
+      {label:"Silica/glass shell or perfect symmetry (diatom)", token:"feat:diatom"},
+      {label:"Net-like colony", token:"feat:net"},
+      {label:"Feather/leaf-like seaweed body", token:"feat:seaweed"},
+      {label:"None / not sure", token:"feat:none"}
+    ]
+  },
+  {
+    id:"texture",
+    title:"Final cue (only if needed): surface/texture?",
+    answers:[
+      {label:"Slimy scum / bloom", token:"cue:scum"},
+      {label:"Gritty brown film", token:"cue:gritty"},
+      {label:"Cottony hair mass", token:"cue:cottony"},
+      {label:"Firm leathery seaweed", token:"cue:leathery"},
+      {label:"Gelatin ball", token:"cue:gelatin"},
+      {label:"Skip / not sure", token:"cue:none"}
+    ]
+  }
+];
+
+/* -----------------------------
+   2) Species scoring rules
+   Add points based on tokens
+------------------------------ */
+const SPECIES = [
+  // Green micro
+  {name:"Spirogyra", about:"Green unbranched filament with spiral chloroplast.", rules:[
+    ["color:green",3],["size:micro",2],["form:filament",3],["filament:unbranched",3],["feat:spiral",6]
+  ]},
+  {name:"Zygnema", about:"Green filament; star-shaped chloroplast.", rules:[
+    ["color:green",3],["size:micro",2],["form:filament",3],["filament:unbranched",2],["feat:star",6]
+  ]},
+  {name:"Ulothrix", about:"Unbranched green filament, often in flowing water.", rules:[
+    ["color:green",3],["form:filament",3],["filament:unbranched",2],["habitat:river",3]
+  ]},
+  {name:"Oedogonium", about:"Filament with cap cells; freshwater.", rules:[
+    ["color:green",3],["size:micro",2],["form:filament",3],["feat:capcells",7]
+  ]},
+  {name:"Cladophora", about:"Coarse branched green filaments; hair-like tufts.", rules:[
+    ["color:green",3],["form:filament",3],["filament:branched",6],["cue:cottony",2]
+  ]},
+  {name:"Hydrodictyon", about:"Net-like colonial green alga (‘water net’).", rules:[
+    ["color:green",3],["form:colony",3],["feat:net",7],["habitat:pond",2]
+  ]},
+  {name:"Pediastrum", about:"Flat star/plate-like green colony.", rules:[
+    ["color:green",3],["form:colony",3],["habitat:pond",1]
+  ]},
+  {name:"Scenedesmus", about:"Small green colonies in rows/spines.", rules:[
+    ["color:green",3],["form:colony",3],["size:micro",2]
+  ]},
+  {name:"Chlamydomonas", about:"Microscopic single motile green cell.", rules:[
+    ["color:green",3],["size:micro",3],["form:single",5]
+  ]},
+  {name:"Chlorella", about:"Microscopic single non-motile green spheres.", rules:[
+    ["color:green",3],["size:micro",3],["form:single",4]
+  ]},
+  // Cyanobacteria
+  {name:"Oscillatoria", about:"Blue-green unbranched filament; gliding movement; blooms in polluted waters.", rules:[
+    ["color:cyanobacteria",4],["form:filament",3],["filament:unbranched",2],["motility:glide",6],["habitat:sewage",2],["cue:scum",2]
+  ]},
+  {name:"Spirulina", about:"Blue-green filament; spiral/helical trichomes; often gliding.", rules:[
+    ["color:cyanobacteria",4],["form:filament",3],["motility:glide",4],["feat:spiral",2]
+  ]},
+  {name:"Lyngbya", about:"Blue-green filaments, often in sheaths; mats.", rules:[
+    ["color:cyanobacteria",4],["form:filament",3],["motility:none",2]
+  ]},
+  {name:"Nostoc", about:"Jelly-like colonies; may appear as green-brown gelatin lumps.", rules:[
+    ["color:cyanobacteria",4],["form:jelly",6],["cue:gelatin",3]
+  ]},
+  {name:"Anabaena", about:"Bead-like chain with heterocysts.", rules:[
+    ["color:cyanobacteria",4],["form:filament",2],["feat:heterocyst",7]
+  ]},
+  {name:"Microcystis", about:"Blue-green slimy bloom; colonial.", rules:[
+    ["color:cyanobacteria",4],["form:colony",4],["cue:scum",3]
+  ]},
+  // Diatoms
+  {name:"Navicula", about:"Diatom: boat-shaped; brown/golden micro.", rules:[
+    ["color:brown",4],["size:micro",3],["feat:diatom",7]
+  ]},
+  {name:"Nitzschia", about:"Diatom: needle-like; common in polluted waters.", rules:[
+    ["color:brown",4],["size:micro",3],["feat:diatom",7],["habitat:sewage",2]
+  ]},
+  // Macro marine greens/browns/reds
+  {name:"Ulva", about:"Green sheet-like sea lettuce.", rules:[
+    ["habitat:marine",5],["color:green",3],["form:sheet",7]
+  ]},
+  {name:"Sargassum", about:"Brown bushy seaweed with many leaflets/vesicles.", rules:[
+    ["habitat:marine",5],["color:brown",3],["form:bushy",7],["feat:seaweed",2]
+  ]},
+  {name:"Padina", about:"Brown fan/peacock-tail sheet.", rules:[
+    ["habitat:marine",5],["color:brown",3],["form:sheet",6],["feat:seaweed",2]
+  ]},
+  {name:"Polysiphonia", about:"Red fine branched filamentous seaweed.", rules:[
+    ["habitat:marine",5],["color:red",4],["form:filament",4],["filament:branched",4]
+  ]},
+  {name:"Gracilaria", about:"Red fleshy branched seaweed.", rules:[
+    ["habitat:marine",5],["color:red",4],["form:bushy",6],["cue:leathery",2]
+  ]},
+  {name:"Porphyra", about:"Red/purple thin sheet.", rules:[
+    ["habitat:marine",5],["color:red",4],["form:sheet",7]
+  ]},
+  // Yellow-green
+  {name:"Tribonema", about:"Yellow-green unbranched filaments.", rules:[
+    ["color:yellowgreen",5],["form:filament",4],["filament:unbranched",3]
+  ]},
+  {name:"Botrydium", about:"Yellow-green soil alga, blister/bubble-like.", rules:[
+    ["color:yellowgreen",5],["habitat:soil",6]
+  ]},
+  // Freshwater macro “stoneworts”
+  {name:"Chara / Nitella", about:"Macroscopic freshwater ‘stonewort’ with whorled branches.", rules:[
+    ["size:macro",4],["color:green",2],["habitat:pond",2],["form:bushy",4]
+  ]},
+];
+
+/* -----------------------------
+   Engine state
+------------------------------ */
+const state = {
+  step: -1,
+  asked: 0,
+  tokens: [],
+  trail: []
+};
+
+const el = (id)=>document.getElementById(id);
+const stage = el("stage");
+const beginBtn = el("beginBtn");
+const resetBtn = el("resetBtn");
+const msg = el("msg");
+const hint = el("hint");
+const trail = el("trail");
+const phase = el("phase");
+const qCount = el("qCount");
+const signal = el("signal");
+const rightTitle = el("rightTitle");
+const rightSub = el("rightSub");
+const timeHint = el("timeHint");
+
+function setMessage(text, sub=""){
+  msg.innerHTML = text;
+  hint.innerHTML = sub || "";
+}
+
+function addTrail(label){
+  trail.style.display = "flex";
+  const t = document.createElement("div");
+  t.className = "tag";
+  t.innerHTML = label;
+  trail.appendChild(t);
+}
+
+function computeTop3(){
+  const scored = SPECIES.map(s=>{
+    let score = 0;
+    for(const [tok, pts] of s.rules){
+      if(state.tokens.includes(tok)) score += pts;
+    }
+    return {name:s.name, about:s.about, score};
+  }).filter(x=>x.score>0);
+
+  scored.sort((a,b)=>b.score-a.score);
+  const top = scored.slice(0,3);
+
+  // Normalize confidence (simple)
+  const max = top[0]?.score || 1;
+  return top.map(x=>({
+    ...x,
+    conf: Math.max(0.12, Math.min(0.98, x.score / max))
+  }));
+}
+
+function renderQuestion(){
+  // find next question that matches showIf
+  let idx = state.step + 1;
+  while(idx < QUESTIONS.length){
+    const q = QUESTIONS[idx];
+    if(!q.showIf || q.showIf(state)) break;
+    idx++;
+  }
+
+  if(idx >= QUESTIONS.length || state.asked >= 8){
+    return renderResults();
+  }
+
+  state.step = idx;
+  state.asked++;
+  phase.textContent = "Questioning";
+  qCount.textContent = state.asked;
+  signal.textContent = "Scanning";
+  rightTitle.textContent = "Question Console";
+  rightSub.textContent = "Select the closest match";
+
+  const q = QUESTIONS[idx];
+  stage.innerHTML = `
+    <div class="qTitle">${q.title}</div>
+    <div class="options" id="opts"></div>
+    <div class="divider"></div>
+    <div class="small">Tip: choose the closest option. You’ll get Top-3 matches at the end.</div>
+  `;
+
+  const opts = document.getElementById("opts");
+  q.answers.forEach((a)=>{
+    const card = document.createElement("div");
+    card.className = "opt";
+    card.innerHTML = `
+      <div class="img">SAMPLE IMAGE</div>
+      <div class="lb">${a.label}</div>
+    `;
+    card.onclick = ()=>chooseAnswer(q, a);
+    opts.appendChild(card);
+  });
+
+  // Timed messages
+  if(state.asked === 1){
+    setMessage("Signal acquired. Begin classification.", "Answer using the image options. We will narrow it fast.");
+  }else if(state.asked === 3){
+    setMessage("Class narrowing in progress…", "Good. The pattern space is shrinking.");
+  }else if(state.asked === 5){
+    setMessage("We’re getting close.", "Final morphology cues will lock the result.");
+  }
+}
+
+function chooseAnswer(q, a){
+  state.tokens.push(a.token);
+  state.trail.push({q:q.id, a:a.label});
+  addTrail(`<b>${q.id}</b>: ${a.label}`);
+  signal.textContent = "Locking";
+  // small cinematic delay
+  setTimeout(()=>{
+    signal.textContent = "Scanning";
+    renderQuestion();
+  }, 180);
+}
+
+function renderResults(){
+  phase.textContent = "Result";
+  signal.textContent = "Complete";
+  rightTitle.textContent = "Astrael Result";
+  rightSub.textContent = "Top-3 probable matches";
+
+  const top3 = computeTop3();
+  if(top3.length === 0){
+    stage.innerHTML = `
+      <div class="qTitle">No confident match</div>
+      <div class="small">Try again and choose “Not sure” less often, or add one clear key feature (diatom / spiral / heterocyst).</div>
+    `;
+    setMessage("I need one clearer cue to lock identification.", "Reset and answer again. Add at least one strong feature.");
+    return;
+  }
+
+  // Outro message
+  setMessage(
+    `Final cross-check complete. <b>Identification finished.</b>`,
+    `Top match: <b>${top3[0].name}</b>. Thanks for assisting the mission.`
+  );
+
+  stage.innerHTML = `
+    <div class="qTitle">Top-3 matches</div>
+    <div class="small">These are ranked by morphological consistency with your answers.</div>
+    ${top3.map((r,i)=>`
+      <div class="resultCard">
+        <div class="rTop">
+          <div class="rName">${i+1}. ${r.name}</div>
+          <div class="small">${Math.round(r.conf*100)}%</div>
+        </div>
+        <div class="bar"><i style="width:${Math.round(r.conf*100)}%"></i></div>
+        <div class="rMeta">${r.about}</div>
+      </div>
+    `).join("")}
+    <div class="divider"></div>
+    <div class="small">Next: we will attach the final algae page (images + description + Kerala notes) to each result.</div>
+  `;
+
+  resetBtn.style.display = "inline-block";
+}
+
+function resetAll(){
+  state.step = -1;
+  state.asked = 0;
+  state.tokens = [];
+  state.trail = [];
+  stage.innerHTML = "";
+  trail.innerHTML = "";
+  trail.style.display = "none";
+  phase.textContent = "Welcome";
+  qCount.textContent = "0";
+  signal.textContent = "Idle";
+  rightTitle.textContent = "Question Console";
+  rightSub.textContent = "Awaiting user input";
+  setMessage(
+    "Welcome. Initiating <b>Morphology Protocol</b>. Answer a few questions and I’ll return the most probable algae.",
+    "Click Begin to start. (We’ll add vixen.png + timed lines next.)"
+  );
+  beginBtn.style.display = "inline-block";
+  resetBtn.style.display = "none";
+}
+
+beginBtn.onclick = ()=>{
+  beginBtn.style.display = "none";
+  resetBtn.style.display = "inline-block";
+  timeHint.textContent = "Protocol active";
+  setMessage("Initiating scan…", "Select the first option to anchor the habitat.");
+  renderQuestion();
+};
+
+resetBtn.onclick = resetAll;
+
+// start state
+resetAll();
+</script>
+</body>
+</html>

@@ -1,0 +1,735 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Astrael • Morphological Algae Identifier</title>
+
+<style>
+  :root{
+    --bg0:#04050a; --bg1:#060a18; --bg2:#061020;
+    --cyan:#66f7ff; --cyan2:#22d3ee; --vio:#a78bfa;
+    --text:rgba(255,255,255,.92); --muted:rgba(255,255,255,.68);
+    --line:rgba(255,255,255,.13); --shadow:0 22px 80px rgba(0,0,0,.55);
+    --glow:0 0 22px rgba(102,247,255,.25); --glow2:0 0 42px rgba(167,139,250,.18); --r:20px;
+  }
+  html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;}
+  body{color:var(--text);background:radial-gradient(1200px 800px at 75% -10%, rgba(102,247,255,.20), transparent 55%),radial-gradient(1000px 700px at 10% 25%, rgba(167,139,250,.18), transparent 60%),linear-gradient(180deg, var(--bg0), var(--bg1) 55%, var(--bg2));overflow-x:hidden;}
+  body::before{content:"";position:fixed;inset:0;background:repeating-linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.05) 1px, transparent 1px, transparent 6px);opacity:.07;pointer-events:none;mix-blend-mode:overlay;}
+  body::after{content:"";position:fixed;inset:0;background-image:linear-gradient(rgba(102,247,255,.05) 1px, transparent 1px),linear-gradient(90deg, rgba(102,247,255,.05) 1px, transparent 1px);background-size:46px 46px;opacity:.12;pointer-events:none;mask:radial-gradient(900px 600px at 60% 15%, #000 25%, transparent 70%);}
+  .wrap{max-width:1120px;margin:0 auto;padding:22px 16px 40px;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 16px;border-radius:18px;border:1px solid rgba(102,247,255,.20);background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));box-shadow:var(--shadow), var(--glow);backdrop-filter:blur(14px);position:relative;top:auto;z-index:10;}
+  .brand{display:flex;align-items:center;gap:12px;min-width:240px}.sig{width:44px;height:44px;border-radius:14px;background:radial-gradient(circle at 30% 25%, rgba(102,247,255,.95), rgba(102,247,255,.20) 40%, rgba(167,139,250,.14) 70%, rgba(255,255,255,.06));border:1px solid rgba(102,247,255,.28);position:relative;overflow:hidden;box-shadow:0 0 20px rgba(102,247,255,.25), 0 0 40px rgba(167,139,250,.14);}
+  .sig::after{content:"";position:absolute;inset:-60%;background:conic-gradient(from 90deg, transparent, rgba(102,247,255,.35), transparent);animation:spin 4.2s linear infinite;}@keyframes spin{to{transform:rotate(360deg)}}
+  .brand h1{margin:0;font-size:14px;letter-spacing:.14em;text-transform:uppercase}.brand .sub{margin-top:3px;font-size:12px;color:var(--muted)}
+  .status{font-size:12px;color:var(--muted);display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}.chip{padding:7px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.035);box-shadow:inset 0 0 18px rgba(102,247,255,.06)}.chip b{color:var(--cyan);font-weight:800}
+  .grid{display:grid;grid-template-columns:1.05fr .95fr;gap:16px;margin-top:16px}@media (max-width:940px){.grid{grid-template-columns:1fr;}}
+  .panel{border-radius:var(--r);border:1px solid rgba(102,247,255,.18);background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.03));box-shadow:var(--shadow), var(--glow2);backdrop-filter:blur(16px);position:relative;overflow:hidden;}
+  .panel::before{content:"";position:absolute;inset:-2px;background:linear-gradient(120deg, rgba(102,247,255,.22), transparent 36%, rgba(167,139,250,.18), transparent 70%, rgba(102,247,255,.18));opacity:.42;pointer-events:none;mask:linear-gradient(#000, transparent 65%);} .panel::after{content:"";position:absolute;inset:0;background:radial-gradient(700px 280px at 20% 0%, rgba(102,247,255,.16), transparent 65%);opacity:.6;pointer-events:none;}
+  .hd{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:space-between;gap:10px}.hd .t{font-weight:900;letter-spacing:.10em;text-transform:uppercase;font-size:12px}.hd .mini{font-size:12px;color:var(--muted)}.bd{padding:16px;position:relative;z-index:1;}
+  .msgRow{display:flex;gap:12px;align-items:flex-start}.vixen{width:58px;height:58px;border-radius:16px;border:1px solid rgba(102,247,255,.28);background:radial-gradient(circle at 30% 20%, rgba(102,247,255,.25), rgba(255,255,255,.05)),linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));box-shadow:0 0 18px rgba(102,247,255,.18), inset 0 0 18px rgba(102,247,255,.08);flex:0 0 auto;overflow:hidden;position:relative;}.vixen img{width:100%;height:100%;object-fit:cover;display:block;filter:drop-shadow(0 0 18px rgba(102,247,255,.25));}.vixen .placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:900;letter-spacing:.14em;font-size:10px;color:rgba(255,255,255,.55)}
+  .msgBox{flex:1}.msg{font-size:14px;line-height:1.38}.hint{margin-top:6px;color:var(--muted);font-size:12px;line-height:1.35}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.btn{cursor:pointer;border:1px solid rgba(102,247,255,.30);background:linear-gradient(180deg, rgba(102,247,255,.18), rgba(255,255,255,.03));color:var(--text);padding:10px 14px;border-radius:16px;box-shadow:0 12px 34px rgba(0,0,0,.35), 0 0 18px rgba(102,247,255,.15);font-weight:850;letter-spacing:.02em;transition:transform .10s ease, border-color .18s ease, filter .18s ease;} .btn:hover{transform:translateY(-1px);border-color:rgba(102,247,255,.62);filter:brightness(1.05)} .btn.secondary,.btn.ghost{border-color:rgba(255,255,255,.14)} .btn.ghost{background:rgba(255,255,255,.03)}
+  .trail{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.tag{font-size:11px;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.035);color:var(--muted);box-shadow:inset 0 0 18px rgba(102,247,255,.06)}.tag b{color:var(--cyan)}
+  .qTitle{font-size:14px;font-weight:950;margin:0 0 10px;letter-spacing:.02em}.small{font-size:12px;color:var(--muted)}.divider{height:1px;background:rgba(255,255,255,.12);margin:14px 0}
+  .options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}@media (max-width:520px){.options{grid-template-columns:1fr;}}
+  .opt{border:1px solid rgba(102,247,255,.20);background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));border-radius:18px;overflow:hidden;cursor:pointer;position:relative;transition:transform .10s ease, border-color .18s ease, box-shadow .18s ease, filter .18s ease;box-shadow:inset 0 0 0 rgba(0,0,0,0)}
+  .opt::before{content:"";position:absolute;inset:-1px;background:linear-gradient(120deg, transparent, rgba(102,247,255,.35), transparent);opacity:0;transform:translateX(-120%);pointer-events:none}.opt:hover{transform:translateY(-2px);border-color:rgba(102,247,255,.65);box-shadow:0 0 18px rgba(102,247,255,.28), 0 0 40px rgba(167,139,250,.16);filter:brightness(1.03)}.opt:hover::before{opacity:.55;animation:sweep 1.05s linear}.opt.selected,.colorCard.selected{border-color:rgba(102,247,255,.7);box-shadow:0 0 22px rgba(102,247,255,.24), inset 0 0 20px rgba(102,247,255,.06)}@keyframes sweep{from{transform:translateX(-120%)}to{transform:translateX(120%)}}
+  .opt .img{height:92px;background:radial-gradient(300px 120px at 30% 20%, rgba(102,247,255,.24), transparent 60%),linear-gradient(135deg, rgba(102,247,255,.14), rgba(167,139,250,.10));display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.78);font-weight:950;letter-spacing:.12em;font-size:11px;text-transform:uppercase}.opt img.preview{width:100%;height:92px;object-fit:cover;display:block}.opt .lb{padding:10px 12px;font-size:13px;color:var(--text);line-height:1.2}.opt .subhint{padding:0 12px 12px;color:var(--muted);font-size:11px;line-height:1.25}
+  .colorGrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}@media (max-width:900px){.colorGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media (max-width:520px){.colorGrid{grid-template-columns:1fr}}
+  .colorCard{position:relative;min-height:140px;border-radius:18px;border:1px solid rgba(255,255,255,.12);overflow:hidden;display:flex;align-items:flex-end;padding:14px;cursor:pointer;transition:transform .12s ease, border-color .18s ease, box-shadow .18s ease;background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02))}.colorCard:hover{transform:translateY(-2px)}.colorCard::before{content:"";position:absolute;inset:-30% -10%;background:radial-gradient(circle at 50% 45%, var(--glowColor) 0%, rgba(255,255,255,.05) 24%, transparent 64%);opacity:.95;filter:blur(8px)}.colorCard::after{content:"";position:absolute;inset:0;background:linear-gradient(120deg, transparent 18%, rgba(255,255,255,.14) 48%, transparent 78%);transform:translateX(-120%);opacity:0}.colorCard:hover::after{opacity:.8;animation:sweep 1.1s linear}.colorCard .label{position:relative;z-index:2;font-size:14px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;text-shadow:0 0 14px rgba(255,255,255,.18)}
+  .colorCard.green{--glowColor:rgba(50,255,140,.72);box-shadow:0 0 22px rgba(50,255,140,.18), inset 0 0 22px rgba(50,255,140,.08)} .colorCard.bluegreen{--glowColor:rgba(70,235,255,.74);box-shadow:0 0 22px rgba(70,235,255,.18), inset 0 0 22px rgba(70,235,255,.08)} .colorCard.brown{--glowColor:rgba(255,182,72,.72);box-shadow:0 0 22px rgba(255,182,72,.18), inset 0 0 22px rgba(255,182,72,.08)} .colorCard.red{--glowColor:rgba(255,80,110,.72);box-shadow:0 0 22px rgba(255,80,110,.18), inset 0 0 22px rgba(255,80,110,.08)} .colorCard.yellowgreen{--glowColor:rgba(206,255,88,.74);box-shadow:0 0 22px rgba(206,255,88,.18), inset 0 0 22px rgba(206,255,88,.08)}
+  .helpPanel,.confidenceBox,.morphBox{margin-top:12px;border:1px solid rgba(255,255,255,.12);border-radius:18px;background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));box-shadow:inset 0 0 20px rgba(102,247,255,.06);overflow:hidden}.helpHd{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.10);display:flex;justify-content:space-between;align-items:center;gap:8px}.helpBd{padding:14px}.helpGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}@media (max-width:520px){.helpGrid{grid-template-columns:1fr}}
+  .scanOverlay{position:absolute;inset:0;border-radius:16px;pointer-events:none;opacity:0}.scanOverlay.on{opacity:1;animation:scanFade 720ms ease-out forwards}@keyframes scanFade{0%{opacity:0}15%{opacity:1}100%{opacity:0}} .scanOverlay .beam{position:absolute;left:-20%;top:0;bottom:0;width:45%;background:linear-gradient(90deg, transparent, rgba(102,247,255,.28), rgba(102,247,255,.10), transparent);filter:blur(.2px);animation:beam 720ms ease-out forwards}@keyframes beam{0%{transform:translateX(0)}100%{transform:translateX(320%)}} .scanOverlay .gridGlow{position:absolute;inset:0;background-image:linear-gradient(rgba(102,247,255,.08) 1px, transparent 1px),linear-gradient(90deg, rgba(102,247,255,.08) 1px, transparent 1px);background-size:34px 34px;opacity:.22;mask:radial-gradient(520px 220px at 50% 30%, #000 40%, transparent 74%)}
+  .morphBox{padding:18px}.morphStep{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08)} .morphStep:last-child{border-bottom:none}.morphStep b{font-size:13px}.morphState{font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:.08em}
+  .resultCard{border:1px solid rgba(102,247,255,.38);background:radial-gradient(800px 240px at 10% 0%, rgba(102,247,255,.16), transparent 60%),linear-gradient(180deg, rgba(102,247,255,.14), rgba(255,255,255,.02));border-radius:18px;padding:14px;margin-top:12px;box-shadow:0 0 22px rgba(102,247,255,.22), inset 0 0 22px rgba(102,247,255,.08)}.resultRow{display:flex;gap:12px;align-items:flex-start}.speciesThumb{width:78px;height:78px;border-radius:14px;overflow:hidden;flex:0 0 auto;border:1px solid rgba(255,255,255,.12);background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02))}.speciesThumb img{width:100%;height:100%;object-fit:cover;display:block}.speciesThumb .ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.45);font-size:10px;letter-spacing:.12em;font-weight:900}
+  .rTop{display:flex;justify-content:space-between;align-items:center;gap:10px}.rName{font-weight:1000;font-size:15px;letter-spacing:.02em}.bar{height:10px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:10px;border:1px solid rgba(255,255,255,.14)}.bar>i{display:block;height:100%;width:40%;background:linear-gradient(90deg, rgba(102,247,255,.95), rgba(167,139,250,.80));box-shadow:0 0 16px rgba(102,247,255,.65)}.rMeta{color:var(--muted);font-size:12px;margin-top:8px;line-height:1.35}
+  .confidenceBox{padding:14px}.confidenceBox h3{margin:0 0 10px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}.checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}@media (max-width:520px){.checks{grid-template-columns:1fr}} .check{padding:8px 10px;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:rgba(255,255,255,.025);font-size:12px;color:var(--text)}.check b{color:#7CFFB2}
+  .foot{margin-top:14px;color:rgba(255,255,255,.55);font-size:11px;line-height:1.35}.foot b{color:rgba(102,247,255,.85)}.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar"><div class="brand"><div class="sig"></div><div><h1>ASTRAEL • MORPHOLOGICAL IDENTIFIER</h1><div class="sub">Blue-glass HUD • image-integrated question tree • Top-3 scientific matches</div></div></div><div class="status"><span class="chip">Phase: <b id="phase">Welcome</b></span><span class="chip">Q: <b id="qCount">0</b>/8</span><span class="chip">Signal: <b id="signal">Idle</b></span></div></div>
+  <div class="grid">
+    <div class="panel"><div class="hd"><div class="t">Astrael Guidance</div><div class="mini" id="timeHint">Protocol standby</div></div><div class="bd"><div class="msgRow"><div class="vixen"><div class="placeholder" id="vixenPh">VIXEN</div><img id="vixenImg" alt="Astrael Vixen" style="display:none"></div><div class="msgBox"><div class="msg" id="msg">Welcome. Initiating <b>Morphology Protocol</b>. Answer a few questions and I’ll return the most probable algae.</div><div class="hint" id="hint">The base UI has been preserved and upgraded with your final question tree.</div><div class="actions"><button class="btn" id="beginBtn">Begin Identification</button><button class="btn secondary hidden" id="resetBtn">Reset</button></div><div class="trail hidden" id="trail"></div><div class="foot"><b>Note:</b> This is a morphological key, not AI guessing. Best results happen when you can confirm a strong clue such as <b>spiral chloroplast</b>, <b>heterocysts</b>, <b>diatom shell</b>, or a distinct <b>surface texture</b>.</div></div></div></div></div>
+    <div class="panel"><div class="hd"><div class="t" id="rightTitle">Question Console</div><div class="mini" id="rightSub">Awaiting user input</div></div><div class="bd" style="position:relative"><div id="stage"></div><div class="scanOverlay" id="scan"><div class="gridGlow"></div><div class="beam"></div></div></div></div>
+  </div>
+</div>
+<script>
+const PATHS={
+  habitat:"images_identifier/habitat/",
+  visibility:"images_identifier/visibility/",
+  structure:"images_identifier/structure/",
+  macroStructure:"images_identifier/macro_structure/",
+  helpMicro:"images_identifier/colour_help/micro/",
+  helpMacro:"images_identifier/colour_help/macro/",
+  diagnosticMicro:"images_identifier/diagnostic/micro/",
+  diagnosticMacro:"images_identifier/diagnostic/micro/macro/",
+  species:"images_identifier/species/",
+  ui:"images_identifier/ui/"
+};
+
+const COLOR_HELP={
+  micro:[
+    {name:"Green • Spirogyra",img:"help_colour_green_spirogyra.jpg"},
+    {name:"Blue-green • Oscillatoria",img:"help_colour_bluegreen_oscillatoria.jpg"},
+    {name:"Brown / Golden • Navicula",img:"help_colour_brown_navicula.jpg"},
+    {name:"Red • Porphyridium",img:"help_colour_red_porphyridium.jpg"},
+    {name:"Yellow-green • Vaucheria",img:"help_colour_yellowgreen_vaucheria.jpg"}
+  ],
+  macro:[
+    {name:"Green • Spirogyra",img:"help_macro_green_spirogyra.jpg"},
+    {name:"Blue-green • Nostoc",img:"help_macro_bluegreen_nostoc.jpg"},
+    {name:"Brown / Golden • Sargassum",img:"help_macro_brown_sargassum.jpg"},
+    {name:"Red • Gracilaria",img:"help_macro_red_gracilaria.jpg"},
+    {name:"Yellow-green • Mass form",img:"help_macro_yellowgreen_mass.jpg"}
+  ]
+};
+
+const SPECIES = [
+  // green single
+  {name:"Chlamydomonas", image:"chlamydomonas.jpg", about:"Motile microscopic green alga with oval / pear-shaped cell.", habitats:["pond","river"], obs:"micro", color:"green", structure:"micro_single", keys:["diag:cell_pear"]},
+  {name:"Chlorella", image:"chlorella.jpg", about:"Non-motile spherical green unicell.", habitats:["pond","river"], obs:"micro", color:"green", structure:"micro_single", keys:["diag:cell_spherical"]},
+  {name:"Cosmarium", image:"cosmarium.jpg", about:"Desmid with two equal semicells joined at the middle.", habitats:["pond"], obs:"micro", color:"green", structure:"micro_single", keys:["diag:cell_two_semicells"]},
+  {name:"Staurastrum", image:"staurastrum.jpg", about:"Star-shaped desmid with pointed arms.", habitats:["pond"], obs:"micro", color:"green", structure:"micro_single", keys:["diag:cell_star"]},
+  {name:"Closterium", image:"closterium.jpg", about:"Crescent-shaped desmid.", habitats:["pond"], obs:"micro", color:"green", structure:"micro_single", keys:["diag:cell_crescent"]},
+
+  // green colony
+  {name:"Volvox", image:"volvox.jpg", about:"Large hollow spherical colony.", habitats:["pond"], obs:"micro", color:"green", structure:"micro_colony", keys:["diag:colony_spherical_large"]},
+  {name:"Pandorina", image:"pandorina.jpg", about:"Small spherical colony of green cells.", habitats:["pond"], obs:"micro", color:"green", structure:"micro_colony", keys:["diag:colony_spherical_small"]},
+  {name:"Eudorina", image:"eudorina.jpg", about:"Larger spherical colony than Pandorina.", habitats:["pond"], obs:"micro", color:"green", structure:"micro_colony", keys:["diag:colony_spherical_medium"]},
+  {name:"Gonium", image:"gonium.jpg", about:"Flat plate-like colony.", habitats:["pond"], obs:"micro", color:"green", structure:"micro_colony", keys:["diag:colony_flat_plate"]},
+  {name:"Scenedesmus", image:"scenedesmus.jpg", about:"Colony in row-like series.", habitats:["pond"], obs:"micro", color:"green", structure:"micro_colony", keys:["diag:colony_row"]},
+  {name:"Pediastrum", image:"pediastrum.jpg", about:"Disc or star-shaped colony.", habitats:["pond"], obs:"micro", color:"green", structure:"micro_colony", keys:["diag:colony_disc"]},
+  {name:"Hydrodictyon", image:"hydrodictyon.jpg", about:"Net colony (water net).", habitats:["pond"], obs:"micro", color:"green", structure:"micro_colony", keys:["diag:colony_net"]},
+  {name:"Palmella", image:"palmella.jpg", about:"Loose gelatinous colony.", habitats:["pond"], obs:"micro", color:"green", structure:"micro_colony", keys:["diag:colony_loose"]},
+  {name:"Tetraspora", image:"tetraspora.jpg", about:"Gelatinous clustered colony.", habitats:["pond"], obs:"micro", color:"green", structure:"micro_colony", keys:["diag:colony_clustered"]},
+
+  // green filament
+  {name:"Spirogyra", image:"spirogyra.jpg", about:"Filamentous green alga with spiral chloroplast.", habitats:["pond","river"], obs:"micro", color:"green", structure:"micro_filament", keys:["diag:chloro_spiral"]},
+  {name:"Zygnema", image:"zygnema.jpg", about:"Filamentous green alga with star-shaped chloroplast.", habitats:["pond"], obs:"micro", color:"green", structure:"micro_filament", keys:["diag:chloro_star"]},
+  {name:"Mougeotia", image:"mougeotia.jpg", about:"Filamentous green alga with plate-like chloroplast.", habitats:["pond"], obs:"micro", color:"green", structure:"micro_filament", keys:["diag:chloro_plate"]},
+  {name:"Ulothrix", image:"ulothrix.jpg", about:"Unbranched filament with basal holdfast cell.", habitats:["river","pond"], obs:"micro", color:"green", structure:"micro_filament", keys:["diag:filament_holdfast"]},
+  {name:"Oedogonium", image:"oedogonium.jpg", about:"Filament with cap cells.", habitats:["pond"], obs:"micro", color:"green", structure:"micro_filament", keys:["diag:filament_capcells"]},
+
+  // green branched
+  {name:"Cladophora", image:"cladophora.jpg", about:"Coarsely branched filamentous green alga.", habitats:["pond","river"], obs:"micro", color:"green", structure:"micro_branched", keys:["diag:branch_coarse"]},
+  {name:"Chaetophora", image:"chaetophora.jpg", about:"Branched green alga with hair-like tips.", habitats:["pond"], obs:"micro", color:"green", structure:"micro_branched", keys:["diag:branch_hairtips"]},
+  {name:"Stigeoclonium", image:"stigeoclonium.jpg", about:"Irregularly branched green filament.", habitats:["river","pond"], obs:"micro", color:"green", structure:"micro_branched", keys:["diag:branch_irregular"]},
+
+  // green macro
+  {name:"Chara", image:"chara.jpg", about:"Stiff plant-like freshwater charophyte.", habitats:["pond"], obs:"macro", color:"green", structure:"macro_branched", keys:["diag:chara_stiff"]},
+  {name:"Nitella", image:"nitella.jpg", about:"Soft delicate freshwater charophyte.", habitats:["pond"], obs:"macro", color:"green", structure:"macro_branched", keys:["diag:chara_delicate"]},
+  {name:"Ulva", image:"ulva.jpg", about:"Flat green blade (sea lettuce).", habitats:["marine","brackish"], obs:"macro", color:"green", structure:"macro_sheet", keys:["diag:green_flat_sheet"]},
+  {name:"Enteromorpha", image:"enteromorpha.jpg", about:"Tube-like green seaweed.", habitats:["marine","brackish"], obs:"macro", color:"green", structure:"macro_sheet", keys:["diag:green_tubular_sheet"]},
+  {name:"Caulerpa", image:"caulerpa.jpg", about:"Marine green alga with feather-like fronds.", habitats:["marine"], obs:"macro", color:"green", structure:"macro_branched", keys:["diag:green_feather"]},
+  {name:"Codium", image:"codium.jpg", about:"Spongy thick green branches.", habitats:["marine"], obs:"macro", color:"green", structure:"macro_branched", keys:["diag:green_spongy"]},
+  {name:"Halimeda", image:"halimeda.jpg", about:"Segmented calcified green alga.", habitats:["marine"], obs:"macro", color:"green", structure:"macro_branched", keys:["diag:green_calcified"]},
+  {name:"Bryopsis", image:"bryopsis.jpg", about:"Fine feathery green tuft.", habitats:["marine"], obs:"macro", color:"green", structure:"macro_branched", keys:["diag:green_feathery_tuft"]},
+  {name:"Ventricaria", image:"ventricaria.jpg", about:"Single bubble-like green vesicle.", habitats:["marine"], obs:"macro", color:"green", structure:"macro_gelatinous", keys:["diag:green_bubble"]},
+
+  // yellow green
+  {name:"Vaucheria", image:"vaucheria.jpg", about:"Siphonous yellow-green filamentous mat.", habitats:["soil","pond"], obs:"micro", color:"yellowgreen", structure:"micro_filament", keys:["diag:yellow_siphonous"]},
+  {name:"Tribonema", image:"tribonema.jpg", about:"Yellow-green filament.", habitats:["pond"], obs:"micro", color:"yellowgreen", structure:"micro_filament", keys:["diag:yellow_filament"]},
+  {name:"Botrydium", image:"botrydium.jpg", about:"Bubble-like yellow-green alga on wet soil.", habitats:["soil"], obs:"macro", color:"yellowgreen", structure:"macro_gelatinous", keys:["diag:yellow_vesicle"]},
+  {name:"Heterococcus", image:"heterococcus.jpg", about:"Branched microscopic yellow-green form.", habitats:["soil"], obs:"micro", color:"yellowgreen", structure:"micro_branched", keys:["diag:yellow_branched"]},
+
+  // cyanobacteria
+  {name:"Oscillatoria", image:"oscillatoria.jpg", about:"Gliding straight cyanobacterial filament.", habitats:["pond","sewage"], obs:"micro", color:"cyanobacteria", structure:"micro_filament", keys:["diag:cyano_gliding"]},
+  {name:"Spirulina", image:"spirulina.jpg", about:"Helical cyanobacterial filament.", habitats:["pond"], obs:"micro", color:"cyanobacteria", structure:"micro_filament", keys:["diag:cyano_spiral"]},
+  {name:"Lyngbya", image:"lyngbya.jpg", about:"Sheathed non-gliding cyanobacterial filament.", habitats:["pond","sewage"], obs:"micro", color:"cyanobacteria", structure:"micro_filament", keys:["diag:cyano_sheath"]},
+  {name:"Anabaena", image:"anabaena.jpg", about:"Bead-like heterocyst-bearing filament.", habitats:["pond","sewage"], obs:"micro", color:"cyanobacteria", structure:"micro_filament", keys:["diag:cyano_heterocyst_chain"]},
+  {name:"Aphanizomenon", image:"aphanizomenon.jpg", about:"Bundled heterocyst-bearing filaments.", habitats:["pond"], obs:"micro", color:"cyanobacteria", structure:"micro_filament", keys:["diag:cyano_heterocyst_bundle"]},
+  {name:"Nostoc", image:"nostoc.jpg", about:"Gelatinous blue-green jelly lumps.", habitats:["pond","soil"], obs:"macro", color:"cyanobacteria", structure:"macro_gelatinous", keys:["diag:cyano_jelly"]},
+  {name:"Microcystis", image:"microcystis.jpg", about:"Blue-green bloom / scum.", habitats:["pond","sewage"], obs:"macro", color:"cyanobacteria", structure:"macro_gelatinous", keys:["diag:cyano_bloom"]},
+  {name:"Gloeocapsa", image:"gloeocapsa.jpg", about:"Microscopic gelatinous packets on wet surfaces.", habitats:["soil"], obs:"micro", color:"cyanobacteria", structure:"micro_colony", keys:["diag:cyano_packets"]},
+  {name:"Rivularia", image:"rivularia.jpg", about:"Radiating tufted cyanobacteria.", habitats:["pond"], obs:"micro", color:"cyanobacteria", structure:"micro_branched", keys:["diag:cyano_radiating"]},
+  {name:"Calothrix", image:"calothrix.jpg", about:"Tapering attached cyanobacterial filaments.", habitats:["pond","soil"], obs:"micro", color:"cyanobacteria", structure:"micro_branched", keys:["diag:cyano_tapering"]},
+  {name:"Scytonema", image:"scytonema.jpg", about:"False-branching cyanobacterial network.", habitats:["soil","pond"], obs:"micro", color:"cyanobacteria", structure:"micro_branched", keys:["diag:cyano_falsebranch"]},
+
+  // diatoms brown micro
+  {name:"Navicula", image:"navicula.jpg", about:"Boat-shaped diatom.", habitats:["pond","river"], obs:"micro", color:"brown", structure:"micro_single", keys:["diag:diatom_boat"]},
+  {name:"Pinnularia", image:"pinnularia.jpg", about:"Broad oval diatom.", habitats:["pond","river"], obs:"micro", color:"brown", structure:"micro_single", keys:["diag:diatom_oval"]},
+  {name:"Nitzschia", image:"nitzschia.jpg", about:"Needle-like diatom.", habitats:["pond","river","sewage"], obs:"micro", color:"brown", structure:"micro_single", keys:["diag:diatom_needle"]},
+  {name:"Cymbella", image:"cymbella.jpg", about:"Curved asymmetric diatom.", habitats:["river"], obs:"micro", color:"brown", structure:"micro_single", keys:["diag:diatom_curved"]},
+  {name:"Cyclotella", image:"cyclotella.jpg", about:"Circular disc diatom.", habitats:["pond"], obs:"micro", color:"brown", structure:"micro_single", keys:["diag:diatom_circular"]},
+  {name:"Surirella", image:"surirella.jpg", about:"Ornate broad diatom frustule.", habitats:["pond","river"], obs:"micro", color:"brown", structure:"micro_single", keys:["diag:diatom_ornate"]},
+  {name:"Gomphonema", image:"gomphonema.jpg", about:"Club-shaped / wedge diatom.", habitats:["river"], obs:"micro", color:"brown", structure:"micro_single", keys:["diag:diatom_wedge"]},
+  {name:"Synedra", image:"synedra.jpg", about:"Rod-like diatom.", habitats:["river"], obs:"micro", color:"brown", structure:"micro_single", keys:["diag:diatom_rod"]},
+  {name:"Gyrosigma", image:"gyrosigma.jpg", about:"Broad sigmoid diatom.", habitats:["river","brackish"], obs:"micro", color:"brown", structure:"micro_single", keys:["diag:diatom_sigmoid_broad"]},
+  {name:"Pleurosigma", image:"pleurosigma.jpg", about:"Slender sigmoid diatom.", habitats:["brackish","marine"], obs:"micro", color:"brown", structure:"micro_single", keys:["diag:diatom_sigmoid_slender"]},
+  {name:"Noctiluca", image:"noctiluca.jpg", about:"Large bioluminescent marine plankton sphere.", habitats:["marine"], obs:"micro", color:"brown", structure:"micro_single", keys:["diag:noctiluca_glow"]},
+
+  {name:"Fragilaria", image:"fragilaria.jpg", about:"Chain-forming diatom.", habitats:["river","pond"], obs:"micro", color:"brown", structure:"micro_colony", keys:["diag:diatom_chain"]},
+  {name:"Tabellaria", image:"tabellaria.jpg", about:"Zig-zag chain diatom.", habitats:["river","pond"], obs:"micro", color:"brown", structure:"micro_colony", keys:["diag:diatom_zigzag"]},
+  {name:"Asterionella", image:"asterionella.jpg", about:"Star colony diatom.", habitats:["pond"], obs:"micro", color:"brown", structure:"micro_colony", keys:["diag:diatom_star_colony"]},
+  {name:"Melosira", image:"melosira.jpg", about:"Cylindrical chain diatom.", habitats:["pond","river"], obs:"micro", color:"brown", structure:"micro_colony", keys:["diag:diatom_cyl_chain"]},
+
+  // brown macro
+  {name:"Sargassum", image:"sargassum.jpg", about:"Brown seaweed with air bladders.", habitats:["marine"], obs:"macro", color:"brown", structure:"macro_branched", keys:["diag:brown_airbladder"]},
+  {name:"Turbinaria", image:"turbinaria.jpg", about:"Brown seaweed with cup-shaped blades.", habitats:["marine"], obs:"macro", color:"brown", structure:"macro_branched", keys:["diag:brown_cupblade"]},
+  {name:"Padina", image:"padina.jpg", about:"Fan-shaped calcified brown blade.", habitats:["marine"], obs:"macro", color:"brown", structure:"macro_sheet", keys:["diag:brown_fan"]},
+  {name:"Dictyota", image:"dictyota.jpg", about:"Flat ribbon-like forked blade.", habitats:["marine"], obs:"macro", color:"brown", structure:"macro_flatblade", keys:["diag:brown_ribbon"]},
+  {name:"Laminaria", image:"laminaria.jpg", about:"Large kelp-like brown blade.", habitats:["marine"], obs:"macro", color:"brown", structure:"macro_sheet", keys:["diag:brown_kelp"]},
+  {name:"Fucus", image:"fucus.jpg", about:"Leathery forked brown blade with midrib feel.", habitats:["marine"], obs:"macro", color:"brown", structure:"macro_sheet", keys:["diag:brown_leathery"]},
+  {name:"Dictyopteris", image:"dictyopteris.jpg", about:"Thin wing-like flat brown blade.", habitats:["marine"], obs:"macro", color:"brown", structure:"macro_flatblade", keys:["diag:brown_wing"]},
+  {name:"Colpomenia", image:"colpomenia.jpg", about:"Inflated bubble-like brown thallus.", habitats:["marine"], obs:"macro", color:"brown", structure:"macro_gelatinous", keys:["diag:brown_inflated"]},
+  {name:"Ectocarpus", image:"ectocarpus.jpg", about:"Fine soft brown branched filament.", habitats:["marine"], obs:"micro", color:"brown", structure:"micro_branched", keys:["diag:brown_soft_filament"]},
+  {name:"Sphacelaria", image:"sphacelaria.jpg", about:"Coarser tufted brown filament.", habitats:["marine"], obs:"micro", color:"brown", structure:"micro_branched", keys:["diag:brown_tufted_filament"]},
+
+  // red macro
+  {name:"Porphyra", image:"porphyra.jpg", about:"Thin red sheet-like blade.", habitats:["marine"], obs:"macro", color:"red", structure:"macro_sheet", keys:["diag:red_sheet"]},
+  {name:"Batrachospermum", image:"batrachospermum.jpg", about:"Bead-like gelatinous freshwater red alga.", habitats:["river"], obs:"macro", color:"red", structure:"macro_gelatinous", keys:["diag:red_beaded_jelly"]},
+  {name:"Gracilaria", image:"gracilaria.jpg", about:"Thick cylindrical red branches.", habitats:["marine"], obs:"macro", color:"red", structure:"macro_branched", keys:["diag:red_cylindrical"]},
+  {name:"Gelidium", image:"gelidium.jpg", about:"Flattened stiff red branches.", habitats:["marine"], obs:"macro", color:"red", structure:"macro_branched", keys:["diag:red_flattened"]},
+  {name:"Laurencia", image:"laurencia.jpg", about:"Dense bushy red tuft.", habitats:["marine"], obs:"macro", color:"red", structure:"macro_branched", keys:["diag:red_bushy"]},
+  {name:"Hypnea", image:"hypnea.jpg", about:"Hooked branch tips.", habitats:["marine"], obs:"macro", color:"red", structure:"macro_branched", keys:["diag:red_hooked"]},
+  {name:"Ceramium", image:"ceramium.jpg", about:"Forked red branch tips.", habitats:["marine"], obs:"macro", color:"red", structure:"macro_branched", keys:["diag:red_forked"]},
+  {name:"Acanthophora", image:"acanthophora.jpg", about:"Spiny red side branches.", habitats:["marine"], obs:"macro", color:"red", structure:"macro_branched", keys:["diag:red_spiny"]},
+  {name:"Corallina", image:"corallina.jpg", about:"Calcified articulated pink-red segments.", habitats:["marine"], obs:"macro", color:"red", structure:"macro_branched", keys:["diag:red_calcified"]},
+  {name:"Polysiphonia", image:"polysiphonia.jpg", about:"Fine hair-like red tuft.", habitats:["marine"], obs:"macro", color:"red", structure:"macro_branched", keys:["diag:red_hairlike"]}
+];
+
+const state = { step:-1, asked:0, tokens:[], trail:[], currentQuestion:null };
+const $ = id => document.getElementById(id);
+const stage = $("stage"), beginBtn = $("beginBtn"), resetBtn = $("resetBtn"),
+      msg = $("msg"), hint = $("hint"), trail = $("trail"), phase = $("phase"),
+      qCount = $("qCount"), signal = $("signal"), rightTitle = $("rightTitle"),
+      rightSub = $("rightSub"), timeHint = $("timeHint"), scan = $("scan");
+
+const hasToken = t => state.tokens.includes(t);
+const setMessage = (h,s="") => { msg.innerHTML = h; hint.innerHTML = s; };
+
+function safeImage(path){
+  return `<img class="preview" src="${path}" onerror="this.style.display='none'; this.parentElement.innerHTML='IMAGE';" alt="">`;
+}
+function showScan(){ scan.classList.remove("on"); void scan.offsetWidth; scan.classList.add("on"); }
+function addTrailTag(qid,label){ trail.classList.remove("hidden"); const t=document.createElement("div"); t.className="tag"; t.innerHTML=`<b>${qid}</b>: ${label}`; trail.appendChild(t);}
+function selectedObservation(){ return hasToken("observe:micro") ? "micro" : hasToken("observe:macro") ? "macro" : null; }
+
+function openColorHelp(){
+  const mode = selectedObservation()==="micro" ? "micro" : "macro";
+  const items = COLOR_HELP[mode];
+  const base = mode==="micro" ? PATHS.helpMicro : PATHS.helpMacro;
+  return `<div class="helpPanel"><div class="helpHd"><div><b>Unsure about the color?</b></div><div class="small">${mode==="micro"?"Microscopic examples":"Macroscopic examples"}</div></div><div class="helpBd"><div class="helpGrid">${items.map(item=>`<div class="opt"><div class="img">${safeImage(base+item.img)}</div><div class="lb">${item.name}</div></div>`).join("")}</div></div></div>`;
+}
+
+const QUESTIONS = [
+  {id:"habitat", kind:"image", title:"Where did you collect it?", getAnswers:()=>[
+    {label:"Pond / stagnant freshwater", token:"habitat:pond", img:PATHS.habitat+"habitat_pond.jpg"},
+    {label:"River / stream", token:"habitat:river", img:PATHS.habitat+"habitat_river.jpg"},
+    {label:"Sewage / drain", token:"habitat:sewage", img:PATHS.habitat+"habitat_sewage.jpg"},
+    {label:"Backwater / estuary", token:"habitat:brackish", img:PATHS.habitat+"habitat_brackish.jpg"},
+    {label:"Sea / marine", token:"habitat:marine", img:PATHS.habitat+"habitat_marine.jpg"},
+    {label:"Wet soil / rock surface", token:"habitat:soil", img:PATHS.habitat+"habitat_wet_soil.jpg"}
+  ]},
+  {id:"observe", kind:"image", title:"How are you observing the algae?", getAnswers:()=>[
+    {label:"Microscopic", token:"observe:micro", subhint:"I am using a microscope", img:PATHS.visibility+"visibility_microscopic.jpg"},
+    {label:"Macroscopic", token:"observe:macro", subhint:"I am observing with the naked eye / no microscope", img:PATHS.visibility+"visibility_macro.jpg"}
+  ]},
+  {id:"color", kind:"color", title:"What is the dominant color of the algae?", getAnswers:()=>[
+    {label:"Green", token:"color:green", colorClass:"green"},
+    {label:"Blue-Green", token:"color:cyanobacteria", colorClass:"bluegreen"},
+    {label:"Brown / Golden", token:"color:brown", colorClass:"brown"},
+    {label:"Red", token:"color:red", colorClass:"red"},
+    {label:"Yellow-Green", token:"color:yellowgreen", colorClass:"yellowgreen"}
+  ]},
+  {id:"structureMicro", kind:"image", showIf:()=>selectedObservation()==="micro", title:"Microscopic — what is the cell arrangement?", getAnswers:()=>[
+    {label:"Single cell", token:"structure:micro_single", img:PATHS.structure+"structure_singlecell.jpg"},
+    {label:"Filament", token:"structure:micro_filament", img:PATHS.structure+"structure_filament.jpg"},
+    {label:"Branched filament", token:"structure:micro_branched", img:PATHS.structure+"structure_branching.jpg"},
+    {label:"Colony", token:"structure:micro_colony", img:PATHS.structure+"structure_colony.jpg"}
+  ]},
+  {id:"structureMacro", kind:"image", showIf:()=>selectedObservation()==="macro", title:"Macroscopic — how does the algae look?", getAnswers:()=>[
+    {label:"Filamentous mass", token:"structure:macro_filament", img:PATHS.macroStructure+"macro_filament.jpg"},
+    {label:"Sheet / blade", token:"structure:macro_sheet", img:PATHS.macroStructure+"macro_sheet.jpg"},
+    {label:"Flat blade / forked blade", token:"structure:macro_flatblade", img:PATHS.diagnosticMacro+"diag_brown_ribbon_blade.jpg"},
+    {label:"Branched / bushy", token:"structure:macro_branched", img:PATHS.macroStructure+"macro_branched.jpg"},
+    {label:"Gelatinous mass", token:"structure:macro_gelatinous", img:PATHS.macroStructure+"macro_gelatinous.jpg"}
+  ]},
+
+  // MICRO diagnostic keys
+  {id:"diagSingleGreen", kind:"image", showIf:()=>hasToken("observe:micro")&&hasToken("color:green")&&hasToken("structure:micro_single"), title:"Single-cell green algae — which cell shape matches best?", getAnswers:()=>[
+    {label:"Spherical / globular cell", token:"diag:cell_spherical", img:PATHS.diagnosticMicro+"diag_cell_spherical.jpg"},
+    {label:"Pear / oval cell", token:"diag:cell_pear", img:PATHS.diagnosticMicro+"diag_cell_pear.jpg"},
+    {label:"Crescent / banana-shaped cell", token:"diag:cell_crescent", img:PATHS.diagnosticMicro+"diag_cell_crescent.jpg"},
+    {label:"Two equal semicells joined in the middle", token:"diag:cell_two_semicells", img:PATHS.diagnosticMicro+"diag_cell_two_semicells.jpg"},
+    {label:"Star-shaped cell with arms", token:"diag:cell_star", img:PATHS.diagnosticMicro+"diag_cell_star.jpg"}
+  ]},
+  {id:"diagColonyGreen", kind:"image", showIf:()=>hasToken("observe:micro")&&hasToken("color:green")&&hasToken("structure:micro_colony"), title:"Green colony — which colony form matches best?", getAnswers:()=>[
+    {label:"Large hollow spherical colony", token:"diag:colony_spherical_large", img:PATHS.diagnosticMicro+"diag_colony_spherical.jpg"},
+    {label:"Small spherical colony", token:"diag:colony_spherical_small", img:PATHS.diagnosticMicro+"diag_colony_spherical.jpg"},
+    {label:"Medium spherical colony", token:"diag:colony_spherical_medium", img:PATHS.diagnosticMicro+"diag_colony_spherical.jpg"},
+    {label:"Flat plate colony", token:"diag:colony_flat_plate", img:PATHS.diagnosticMicro+"diag_colony_flat_plate.jpg"},
+    {label:"Net colony", token:"diag:colony_net", img:PATHS.diagnosticMicro+"diag_colony_net.jpg"},
+    {label:"Disc / star colony", token:"diag:colony_disc", img:PATHS.diagnosticMicro+"diag_colony_disc.jpg"},
+    {label:"Row colony", token:"diag:colony_row", img:PATHS.diagnosticMicro+"diag_colony_row.jpg"},
+    {label:"Loose gelatinous colony", token:"diag:colony_loose", img:null},
+    {label:"Gelatinous clustered colony", token:"diag:colony_clustered", img:null}
+  ]},
+  {id:"diagFilamentGreen", kind:"image", showIf:()=>hasToken("observe:micro")&&hasToken("color:green")&&hasToken("structure:micro_filament"), title:"Green filament — which diagnostic feature can you confirm?", getAnswers:()=>[
+    {label:"Spiral chloroplast", token:"diag:chloro_spiral", img:PATHS.diagnosticMicro+"diag_chloro_spiral.jpg"},
+    {label:"Star-shaped chloroplast", token:"diag:chloro_star", img:PATHS.diagnosticMicro+"diag_chloro_star.jpg"},
+    {label:"Plate / ribbon-like chloroplast", token:"diag:chloro_plate", img:PATHS.diagnosticMicro+"diag_chloro_plate.jpg"},
+    {label:"Cap cells visible", token:"diag:filament_capcells", img:null},
+    {label:"Basal holdfast cell", token:"diag:filament_holdfast", img:null}
+  ]},
+  {id:"diagBranchedGreen", kind:"image", showIf:()=>hasToken("observe:micro")&&hasToken("color:green")&&hasToken("structure:micro_branched"), title:"Branched green filament — which branch pattern matches best?", getAnswers:()=>[
+    {label:"Coarse bushy branching", token:"diag:branch_coarse", img:null},
+    {label:"Hair-like terminal tips", token:"diag:branch_hairtips", img:null},
+    {label:"Irregular branching network", token:"diag:branch_irregular", img:null}
+  ]},
+
+  {id:"diagCyanoFilament", kind:"image", showIf:()=>hasToken("observe:micro")&&hasToken("color:cyanobacteria")&&hasToken("structure:micro_filament"), title:"Blue-green filament — which clue matches best?", getAnswers:()=>[
+    {label:"Spiral / helical filament", token:"diag:cyano_spiral", img:null},
+    {label:"Gliding straight filament", token:"diag:cyano_gliding", img:PATHS.diagnosticMicro+"diag_cyano_gliding.jpg"},
+    {label:"Thick sheathed filament", token:"diag:cyano_sheath", img:PATHS.diagnosticMicro+"diag_cyano_non_gliding.jpg"},
+    {label:"Bead-like filament with heterocysts", token:"diag:cyano_heterocyst_chain", img:PATHS.diagnosticMicro+"diag_cyano_heterocyst.jpg"},
+    {label:"Bundles of filaments with heterocysts", token:"diag:cyano_heterocyst_bundle", img:PATHS.diagnosticMicro+"diag_cyano_heterocyst.jpg"}
+  ]},
+  {id:"diagCyanoColony", kind:"image", showIf:()=>hasToken("observe:micro")&&hasToken("color:cyanobacteria")&&hasToken("structure:micro_colony"), title:"Blue-green colony — which form matches best?", getAnswers:()=>[
+    {label:"Microscopic gelatinous packets", token:"diag:cyano_packets", img:null}
+  ]},
+  {id:"diagCyanoBranched", kind:"image", showIf:()=>hasToken("observe:micro")&&hasToken("color:cyanobacteria")&&hasToken("structure:micro_branched"), title:"Branched blue-green form — which pattern matches best?", getAnswers:()=>[
+    {label:"Radiating tufted colony", token:"diag:cyano_radiating", img:null},
+    {label:"Tapering attached filament", token:"diag:cyano_tapering", img:null},
+    {label:"False branching network", token:"diag:cyano_falsebranch", img:null}
+  ]},
+  {id:"diagDiatomSingle", kind:"image", showIf:()=>hasToken("observe:micro")&&hasToken("color:brown")&&hasToken("structure:micro_single"), title:"Brown / golden microscopic single cell — which shape matches best?", getAnswers:()=>[
+    {label:"Boat-shaped frustule", token:"diag:diatom_boat", img:PATHS.diagnosticMicro+"diag_diatom_frustule.jpg"},
+    {label:"Broad oval frustule", token:"diag:diatom_oval", img:PATHS.diagnosticMicro+"diag_diatom_frustule.jpg"},
+    {label:"Needle-like frustule", token:"diag:diatom_needle", img:PATHS.diagnosticMicro+"diag_diatom_frustule.jpg"},
+    {label:"Curved asymmetric frustule", token:"diag:diatom_curved", img:PATHS.diagnosticMicro+"diag_diatom_frustule.jpg"},
+    {label:"Circular disc frustule", token:"diag:diatom_circular", img:PATHS.diagnosticMicro+"diag_diatom_frustule.jpg"},
+    {label:"Ornate broad frustule", token:"diag:diatom_ornate", img:PATHS.diagnosticMicro+"diag_diatom_frustule.jpg"},
+    {label:"Wedge / club-shaped frustule", token:"diag:diatom_wedge", img:PATHS.diagnosticMicro+"diag_diatom_frustule.jpg"},
+    {label:"Long rod-like frustule", token:"diag:diatom_rod", img:PATHS.diagnosticMicro+"diag_diatom_frustule.jpg"},
+    {label:"Broad sigmoid frustule", token:"diag:diatom_sigmoid_broad", img:PATHS.diagnosticMicro+"diag_diatom_frustule.jpg"},
+    {label:"Slender sigmoid frustule", token:"diag:diatom_sigmoid_slender", img:PATHS.diagnosticMicro+"diag_diatom_frustule.jpg"},
+    {label:"Large round bioluminescent plankton cell", token:"diag:noctiluca_glow", img:null}
+  ]},
+  {id:"diagDiatomColony", kind:"image", showIf:()=>hasToken("observe:micro")&&hasToken("color:brown")&&hasToken("structure:micro_colony"), title:"Brown / golden colony — which form matches best?", getAnswers:()=>[
+    {label:"Chain colony", token:"diag:diatom_chain", img:null},
+    {label:"Zig-zag colony", token:"diag:diatom_zigzag", img:null},
+    {label:"Star colony", token:"diag:diatom_star_colony", img:null},
+    {label:"Cylindrical chain", token:"diag:diatom_cyl_chain", img:null}
+  ]},
+  {id:"diagBrownMicroBranched", kind:"image", showIf:()=>hasToken("observe:micro")&&hasToken("color:brown")&&hasToken("structure:micro_branched"), title:"Brown microscopic branched form — which best matches?", getAnswers:()=>[
+    {label:"Fine soft branched filament", token:"diag:brown_soft_filament", img:null},
+    {label:"Coarse tufted branched filament", token:"diag:brown_tufted_filament", img:null}
+  ]},
+  {id:"diagYellow", kind:"image", showIf:()=>hasToken("color:yellowgreen"), title:"Yellow-green algae — which form matches best?", getAnswers:()=>{
+    const arr = [];
+    if(hasToken("observe:micro") && hasToken("structure:micro_filament")) arr.push(
+      {label:"Yellow-green filament", token:"diag:yellow_filament", img:null},
+      {label:"Siphonous / coenocytic filament", token:"diag:yellow_siphonous", img:null}
+    );
+    if(hasToken("observe:micro") && hasToken("structure:micro_branched")) arr.push(
+      {label:"Branched microscopic yellow-green form", token:"diag:yellow_branched", img:null}
+    );
+    if(hasToken("observe:macro") && hasToken("structure:macro_gelatinous")) arr.push(
+      {label:"Bubble-like vesicle on wet soil", token:"diag:yellow_vesicle", img:null}
+    );
+    return arr;
+  }},
+
+  // MACRO diagnostic keys
+  {id:"diagMacroGreenSheet", kind:"image", showIf:()=>hasToken("observe:macro")&&hasToken("color:green")&&hasToken("structure:macro_sheet"), title:"Green macro sheet — which body form matches best?", getAnswers:()=>[
+    {label:"Flat blade / sheet", token:"diag:green_flat_sheet", img:null},
+    {label:"Hollow tube / tubular sheet", token:"diag:green_tubular_sheet", img:null}
+  ]},
+  {id:"diagMacroGreenBranched", kind:"image", showIf:()=>hasToken("observe:macro")&&hasToken("color:green")&&hasToken("structure:macro_branched"), title:"Green macro branched algae — which form matches best?", getAnswers:()=>[
+    {label:"Feather-like fronds", token:"diag:green_feather", img:null},
+    {label:"Spongy thick branches", token:"diag:green_spongy", img:null},
+    {label:"Calcified segmented body", token:"diag:green_calcified", img:null},
+    {label:"Fine feathery tuft", token:"diag:green_feathery_tuft", img:null},
+    {label:"Stiff plant-like body", token:"diag:chara_stiff", img:null},
+    {label:"Soft delicate body", token:"diag:chara_delicate", img:null}
+  ]},
+  {id:"diagMacroGreenGel", kind:"image", showIf:()=>hasToken("observe:macro")&&hasToken("color:green")&&hasToken("structure:macro_gelatinous"), title:"Green macro gelatinous form — which matches best?", getAnswers:()=>[
+    {label:"Single bubble-like green vesicle", token:"diag:green_bubble", img:null}
+  ]},
+  {id:"diagBrownBranched", kind:"image", showIf:()=>hasToken("observe:macro")&&hasToken("color:brown")&&hasToken("structure:macro_branched"), title:"Brown branched seaweed — which clue matches best?", getAnswers:()=>[
+    {label:"Gas bladders / air vesicles", token:"diag:brown_airbladder", img:null},
+    {label:"Cup-shaped blades", token:"diag:brown_cupblade", img:null}
+  ]},
+  {id:"diagBrownSheet", kind:"image", showIf:()=>hasToken("observe:macro")&&hasToken("color:brown")&&(hasToken("structure:macro_sheet")||hasToken("structure:macro_flatblade")), title:"Brown blade seaweed — which blade form matches best?", getAnswers:()=>[
+    {label:"Fan-shaped blade", token:"diag:brown_fan", img:PATHS.diagnosticMacro+"diag_brown_fan_blade.jpg"},
+    {label:"Ribbon-like flat blade", token:"diag:brown_ribbon", img:PATHS.diagnosticMacro+"diag_brown_ribbon_blade.jpg"},
+    {label:"Large kelp blade", token:"diag:brown_kelp", img:PATHS.diagnosticMacro+"diag_brown_kelp_blade.jpg"},
+    {label:"Leathery forked blade", token:"diag:brown_leathery", img:null},
+    {label:"Thin wing-like flat blade", token:"diag:brown_wing", img:null}
+  ]},
+  {id:"diagBrownGel", kind:"image", showIf:()=>hasToken("observe:macro")&&hasToken("color:brown")&&hasToken("structure:macro_gelatinous"), title:"Brown gelatinous seaweed — which form matches best?", getAnswers:()=>[
+    {label:"Inflated bubble-like thallus", token:"diag:brown_inflated", img:null}
+  ]},
+  {id:"diagRedSheet", kind:"image", showIf:()=>hasToken("observe:macro")&&hasToken("color:red")&&hasToken("structure:macro_sheet"), title:"Red macro sheet — which matches best?", getAnswers:()=>[
+    {label:"Thin red sheet / blade", token:"diag:red_sheet", img:null}
+  ]},
+  {id:"diagRedGel", kind:"image", showIf:()=>hasToken("observe:macro")&&hasToken("color:red")&&hasToken("structure:macro_gelatinous"), title:"Red gelatinous form — which matches best?", getAnswers:()=>[
+    {label:"Bead-like gelatinous red branches", token:"diag:red_beaded_jelly", img:null}
+  ]},
+  {id:"diagRedBranched", kind:"image", showIf:()=>hasToken("observe:macro")&&hasToken("color:red")&&hasToken("structure:macro_branched"), title:"Red branched seaweed — which branch form matches best?", getAnswers:()=>[
+    {label:"Cylindrical thick branches", token:"diag:red_cylindrical", img:PATHS.diagnosticMacro+"diag_red_cylindrical_branch.jpg"},
+    {label:"Flattened stiff branches", token:"diag:red_flattened", img:PATHS.diagnosticMacro+"diag_red_flattened_branch.jpg"},
+    {label:"Dense bushy short branches", token:"diag:red_bushy", img:null},
+    {label:"Hooked branch tips", token:"diag:red_hooked", img:null},
+    {label:"Forked branch tips", token:"diag:red_forked", img:null},
+    {label:"Spiny side branches", token:"diag:red_spiny", img:null},
+    {label:"Calcified articulated segments", token:"diag:red_calcified", img:null},
+    {label:"Fine hair-like red tuft", token:"diag:red_hairlike", img:null}
+  ]}
+];
+
+function openColorHelp(){
+  const mode = selectedObservation()==="micro" ? "micro" : "macro";
+  const items = COLOR_HELP[mode];
+  const base = mode==="micro" ? PATHS.helpMicro : PATHS.helpMacro;
+  return `<div class="helpPanel"><div class="helpHd"><div><b>Unsure about the color?</b></div><div class="small">${mode==="micro"?"Microscopic examples":"Macroscopic examples"}</div></div><div class="helpBd"><div class="helpGrid">${items.map(item=>`<div class="opt"><div class="img">${safeImage(base+item.img)}</div><div class="lb">${item.name}</div></div>`).join("")}</div></div></div>`;
+}
+
+function nextQuestionIndex(fromIdx){
+  let idx = fromIdx + 1;
+  while(idx < QUESTIONS.length){
+    const q = QUESTIONS[idx];
+    if(!q.showIf || q.showIf(state)) return idx;
+    idx++;
+  }
+  return -1;
+}
+
+function renderImageOptions(q){
+  const answers = q.getAnswers();
+  return `<div class="qTitle">${q.title}</div><div class="options">${answers.map((a,i)=>`<div class="opt" data-answer-index="${i}"><div class="img">${a.img ? safeImage(a.img) : q.kind==='image' ? 'NO IMAGE' : ''}</div><div class="lb">${a.label}</div>${a.subhint?`<div class="subhint">${a.subhint}</div>`:''}</div>`).join("")}</div><div class="divider"></div><div class="small">Select the closest match based on what you are observing.</div>`;
+}
+function renderColorOptions(q){
+  const answers=q.getAnswers();
+  return `<div class="qTitle">${q.title}</div><div class="colorGrid">${answers.map((a,i)=>`<div class="colorCard ${a.colorClass}" data-answer-index="${i}"><div class="label">${a.label}</div></div>`).join("")}</div><div class="actions" style="margin-top:12px"><button class="btn ghost" id="toggleColorHelp">Unsure about the color? Click here</button></div><div id="colorHelpMount"></div><div class="divider"></div><div class="small">Choose the dominant visible color, not a mixed background color.</div>`;
+}
+function bindQuestionEvents(q){
+  const answers=q.getAnswers();
+  stage.querySelectorAll("[data-answer-index]").forEach(node=>node.addEventListener("click",()=>chooseAnswer(q,answers[Number(node.getAttribute("data-answer-index"))],node)));
+  const toggle=$("toggleColorHelp");
+  if(toggle){ let open=false; toggle.addEventListener("click",()=>{$("colorHelpMount").innerHTML=(open=!open)?openColorHelp():"";});}
+}
+
+function renderQuestion(){
+  const idx = nextQuestionIndex(state.step);
+  if(idx===-1 || state.asked>=12) return startMorphologyScan();
+  state.step = idx;
+  state.asked++;
+  phase.textContent="Questioning";
+  qCount.textContent=String(state.asked);
+  signal.textContent="Scanning";
+  rightTitle.textContent="Question Console";
+  rightSub.textContent="Select the closest match";
+  const q=QUESTIONS[idx];
+  state.currentQuestion=q;
+  if(state.asked===1){setMessage("Signal acquired. Begin classification.","Anchor habitat first. This removes many false matches.");}
+  else if(state.asked===3){setMessage("Class narrowing in progress…","Good. The candidate space is shrinking.");}
+  else if(state.asked>=5){setMessage("We’re getting close.","The structure path is now narrowing your algae strongly.");}
+  stage.innerHTML = q.kind==="color" ? renderColorOptions(q) : renderImageOptions(q);
+  bindQuestionEvents(q);
+  showScan();
+}
+
+function chooseAnswer(q,a,node){
+  if(node) node.classList.add("selected");
+  signal.textContent="Locking";
+  state.tokens.push(a.token);
+  state.trail.push({q:q.id,a:a.label});
+  addTrailTag(q.id,a.label);
+  setTimeout(()=>{ signal.textContent="Scanning"; renderQuestion(); }, 220);
+}
+
+function speciesPassesHardFilters(sp){
+  const obs = selectedObservation();
+  if(obs && sp.obs !== obs) return false;
+
+  const color = hasToken("color:green") ? "green" :
+                hasToken("color:cyanobacteria") ? "cyanobacteria" :
+                hasToken("color:brown") ? "brown" :
+                hasToken("color:red") ? "red" :
+                hasToken("color:yellowgreen") ? "yellowgreen" : null;
+  if(color && sp.color !== color) return false;
+
+  const structure =
+    hasToken("structure:micro_single") ? "micro_single" :
+    hasToken("structure:micro_filament") ? "micro_filament" :
+    hasToken("structure:micro_branched") ? "micro_branched" :
+    hasToken("structure:micro_colony") ? "micro_colony" :
+    hasToken("structure:macro_filament") ? "macro_filament" :
+    hasToken("structure:macro_sheet") ? "macro_sheet" :
+    hasToken("structure:macro_flatblade") ? "macro_flatblade" :
+    hasToken("structure:macro_branched") ? "macro_branched" :
+    hasToken("structure:macro_gelatinous") ? "macro_gelatinous" : null;
+  if(structure && sp.structure !== structure) return false;
+
+  const habitat = hasToken("habitat:pond") ? "pond" :
+                  hasToken("habitat:river") ? "river" :
+                  hasToken("habitat:sewage") ? "sewage" :
+                  hasToken("habitat:brackish") ? "brackish" :
+                  hasToken("habitat:marine") ? "marine" :
+                  hasToken("habitat:soil") ? "soil" : null;
+  if(habitat && !sp.habitats.includes(habitat)) return false;
+
+  return true;
+}
+
+function tokenExplain(tok){
+  const map = {
+    "diag:cell_spherical":"Cell shape: spherical / globular",
+    "diag:cell_pear":"Cell shape: pear / oval",
+    "diag:cell_crescent":"Cell shape: crescent",
+    "diag:cell_two_semicells":"Cell shape: two semicells joined",
+    "diag:cell_star":"Cell shape: star-like",
+    "diag:colony_flat_plate":"Colony form: flat plate",
+    "diag:colony_net":"Colony form: net",
+    "diag:colony_disc":"Colony form: disc / star",
+    "diag:colony_row":"Colony form: row colony",
+    "diag:chloro_spiral":"Chloroplast: spiral",
+    "diag:chloro_star":"Chloroplast: star",
+    "diag:chloro_plate":"Chloroplast: plate-like",
+    "diag:brown_fan":"Blade form: fan-shaped",
+    "diag:brown_ribbon":"Blade form: ribbon-like",
+    "diag:brown_kelp":"Blade form: kelp-like",
+    "diag:red_cylindrical":"Branch form: cylindrical",
+    "diag:red_flattened":"Branch form: flattened"
+  };
+  return map[tok] || tok.replace(/^diag:/,'Key: ').replaceAll('_',' ');
+}
+
+function computeTop3(){
+  const candidates = SPECIES.filter(speciesPassesHardFilters);
+  const scored = candidates.map(sp=>{
+    let score = 0;
+    if(hasToken("habitat:pond") && sp.habitats.includes("pond")) score += 2;
+    if(hasToken("habitat:river") && sp.habitats.includes("river")) score += 2;
+    if(hasToken("habitat:sewage") && sp.habitats.includes("sewage")) score += 2;
+    if(hasToken("habitat:brackish") && sp.habitats.includes("brackish")) score += 2;
+    if(hasToken("habitat:marine") && sp.habitats.includes("marine")) score += 2;
+    if(hasToken("habitat:soil") && sp.habitats.includes("soil")) score += 2;
+
+    if((hasToken("observe:micro") && sp.obs==="micro") || (hasToken("observe:macro")&& sp.obs==="macro")) score += 2;
+    if(hasToken(`color:${sp.color==="cyanobacteria"?"cyanobacteria":sp.color}`)) score += 2;
+    if(hasToken(`structure:${sp.structure}`)) score += 2;
+
+    sp.keys.forEach(k=>{ if(hasToken(k)) score += 8; });
+
+    return {...sp, score};
+  }).sort((a,b)=> b.score-a.score || a.name.localeCompare(b.name));
+
+  const top = scored.slice(0,3);
+  const max = top[0]?.score || 1;
+  return top.map(s=>({...s, conf:Math.max(0.25, Math.min(0.98, s.score/max))}));
+}
+
+function renderSpeciesThumb(filename){
+  return `<div class="speciesThumb"><img src="${PATHS.species+filename}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" alt=""><div class="ph" style="display:none">SPECIES</div></div>`;
+}
+
+function startMorphologyScan(){
+  phase.textContent="Analysis";
+  signal.textContent="Processing";
+  rightTitle.textContent="Morphology Scan";
+  rightSub.textContent="Cross-checking your answers";
+  setMessage("Running <b>Morphology Scan</b>…","Astrael is applying habitat lock, observation lock, color lock, structure lock, and morphology-key scoring.");
+  stage.innerHTML = `<div class="morphBox">
+      <div class="qTitle">Morphology Scan</div>
+      <div class="small">Please wait while the identifier cross-checks your answers.</div>
+      <div class="divider"></div>
+      <div class="morphStep"><b>1. Habitat filter</b><span class="morphState" id="ms1">Queued</span></div>
+      <div class="morphStep"><b>2. Observation lock</b><span class="morphState" id="ms2">Queued</span></div>
+      <div class="morphStep"><b>3. Color lock</b><span class="morphState" id="ms3">Queued</span></div>
+      <div class="morphStep"><b>4. Structure lock</b><span class="morphState" id="ms4">Queued</span></div>
+      <div class="morphStep"><b>5. Morphology-key weighting</b><span class="morphState" id="ms5">Queued</span></div>
+      <div class="morphStep"><b>6. Confidence synthesis</b><span class="morphState" id="ms6">Queued</span></div>
+    </div>`;
+  showScan();
+  ["ms1","ms2","ms3","ms4","ms5","ms6"].forEach((id,i)=>setTimeout(()=>{const el=$(id); if(el) el.textContent="Complete";}, 220*(i+1)));
+  setTimeout(renderResults, 1600);
+}
+
+function renderResults(){
+  phase.textContent="Result";
+  signal.textContent="Complete";
+  rightTitle.textContent="Astrael Result";
+  rightSub.textContent="Top-3 probable matches";
+  const top3 = computeTop3();
+  if(top3.length===0){
+    stage.innerHTML = `<div class="qTitle">No confident match</div><div class="small">Try a clearer path or verify the observation method, color, and structure again.</div>`;
+    setMessage("I need one clearer clue to lock the identification.","Reset and answer again. The filters are active, so one wrong early answer can remove the true group.");
+    return;
+  }
+  const matched = state.tokens.filter(t=>t.startsWith("diag:") || t.startsWith("habitat:") || t.startsWith("color:") || t.startsWith("structure:")).slice(0,8);
+  setMessage(`Identification complete. <b>The closest current match is</b> <span style="color:var(--cyan)">${top3[0].name}</span>.`, `Top-3 provided for reliability. Hard locks prevented wrong color and wrong structure species from appearing.`);
+  stage.innerHTML = `<div class="qTitle">Top-3 matches</div><div class="small">Ranked by biological locks + morphology-key similarity.</div>
+    ${top3.map((r,i)=>`<div class="resultCard"><div class="resultRow">${renderSpeciesThumb(r.image)}<div style="flex:1"><div class="rTop"><div class="rName">${i+1}. ${r.name}</div><div class="small">${Math.round(r.conf*100)}%</div></div><div class="bar"><i style="width:${Math.round(r.conf*100)}%"></i></div><div class="rMeta">${r.about}</div></div></div></div>`).join("")}
+    <div class="confidenceBox"><h3>Confidence Explanation</h3><div class="small" style="margin-bottom:10px">These matched features drove the result ranking.</div><div class="checks">${matched.map(text=>`<div class="check"><b>✓</b> ${tokenExplain(text)}</div>`).join("")}</div></div>
+    <div class="divider"></div><div class="small">Archive linking can be added next by mapping each result name to your archive page.</div>`;
+  showScan();
+}
+
+function resetAll(){
+  state.step=-1; state.asked=0; state.tokens=[]; state.trail=[]; state.currentQuestion=null;
+  stage.innerHTML=""; trail.innerHTML=""; trail.classList.add("hidden");
+  phase.textContent="Welcome"; qCount.textContent="0"; signal.textContent="Idle";
+  rightTitle.textContent="Question Console"; rightSub.textContent="Awaiting user input"; timeHint.textContent="Protocol standby";
+  setMessage("Welcome. Initiating <b>Morphology Protocol</b>. Answer a few questions and I’ll return the most probable algae.","The UI is preserved. This version uses the two-way structure system, hard color/structure locks, diagnostic cards, morphology scan, and confidence explanation.");
+  beginBtn.classList.remove("hidden"); resetBtn.classList.add("hidden");
+}
+
+beginBtn.onclick=()=>{ beginBtn.classList.add("hidden"); resetBtn.classList.remove("hidden"); timeHint.textContent="Protocol active"; setMessage("Initiating scan…","Select the first option to anchor habitat."); renderQuestion(); };
+resetBtn.onclick=resetAll;
+
+(function tryLoadVixen(){
+  const img=document.getElementById("vixenImg"), ph=document.getElementById("vixenPh");
+  const test=new Image();
+  test.onload=()=>{img.src=PATHS.ui+"vixen.png"; img.style.display="block"; ph.style.display="none";};
+  test.onerror=()=>{};
+  test.src=PATHS.ui+"vixen.png";
+})();
+
+resetAll();
+</script>
+
+<script>
+/* ===== ASTRAEL TOKEN-BASED TEST RUNNER =====
+   Open DevTools Console and run:
+   runAstraelTests()
+*/
+
+const ASTRAEL_TESTS = [
+  {species:"Cosmarium", path:["habitat:pond","observe:micro","color:green","structure:micro_single","diag:cell_two_semicells"]},
+  {species:"Chlorella", path:["habitat:pond","observe:micro","color:green","structure:micro_single","diag:cell_spherical"]},
+  {species:"Chlamydomonas", path:["habitat:pond","observe:micro","color:green","structure:micro_single","diag:cell_pear"]},
+  {species:"Closterium", path:["habitat:pond","observe:micro","color:green","structure:micro_single","diag:cell_crescent"]},
+  {species:"Staurastrum", path:["habitat:pond","observe:micro","color:green","structure:micro_single","diag:cell_star"]},
+
+  {species:"Spirogyra", path:["habitat:pond","observe:micro","color:green","structure:micro_filament","diag:chloro_spiral"]},
+  {species:"Zygnema", path:["habitat:pond","observe:micro","color:green","structure:micro_filament","diag:chloro_star"]},
+  {species:"Mougeotia", path:["habitat:pond","observe:micro","color:green","structure:micro_filament","diag:chloro_plate"]},
+  {species:"Ulothrix", path:["habitat:river","observe:micro","color:green","structure:micro_filament","diag:filament_holdfast"]},
+  {species:"Oedogonium", path:["habitat:pond","observe:micro","color:green","structure:micro_filament","diag:filament_capcells"]},
+
+  {species:"Pediastrum", path:["habitat:pond","observe:micro","color:green","structure:micro_colony","diag:colony_disc"]},
+  {species:"Hydrodictyon", path:["habitat:pond","observe:micro","color:green","structure:micro_colony","diag:colony_net"]},
+  {species:"Scenedesmus", path:["habitat:pond","observe:micro","color:green","structure:micro_colony","diag:colony_row"]},
+  {species:"Gonium", path:["habitat:pond","observe:micro","color:green","structure:micro_colony","diag:colony_flat_plate"]},
+  {species:"Pandorina", path:["habitat:pond","observe:micro","color:green","structure:micro_colony","diag:colony_spherical_small"]},
+  {species:"Eudorina", path:["habitat:pond","observe:micro","color:green","structure:micro_colony","diag:colony_spherical_medium"]},
+  {species:"Volvox", path:["habitat:pond","observe:micro","color:green","structure:micro_colony","diag:colony_spherical_large"]},
+
+  {species:"Ulva", path:["habitat:marine","observe:macro","color:green","structure:macro_sheet","diag:green_flat_sheet"]},
+  {species:"Enteromorpha", path:["habitat:marine","observe:macro","color:green","structure:macro_sheet","diag:green_tubular_sheet"]},
+  {species:"Caulerpa", path:["habitat:marine","observe:macro","color:green","structure:macro_branched","diag:green_feather"]},
+  {species:"Codium", path:["habitat:marine","observe:macro","color:green","structure:macro_branched","diag:green_spongy"]},
+  {species:"Halimeda", path:["habitat:marine","observe:macro","color:green","structure:macro_branched","diag:green_calcified"]},
+  {species:"Bryopsis", path:["habitat:marine","observe:macro","color:green","structure:macro_branched","diag:green_feathery_tuft"]},
+  {species:"Ventricaria", path:["habitat:marine","observe:macro","color:green","structure:macro_gelatinous","diag:green_bubble"]},
+
+  {species:"Oscillatoria", path:["habitat:pond","observe:micro","color:cyanobacteria","structure:micro_filament","diag:cyano_gliding"]},
+  {species:"Spirulina", path:["habitat:pond","observe:micro","color:cyanobacteria","structure:micro_filament","diag:cyano_spiral"]},
+  {species:"Lyngbya", path:["habitat:pond","observe:micro","color:cyanobacteria","structure:micro_filament","diag:cyano_sheath"]},
+  {species:"Anabaena", path:["habitat:pond","observe:micro","color:cyanobacteria","structure:micro_filament","diag:cyano_heterocyst_chain"]},
+  {species:"Aphanizomenon", path:["habitat:pond","observe:micro","color:cyanobacteria","structure:micro_filament","diag:cyano_heterocyst_bundle"]},
+  {species:"Nostoc", path:["habitat:pond","observe:macro","color:cyanobacteria","structure:macro_gelatinous","diag:cyano_jelly"]},
+  {species:"Microcystis", path:["habitat:pond","observe:macro","color:cyanobacteria","structure:macro_gelatinous","diag:cyano_bloom"]},
+  {species:"Gloeocapsa", path:["habitat:soil","observe:micro","color:cyanobacteria","structure:micro_colony","diag:cyano_packets"]},
+
+  {species:"Navicula", path:["habitat:river","observe:micro","color:brown","structure:micro_single","diag:diatom_boat"]},
+  {species:"Pinnularia", path:["habitat:river","observe:micro","color:brown","structure:micro_single","diag:diatom_oval"]},
+  {species:"Nitzschia", path:["habitat:river","observe:micro","color:brown","structure:micro_single","diag:diatom_needle"]},
+  {species:"Cymbella", path:["habitat:river","observe:micro","color:brown","structure:micro_single","diag:diatom_curved"]},
+  {species:"Cyclotella", path:["habitat:pond","observe:micro","color:brown","structure:micro_single","diag:diatom_circular"]},
+  {species:"Noctiluca", path:["habitat:marine","observe:micro","color:brown","structure:micro_single","diag:noctiluca_glow"]},
+
+  {species:"Sargassum", path:["habitat:marine","observe:macro","color:brown","structure:macro_branched","diag:brown_airbladder"]},
+  {species:"Turbinaria", path:["habitat:marine","observe:macro","color:brown","structure:macro_branched","diag:brown_cupblade"]},
+  {species:"Padina", path:["habitat:marine","observe:macro","color:brown","structure:macro_sheet","diag:brown_fan"]},
+  {species:"Dictyota", path:["habitat:marine","observe:macro","color:brown","structure:macro_flatblade","diag:brown_ribbon"]},
+  {species:"Laminaria", path:["habitat:marine","observe:macro","color:brown","structure:macro_sheet","diag:brown_kelp"]},
+  {species:"Fucus", path:["habitat:marine","observe:macro","color:brown","structure:macro_sheet","diag:brown_leathery"]},
+  {species:"Dictyopteris", path:["habitat:marine","observe:macro","color:brown","structure:macro_flatblade","diag:brown_wing"]},
+  {species:"Colpomenia", path:["habitat:marine","observe:macro","color:brown","structure:macro_gelatinous","diag:brown_inflated"]},
+
+  {species:"Porphyra", path:["habitat:marine","observe:macro","color:red","structure:macro_sheet","diag:red_sheet"]},
+  {species:"Batrachospermum", path:["habitat:river","observe:macro","color:red","structure:macro_gelatinous","diag:red_beaded_jelly"]},
+  {species:"Gracilaria", path:["habitat:marine","observe:macro","color:red","structure:macro_branched","diag:red_cylindrical"]},
+  {species:"Gelidium", path:["habitat:marine","observe:macro","color:red","structure:macro_branched","diag:red_flattened"]},
+  {species:"Laurencia", path:["habitat:marine","observe:macro","color:red","structure:macro_branched","diag:red_bushy"]},
+  {species:"Hypnea", path:["habitat:marine","observe:macro","color:red","structure:macro_branched","diag:red_hooked"]},
+  {species:"Ceramium", path:["habitat:marine","observe:macro","color:red","structure:macro_branched","diag:red_forked"]},
+  {species:"Acanthophora", path:["habitat:marine","observe:macro","color:red","structure:macro_branched","diag:red_spiny"]},
+  {species:"Corallina", path:["habitat:marine","observe:macro","color:red","structure:macro_branched","diag:red_calcified"]},
+  {species:"Polysiphonia", path:["habitat:marine","observe:macro","color:red","structure:macro_branched","diag:red_hairlike"]},
+
+  {species:"Tribonema", path:["habitat:pond","observe:micro","color:yellowgreen","structure:micro_filament","diag:yellow_filament"]},
+  {species:"Vaucheria", path:["habitat:soil","observe:micro","color:yellowgreen","structure:micro_filament","diag:yellow_siphonous"]},
+  {species:"Botrydium", path:["habitat:soil","observe:macro","color:yellowgreen","structure:macro_gelatinous","diag:yellow_vesicle"]},
+  {species:"Heterococcus", path:["habitat:soil","observe:micro","color:yellowgreen","structure:micro_branched","diag:yellow_branched"]}
+];
+
+function runAstraelSingleTokenTest(test){
+  const saved = {
+    step: state.step,
+    asked: state.asked,
+    tokens: [...state.tokens],
+    trail: [...state.trail],
+    currentQuestion: state.currentQuestion
+  };
+
+  state.step = -1;
+  state.asked = 0;
+  state.tokens = [...test.path];
+  state.trail = [];
+  state.currentQuestion = null;
+
+  let results = [];
+  try {
+    results = computeTop3().map(r => r.name);
+  } catch (e) {
+    console.error("Compute failed for", test.species, e);
+  }
+
+  const passTop1 = results[0] === test.species;
+  const passTop3 = results.includes(test.species);
+
+  console.log(
+    `${test.species} ${passTop1 ? "TOP1 PASS" : passTop3 ? "TOP3 PASS" : "FAIL"}`,
+    results
+  );
+
+  state.step = saved.step;
+  state.asked = saved.asked;
+  state.tokens = saved.tokens;
+  state.trail = saved.trail;
+  state.currentQuestion = saved.currentQuestion;
+
+  return {passTop1, passTop3, results};
+}
+
+function runAstraelTests(){
+  console.clear();
+  let top1 = 0, top3 = 0;
+  const fails = [];
+  for (const test of ASTRAEL_TESTS) {
+    const r = runAstraelSingleTokenTest(test);
+    if (r.passTop1) top1++;
+    if (r.passTop3) top3++;
+    if (!r.passTop3) fails.push({species:test.species, got:r.results});
+  }
+  console.log("==========");
+  console.log(`Top-1 pass: ${top1} / ${ASTRAEL_TESTS.length}`);
+  console.log(`Top-3 pass: ${top3} / ${ASTRAEL_TESTS.length}`);
+  if (fails.length) {
+    console.log("Fails:", fails);
+  } else {
+    console.log("No Top-3 failures.");
+  }
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Elythera Overlay Slow Summon Test</title>
+<style>
+:root{--blue:#84ddff;--green:#8bff8f;--violet:#d29aff;--orange:#ffc06e;--sky:#7ce5ff}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000;font-family:Arial,Helvetica,sans-serif;color:#eef8ff}
+.scene{position:relative;width:100vw;height:100vh;overflow:hidden;background:radial-gradient(circle at 50% 9%, rgba(90,150,255,.12), rgba(0,0,0,0) 26%), linear-gradient(to bottom, rgba(9,18,38,.42), rgba(0,0,0,.08) 22%, rgba(0,0,0,.55) 100%)}
+.intro{position:absolute;inset:0;display:flex;align-items:flex-start;justify-content:center;pointer-events:none;z-index:50}
+.intro-box{margin-top:9vh;text-align:center;opacity:0;transform:translateY(12px) scale(.985);animation:introIn 1.4s ease forwards, introOut 1.2s ease forwards;animation-delay:.2s, 2.9s}
+.intro-box h1{margin:0;font-size:clamp(30px,4vw,54px);letter-spacing:.34em;text-transform:uppercase;text-shadow:0 0 18px rgba(132,221,255,.22)}
+.intro-box p{margin:.6rem 0 0;font-size:clamp(10px,1vw,14px);letter-spacing:.22em;text-transform:uppercase;color:rgba(238,248,255,.7)}
+.stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;animation:stageIn 1.2s ease forwards;animation-delay:3.9s}
+.frame{position:relative;width:min(100vw,1536px);aspect-ratio:1536/1024;max-height:100vh}
+.base,.overlay{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center center;user-select:none;pointer-events:none;-webkit-user-drag:none}
+.base{z-index:5;opacity:0;transform:scale(.992);animation:baseIn 1.6s ease forwards;animation-delay:4.15s}
+.overlay{z-index:25;opacity:0;filter:brightness(1.32);animation:overlayIn 1.7s ease forwards;animation-delay:8.55s}
+.effects{position:absolute;inset:0;z-index:18;pointer-events:none;opacity:0;animation:effectsOn .8s ease forwards;animation-delay:4.8s}
+.palm{position:absolute;transform:translate(-50%,-50%);width:6.8%;aspect-ratio:1/1;opacity:0;animation:palmAppear 1.2s ease forwards,palmPulse 4.4s ease-in-out infinite,palmBright 2.3s ease forwards;animation-delay:var(--delay), calc(var(--delay) + 1.2s), 7.1s}
+.palm::before{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle, rgba(255,255,255,.95) 0%, var(--color) 18%, rgba(255,255,255,.15) 34%, rgba(0,0,0,0) 74%);filter:blur(12px);opacity:.9}
+.palm::after{content:"";position:absolute;left:50%;top:50%;width:54%;height:54%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle, rgba(255,255,255,.68) 0%, rgba(255,255,255,.18) 35%, rgba(0,0,0,0) 76%);box-shadow:0 0 14px var(--color), 0 0 34px var(--color);filter:blur(1px);opacity:.78}
+.smoke{position:absolute;transform:translate(-50%,-50%);width:9.5%;height:13%;opacity:0;animation:smokeIn 1.6s ease forwards, smokeBreathe 4.6s ease-in-out infinite;animation-delay:calc(var(--delay) + .75s), calc(var(--delay) + 2.3s);filter:blur(7px)}
+.smoke::before,.smoke::after{content:"";position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:70%;height:100%;border-radius:50% 50% 42% 42% / 64% 64% 36% 36%;background:radial-gradient(circle at 50% 80%, color-mix(in srgb, var(--color) 88%, white 12%) 0%, rgba(255,255,255,.28) 16%, rgba(0,0,0,0) 64%);opacity:.55}
+.smoke::after{width:42%;height:78%;left:58%;opacity:.34;transform:translateX(-50%) rotate(12deg)}
+.vixen{left:13.95%;top:54.25%;--color:var(--blue);--delay:5.0s}
+.mareoj{left:33.35%;top:55.15%;--color:var(--green);--delay:5.45s}
+.vel{left:50.35%;top:56.20%;--color:var(--violet);--delay:5.9s}
+.lyra{left:67.45%;top:55.45%;--color:var(--orange);--delay:6.35s}
+.uniq{left:85.20%;top:54.45%;--color:var(--sky);--delay:6.8s}
+canvas{position:absolute;inset:0;z-index:20;pointer-events:none;opacity:0;animation:effectsOn .8s ease forwards;animation-delay:5.1s}
+.legend{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:60;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(238,248,255,.58);background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.06);border-radius:999px;padding:8px 12px;backdrop-filter:blur(5px)}
+@keyframes introIn{from{opacity:0;transform:translateY(12px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes introOut{from{opacity:1;transform:translateY(0) scale(1)}to{opacity:0;transform:translateY(-10px) scale(1.015)}}
+@keyframes stageIn{from{opacity:0}to{opacity:1}}
+@keyframes baseIn{0%{opacity:0;transform:scale(.992)}100%{opacity:1;transform:scale(1)}}
+@keyframes effectsOn{from{opacity:0}to{opacity:1}}
+@keyframes palmAppear{0%{opacity:0;transform:translate(-50%,-50%) scale(.14)}70%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}100%{opacity:.72;transform:translate(-50%,-50%) scale(1)}}
+@keyframes palmPulse{0%,100%{opacity:.68}50%{opacity:1}}
+@keyframes palmBright{0%{filter:brightness(1)}40%{filter:brightness(1.15)}100%{filter:brightness(1.8)}}
+@keyframes smokeIn{0%{opacity:0;transform:translate(-50%,-50%) scale(.7)}100%{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+@keyframes smokeBreathe{0%,100%{opacity:.42;transform:translate(-50%,-50%) translateY(0)}50%{opacity:.78;transform:translate(-50%,-50%) translateY(-6px)}}
+@keyframes overlayIn{0%{opacity:0;filter:brightness(1.55)}100%{opacity:1;filter:brightness(1)}}
+@media (max-width:900px){.legend{display:none}.frame{width:100vw}.stage{align-items:flex-end}.frame{margin-bottom:8vh}.palm{width:7.8%}.smoke{width:11%;height:14%}}
+@media (max-width:640px){.intro-box{margin-top:8vh}.intro-box h1{font-size:22px;letter-spacing:.18em}.intro-box p{font-size:9px}.stage{align-items:flex-end}.frame{width:100vw;margin-bottom:10vh}.palm{width:8.2%}.smoke{width:12.5%;height:15%}.vixen{left:13.95%;top:54.35%}.mareoj{left:33.45%;top:55.25%}.vel{left:50.50%;top:56.35%}.lyra{left:67.55%;top:55.55%}.uniq{left:85.25%;top:54.55%}}
+</style>
+</head>
+<body>
+<div class="scene">
+  <div class="intro">
+    <div class="intro-box">
+      <h1>Welcome to Elythera</h1>
+      <p>Activation sequence begins</p>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="frame" id="frame">
+      <img class="base" src="assets/elythera/elythera_team_base.png" alt="Elythera team base">
+      <div class="effects">
+        <div class="palm vixen"></div><div class="smoke vixen"></div>
+        <div class="palm mareoj"></div><div class="smoke mareoj"></div>
+        <div class="palm vel"></div><div class="smoke vel"></div>
+        <div class="palm lyra"></div><div class="smoke lyra"></div>
+        <div class="palm uniq"></div><div class="smoke uniq"></div>
+      </div>
+      <canvas id="particles"></canvas>
+      <img class="overlay" src="assets/elythera/elythera_team_overlay.png" alt="Elythera team overlay">
+    </div>
+  </div>
+
+  <div class="legend">Slow summon test • glow → smoke dust → brighten → overlay</div>
+</div>
+
+<script>
+const canvas=document.getElementById('particles');
+const ctx=canvas.getContext('2d');
+const frame=document.getElementById('frame');
+
+function resizeCanvas(){
+  const dpr=window.devicePixelRatio||1;
+  const rect=frame.getBoundingClientRect();
+  canvas.width=rect.width*dpr;
+  canvas.height=rect.height*dpr;
+  canvas.style.width=rect.width+'px';
+  canvas.style.height=rect.height+'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+resizeCanvas();
+window.addEventListener('resize',resizeCanvas);
+
+const palms=[
+  {x:0.1395,y:0.5425,color:'#84ddff',delay:5000},
+  {x:0.3335,y:0.5515,color:'#8bff8f',delay:5450},
+  {x:0.5035,y:0.5620,color:'#d29aff',delay:5900},
+  {x:0.6745,y:0.5545,color:'#ffc06e',delay:6350},
+  {x:0.8520,y:0.5445,color:'#7ce5ff',delay:6800},
+];
+
+let particles=[];
+
+function hexToRgba(hex,a){
+  const h=hex.replace('#','');
+  const n=parseInt(h,16);
+  return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;
+}
+
+function spawnSmokeDust(palm){
+  const rect=frame.getBoundingClientRect();
+  const cx=rect.width*palm.x;
+  const cy=rect.height*palm.y;
+  for(let i=0;i<65;i++){
+    particles.push({
+      cx,cy,
+      driftX:-16+Math.random()*32,
+      driftY:-10-Math.random()*54,
+      curve:-8+Math.random()*16,
+      size:0.45+Math.random()*1.15,
+      life:0,
+      max:170+Math.random()*160,
+      color:palm.color,
+      alpha:0.18+Math.random()*0.3
+    });
+  }
+}
+palms.forEach(p=>{
+  setTimeout(()=>spawnSmokeDust(p),p.delay+350);
+  setTimeout(()=>spawnSmokeDust(p),p.delay+1400);
+  setTimeout(()=>spawnSmokeDust(p),p.delay+2400);
+});
+
+function render(){
+  const rect=frame.getBoundingClientRect();
+  ctx.clearRect(0,0,rect.width,rect.height);
+  particles=particles.filter(p=>p.life<p.max);
+  for(const p of particles){
+    p.life++;
+    const t=p.life/p.max;
+    const x=p.cx + p.driftX*t*0.35 + Math.sin(t*Math.PI*2 + p.curve)*3.2;
+    const y=p.cy + p.driftY*t;
+    const a=Math.max(0,p.alpha*(1-t));
+    ctx.beginPath();
+    ctx.fillStyle=hexToRgba(p.color,a);
+    ctx.shadowColor=hexToRgba(p.color,a*0.85);
+    ctx.shadowBlur=10;
+    ctx.arc(x,y,p.size,0,Math.PI*2);
+    ctx.fill();
+  }
+  requestAnimationFrame(render);
+}
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Elythera Overlay Clean Test</title>
+  <style>
+    :root{
+      --blue:#78d8ff;
+      --green:#7cff90;
+      --violet:#c38aff;
+      --orange:#ffb85c;
+      --sky:#6edcff;
+    }
+    *{box-sizing:border-box}
+    html,body{
+      margin:0;
+      width:100%;
+      height:100%;
+      overflow:hidden;
+      background:#000;
+      font-family:Arial, Helvetica, sans-serif;
+      color:#eef8ff;
+    }
+    .scene{
+      position:relative;
+      width:100vw;
+      height:100vh;
+      overflow:hidden;
+      background:
+        radial-gradient(circle at 50% 10%, rgba(95,160,255,.10), rgba(0,0,0,0) 28%),
+        linear-gradient(to bottom, rgba(8,14,28,.35), rgba(0,0,0,.08) 24%, rgba(0,0,0,.52) 100%);
+    }
+    .intro{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      pointer-events:none;
+      z-index:50;
+    }
+    .intro-box{
+      margin-top:9vh;
+      text-align:center;
+      opacity:0;
+      transform:translateY(10px) scale(.98);
+      animation:introIn 1s ease forwards, introOut 1s ease forwards;
+      animation-delay:.15s, 1.9s;
+    }
+    .intro-box h1{
+      margin:0;
+      font-size:clamp(28px,4vw,54px);
+      letter-spacing:.34em;
+      text-transform:uppercase;
+      text-shadow:0 0 18px rgba(120,216,255,.24);
+    }
+    .intro-box p{
+      margin:.55rem 0 0;
+      font-size:clamp(10px,1vw,14px);
+      letter-spacing:.22em;
+      text-transform:uppercase;
+      color:rgba(238,248,255,.70);
+    }
+    .stage{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      opacity:0;
+      animation:stageIn 1s ease forwards;
+      animation-delay:2.6s;
+    }
+    .frame{
+      position:relative;
+      width:min(100vw, 1536px);
+      aspect-ratio:1536 / 1024;
+      max-height:100vh;
+    }
+    .base,.overlay{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      object-position:center center;
+      user-select:none;
+      pointer-events:none;
+      -webkit-user-drag:none;
+    }
+    .base{
+      z-index:5;
+      opacity:0;
+      transform:scale(.99);
+      animation:baseIn 1.15s ease forwards;
+      animation-delay:2.9s;
+    }
+    .overlay{
+      z-index:25;
+      opacity:0;
+      filter:brightness(1.22);
+      animation:overlayIn 1s ease forwards;
+      animation-delay:5.75s;
+    }
+    .effects{
+      position:absolute;
+      inset:0;
+      z-index:18;
+      pointer-events:none;
+      opacity:0;
+      animation:effectsIn .6s ease forwards;
+      animation-delay:3.45s;
+    }
+    .palm{
+      position:absolute;
+      width:7.2%;
+      aspect-ratio:1/1;
+      transform:translate(-50%,-50%);
+      opacity:0;
+      animation:
+        palmAppear .9s ease forwards,
+        palmPulse 2.6s ease-in-out infinite,
+        palmBrighten 1s ease forwards;
+      animation-delay:var(--delay), calc(var(--delay) + .9s), 4.95s;
+    }
+    .palm::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:50%;
+      background:
+        radial-gradient(circle, rgba(255,255,255,.98) 0%, var(--color) 20%, rgba(255,255,255,.20) 38%, rgba(0,0,0,0) 72%);
+      filter:blur(11px);
+      opacity:.94;
+    }
+    .palm::after{
+      content:"";
+      position:absolute;
+      left:50%;
+      top:50%;
+      width:66%;
+      height:66%;
+      transform:translate(-50%,-50%);
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(255,255,255,.75) 0%, rgba(255,255,255,.22) 35%, rgba(0,0,0,0) 75%);
+      box-shadow:0 0 12px var(--color), 0 0 26px var(--color);
+      opacity:.72;
+      filter:blur(2px);
+    }
+    .vixen { left:14.15%; top:55.25%; --color:var(--blue);   --delay:3.55s; }
+    .mareoj{ left:33.20%; top:56.00%; --color:var(--green);  --delay:3.90s; }
+    .vel   { left:50.15%; top:56.95%; --color:var(--violet); --delay:4.25s; }
+    .lyra  { left:67.25%; top:56.20%; --color:var(--orange); --delay:4.60s; }
+    .uniq  { left:85.05%; top:55.35%; --color:var(--sky);    --delay:4.95s; }
+
+    canvas{
+      position:absolute;
+      inset:0;
+      z-index:20;
+      pointer-events:none;
+      opacity:0;
+      animation:effectsIn .6s ease forwards;
+      animation-delay:3.55s;
+    }
+    .legend{
+      position:absolute;
+      left:50%;
+      bottom:14px;
+      transform:translateX(-50%);
+      z-index:60;
+      font-size:10px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      color:rgba(238,248,255,.58);
+      background:rgba(0,0,0,.20);
+      border:1px solid rgba(255,255,255,.07);
+      border-radius:999px;
+      padding:8px 12px;
+      backdrop-filter:blur(5px);
+    }
+    @keyframes introIn{
+      from{opacity:0; transform:translateY(10px) scale(.98)}
+      to{opacity:1; transform:translateY(0) scale(1)}
+    }
+    @keyframes introOut{
+      from{opacity:1; transform:translateY(0) scale(1)}
+      to{opacity:0; transform:translateY(-8px) scale(1.01)}
+    }
+    @keyframes stageIn{from{opacity:0} to{opacity:1}}
+    @keyframes baseIn{
+      0%{opacity:0; transform:scale(.99)}
+      100%{opacity:1; transform:scale(1)}
+    }
+    @keyframes effectsIn{from{opacity:0} to{opacity:1}}
+    @keyframes palmAppear{
+      0%{opacity:0; transform:translate(-50%,-50%) scale(.16)}
+      70%{opacity:1; transform:translate(-50%,-50%) scale(1.12)}
+      100%{opacity:.76; transform:translate(-50%,-50%) scale(1)}
+    }
+    @keyframes palmPulse{0%,100%{opacity:.72} 50%{opacity:1}}
+    @keyframes palmBrighten{from{filter:brightness(1)} to{filter:brightness(1.55)}}
+    @keyframes overlayIn{
+      0%{opacity:0; filter:brightness(1.45)}
+      100%{opacity:1; filter:brightness(1)}
+    }
+    @media (max-width:900px){
+      .legend{display:none}
+      .frame{width:100vw}
+      .palm{width:8.4%}
+    }
+  </style>
+</head>
+<body>
+  <div class="scene">
+    <div class="intro">
+      <div class="intro-box">
+        <h1>Welcome to Elythera</h1>
+        <p>Activation sequence begins</p>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="frame" id="frame">
+        <img class="base" src="assets/elythera/elythera_team_base.png" alt="Elythera team base">
+        <div class="effects">
+          <div class="palm vixen"></div>
+          <div class="palm mareoj"></div>
+          <div class="palm vel"></div>
+          <div class="palm lyra"></div>
+          <div class="palm uniq"></div>
+        </div>
+        <canvas id="particles"></canvas>
+        <img class="overlay" src="assets/elythera/elythera_team_overlay.png" alt="Elythera team overlay">
+      </div>
+    </div>
+
+    <div class="legend">Base image → palm glow → rising particles → brightening → overlay</div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    const frame = document.getElementById('frame');
+
+    function resizeCanvas(){
+      const dpr = window.devicePixelRatio || 1;
+      const rect = frame.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      canvas.style.width = rect.width + 'px';
+      canvas.style.height = rect.height + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    const palms = [
+      {x:0.1415, y:0.5525, color:'#78d8ff', delay:3550},
+      {x:0.3320, y:0.5600, color:'#7cff90', delay:3900},
+      {x:0.5015, y:0.5695, color:'#c38aff', delay:4250},
+      {x:0.6725, y:0.5620, color:'#ffb85c', delay:4600},
+      {x:0.8505, y:0.5535, color:'#6edcff', delay:4950},
+    ];
+
+    let particles = [];
+
+    function hexToRgba(hex, a){
+      const h = hex.replace('#','');
+      const n = parseInt(h,16);
+      const r = (n >> 16) & 255;
+      const g = (n >> 8) & 255;
+      const b = n & 255;
+      return `rgba(${r},${g},${b},${a})`;
+    }
+
+    function spawnPalmDust(palm){
+      const rect = frame.getBoundingClientRect();
+      const cx = rect.width * palm.x;
+      const cy = rect.height * palm.y;
+
+      for(let i=0;i<42;i++){
+        particles.push({
+          cx, cy,
+          driftX: -10 + Math.random()*20,
+          driftY: -18 - Math.random()*36,
+          spread: 4 + Math.random()*16,
+          size: 1 + Math.random()*2.6,
+          life: 0,
+          max: 120 + Math.random()*90,
+          color: palm.color
+        });
+      }
+    }
+
+    palms.forEach(p => {
+      setTimeout(() => spawnPalmDust(p), p.delay + 250);
+      setTimeout(() => spawnPalmDust(p), p.delay + 900);
+    });
+
+    function render(){
+      const rect = frame.getBoundingClientRect();
+      ctx.clearRect(0, 0, rect.width, rect.height);
+
+      particles = particles.filter(p => p.life < p.max);
+
+      for(const p of particles){
+        p.life++;
+        const t = p.life / p.max;
+        const rise = p.driftY * t;
+        const sway = Math.sin(t * Math.PI * 2) * p.spread * 0.18 + p.driftX * t * 0.25;
+        const x = p.cx + sway;
+        const y = p.cy + rise;
+        const a = Math.max(0, 0.95 * (1 - t));
+
+        ctx.beginPath();
+        ctx.fillStyle = hexToRgba(p.color, a);
+        ctx.shadowColor = hexToRgba(p.color, a);
+        ctx.shadowBlur = 18;
+        ctx.arc(x, y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      requestAnimationFrame(render);
+    }
+    render();
+  </script>
+</body>
+</html>

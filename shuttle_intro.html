@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Shuttle Test</title>
+<title>Mission Elythera Shuttle</title>
 
 <style>
 body{
@@ -17,10 +17,10 @@ background:black;
 <body>
 
 <!-- Three.js -->
-<script src="https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.min.js"></script>
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
 
 <!-- GLTF Loader -->
-<script src="https://cdn.jsdelivr.net/npm/three@0.161.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://unpkg.com/three@0.160.0/examples/js/loaders/GLTFLoader.js"></script>
 
 <script>
 
@@ -51,8 +51,8 @@ function(gltf){
 
 const model = gltf.scene;
 
-model.position.set(0,0,0);
 model.scale.set(1,1,1);
+model.position.set(0,0,0);
 
 scene.add(model);
 
@@ -69,7 +69,6 @@ console.error(error);
 function animate(){
 
 requestAnimationFrame(animate);
-
 renderer.render(scene,camera);
 
 }

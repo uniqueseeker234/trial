@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Elythera Overlay Test</title>
+
+<style>
+
+body{
+background:#000;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+margin:0;
+}
+
+.scene{
+position:relative;
+width:900px;
+}
+
+.scene img{
+position:absolute;
+top:0;
+left:0;
+width:100%;
+opacity:0;
+transition:opacity 0.8s ease;
+}
+
+.scene img.active{
+opacity:1;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="scene">
+
+<img src="assets/elythera/frame0_base.png" class="active">
+<img src="assets/elythera/frame1_glow.png">
+<img src="assets/elythera/frame2_glowstrong.png">
+<img src="assets/elythera/frame3_orb.png">
+<img src="assets/elythera/frame4_orbstrong.png">
+<img src="assets/elythera/frame5_logo.png">
+
+</div>
+
+<script>
+
+let frames = document.querySelectorAll(".scene img");
+let i = 0;
+
+setInterval(() => {
+
+frames[i].classList.remove("active");
+
+i++;
+
+if(i >= frames.length){
+i = 0;
+}
+
+frames[i].classList.add("active");
+
+},1000);
+
+</script>
+
+</body>
+</html>

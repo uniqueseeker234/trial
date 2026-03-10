@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Elythera Intro Hub</title>
+<style>
+  :root{
+    --bg:#000;
+    --line:rgba(255,255,255,.08);
+    --text:#eaf6ff;
+    --muted:rgba(234,246,255,.7);
+  }
+  *{box-sizing:border-box}
+  html,body{
+    margin:0;
+    width:100%;
+    min-height:100%;
+    background:#000;
+    color:var(--text);
+    font-family:Arial, Helvetica, sans-serif;
+  }
+  body{
+    background:
+      radial-gradient(circle at 50% 8%, rgba(98,161,255,.10), transparent 22%),
+      linear-gradient(180deg, #02040a 0%, #000 45%, #02040a 100%);
+  }
+  .page{
+    width:min(1440px, 100%);
+    margin:0 auto;
+    padding:0 16px 28px;
+  }
+  .hero{
+    position:relative;
+    min-height:100svh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+  }
+  .welcome{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    pointer-events:none;
+    z-index:30;
+  }
+  .welcome-box{
+    margin-top:8vh;
+    text-align:center;
+    opacity:0;
+    transform:translateY(10px) scale(.985);
+    animation:welcomeIn 1.2s ease forwards, welcomeOut 1s ease forwards;
+    animation-delay:.2s, 2.8s;
+  }
+  .welcome-box h1{
+    margin:0;
+    font-size:clamp(28px, 4vw, 56px);
+    letter-spacing:.34em;
+    text-transform:uppercase;
+    text-shadow:0 0 18px rgba(126,219,255,.22);
+  }
+  .welcome-box p{
+    margin:.7rem 0 0;
+    font-size:clamp(10px, 1vw, 14px);
+    letter-spacing:.24em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  .scene{
+    width:100%;
+    opacity:0;
+    animation:sceneIn 1s ease forwards;
+    animation-delay:3.8s;
+  }
+  .team-wrap{
+    position:relative;
+    width:min(1200px, 100%);
+    margin:0 auto;
+    aspect-ratio:1536 / 1024;
+  }
+  .team-wrap img{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    object-position:center center;
+    user-select:none;
+    pointer-events:none;
+    -webkit-user-drag:none;
+  }
+  .team-wrap .frame{
+    opacity:0;
+    transition:opacity 1.3s ease;
+  }
+  .team-wrap .frame.active{
+    opacity:1;
+  }
+  .hub{
+    margin-top:14px;
+    padding:18px 10px 6px;
+    background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+    border-top:1px solid var(--line);
+  }
+  .hub-head{
+    text-align:center;
+    margin-bottom:18px;
+  }
+  .hub-head h2{
+    margin:0 0 8px;
+    font-size:clamp(18px, 2vw, 26px);
+    letter-spacing:.22em;
+    text-transform:uppercase;
+  }
+  .hub-head p{
+    margin:0;
+    color:var(--muted);
+    font-size:14px;
+    letter-spacing:.04em;
+  }
+  .logo-grid{
+    display:grid;
+    grid-template-columns:repeat(5, minmax(0, 1fr));
+    gap:14px;
+  }
+  .logo-card{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    text-decoration:none;
+    color:var(--text);
+    background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:14px 10px 16px;
+    min-height:240px;
+    transition:transform .25s ease, border-color .25s ease, box-shadow .25s ease, background .25s ease;
+  }
+  .logo-card:hover{
+    transform:translateY(-4px);
+    background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+    border-color:rgba(255,255,255,.16);
+    box-shadow:0 0 24px rgba(255,255,255,.06);
+  }
+  .logo-shell{
+    width:120px;
+    height:120px;
+    display:grid;
+    place-items:center;
+    margin-bottom:12px;
+    animation:hoverFloat 3.8s ease-in-out infinite;
+  }
+  .logo-shell img{
+    max-width:100%;
+    max-height:100%;
+    display:block;
+    filter:drop-shadow(0 0 10px rgba(255,255,255,.15));
+  }
+  .logo-card:nth-child(1) .logo-shell{ animation-delay:0s; }
+  .logo-card:nth-child(2) .logo-shell{ animation-delay:.3s; }
+  .logo-card:nth-child(3) .logo-shell{ animation-delay:.6s; }
+  .logo-card:nth-child(4) .logo-shell{ animation-delay:.9s; }
+  .logo-card:nth-child(5) .logo-shell{ animation-delay:1.2s; }
+  .logo-card h3{
+    margin:0 0 8px;
+    font-size:15px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+  }
+  .logo-card p{
+    margin:0;
+    font-size:13px;
+    line-height:1.5;
+    color:var(--muted);
+  }
+  @keyframes welcomeIn{
+    from{opacity:0; transform:translateY(10px) scale(.985)}
+    to{opacity:1; transform:translateY(0) scale(1)}
+  }
+  @keyframes welcomeOut{
+    from{opacity:1; transform:translateY(0) scale(1)}
+    to{opacity:0; transform:translateY(-8px) scale(1.02)}
+  }
+  @keyframes sceneIn{
+    from{opacity:0}
+    to{opacity:1}
+  }
+  @keyframes hoverFloat{
+    0%,100%{ transform:translateY(0px); }
+    50%{ transform:translateY(-7px); }
+  }
+  @media (max-width: 1024px){
+    .logo-grid{ grid-template-columns:repeat(3, minmax(0, 1fr)); }
+  }
+  @media (max-width: 680px){
+    .page{ padding:0 10px 20px; }
+    .hero{ min-height:auto; padding-top:90px; }
+    .team-wrap{ width:100%; }
+    .hub{ margin-top:4px; padding-top:14px; }
+    .logo-grid{ grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px; }
+    .logo-card{ min-height:210px; padding:12px 8px 14px; }
+    .logo-shell{ width:92px; height:92px; }
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <section class="hero">
+      <div class="welcome">
+        <div class="welcome-box">
+          <h1>Welcome to Elythera</h1>
+          <p>Mission interface initializing</p>
+        </div>
+      </div>
+
+      <div class="scene">
+        <div class="team-wrap" id="teamWrap">
+          <img class="frame active" src="assets/elythera/frame0_base.png" alt="Elythera base frame">
+          <img class="frame" src="assets/elythera/frame1_glow.png" alt="Glow frame 1">
+          <img class="frame" src="assets/elythera/frame2_glowstrong.png" alt="Glow frame 2">
+          <img class="frame" src="assets/elythera/frame3_orb.png" alt="Orb frame 1">
+          <img class="frame" src="assets/elythera/frame4_orbstrong.png" alt="Orb frame 2">
+          <img class="frame" src="assets/elythera/frame5_logo.png" alt="Logo frame">
+        </div>
+
+        <div class="hub">
+          <div class="hub-head">
+            <h2>Elythera Systems</h2>
+            <p>Select a portal to enter each mission division.</p>
+          </div>
+
+          <div class="logo-grid">
+            <a class="logo-card" href="#">
+              <div class="logo-shell">
+                <img src="assets/elythera/logo_identifier.png" alt="Identifier logo">
+              </div>
+              <h3>Identifier</h3>
+              <p>Analyze algae traits and guide users through the core recognition pathway.</p>
+            </a>
+
+            <a class="logo-card" href="#">
+              <div class="logo-shell">
+                <img src="assets/elythera/logo_pond.png" alt="Pond logo">
+              </div>
+              <h3>Algal Pond</h3>
+              <p>Enter the living habitat hub where discovery, atmosphere, and ecosystem memory meet.</p>
+            </a>
+
+            <a class="logo-card" href="#">
+              <div class="logo-shell">
+                <img src="assets/elythera/logo_archive.png" alt="Archive logo">
+              </div>
+              <h3>Archive</h3>
+              <p>Store verified findings, gallery entries, and curated algae records from the mission.</p>
+            </a>
+
+            <a class="logo-card" href="#">
+              <div class="logo-shell">
+                <img src="assets/elythera/logo_photohouse.png" alt="PhotoHouse logo">
+              </div>
+              <h3>PhotoHouse</h3>
+              <p>Enhance, refine, and prepare images before sending them to the archive systems.</p>
+            </a>
+
+            <a class="logo-card" href="#">
+              <div class="logo-shell">
+                <img src="assets/elythera/logo_locator.png" alt="Locator logo">
+              </div>
+              <h3>Locator</h3>
+              <p>Track algae locations and connect field observations to the Elythera world map.</p>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+<script>
+  const frames = document.querySelectorAll('.team-wrap .frame');
+  let index = 0;
+  const stepDuration = 1800;
+
+  const timer = setInterval(() => {
+    if (index < frames.length - 1) {
+      frames[index].classList.remove('active');
+      index += 1;
+      frames[index].classList.add('active');
+    } else {
+      clearInterval(timer);
+    }
+  }, stepDuration);
+</script>
+</body>
+</html>

@@ -26,7 +26,7 @@ top:0;
 left:0;
 width:100%;
 opacity:0;
-transition:opacity 0.8s ease;
+transition:opacity 1.2s ease;
 }
 
 .scene img.active{
@@ -54,19 +54,19 @@ opacity:1;
 let frames = document.querySelectorAll(".scene img");
 let i = 0;
 
-setInterval(() => {
+let interval = setInterval(() => {
 
 frames[i].classList.remove("active");
 
 i++;
 
-if(i >= frames.length){
-i = 0;
-}
-
 frames[i].classList.add("active");
 
-},1000);
+if(i === frames.length-1){
+clearInterval(interval);
+}
+
+},1800);
 
 </script>
 

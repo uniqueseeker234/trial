@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elythera Lab – Layout Editor</title>
+
+<style>
+html,body{
+margin:0;
+height:100%;
+overflow:hidden;
+background:#000;
+font-family:Arial, sans-serif;
+}
+#msg{
+position:fixed;
+top:10px;
+left:10px;
+background:rgba(0,0,0,0.5);
+color:white;
+padding:8px 12px;
+border-radius:10px;
+z-index:10;
+}
+</style>
+
+<script type="importmap">
+{
+ "imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+ }
+}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/dat.gui@0.7.9/build/dat.gui.min.js"></script>
+
+</head>
+
+<body>
+<div id="msg">Drag sliders to move objects</div>
+
+<script type="module">
+
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xffffff);
+
+const camera = new THREE.PerspectiveCamera(
+70,
+window.innerWidth/window.innerHeight,
+0.01,
+2000
+);
+
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(window.innerWidth,window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+/* lights */
+
+const hemi = new THREE.HemisphereLight(0xffffff,0x444444,2);
+scene.add(hemi);
+
+const dir = new THREE.DirectionalLight(0xffffff,2);
+dir.position.set(5,10,5);
+scene.add(dir);
+
+/* loader */
+
+const loader = new GLTFLoader();
+
+let table,journal,laptop,micro,books,cup,globe;
+
+/* ROOM */
+
+loader.load('./models/room.glb',(gltf)=>{
+
+const room = gltf.scene;
+scene.add(room);
+
+room.traverse((child)=>{
+
+if(child.isMesh){
+
+child.material.side = THREE.DoubleSide;
+
+if(child.material.color &&
+child.material.color.r < 0.1 &&
+child.material.color.g < 0.1 &&
+child.material.color.b < 0.1){
+
+child.material.color.set(0xffffff);
+
+}
+
+}
+
+});
+
+});
+
+/* TABLE */
+
+loader.load('./models/research_table.glb',(gltf)=>{
+
+table = gltf.scene;
+table.position.set(0,0,-1);
+scene.add(table);
+
+createControls(table,"Table");
+
+});
+
+/* JOURNAL */
+
+loader.load('./models/journal.glb',(gltf)=>{
+
+journal = gltf.scene;
+journal.scale.set(0.5,0.5,0.5);
+journal.position.set(0.1,0.8,-1);
+scene.add(journal);
+
+createControls(journal,"Journal");
+
+});
+
+/* LAPTOP */
+
+loader.load('./models/laptop.glb',(gltf)=>{
+
+laptop = gltf.scene;
+laptop.scale.set(0.6,0.6,0.6);
+laptop.position.set(-0.3,0.8,-1);
+scene.add(laptop);
+
+createControls(laptop,"Laptop");
+
+});
+
+/* MICROSCOPE */
+
+loader.load('./models/microscope.glb',(gltf)=>{
+
+micro = gltf.scene;
+micro.scale.set(0.6,0.6,0.6);
+micro.position.set(1,0,-1);
+scene.add(micro);
+
+createControls(micro,"Microscope");
+
+});
+
+/* BOOKS */
+
+loader.load('./models/books.glb',(gltf)=>{
+
+books = gltf.scene;
+books.scale.set(0.7,0.7,0.7);
+books.position.set(-1,0,-1);
+scene.add(books);
+
+createControls(books,"Books");
+
+});
+
+/* COFFEE CUP */
+
+loader.load('./models/coffee_cup.glb',(gltf)=>{
+
+cup = gltf.scene;
+cup.scale.set(0.4,0.4,0.4);
+cup.position.set(0.3,0.8,-1);
+scene.add(cup);
+
+createControls(cup,"Cup");
+
+});
+
+/* GLOBE */
+
+loader.load('./models/glass_globe.glb',(gltf)=>{
+
+globe = gltf.scene;
+globe.position.set(0,0.9,-0.5);
+scene.add(globe);
+
+createControls(globe,"Globe");
+
+});
+
+/* TV algae display */
+
+const textureLoader = new THREE.TextureLoader();
+const algaeTexture = textureLoader.load(
+'https://upload.wikimedia.org/wikipedia/commons/0/0e/Volvox_globator.jpg'
+);
+
+const tv = new THREE.Mesh(
+new THREE.PlaneGeometry(1.6,0.9),
+new THREE.MeshBasicMaterial({map:algaeTexture})
+);
+
+tv.position.set(2,1.3,-1);
+scene.add(tv);
+
+/* GUI CONTROLS */
+
+const gui = new dat.GUI();
+
+function createControls(object,name){
+
+const folder = gui.addFolder(name);
+
+folder.add(object.position,"x",-5,5,0.01);
+folder.add(object.position,"y",-1,3,0.01);
+folder.add(object.position,"z",-5,5,0.01);
+
+folder.add(object.scale,"x",0.1,3,0.01).name("scaleX");
+folder.add(object.scale,"y",0.1,3,0.01).name("scaleY");
+folder.add(object.scale,"z",0.1,3,0.01).name("scaleZ");
+
+folder.open();
+
+}
+
+/* camera */
+
+camera.position.set(0,1.6,2);
+
+/* animation */
+
+function animate(){
+
+requestAnimationFrame(animate);
+
+renderer.render(scene,camera);
+
+}
+
+animate();
+
+/* resize */
+
+window.addEventListener('resize',()=>{
+
+camera.aspect = window.innerWidth/window.innerHeight;
+camera.updateProjectionMatrix();
+renderer.setSize(window.innerWidth,window.innerHeight);
+
+});
+
+</script>
+
+</body>
+</html>

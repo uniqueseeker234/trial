@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elythera Portal Hub</title>
+<style>
+:root{
+  --line:rgba(255,255,255,0.08);
+  --text:#ecf7ff;
+  --muted:rgba(236,247,255,0.72);
+  --blue:#5edbff;
+  --green:#4cff79;
+  --violet:#b96bff;
+  --orange:#ffb347;
+}
+*{box-sizing:border-box}
+html,body{
+  margin:0;
+  width:100%;
+  min-height:100%;
+  background:#000;
+  color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
+}
+body{
+  background:
+    radial-gradient(circle at 50% 8%, rgba(94,156,255,.10), transparent 24%),
+    linear-gradient(180deg,#02040a 0%,#000 45%,#02040a 100%);
+}
+.page{
+  width:min(1440px,100%);
+  margin:0 auto;
+  padding:0 16px 26px;
+}
+.hero{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  padding:20px 10px;
+}
+.team{
+  position:relative;
+  width:1000px;
+  max-width:95%;
+  aspect-ratio:1536/1024;
+}
+.team img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  opacity:0;
+  transition:opacity 1s;
+  user-select:none;
+  pointer-events:none;
+  -webkit-user-drag:none;
+}
+.team img.active{opacity:1}
+
+.systems{
+  text-align:center;
+  margin-top:40px;
+  width:min(1100px,100%);
+  opacity:0;
+  transition:opacity .9s ease;
+}
+.systems.show{opacity:1}
+.systems h2{
+  margin:0 0 8px;
+  letter-spacing:4px;
+}
+.systems .intro{
+  margin:0 0 24px;
+  color:var(--muted);
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:20px;
+}
+.card{
+  background:#05080f;
+  border-radius:15px;
+  padding:20px;
+  border:1px solid var(--line);
+  text-decoration:none;
+  color:var(--text);
+  transition:.3s;
+  -webkit-tap-highlight-color: transparent;
+}
+.card:hover,
+.card:focus-visible{
+  transform:translateY(-6px);
+  box-shadow:0 0 20px rgba(255,255,255,.12);
+  outline:none;
+}
+.logo-shell{
+  width:110px;
+  height:110px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:0 auto 10px;
+  animation:hoverFloat 3.8s ease-in-out infinite;
+}
+.card:nth-child(1) .logo-shell{animation-delay:0s}
+.card:nth-child(2) .logo-shell{animation-delay:.25s}
+.card:nth-child(3) .logo-shell{animation-delay:.5s}
+.card:nth-child(4) .logo-shell{animation-delay:.75s}
+.card:nth-child(5) .logo-shell{animation-delay:1s}
+.logo-shell img{
+  max-width:100%;
+  max-height:100%;
+  display:block;
+}
+
+.identifier h3,.identifier p{color:var(--blue)}
+.pond h3,.pond p{color:var(--green)}
+.archive h3,.archive p{color:var(--violet)}
+.photohouse h3,.photohouse p{color:var(--orange)}
+.locator h3,.locator p{color:var(--blue)}
+
+.card h3{
+  margin:0 0 8px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+.card p{
+  margin:0;
+  line-height:1.5;
+  opacity:.9;
+  font-size:13px;
+}
+
+@keyframes hoverFloat{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-7px)}
+}
+
+@media (max-width: 680px){
+  .page{padding:0 10px 20px}
+  .systems{margin-top:28px}
+  .grid{grid-template-columns:repeat(2,1fr);gap:12px}
+  .card{padding:14px 10px}
+  .logo-shell{width:92px;height:92px}
+  .card p{font-size:12px}
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <section class="hero">
+
+    <div class="team">
+      <img class="frame active" src="assets/elythera/frame0_base.png" alt="Elythera frame 0">
+      <img class="frame" src="assets/elythera/frame1_glow.png" alt="Elythera frame 1">
+      <img class="frame" src="assets/elythera/frame2_glowstrong.png" alt="Elythera frame 2">
+      <img class="frame" src="assets/elythera/frame3_orb.png" alt="Elythera frame 3">
+      <img class="frame" src="assets/elythera/frame4_orbstrong.png" alt="Elythera frame 4">
+      <img class="frame" src="assets/elythera/frame5_logo.png" alt="Elythera frame 5">
+    </div>
+
+    <div class="systems" id="systems">
+      <h2>ELYTHERA SYSTEMS</h2>
+      <p class="intro">After the palm logos appear, the portal buttons unlock below.</p>
+
+      <div class="grid">
+        <a class="card identifier" href="identifier.html">
+          <div class="logo-shell"><img src="assets/elythera/logo_identifier_black.png" alt="Identifier logo"></div>
+          <h3>Identifier</h3>
+          <p>Blue signal portal for the algae identification system.</p>
+        </a>
+
+        <a class="card pond" href="pond.html">
+          <div class="logo-shell"><img src="assets/elythera/logo_pond_black.png" alt="Pond logo"></div>
+          <h3>Algal Pond</h3>
+          <p>Green habitat portal guiding users into the living pond world.</p>
+        </a>
+
+        <a class="card archive" href="archive.html">
+          <div class="logo-shell"><img src="assets/elythera/logo_archive_black.png" alt="Archive logo"></div>
+          <h3>Archive</h3>
+          <p>Violet archive portal for records, findings, and stored algae data.</p>
+        </a>
+
+        <a class="card photohouse" href="photohouse.html">
+          <div class="logo-shell"><img src="assets/elythera/logo_camera_black.png" alt="PhotoHouse logo"></div>
+          <h3>PhotoHouse</h3>
+          <p>Orange imaging portal for photo enhancement and preparation.</p>
+        </a>
+
+        <a class="card locator" href="locator.html">
+          <div class="logo-shell"><img src="assets/elythera/logo_locator_black.png" alt="Locator logo"></div>
+          <h3>Locator</h3>
+          <p>Blue world-map portal linking users to algae location tracking.</p>
+        </a>
+      </div>
+    </div>
+
+  </section>
+</div>
+
+<script>
+const frames = document.querySelectorAll(".frame");
+const systems = document.getElementById("systems");
+let i = 0;
+
+const interval = setInterval(() => {
+  frames[i].classList.remove("active");
+  i++;
+  frames[i].classList.add("active");
+
+  if (i === frames.length - 1) {
+    systems.classList.add("show");
+    clearInterval(interval);
+  }
+}, 1800);
+</script>
+
+</body>
+</html>

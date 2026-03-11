@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Elythera Lab Room</title>
+<style>
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #e9eef4;
+  font-family: Arial, sans-serif;
+}
+#hud {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 20;
+  color: white;
+  background: rgba(15,22,32,0.66);
+  padding: 10px 12px;
+  border-radius: 12px;
+  line-height: 1.45;
+  font-size: 13px;
+  max-width: 340px;
+  backdrop-filter: blur(8px);
+}
+</style>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+
+<div id="hud">
+  <strong>Mission Elythera • Lab Room</strong><br>
+  Drag to look around. Scroll to zoom.<br>
+  Fixed file paths:<br>
+  <small>room.glb → repo root</small><br>
+  <small>other props → /models/ folder</small>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xf6f8fb);
+
+const camera = new THREE.PerspectiveCamera(64, window.innerWidth / window.innerHeight, 0.01, 3000);
+camera.position.set(0, 1.55, 4.3);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+document.body.appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.target.set(0, 1.15, 0);
+controls.minDistance = 1.5;
+controls.maxDistance = 10;
+controls.maxPolarAngle = Math.PI * 0.48;
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0xcfd8e3, 2.15));
+
+const key = new THREE.DirectionalLight(0xffffff, 2.3);
+key.position.set(5, 7, 5);
+scene.add(key);
+
+const fill = new THREE.PointLight(0xf8fbff, 1.3, 30);
+fill.position.set(-4, 2.5, 3.5);
+scene.add(fill);
+
+const soft = new THREE.PointLight(0xb8f4ff, 0.75, 20);
+soft.position.set(2, 2.0, -1.8);
+scene.add(soft);
+
+const loader = new GLTFLoader();
+const texLoader = new THREE.TextureLoader();
+
+function applyWhiteRoomLook(root) {
+  root.traverse((child) => {
+    if (!child.isMesh) return;
+    const mats = Array.isArray(child.material) ? child.material : [child.material];
+    mats.forEach((mat) => {
+      if (!mat) return;
+      mat.side = THREE.DoubleSide;
+      if (mat.color) {
+        const c = mat.color;
+        const brightness = (c.r + c.g + c.b) / 3;
+        if (brightness < 0.12) mat.color.set(0xffffff);
+        if (brightness >= 0.12 && brightness < 0.55) {
+          mat.color.lerp(new THREE.Color(0xf4f6f8), 0.65);
+        }
+      }
+      if ('roughness' in mat && mat.roughness !== undefined) mat.roughness = Math.min(1, mat.roughness + 0.1);
+      if ('metalness' in mat && mat.metalness !== undefined) mat.metalness = Math.max(0, mat.metalness * 0.5);
+      mat.needsUpdate = true;
+    });
+  });
+}
+
+function setObject(root, position, scale, rotationY = 0) {
+  root.position.copy(position);
+  root.scale.setScalar(scale);
+  root.rotation.y = rotationY;
+}
+
+function loadProp(path, onLoad) {
+  loader.load(
+    path,
+    (gltf) => onLoad(gltf.scene),
+    undefined,
+    (err) => console.error('Failed to load:', path, err)
+  );
+}
+
+function makeTechStrip(x, y, z, rotY = 0, w = 1.1, h = 0.06) {
+  const strip = new THREE.Mesh(
+    new THREE.PlaneGeometry(w, h),
+    new THREE.MeshBasicMaterial({ color: 0x91eeff, transparent: true, opacity: 0.8 })
+  );
+  strip.position.set(x, y, z);
+  strip.rotation.y = rotY;
+  scene.add(strip);
+
+  const glow = new THREE.PointLight(0x92f2ff, 0.24, 3.8);
+  glow.position.copy(strip.position);
+  scene.add(glow);
+}
+
+function makeMonitorPanel(x, y, z, w, h, title, lines) {
+  const board = new THREE.Mesh(
+    new THREE.PlaneGeometry(w, h),
+    new THREE.MeshBasicMaterial({ color: 0x111b24 })
+  );
+  board.position.set(x, y, z);
+  scene.add(board);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 900;
+  canvas.height = 520;
+  const ctx = canvas.getContext('2d');
+
+  ctx.fillStyle = '#111b24';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.strokeStyle = '#3fe3ff';
+  ctx.lineWidth = 8;
+  ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+
+  ctx.fillStyle = '#8ff6ff';
+  ctx.font = 'bold 52px Arial';
+  ctx.fillText(title, 50, 92);
+
+  ctx.font = '36px Arial';
+  ctx.fillStyle = '#d8fcff';
+  let yy = 180;
+  lines.forEach((line) => {
+    ctx.fillText(line, 50, yy);
+    yy += 68;
+  });
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+
+  const screen = new THREE.Mesh(
+    new THREE.PlaneGeometry(w * 0.92, h * 0.82),
+    new THREE.MeshBasicMaterial({ map: texture })
+  );
+  screen.position.set(x, y, z + 0.001);
+  scene.add(screen);
+
+  const glow = new THREE.PointLight(0x8cf7ff, 0.35, 4.5);
+  glow.position.set(x, y, z + 0.2);
+  scene.add(glow);
+}
+
+function makeMapBoard(x, y, z, w, h) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 900;
+  canvas.height = 560;
+  const ctx = canvas.getContext('2d');
+
+  ctx.fillStyle = '#f6f2e7';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.strokeStyle = '#8a8a8a';
+  ctx.lineWidth = 10;
+  ctx.strokeRect(16, 16, canvas.width - 32, canvas.height - 32);
+
+  ctx.fillStyle = '#2a2a2a';
+  ctx.font = 'bold 38px Arial';
+  ctx.fillText('Algae Discovery Locations', 34, 54);
+
+  ctx.fillStyle = '#d8e4c5';
+  ctx.beginPath();
+  ctx.moveTo(260, 110);
+  ctx.bezierCurveTo(300, 90, 380, 130, 400, 170);
+  ctx.bezierCurveTo(430, 230, 420, 320, 390, 390);
+  ctx.bezierCurveTo(360, 450, 330, 500, 300, 520);
+  ctx.bezierCurveTo(250, 520, 235, 450, 225, 380);
+  ctx.bezierCurveTo(215, 320, 220, 235, 225, 180);
+  ctx.bezierCurveTo(228, 150, 242, 120, 260, 110);
+  ctx.fill();
+
+  const points = [
+    [295, 155, 'TVM'],
+    [308, 230, 'KLM'],
+    [300, 300, 'ALP'],
+    [286, 368, 'KTM'],
+    [310, 440, 'IDK']
+  ];
+
+  points.forEach(([px, py, label]) => {
+    ctx.fillStyle = '#0fc5a1';
+    ctx.beginPath();
+    ctx.arc(px, py, 9, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = '#79fff2';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.arc(px, py, 18, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.fillStyle = '#16324a';
+    ctx.font = 'bold 24px Arial';
+    ctx.fillText(label, px + 18, py + 6);
+  });
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+
+  const frame = new THREE.Mesh(
+    new THREE.PlaneGeometry(w, h),
+    new THREE.MeshBasicMaterial({ color: 0xddd7cd })
+  );
+  frame.position.set(x, y, z);
+  scene.add(frame);
+
+  const map = new THREE.Mesh(
+    new THREE.PlaneGeometry(w * 0.94, h * 0.9),
+    new THREE.MeshBasicMaterial({ map: texture })
+  );
+  map.position.set(x, y, z + 0.001);
+  scene.add(map);
+}
+
+loadProp('./room.glb', (room) => {
+  scene.add(room);
+  applyWhiteRoomLook(room);
+
+  const box = new THREE.Box3().setFromObject(room);
+  const center = box.getCenter(new THREE.Vector3());
+  room.position.sub(center);
+
+  controls.target.set(0, 1.1, 0);
+});
+
+loadProp('./models/research_table.glb', (obj) => {
+  setObject(obj, new THREE.Vector3(-0.35, 0.0, -1.45), 1.0, 0.12);
+  scene.add(obj);
+});
+
+loadProp('./models/microscope.glb', (obj) => {
+  setObject(obj, new THREE.Vector3(-0.95, 0.80, -1.56), 0.48, 0.2);
+  scene.add(obj);
+});
+
+loadProp('./models/algae_specimen_jar_lowpoly.glb', (obj) => {
+  setObject(obj, new THREE.Vector3(-0.56, 0.83, -1.48), 0.7, -0.15);
+  scene.add(obj);
+});
+
+loadProp('./models/journal.glb', (obj) => {
+  setObject(obj, new THREE.Vector3(-0.08, 0.81, -1.42), 0.40, 0.45);
+  scene.add(obj);
+});
+
+loadProp('./models/laptop.glb', (obj) => {
+  setObject(obj, new THREE.Vector3(-0.55, 0.81, -1.17), 0.52, 0.35);
+  scene.add(obj);
+});
+
+loadProp('./models/coffee_cup.glb', (obj) => {
+  setObject(obj, new THREE.Vector3(0.22, 0.81, -1.30), 0.28, 0.0);
+  scene.add(obj);
+});
+
+loadProp('./models/glass_globe.glb', (obj) => {
+  setObject(obj, new THREE.Vector3(0.55, 0.84, -1.58), 0.75, 0.0);
+  scene.add(obj);
+});
+
+loadProp('./models/books.glb', (obj) => {
+  setObject(obj, new THREE.Vector3(0.92, 0.03, -1.52), 0.55, -0.2);
+  scene.add(obj);
+});
+
+loadProp('./models/marble_table_2.glb', (obj) => {
+  setObject(obj, new THREE.Vector3(1.55, 0.0, -0.25), 1.15, 0.0);
+  scene.add(obj);
+});
+
+const algaeTexture = texLoader.load('https://upload.wikimedia.org/wikipedia/commons/0/0e/Volvox_globator.jpg');
+algaeTexture.colorSpace = THREE.SRGBColorSpace;
+
+const tvFrame = new THREE.Mesh(
+  new THREE.PlaneGeometry(1.72, 1.02),
+  new THREE.MeshBasicMaterial({ color: 0x0d141d })
+);
+tvFrame.position.set(2.1, 1.45, -1.48);
+scene.add(tvFrame);
+
+const tvScreen = new THREE.Mesh(
+  new THREE.PlaneGeometry(1.56, 0.88),
+  new THREE.MeshBasicMaterial({ map: algaeTexture })
+);
+tvScreen.position.set(2.1, 1.45, -1.479);
+scene.add(tvScreen);
+
+const tvGlow = new THREE.PointLight(0x6cefff, 0.28, 4.5);
+tvGlow.position.set(2.1, 1.45, -1.0);
+scene.add(tvGlow);
+
+makeMonitorPanel(
+  -2.0, 1.62, -1.47, 1.5, 0.92,
+  'GRAVITY FIELD',
+  ['STATUS: ENABLED', 'CABIN STABILITY: NORMAL', 'ATMOSPHERE: STABLE']
+);
+
+makeMapBoard(-2.05, 0.95, -1.46, 1.42, 0.92);
+
+makeTechStrip(-2.72, 1.95, -1.42, 0, 0.9, 0.05);
+makeTechStrip(-2.72, 1.75, -1.42, 0, 0.55, 0.04);
+makeTechStrip(2.72, 1.95, -1.42, 0, 0.9, 0.05);
+makeTechStrip(2.72, 1.75, -1.42, 0, 0.55, 0.04);
+makeTechStrip(0.0, 2.08, -1.42, 0, 1.2, 0.04);
+
+const standGlow = new THREE.PointLight(0x82ffd9, 0.26, 3.2);
+standGlow.position.set(1.55, 0.8, -0.25);
+scene.add(standGlow);
+
+function animate() {
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene, camera);
+}
+animate();
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+</body>
+</html>

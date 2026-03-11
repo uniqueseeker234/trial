@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aquarium Layout Editor</title>
+  <style>
+    :root{
+      --bg:#07131a;
+      --panel:rgba(7,18,24,0.88);
+      --line:rgba(150,220,230,0.18);
+      --text:#e9fbff;
+      --muted:#a8d4da;
+      --accent:#63d7c6;
+      --accent2:#79bfff;
+      --danger:#ff7f96;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;height:100%;overflow:hidden;background:radial-gradient(circle at top,#0d2330,#050c10 60%,#03070a);font-family:Arial,Helvetica,sans-serif;color:var(--text)}
+    #app{position:fixed;inset:0}
+    canvas{display:block}
+    .panel{
+      position:fixed; z-index:10; background:var(--panel); backdrop-filter:blur(10px);
+      border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+    #leftPanel{left:14px; top:14px; width:320px; max-height:calc(100vh - 28px); overflow:auto; padding:14px}
+    #bottomPanel{left:14px; bottom:14px; width:420px; padding:12px}
+    #topHint{right:14px; top:14px; padding:12px 14px; font-size:13px; line-height:1.45; max-width:380px}
+    h1{margin:0 0 10px; font-size:20px}
+    h2{margin:14px 0 8px; font-size:14px; color:var(--accent)}
+    p, .mini{margin:6px 0; color:var(--muted); font-size:13px}
+    .row{display:flex; gap:8px; flex-wrap:wrap}
+    button, select{
+      background:#0d1f28; color:var(--text); border:1px solid var(--line);
+      border-radius:12px; padding:9px 11px; cursor:pointer; font-size:13px;
+    }
+    button:hover, select:hover{border-color:rgba(121,191,255,.5)}
+    button.active{background:linear-gradient(180deg, rgba(99,215,198,.22), rgba(121,191,255,.16)); border-color:rgba(99,215,198,.55)}
+    button.warn{border-color:rgba(255,127,150,.45)}
+    .list{display:grid; gap:8px; margin-top:8px}
+    .itemBtn{width:100%; text-align:left; padding:10px 12px}
+    .itemBtn small{display:block; color:var(--muted); margin-top:3px}
+    .itemBtn.active{outline:2px solid rgba(99,215,198,.5)}
+    .coords{
+      display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:8px
+    }
+    .card{
+      background:rgba(255,255,255,.03); border:1px solid var(--line); border-radius:12px; padding:8px
+    }
+    .card b{display:block; color:#fff; margin-bottom:4px}
+    code, pre{
+      font-family:Consolas,monospace; font-size:12px; white-space:pre-wrap; word-break:break-word;
+      color:#e8ffff;
+    }
+    #jsonOut{
+      max-height:180px; overflow:auto; background:rgba(0,0,0,.22);
+      border-radius:12px; padding:10px; border:1px solid var(--line)
+    }
+    .pill{
+      display:inline-block; padding:5px 8px; border-radius:999px; border:1px solid var(--line);
+      font-size:12px; color:var(--muted); margin:2px 4px 2px 0
+    }
+  </style>
+</head>
+<body>
+<div id="app"></div>
+
+<div id="leftPanel" class="panel">
+  <h1>Aquarium Layout Editor</h1>
+  <p>Click any object in the 3D view or select it below. Then move it with the editor gizmo.</p>
+
+  <h2>Camera</h2>
+  <div class="row">
+    <button id="camFront">Front</button>
+    <button id="camTop">Top</button>
+    <button id="camSide">Side</button>
+    <button id="camFree" class="active">Free Orbit</button>
+  </div>
+
+  <h2>Transform Mode</h2>
+  <div class="row">
+    <button id="modeTranslate" class="active">Move</button>
+    <button id="modeRotate">Rotate</button>
+    <button id="modeScale">Scale</button>
+  </div>
+
+  <h2>Scene Objects</h2>
+  <div id="objectList" class="list"></div>
+
+  <h2>Actions</h2>
+  <div class="row">
+    <button id="copyJson">Copy coordinates</button>
+    <button id="saveLocal">Save layout</button>
+    <button id="loadLocal">Load layout</button>
+    <button id="resetScene" class="warn">Reset</button>
+  </div>
+
+  <h2>Tips</h2>
+  <div>
+    <span class="pill">Left click = select</span>
+    <span class="pill">Drag arrows = move</span>
+    <span class="pill">E = rotate</span>
+    <span class="pill">R = scale</span>
+    <span class="pill">W = move</span>
+    <span class="pill">Orbit with mouse</span>
+  </div>
+</div>
+
+<div id="bottomPanel" class="panel">
+  <div id="selectionName"><b>No object selected</b></div>
+  <div class="coords">
+    <div class="card"><b>Position</b><code id="posText">x: -\ny: -\nz: -</code></div>
+    <div class="card"><b>Rotation</b><code id="rotText">x: -\ny: -\nz: -</code></div>
+    <div class="card"><b>Scale</b><code id="scaleText">x: -\ny: -\nz: -</code></div>
+  </div>
+  <h2 style="margin-top:12px">Current exact coordinates</h2>
+  <pre id="jsonOut">{}</pre>
+</div>
+
+<div id="topHint" class="panel">
+  <b>What this gives you</b>
+  <div class="mini">
+    A full 3D editable aquarium scene with frog, lily pad, lotus flowers, fish, rocks, and bubbles.
+    Reposition everything visually, then copy the exact coordinates and use them in your final project file.
+  </div>
+</div>
+
+<script type="module">
+import * as THREE from "https://unpkg.com/three@0.161.0/build/three.module.js";
+import { OrbitControls } from "https://unpkg.com/three@0.161.0/examples/jsm/controls/OrbitControls.js";
+import { TransformControls } from "https://unpkg.com/three@0.161.0/examples/jsm/controls/TransformControls.js";
+
+const app = document.getElementById('app');
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0x07131a, 14, 34);
+
+const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+app.appendChild(renderer.domElement);
+
+const camera = new THREE.PerspectiveCamera(48, window.innerWidth/window.innerHeight, 0.1, 100);
+camera.position.set(0, 4.5, 10.5);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.target.set(0, 1.8, 0);
+controls.maxDistance = 22;
+controls.minDistance = 4.5;
+
+const transformControls = new TransformControls(camera, renderer.domElement);
+transformControls.setSize(0.9);
+transformControls.addEventListener('dragging-changed', (e) => controls.enabled = !e.value);
+transformControls.addEventListener('objectChange', () => refreshUI());
+scene.add(transformControls);
+
+// Lights
+scene.add(new THREE.AmbientLight(0xbfefff, 0.85));
+
+const keyLight = new THREE.DirectionalLight(0xe6ffff, 1.45);
+keyLight.position.set(5, 10, 6);
+keyLight.castShadow = true;
+keyLight.shadow.mapSize.set(2048, 2048);
+scene.add(keyLight);
+
+const fillLight = new THREE.DirectionalLight(0x79c7ff, 0.7);
+fillLight.position.set(-5, 5, -4);
+scene.add(fillLight);
+
+const glowLight = new THREE.PointLight(0x63d7c6, 1.0, 12);
+glowLight.position.set(0, 4.2, 0);
+scene.add(glowLight);
+
+// Environment ground
+const ground = new THREE.Mesh(
+  new THREE.CircleGeometry(22, 64),
+  new THREE.MeshStandardMaterial({ color:0x0a1720, roughness:1 })
+);
+ground.rotation.x = -Math.PI/2;
+ground.position.y = -0.01;
+scene.add(ground);
+
+// Aquarium group
+const aquarium = new THREE.Group();
+aquarium.name = "Aquarium";
+scene.add(aquarium);
+
+const glassMat = new THREE.MeshPhysicalMaterial({
+  color:0xc5f7ff,
+  transparent:true,
+  opacity:0.16,
+  roughness:0.1,
+  metalness:0,
+  transmission:0.2,
+  thickness:0.4
+});
+const frameMat = new THREE.MeshStandardMaterial({ color:0x6fcfbe, metalness:0.55, roughness:0.35 });
+const waterMat = new THREE.MeshPhysicalMaterial({
+  color:0x37a89a,
+  transparent:true,
+  opacity:0.72,
+  roughness:0.08,
+  metalness:0.02,
+  transmission:0.15
+});
+
+const tankW = 8.5, tankH = 4.6, tankD = 5.6;
+const tankBox = new THREE.Mesh(new THREE.BoxGeometry(tankW, tankH, tankD), glassMat);
+tankBox.position.y = tankH/2;
+aquarium.add(tankBox);
+
+const edges = new THREE.LineSegments(
+  new THREE.EdgesGeometry(new THREE.BoxGeometry(tankW, tankH, tankD)),
+  new THREE.LineBasicMaterial({ color:0x99fff0 })
+);
+edges.position.copy(tankBox.position);
+aquarium.add(edges);
+
+const water = new THREE.Mesh(new THREE.BoxGeometry(tankW-0.25, tankH*0.82, tankD-0.25), waterMat);
+water.position.set(0, (tankH*0.82)/2 + 0.04, 0);
+aquarium.add(water);
+
+const floor = new THREE.Mesh(
+  new THREE.BoxGeometry(tankW-0.45, 0.18, tankD-0.45),
+  new THREE.MeshStandardMaterial({ color:0x44655a, roughness:0.95 })
+);
+floor.position.set(0, 0.09, 0);
+aquarium.add(floor);
+
+// Surface shimmer
+const surface = new THREE.Mesh(
+  new THREE.PlaneGeometry(tankW-0.3, tankD-0.3, 40, 30),
+  new THREE.MeshStandardMaterial({
+    color:0x8ffff0, transparent:true, opacity:0.18, roughness:0.2, metalness:0.1, side:THREE.DoubleSide
+  })
+);
+surface.rotation.x = -Math.PI/2;
+surface.position.set(0, tankH*0.82 + 0.02, 0);
+aquarium.add(surface);
+
+// Decorative objects
+const editable = [];
+const startState = {};
+
+function rememberStart(obj){
+  startState[obj.name] = {
+    p: obj.position.clone(),
+    r: obj.rotation.clone(),
+    s: obj.scale.clone()
+  };
+}
+
+function makePad(name, x, z, scale=1){
+  const g = new THREE.Group();
+  g.name = name;
+  const pad = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.62, 0.7, 0.07, 32),
+    new THREE.MeshStandardMaterial({ color:0x3ead75, roughness:0.85 })
+  );
+  pad.scale.set(scale, 1, scale*0.88);
+  const cut = new THREE.Mesh(
+    new THREE.BoxGeometry(0.45, 0.12, 0.24),
+    new THREE.MeshStandardMaterial({ color:0x2c8f5c })
+  );
+  cut.position.set(0.45, 0, 0);
+  cut.rotation.y = 0.48;
+  g.add(pad, cut);
+  g.position.set(x, tankH*0.82 + 0.09, z);
+  aquarium.add(g);
+  editable.push(g);
+  rememberStart(g);
+  return g;
+}
+
+function makeLotus(name, x, z, scale=1){
+  const g = new THREE.Group();
+  g.name = name;
+
+  const petalMat = new THREE.MeshStandardMaterial({ color:0xf5b0df, roughness:0.7 });
+  for(let i=0;i<10;i++){
+    const petal = new THREE.Mesh(new THREE.SphereGeometry(0.18, 18, 16), petalMat);
+    petal.scale.set(0.65, 0.18, 1.2);
+    const a = (i/10) * Math.PI*2;
+    petal.position.set(Math.cos(a)*0.22, 0, Math.sin(a)*0.22);
+    petal.rotation.y = a;
+    g.add(petal);
+  }
+  const core = new THREE.Mesh(
+    new THREE.SphereGeometry(0.14, 20, 16),
+    new THREE.MeshStandardMaterial({ color:0xffd866, roughness:0.7 })
+  );
+  core.scale.y = 0.65;
+  g.add(core);
+  g.scale.setScalar(scale);
+  g.position.set(x, tankH*0.82 + 0.13, z);
+  aquarium.add(g);
+  editable.push(g);
+  rememberStart(g);
+  return g;
+}
+
+function makeFrog(name, x, z, scale=1){
+  const g = new THREE.Group();
+  g.name = name;
+  const mat = new THREE.MeshStandardMaterial({ color:0x63a14c, roughness:0.85 });
+
+  const body = new THREE.Mesh(new THREESphere(0.34), mat);
+  body.scale.set(1.15, 0.75, 1.35);
+  body.position.y = 0.22;
+
+  const head = new THREE.Mesh(new THREESphere(0.24), mat);
+  head.scale.set(1.1, 0.9, 1.1);
+  head.position.set(0, 0.34, 0.28);
+
+  const eyeMat = new THREE.MeshStandardMaterial({ color:0xf4fff8, roughness:0.6 });
+  const pupilMat = new THREE.MeshStandardMaterial({ color:0x101010, roughness:0.4 });
+
+  const eyeL = new THREE.Mesh(new THREESphere(0.09), eyeMat);
+  eyeL.position.set(-0.12, 0.5, 0.37);
+  const eyeR = eyeL.clone(); eyeR.position.x = 0.12;
+  const pupilL = new THREE.Mesh(new THREESphere(0.032), pupilMat);
+  pupilL.position.set(-0.12, 0.5, 0.44);
+  const pupilR = pupilL.clone(); pupilR.position.x = 0.12;
+
+  const legGeo = new THREE.CapsuleGeometry(0.06, 0.22, 4, 8);
+  const leg1 = new THREE.Mesh(legGeo, mat);
+  leg1.position.set(-0.2, 0.11, 0.05); leg1.rotation.z = 0.85;
+  const leg2 = leg1.clone(); leg2.position.x = 0.2; leg2.rotation.z = -0.85;
+  const back1 = new THREE.Mesh(legGeo, mat);
+  back1.position.set(-0.24, 0.1, -0.22); back1.rotation.z = 1.1; back1.rotation.x = 0.7;
+  const back2 = back1.clone(); back2.position.x = 0.24; back2.rotation.z = -1.1;
+
+  g.add(body, head, eyeL, eyeR, pupilL, pupilR, leg1, leg2, back1, back2);
+  g.scale.setScalar(scale);
+  g.position.set(x, tankH*0.82 + 0.19, z);
+  aquarium.add(g);
+  editable.push(g);
+  rememberStart(g);
+  return g;
+}
+
+function makeFish(name, x, y, z, color=0xf8a45a, dir=1, scale=1){
+  const g = new THREE.Group();
+  g.name = name;
+
+  const mat = new THREE.MeshStandardMaterial({ color, roughness:0.55 });
+  const body = new THREE.Mesh(new THREESphere(0.18), mat);
+  body.scale.set(1.8, 1, 0.8);
+
+  const tail = new THREE.Mesh(
+    new THREE.ConeGeometry(0.16, 0.26, 4),
+    mat
+  );
+  tail.rotation.z = Math.PI/2;
+  tail.position.x = -0.34;
+
+  const fin = new THREE.Mesh(
+    new THREE.ConeGeometry(0.08, 0.16, 4),
+    mat
+  );
+  fin.position.set(0,0.12,0);
+  fin.rotation.z = Math.PI;
+  const eye = new THREE.Mesh(
+    new THREESphere(0.018),
+    new THREE.MeshStandardMaterial({ color:0x111111 })
+  );
+  eye.position.set(0.19, 0.04, 0.1);
+  const eye2 = eye.clone(); eye2.position.z = -0.1;
+
+  g.add(body, tail, fin, eye, eye2);
+  g.scale.setScalar(scale);
+  g.position.set(x,y,z);
+  g.rotation.y = dir < 0 ? Math.PI : 0;
+  aquarium.add(g);
+  editable.push(g);
+  rememberStart(g);
+  return g;
+}
+
+function makeRock(name, x, z, scale=1){
+  const rock = new THREE.Mesh(
+    new THREE.DodecahedronGeometry(0.34, 0),
+    new THREE.MeshStandardMaterial({ color:0x7d8b91, roughness:1 })
+  );
+  rock.name = name;
+  rock.scale.set(scale*1.2, scale*0.85, scale);
+  rock.position.set(x, 0.25, z);
+  aquarium.add(rock);
+  editable.push(rock);
+  rememberStart(rock);
+  return rock;
+}
+
+function makeBubble(name, x, y, z, scale=1){
+  const bubble = new THREE.Mesh(
+    new THREE.SphereGeometry(0.09, 18, 18),
+    new THREE.MeshPhysicalMaterial({
+      color:0xcafcff, transparent:true, opacity:0.45, roughness:0, transmission:0.8
+    })
+  );
+  bubble.name = name;
+  bubble.position.set(x,y,z);
+  bubble.scale.setScalar(scale);
+  aquarium.add(bubble);
+  editable.push(bubble);
+  rememberStart(bubble);
+  bubble.userData.floaty = true;
+  bubble.userData.baseY = y;
+  return bubble;
+}
+
+function new THREESphere(r){ return new THREE.SphereGeometry(r, 20, 18); }
+
+// Default layout
+makePad("pad_main", 1.15, -0.25, 1.12);
+makeFrog("frog_main", 1.18, -0.18, 1.0);
+makePad("pad_left", -1.55, -0.35, 0.95);
+makePad("pad_right", 2.25, 0.85, 0.84);
+makeLotus("lotus_left", -2.2, -0.15, 1.05);
+makeLotus("lotus_right", 2.85, 0.25, 0.98);
+makeFish("fish_1", -1.5, 2.1, 1.2, 0xffb066, 1, 1.0);
+makeFish("fish_2", 1.5, 1.7, -1.1, 0x7ab8ff, -1, 0.92);
+makeRock("rock_left", -2.65, -1.55, 1.1);
+makeRock("rock_right", 2.6, 1.6, 0.9);
+makeBubble("bubble_1", -2.1, 0.8, 1.8, 0.9);
+makeBubble("bubble_2", -1.75, 1.5, 1.55, 0.75);
+makeBubble("bubble_3", -2.0, 2.3, 1.7, 0.62);
+
+// Selection helpers
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+let selected = null;
+
+function selectObject(obj){
+  selected = obj;
+  transformControls.attach(obj);
+  refreshUI();
+  highlightButtons();
+}
+
+function deselectObject(){
+  selected = null;
+  transformControls.detach();
+  refreshUI();
+  highlightButtons();
+}
+
+function findEditableRoot(object){
+  let o = object;
+  while(o && !editable.includes(o) && o.parent) o = o.parent;
+  return editable.includes(o) ? o : null;
+}
+
+renderer.domElement.addEventListener('pointerdown', (e)=>{
+  pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
+  pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(pointer, camera);
+  const hits = raycaster.intersectObjects(aquarium.children, true);
+  if(!hits.length){ return; }
+  const root = findEditableRoot(hits[0].object);
+  if(root) selectObject(root);
+});
+
+// UI
+const objectList = document.getElementById('objectList');
+function buildObjectButtons(){
+  objectList.innerHTML = "";
+  editable.forEach(obj=>{
+    const btn = document.createElement('button');
+    btn.className = 'itemBtn';
+    btn.dataset.name = obj.name;
+    btn.innerHTML = `<b>${obj.name}</b><small>click to select</small>`;
+    btn.onclick = () => selectObject(obj);
+    objectList.appendChild(btn);
+  });
+}
+buildObjectButtons();
+
+function highlightButtons(){
+  document.querySelectorAll('.itemBtn').forEach(btn=>{
+    btn.classList.toggle('active', selected && btn.dataset.name === selected.name);
+  });
+}
+
+const selectionName = document.getElementById('selectionName');
+const posText = document.getElementById('posText');
+const rotText = document.getElementById('rotText');
+const scaleText = document.getElementById('scaleText');
+const jsonOut = document.getElementById('jsonOut');
+
+function n(v){ return Number(v).toFixed(3); }
+function deg(v){ return Number(THREE.MathUtils.radToDeg(v)).toFixed(1); }
+
+function exportStateObject(){
+  const out = {};
+  editable.forEach(obj=>{
+    out[obj.name] = {
+      position: { x:+n(obj.position.x), y:+n(obj.position.y), z:+n(obj.position.z) },
+      rotation: { x:+n(obj.rotation.x), y:+n(obj.rotation.y), z:+n(obj.rotation.z) },
+      scale: { x:+n(obj.scale.x), y:+n(obj.scale.y), z:+n(obj.scale.z) }
+    };
+  });
+  return out;
+}
+
+function refreshUI(){
+  if(!selected){
+    selectionName.innerHTML = "<b>No object selected</b>";
+    posText.textContent = "x: -\ny: -\nz: -";
+    rotText.textContent = "x: -\ny: -\nz: -";
+    scaleText.textContent = "x: -\ny: -\nz: -";
+  }else{
+    selectionName.innerHTML = `<b>Selected: ${selected.name}</b>`;
+    posText.textContent = `x: ${n(selected.position.x)}\ny: ${n(selected.position.y)}\nz: ${n(selected.position.z)}`;
+    rotText.textContent = `x: ${deg(selected.rotation.x)}°\ny: ${deg(selected.rotation.y)}°\nz: ${deg(selected.rotation.z)}°`;
+    scaleText.textContent = `x: ${n(selected.scale.x)}\ny: ${n(selected.scale.y)}\nz: ${n(selected.scale.z)}`;
+  }
+  jsonOut.textContent = JSON.stringify(exportStateObject(), null, 2);
+}
+refreshUI();
+
+document.getElementById('modeTranslate').onclick = ()=>setMode('translate');
+document.getElementById('modeRotate').onclick = ()=>setMode('rotate');
+document.getElementById('modeScale').onclick = ()=>setMode('scale');
+
+function setMode(mode){
+  transformControls.setMode(mode);
+  document.getElementById('modeTranslate').classList.toggle('active', mode==='translate');
+  document.getElementById('modeRotate').classList.toggle('active', mode==='rotate');
+  document.getElementById('modeScale').classList.toggle('active', mode==='scale');
+}
+
+window.addEventListener('keydown', (e)=>{
+  if(e.key.toLowerCase()==='w') setMode('translate');
+  if(e.key.toLowerCase()==='e') setMode('rotate');
+  if(e.key.toLowerCase()==='r') setMode('scale');
+  if(e.key === 'Escape') deselectObject();
+});
+
+function tweenCamera(pos, target){
+  camera.position.copy(pos);
+  controls.target.copy(target);
+  controls.update();
+  document.getElementById('camFront').classList.remove('active');
+  document.getElementById('camTop').classList.remove('active');
+  document.getElementById('camSide').classList.remove('active');
+  document.getElementById('camFree').classList.remove('active');
+}
+document.getElementById('camFront').onclick = ()=>{
+  tweenCamera(new THREE.Vector3(0,4.0,11.2), new THREE.Vector3(0,1.8,0));
+  document.getElementById('camFront').classList.add('active');
+};
+document.getElementById('camTop').onclick = ()=>{
+  tweenCamera(new THREE.Vector3(0,13.5,0.001), new THREE.Vector3(0,1.8,0));
+  document.getElementById('camTop').classList.add('active');
+};
+document.getElementById('camSide').onclick = ()=>{
+  tweenCamera(new THREE.Vector3(11.5,3.6,0), new THREE.Vector3(0,1.8,0));
+  document.getElementById('camSide').classList.add('active');
+};
+document.getElementById('camFree').onclick = ()=>{
+  tweenCamera(new THREE.Vector3(0,4.5,10.5), new THREE.Vector3(0,1.8,0));
+  document.getElementById('camFree').classList.add('active');
+};
+
+document.getElementById('copyJson').onclick = async ()=>{
+  const text = JSON.stringify(exportStateObject(), null, 2);
+  try{
+    await navigator.clipboard.writeText(text);
+    alert('Coordinates copied.');
+  }catch(err){
+    alert('Could not copy automatically. You can still copy from the box below.');
+  }
+};
+
+document.getElementById('saveLocal').onclick = ()=>{
+  localStorage.setItem('aquariumLayoutEditorState', JSON.stringify(exportStateObject()));
+  alert('Layout saved in your browser.');
+};
+
+document.getElementById('loadLocal').onclick = ()=>{
+  const raw = localStorage.getItem('aquariumLayoutEditorState');
+  if(!raw){ alert('No saved layout found.'); return; }
+  try{
+    applyState(JSON.parse(raw));
+    refreshUI();
+    alert('Saved layout loaded.');
+  }catch(err){
+    alert('Saved data could not be loaded.');
+  }
+};
+
+document.getElementById('resetScene').onclick = ()=>{
+  editable.forEach(obj=>{
+    const s = startState[obj.name];
+    obj.position.copy(s.p);
+    obj.rotation.set(s.r.x, s.r.y, s.r.z);
+    obj.scale.copy(s.s);
+  });
+  refreshUI();
+};
+
+function applyState(data){
+  editable.forEach(obj=>{
+    const d = data[obj.name];
+    if(!d) return;
+    if(d.position) obj.position.set(d.position.x, d.position.y, d.position.z);
+    if(d.rotation) obj.rotation.set(d.rotation.x, d.rotation.y, d.rotation.z);
+    if(d.scale) obj.scale.set(d.scale.x, d.scale.y, d.scale.z);
+  });
+}
+
+window.addEventListener('resize', ()=>{
+  camera.aspect = window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// animation
+const clock = new THREE.Clock();
+function animate(){
+  requestAnimationFrame(animate);
+  const t = clock.getElapsedTime();
+
+  // mild water ripple
+  const pos = surface.geometry.attributes.position;
+  for(let i=0;i<pos.count;i++){
+    const x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i);
+    pos.setZ(i, Math.sin((x*1.2)+t*1.6)*0.035 + Math.cos((y*1.35)+t*1.2)*0.03);
+  }
+  pos.needsUpdate = true;
+  surface.geometry.computeVertexNormals();
+
+  editable.forEach(obj=>{
+    if(obj.userData.floaty){
+      obj.position.y = obj.userData.baseY + Math.sin(t*1.8 + obj.position.x)*0.06;
+    }
+    if(obj.name.startsWith('fish_') && obj !== selected){
+      obj.position.x += Math.sin(t*0.9 + obj.position.z)*0.0025 * (obj.rotation.y > 1 ? -1 : 1);
+      obj.rotation.z = Math.sin(t*3 + obj.position.z)*0.08;
+    }
+  });
+
+  controls.update();
+  renderer.render(scene, camera);
+}
+animate();
+</script>
+</body>
+</html>

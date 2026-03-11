@@ -1,0 +1,178 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Aquarium Layout Editor</title>
+<style>
+body{margin:0;background:#0b1a22;color:white;font-family:Arial}
+#panel{
+position:fixed;
+top:10px;
+left:10px;
+background:rgba(0,0,0,.65);
+padding:12px;
+border-radius:10px;
+font-size:14px;
+}
+button{margin:3px;padding:6px 10px}
+</style>
+</head>
+
+<body>
+
+<div id="panel">
+<b>Aquarium Layout Editor</b><br>
+Click frog/pad/lotus then drag arrows<br><br>
+<button onclick="setMode('translate')">Move</button>
+<button onclick="setMode('rotate')">Rotate</button>
+<button onclick="setMode('scale')">Scale</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/TransformControls.js"></script>
+
+<script>
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0b1a22);
+
+const camera = new THREE.PerspectiveCamera(60,window.innerWidth/window.innerHeight,0.1,100);
+camera.position.set(0,5,10);
+
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(window.innerWidth,window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+const orbit = new THREE.OrbitControls(camera,renderer.domElement);
+
+const transform = new THREE.TransformControls(camera,renderer.domElement);
+scene.add(transform);
+
+transform.addEventListener("dragging-changed",function(e){
+orbit.enabled=!e.value;
+});
+
+function setMode(m){ transform.setMode(m); }
+
+scene.add(new THREE.AmbientLight(0xffffff,0.8));
+
+const sun=new THREE.DirectionalLight(0xffffff,1);
+sun.position.set(5,10,5);
+scene.add(sun);
+
+/* aquarium */
+
+const tank = new THREE.Mesh(
+new THREE.BoxGeometry(8,4,5),
+new THREE.MeshBasicMaterial({color:0x44cccc,wireframe:true})
+);
+tank.position.y=2;
+scene.add(tank);
+
+/* objects */
+
+const objects=[];
+
+function addObject(name,obj,x,y,z){
+obj.name=name;
+obj.position.set(x,y,z);
+scene.add(obj);
+objects.push(obj);
+}
+
+function frog(){
+
+const g=new THREE.Group();
+
+const body=new THREE.Mesh(
+new THREE.SphereGeometry(.5,20,20),
+new THREE.MeshStandardMaterial({color:0x55aa55})
+);
+
+body.scale.set(1.4,.7,1.6);
+
+g.add(body);
+
+return g;
+
+}
+
+function pad(){
+
+return new THREE.Mesh(
+new THREE.CylinderGeometry(.7,.7,.1,32),
+new THREE.MeshStandardMaterial({color:0x2fa36b})
+);
+
+}
+
+function lotus(){
+
+return new THREE.Mesh(
+new THREE.SphereGeometry(.3,16,16),
+new THREE.MeshStandardMaterial({color:0xff88dd})
+);
+
+}
+
+addObject("frog",frog(),1,2.2,0);
+addObject("pad",pad(),1,2,0);
+addObject("lotus_left",lotus(),-2,2.1,0);
+addObject("lotus_right",lotus(),2,2.1,0);
+
+/* selection */
+
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+window.addEventListener("pointerdown",function(e){
+
+mouse.x = (e.clientX/window.innerWidth)*2-1;
+mouse.y = -(e.clientY/window.innerHeight)*2+1;
+
+raycaster.setFromCamera(mouse,camera);
+
+const hits = raycaster.intersectObjects(objects,true);
+
+if(hits.length){
+
+let obj = hits[0].object;
+
+while(obj.parent && !objects.includes(obj)){
+obj=obj.parent;
+}
+
+transform.attach(obj);
+
+}
+
+});
+
+/* render */
+
+function animate(){
+
+requestAnimationFrame(animate);
+
+orbit.update();
+
+renderer.render(scene,camera);
+
+}
+
+animate();
+
+window.addEventListener("resize",function(){
+
+camera.aspect=window.innerWidth/window.innerHeight;
+camera.updateProjectionMatrix();
+renderer.setSize(window.innerWidth,window.innerHeight);
+
+});
+
+</script>
+
+</body>
+</html>

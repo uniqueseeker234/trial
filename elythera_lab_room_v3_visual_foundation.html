@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elythera Lab Room V3</title>
+
+<style>
+html,body{
+  margin:0;
+  height:100%;
+  overflow:hidden;
+  background:#e9eef4;
+  font-family:Arial,sans-serif;
+}
+#hud{
+  position:fixed;
+  top:10px;
+  left:10px;
+  background:rgba(12,18,28,0.62);
+  color:white;
+  padding:10px 12px;
+  border-radius:10px;
+  font-size:13px;
+  line-height:1.45;
+  z-index:20;
+  backdrop-filter:blur(8px);
+}
+</style>
+
+<script type="importmap">
+{
+  "imports":{
+    "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+
+<body>
+
+<div id="hud">
+  Mission Elythera Lab – V3<br>
+  Drag to look around inside the room
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xeef3f7);
+
+const camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.01, 2000);
+
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+document.body.appendChild(renderer.domElement);
+
+const loader = new GLTFLoader();
+const texLoader = new THREE.TextureLoader();
+const maxAniso = renderer.capabilities.getMaxAnisotropy();
+
+/* --- Lights --- */
+scene.add(new THREE.HemisphereLight(0xffffff, 0xdce6ef, 2.1));
+
+const dir = new THREE.DirectionalLight(0xffffff, 2.0);
+dir.position.set(5,7,5);
+scene.add(dir);
+
+const fill = new THREE.PointLight(0xf7fcff, 0.9, 20);
+fill.position.set(-3, 2.2, 3.5);
+scene.add(fill);
+
+const warm = new THREE.PointLight(0xfff3df, 0.55, 12);
+warm.position.set(-0.9, 1.6, -1.1);
+scene.add(warm);
+
+const techGlow = new THREE.PointLight(0x9cf6ff, 0.45, 14);
+techGlow.position.set(2.1, 1.6, -1.35);
+scene.add(techGlow);
+
+function loadGLB(path){
+  return new Promise((resolve,reject)=>{
+    loader.load(path, g => resolve(g.scene), undefined, reject);
+  });
+}
+
+function boxSize(obj){
+  return new THREE.Box3().setFromObject(obj).getSize(new THREE.Vector3());
+}
+
+function boxMinMax(obj){
+  const b = new THREE.Box3().setFromObject(obj);
+  return {min:b.min.clone(), max:b.max.clone(), size:b.getSize(new THREE.Vector3())};
+}
+
+function scaleTo(obj,target){
+  const s = boxSize(obj);
+  const m = Math.max(s.x,s.y,s.z);
+  if(m > 0) obj.scale.multiplyScalar(target/m);
+}
+
+function scaleWidth(obj,w){
+  const s = boxSize(obj);
+  if(s.x > 0) obj.scale.multiplyScalar(w/s.x);
+}
+
+function prepMaterials(root){
+  root.traverse((child)=>{
+    if(!child.isMesh) return;
+
+    const mats = Array.isArray(child.material) ? child.material : [child.material];
+    mats.forEach(mat=>{
+      if(!mat) return;
+      mat.side = THREE.DoubleSide;
+
+      if(mat.map){
+        mat.map.colorSpace = THREE.SRGBColorSpace;
+        mat.map.anisotropy = maxAniso;
+      }
+
+      if(mat.color){
+        const c = mat.color;
+        const bright = (c.r + c.g + c.b) / 3;
+
+        if(bright < 0.12){
+          mat.color.set(0xdfe5ec);
+        }else if(bright < 0.55){
+          mat.color.lerp(new THREE.Color(0xe8edf2), 0.45);
+        }
+      }
+
+      if('roughness' in mat && mat.roughness !== undefined){
+        mat.roughness = Math.min(1, mat.roughness + 0.05);
+      }
+      if('metalness' in mat && mat.metalness !== undefined){
+        mat.metalness *= 0.55;
+      }
+      mat.needsUpdate = true;
+    });
+  });
+}
+
+/* --- Human-eye interior camera --- */
+let eye = new THREE.Vector3(0,1.2,0.8);
+let yaw = 0;
+let pitch = 0;
+let drag = false;
+let lastX = 0;
+let lastY = 0;
+
+function updateLook(){
+  const dir = new THREE.Vector3(
+    Math.cos(pitch) * Math.sin(yaw),
+    Math.sin(pitch),
+    -Math.cos(pitch) * Math.cos(yaw)
+  );
+  camera.position.copy(eye);
+  camera.lookAt(eye.clone().add(dir));
+}
+
+function makeGlowStrip(x,y,z,w,h,rotY=0){
+  const panel = new THREE.Mesh(
+    new THREE.PlaneGeometry(w,h),
+    new THREE.MeshBasicMaterial({color:0x93f4ff, transparent:true, opacity:0.78})
+  );
+  panel.position.set(x,y,z);
+  panel.rotation.y = rotY;
+  scene.add(panel);
+
+  const glow = new THREE.PointLight(0x9ff8ff, 0.18, 3.2);
+  glow.position.copy(panel.position);
+  scene.add(glow);
+}
+
+function makeCanvasMonitor(title, lines, w, h, x, y, z){
+  const canvas = document.createElement('canvas');
+  canvas.width = 900;
+  canvas.height = 520;
+  const ctx = canvas.getContext('2d');
+
+  ctx.fillStyle = '#101a24';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  ctx.strokeStyle = '#39e6ff';
+  ctx.lineWidth = 8;
+  ctx.strokeRect(18,18,canvas.width-36,canvas.height-36);
+
+  ctx.fillStyle = '#92f7ff';
+  ctx.font = 'bold 54px Arial';
+  ctx.fillText(title, 50, 95);
+
+  ctx.fillStyle = '#d7fcff';
+  ctx.font = '36px Arial';
+  let yy = 182;
+  lines.forEach(line=>{
+    ctx.fillText(line, 50, yy);
+    yy += 68;
+  });
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = maxAniso;
+
+  const frame = new THREE.Mesh(
+    new THREE.PlaneGeometry(w,h),
+    new THREE.MeshBasicMaterial({color:0x111a22})
+  );
+  frame.position.set(x,y,z);
+  scene.add(frame);
+
+  const screen = new THREE.Mesh(
+    new THREE.PlaneGeometry(w*0.92,h*0.82),
+    new THREE.MeshBasicMaterial({map:tex})
+  );
+  screen.position.set(x,y,z+0.001);
+  scene.add(screen);
+}
+
+function makeMapBoard(x,y,z,w,h){
+  const canvas = document.createElement('canvas');
+  canvas.width = 900;
+  canvas.height = 560;
+  const ctx = canvas.getContext('2d');
+
+  ctx.fillStyle = '#f5f0e6';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  ctx.strokeStyle = '#888';
+  ctx.lineWidth = 10;
+  ctx.strokeRect(16,16,canvas.width-32,canvas.height-32);
+
+  ctx.fillStyle = '#222';
+  ctx.font = 'bold 38px Arial';
+  ctx.fillText('Algae Discovery Locations', 34, 54);
+
+  ctx.fillStyle = '#d7e4c4';
+  ctx.beginPath();
+  ctx.moveTo(260,110);
+  ctx.bezierCurveTo(300,90,380,130,400,170);
+  ctx.bezierCurveTo(430,230,420,320,390,390);
+  ctx.bezierCurveTo(360,450,330,500,300,520);
+  ctx.bezierCurveTo(250,520,235,450,225,380);
+  ctx.bezierCurveTo(215,320,220,235,225,180);
+  ctx.bezierCurveTo(228,150,242,120,260,110);
+  ctx.fill();
+
+  const points = [[295,155,'TVM'],[308,230,'KLM'],[300,300,'ALP'],[286,368,'KTM'],[310,440,'IDK']];
+  points.forEach(([px,py,label])=>{
+    ctx.fillStyle = '#0fc5a1';
+    ctx.beginPath();
+    ctx.arc(px, py, 9, 0, Math.PI*2);
+    ctx.fill();
+
+    ctx.strokeStyle = '#79fff2';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.arc(px, py, 18, 0, Math.PI*2);
+    ctx.stroke();
+
+    ctx.fillStyle = '#16324a';
+    ctx.font = 'bold 24px Arial';
+    ctx.fillText(label, px+18, py+6);
+  });
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = maxAniso;
+
+  const frame = new THREE.Mesh(
+    new THREE.PlaneGeometry(w,h),
+    new THREE.MeshBasicMaterial({color:0xddd7cd})
+  );
+  frame.position.set(x,y,z);
+  scene.add(frame);
+
+  const map = new THREE.Mesh(
+    new THREE.PlaneGeometry(w*0.94,h*0.90),
+    new THREE.MeshBasicMaterial({map:tex})
+  );
+  map.position.set(x,y,z+0.001);
+  scene.add(map);
+}
+
+function makeTVScreen(x,y,z){
+  const canvas = document.createElement('canvas');
+  canvas.width = 1024;
+  canvas.height = 576;
+  const ctx = canvas.getContext('2d');
+
+  const grad = ctx.createLinearGradient(0,0,1024,576);
+  grad.addColorStop(0,'#0e2233');
+  grad.addColorStop(1,'#133c4d');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0,0,1024,576);
+
+  for(let i=0;i<18;i++){
+    const px = 80 + Math.random()*860;
+    const py = 80 + Math.random()*400;
+    const r = 20 + Math.random()*46;
+    ctx.beginPath();
+    ctx.arc(px,py,r,0,Math.PI*2);
+    ctx.fillStyle = 'rgba(108,255,175,0.14)';
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'rgba(127,255,221,0.88)';
+    ctx.stroke();
+
+    for(let j=0;j<8;j++){
+      const a = Math.random()*Math.PI*2;
+      const rr = r*0.55*Math.random();
+      ctx.beginPath();
+      ctx.arc(px + Math.cos(a)*rr, py + Math.sin(a)*rr, 3+Math.random()*5, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(218,255,233,0.90)';
+      ctx.fill();
+    }
+  }
+
+  ctx.fillStyle = '#8ff6ff';
+  ctx.font = 'bold 48px Arial';
+  ctx.fillText('Algal Gallery', 34, 58);
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = maxAniso;
+
+  const frame = new THREE.Mesh(
+    new THREE.PlaneGeometry(1.62,0.96),
+    new THREE.MeshBasicMaterial({color:0x121a23})
+  );
+  frame.position.set(x,y,z);
+  scene.add(frame);
+
+  const screen = new THREE.Mesh(
+    new THREE.PlaneGeometry(1.46,0.82),
+    new THREE.MeshBasicMaterial({map:tex})
+  );
+  screen.position.set(x,y,z+0.001);
+  scene.add(screen);
+}
+
+(async function(){
+
+  const room = await loadGLB("./room.glb");
+  scene.add(room);
+  prepMaterials(room);
+
+  const roomBox = boxMinMax(room);
+
+  eye.set(0, roomBox.size.y*0.18, roomBox.size.z*0.35);
+  updateLook();
+
+  /* keep interior feel so you don't stare into the outside void */
+  const frontFade = new THREE.Mesh(
+    new THREE.PlaneGeometry(roomBox.size.x*0.90, roomBox.size.y*0.84),
+    new THREE.MeshPhysicalMaterial({
+      color:0xfafcff,
+      transparent:true,
+      opacity:0.11,
+      transmission:0.55,
+      roughness:0.10
+    })
+  );
+  frontFade.position.set(0, roomBox.min.y + roomBox.size.y*0.48, roomBox.max.z - 0.08);
+  scene.add(frontFade);
+
+  /* visual foundation extras */
+  makeGlowStrip(-2.72,1.92,-1.42,0.86,0.05,0);
+  makeGlowStrip(-2.72,1.72,-1.42,0.50,0.04,0);
+  makeGlowStrip(2.72,1.92,-1.42,0.86,0.05,0);
+  makeGlowStrip(2.72,1.72,-1.42,0.50,0.04,0);
+  makeGlowStrip(0.00,2.05,-1.42,1.08,0.04,0);
+
+  makeCanvasMonitor(
+    'GRAVITY FIELD',
+    ['STATUS: ENABLED','CABIN STABILITY: NORMAL','ATMOSPHERE: STABLE'],
+    1.42,0.86,-2.0,1.60,-1.47
+  );
+
+  makeMapBoard(-2.03,0.95,-1.46,1.34,0.88);
+  makeTVScreen(2.02,1.43,-1.48);
+
+  const table = await loadGLB("./models/research_table.glb");
+  scene.add(table);
+  prepMaterials(table);
+  scaleWidth(table,1.50);
+  table.position.set(-0.4,0,-1.4);
+
+  const tbox = boxMinMax(table);
+  const top = tbox.max.y;
+  const left = tbox.min.x;
+  const right = tbox.max.x;
+  const front = tbox.max.z;
+  const back = tbox.min.z;
+
+  const microscope = await loadGLB("./models/microscope.glb");
+  scene.add(microscope);
+  prepMaterials(microscope);
+  scaleTo(microscope,0.25);
+  microscope.rotation.y = 0.35;
+  microscope.position.set(left+0.30, top+0.01, back+0.18);
+
+  const jar = await loadGLB("./models/algae_specimen_jar_lowpoly.glb");
+  scene.add(jar);
+  prepMaterials(jar);
+  scaleTo(jar,0.12);
+  jar.rotation.y = -0.12;
+  jar.position.set(left+0.55, top+0.01, back+0.20);
+
+  const journal = await loadGLB("./models/journal.glb");
+  scene.add(journal);
+  prepMaterials(journal);
+  scaleTo(journal,0.27);
+  journal.rotation.x = -Math.PI/2;
+  journal.rotation.y = 0.4;
+  journal.rotation.z = 0.12;
+  journal.position.set(right-0.38, top+0.012, front-0.22);
+
+  const laptop = await loadGLB("./models/laptop.glb");
+  scene.add(laptop);
+  prepMaterials(laptop);
+  scaleTo(laptop,0.35);
+  laptop.rotation.y = 0.28;
+  laptop.position.set(left+0.55, top+0.01, front-0.25);
+
+  const cup = await loadGLB("./models/coffee_cup.glb");
+  scene.add(cup);
+  prepMaterials(cup);
+  scaleTo(cup,0.10);
+  cup.position.set(right-0.20, top+0.01, front-0.18);
+
+  const globe = await loadGLB("./models/glass_globe.glb");
+  scene.add(globe);
+  prepMaterials(globe);
+  scaleTo(globe,0.22);
+  globe.position.set(right-0.16, top+0.01, back+0.15);
+
+  const books = await loadGLB("./models/books.glb");
+  scene.add(books);
+  prepMaterials(books);
+  scaleTo(books,0.24);
+  books.rotation.y = -0.25;
+  books.position.set(right-0.04, top+0.01, back+0.30);
+
+  const stand = await loadGLB("./models/marble_table_2.glb");
+  scene.add(stand);
+  prepMaterials(stand);
+  scaleWidth(stand,0.90);
+  stand.position.set(1.4,0,-0.25);
+
+  const standGlow = new THREE.PointLight(0x82ffd9,0.22,3.1);
+  standGlow.position.set(1.4,0.75,-0.25);
+  scene.add(standGlow);
+
+})();
+
+renderer.domElement.addEventListener("mousedown",e=>{
+  drag=true;
+  lastX=e.clientX;
+  lastY=e.clientY;
+});
+
+window.addEventListener("mouseup",()=>drag=false);
+
+window.addEventListener("mousemove",e=>{
+  if(!drag) return;
+  const dx=e.clientX-lastX;
+  const dy=e.clientY-lastY;
+  lastX=e.clientX;
+  lastY=e.clientY;
+  yaw-=dx*0.005;
+  pitch-=dy*0.004;
+  pitch=Math.max(-1.2,Math.min(1.2,pitch));
+  updateLook();
+});
+
+renderer.domElement.addEventListener("touchstart",e=>{
+  if(e.touches.length!==1) return;
+  drag=true;
+  lastX=e.touches[0].clientX;
+  lastY=e.touches[0].clientY;
+},{passive:true});
+
+renderer.domElement.addEventListener("touchmove",e=>{
+  if(!drag || e.touches.length!==1) return;
+  const dx=e.touches[0].clientX-lastX;
+  const dy=e.touches[0].clientY-lastY;
+  lastX=e.touches[0].clientX;
+  lastY=e.touches[0].clientY;
+  yaw-=dx*0.005;
+  pitch-=dy*0.004;
+  pitch=Math.max(-1.2,Math.min(1.2,pitch));
+  updateLook();
+},{passive:true});
+
+window.addEventListener("touchend",()=>drag=false);
+
+function animate(){
+  requestAnimationFrame(animate);
+  renderer.render(scene,camera);
+}
+animate();
+
+window.addEventListener("resize",()=>{
+  camera.aspect=window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth,window.innerHeight);
+  updateLook();
+});
+
+</script>
+</body>
+</html>

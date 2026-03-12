@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elythera Lab Room V4 Light</title>
+<style>
+html,body{
+  margin:0;
+  height:100%;
+  overflow:hidden;
+  background:#eef2f6;
+  font-family:Arial,sans-serif;
+}
+#hud{
+  position:fixed;
+  top:10px;
+  left:10px;
+  background:rgba(0,0,0,0.52);
+  color:white;
+  padding:10px 12px;
+  border-radius:10px;
+  font-size:13px;
+  z-index:20;
+}
+</style>
+<script type="importmap">
+{
+  "imports":{
+    "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+<div id="hud">Mission Elythera Lab<br>Drag to look around</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xf2f5f8);
+
+const camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.01, 2000);
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(window.innerWidth,window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+document.body.appendChild(renderer.domElement);
+
+const loader = new GLTFLoader();
+
+/* light and fast */
+scene.add(new THREE.HemisphereLight(0xffffff,0xdfe6ee,2.0));
+
+const dir = new THREE.DirectionalLight(0xffffff,1.8);
+dir.position.set(5,7,5);
+scene.add(dir);
+
+const warm = new THREE.PointLight(0xfff0de,0.35,10);
+warm.position.set(-0.8,1.6,-1.1);
+scene.add(warm);
+
+const tech = new THREE.PointLight(0x9df7ff,0.28,10);
+tech.position.set(2.1,1.7,-1.3);
+scene.add(tech);
+
+function loadGLB(path){
+  return new Promise((resolve,reject)=>{
+    loader.load(path, g=>resolve(g.scene), undefined, reject);
+  });
+}
+function boxSize(obj){
+  return new THREE.Box3().setFromObject(obj).getSize(new THREE.Vector3());
+}
+function boxMinMax(obj){
+  const b = new THREE.Box3().setFromObject(obj);
+  return {min:b.min.clone(), max:b.max.clone(), size:b.getSize(new THREE.Vector3())};
+}
+function scaleTo(obj,target){
+  const s = boxSize(obj);
+  const m = Math.max(s.x,s.y,s.z);
+  if(m>0) obj.scale.multiplyScalar(target/m);
+}
+function scaleWidth(obj,w){
+  const s = boxSize(obj);
+  if(s.x>0) obj.scale.multiplyScalar(w/s.x);
+}
+function prep(root){
+  root.traverse(c=>{
+    if(!c.isMesh) return;
+    const mats = Array.isArray(c.material) ? c.material : [c.material];
+    mats.forEach(mat=>{
+      if(!mat) return;
+      mat.side = THREE.DoubleSide;
+      if(mat.map){
+        mat.map.colorSpace = THREE.SRGBColorSpace;
+      }
+      if(mat.color){
+        const b = (mat.color.r+mat.color.g+mat.color.b)/3;
+        if(b < 0.12) mat.color.set(0xe2e7ec);
+        else if(b < 0.55) mat.color.lerp(new THREE.Color(0xe8edf2),0.35);
+      }
+      if('metalness' in mat && mat.metalness !== undefined) mat.metalness *= 0.55;
+      mat.needsUpdate = true;
+    });
+  });
+}
+
+/* camera like yesterday */
+let eye = new THREE.Vector3(0,1.2,0.8);
+let yaw = 0;
+let pitch = 0;
+let drag = false;
+let lastX = 0, lastY = 0;
+
+function updateLook(){
+  const dir = new THREE.Vector3(
+    Math.cos(pitch)*Math.sin(yaw),
+    Math.sin(pitch),
+    -Math.cos(pitch)*Math.cos(yaw)
+  );
+  camera.position.copy(eye);
+  camera.lookAt(eye.clone().add(dir));
+}
+
+function makeGlowStrip(x,y,z,w,h){
+  const m = new THREE.Mesh(
+    new THREE.PlaneGeometry(w,h),
+    new THREE.MeshBasicMaterial({color:0x96f5ff, transparent:true, opacity:0.75})
+  );
+  m.position.set(x,y,z);
+  scene.add(m);
+}
+
+/* lighter monitor */
+function makeTextPanel(title, lines, x, y, z, w, h){
+  const canvas = document.createElement('canvas');
+  canvas.width = 700;
+  canvas.height = 420;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#101923';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.strokeStyle = '#3fe5ff';
+  ctx.lineWidth = 6;
+  ctx.strokeRect(16,16,canvas.width-32,canvas.height-32);
+  ctx.fillStyle = '#90f7ff';
+  ctx.font = 'bold 42px Arial';
+  ctx.fillText(title, 34, 70);
+  ctx.fillStyle = '#ddfdff';
+  ctx.font = '29px Arial';
+  let yy = 150;
+  lines.forEach(line=>{ ctx.fillText(line,34,yy); yy += 54; });
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+
+  const frame = new THREE.Mesh(
+    new THREE.PlaneGeometry(w,h),
+    new THREE.MeshBasicMaterial({color:0x101923})
+  );
+  frame.position.set(x,y,z);
+  scene.add(frame);
+
+  const screen = new THREE.Mesh(
+    new THREE.PlaneGeometry(w*0.92,h*0.84),
+    new THREE.MeshBasicMaterial({map:tex})
+  );
+  screen.position.set(x,y,z+0.001);
+  scene.add(screen);
+}
+
+/* earth globe style board with pins */
+function makeEarthBoard(x,y,z,w,h){
+  const canvas = document.createElement('canvas');
+  canvas.width = 700;
+  canvas.height = 420;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#f4f0e5';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.strokeStyle = '#8a8a8a';
+  ctx.lineWidth = 8;
+  ctx.strokeRect(14,14,canvas.width-28,canvas.height-28);
+
+  ctx.fillStyle = '#263746';
+  ctx.font = 'bold 30px Arial';
+  ctx.fillText('Discovery Globe', 28, 46);
+
+  const cx = 350, cy = 230, r = 120;
+  const grad = ctx.createRadialGradient(cx-25, cy-25, 10, cx, cy, r);
+  grad.addColorStop(0, '#53b2ff');
+  grad.addColorStop(1, '#1f4e84');
+  ctx.fillStyle = grad;
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
+
+  ctx.fillStyle = '#86c784';
+  ctx.beginPath();
+  ctx.ellipse(cx-20, cy-10, 42, 70, 0.35, 0, Math.PI*2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(cx+35, cy+22, 30, 50, -0.3, 0, Math.PI*2);
+  ctx.fill();
+
+  const pins = [
+    [cx+10, cy-25, 'TVM'],
+    [cx+25, cy+0, 'KLM'],
+    [cx+18, cy+24, 'ALP'],
+    [cx+5, cy+48, 'KTM'],
+    [cx+28, cy+72, 'IDK']
+  ];
+  pins.forEach(([px,py,label])=>{
+    ctx.fillStyle = '#10d3a9';
+    ctx.beginPath(); ctx.arc(px,py,6,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle = '#7affef';
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(px,py,13,0,Math.PI*2); ctx.stroke();
+    ctx.fillStyle = '#173046';
+    ctx.font = 'bold 18px Arial';
+    ctx.fillText(label, px+14, py+5);
+  });
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+
+  const frame = new THREE.Mesh(
+    new THREE.PlaneGeometry(w,h),
+    new THREE.MeshBasicMaterial({color:0xe1dbd0})
+  );
+  frame.position.set(x,y,z);
+  scene.add(frame);
+
+  const board = new THREE.Mesh(
+    new THREE.PlaneGeometry(w*0.94,h*0.90),
+    new THREE.MeshBasicMaterial({map:tex})
+  );
+  board.position.set(x,y,z+0.001);
+  scene.add(board);
+}
+
+/* tv algae screen */
+function makeTV(x,y,z){
+  const canvas = document.createElement('canvas');
+  canvas.width = 800;
+  canvas.height = 450;
+  const ctx = canvas.getContext('2d');
+  const grad = ctx.createLinearGradient(0,0,800,450);
+  grad.addColorStop(0,'#102334');
+  grad.addColorStop(1,'#113745');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0,0,800,450);
+  ctx.fillStyle = '#8ff6ff';
+  ctx.font = 'bold 34px Arial';
+  ctx.fillText('Algal Gallery', 26, 42);
+
+  for(let i=0;i<14;i++){
+    const px = 50 + Math.random()*700;
+    const py = 70 + Math.random()*310;
+    const r = 16 + Math.random()*32;
+    ctx.beginPath(); ctx.arc(px,py,r,0,Math.PI*2);
+    ctx.fillStyle = 'rgba(124,255,188,0.14)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(130,255,220,0.85)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+
+  const frame = new THREE.Mesh(
+    new THREE.PlaneGeometry(1.60,0.96),
+    new THREE.MeshBasicMaterial({color:0x121a23})
+  );
+  frame.position.set(x,y,z);
+  scene.add(frame);
+
+  const screen = new THREE.Mesh(
+    new THREE.PlaneGeometry(1.44,0.82),
+    new THREE.MeshBasicMaterial({map:tex})
+  );
+  screen.position.set(x,y,z+0.001);
+  scene.add(screen);
+}
+
+(async function(){
+
+  const room = await loadGLB("./room.glb");
+  scene.add(room);
+  prep(room);
+
+  const roomBox = boxMinMax(room);
+  eye.set(0, roomBox.size.y*0.18, roomBox.size.z*0.35);
+  updateLook();
+
+  /* visual pass, but lighter */
+  makeGlowStrip(-2.70,1.90,-1.42,0.82,0.05);
+  makeGlowStrip( 2.70,1.90,-1.42,0.82,0.05);
+  makeGlowStrip( 0.00,2.02,-1.42,1.00,0.04);
+
+  makeTextPanel(
+    "GRAVITY FIELD",
+    ["STATUS: ENABLED","CABIN STABILITY: NORMAL","ATMOSPHERE: STABLE"],
+    -2.0,1.58,-1.47,1.34,0.80
+  );
+
+  makeEarthBoard(-2.03,0.92,-1.46,1.28,0.82);
+  makeTV(2.00,1.40,-1.48);
+
+  const table = await loadGLB("./models/research_table.glb");
+  scene.add(table);
+  prep(table);
+  scaleWidth(table,1.50);
+  table.position.set(-0.40,0,-1.40);
+
+  const tbox = boxMinMax(table);
+  const top = tbox.max.y;
+  const left = tbox.min.x;
+  const right = tbox.max.x;
+  const front = tbox.max.z;
+  const back = tbox.min.z;
+
+  const microscope = await loadGLB("./models/microscope.glb");
+  scene.add(microscope);
+  prep(microscope);
+  scaleTo(microscope,0.25);
+  microscope.position.set(left+0.30, top+0.01, back+0.18);
+
+  const jar = await loadGLB("./models/algae_specimen_jar_lowpoly.glb");
+  scene.add(jar);
+  prep(jar);
+  scaleTo(jar,0.12);
+  jar.position.set(left+0.56, top+0.01, back+0.20);
+
+  const journal = await loadGLB("./models/journal.glb");
+  scene.add(journal);
+  prep(journal);
+  scaleTo(journal,0.27);
+  journal.rotation.x = -Math.PI/2;
+  journal.rotation.y = 0.42;
+  journal.rotation.z = 0.06;
+  journal.position.set(right-0.34, top+0.008, front-0.18);
+
+  const laptop = await loadGLB("./models/laptop.glb");
+  scene.add(laptop);
+  prep(laptop);
+  scaleTo(laptop,0.35);
+  laptop.position.set(left+0.58, top+0.01, front-0.24);
+
+  const cup = await loadGLB("./models/coffee_cup.glb");
+  scene.add(cup);
+  prep(cup);
+  scaleTo(cup,0.10);
+  cup.position.set(right-0.16, top+0.01, front-0.18);
+
+  const globe = await loadGLB("./models/glass_globe.glb");
+  scene.add(globe);
+  prep(globe);
+  scaleTo(globe,0.22);
+  globe.position.set(right-0.12, top+0.01, back+0.16);
+
+  const books = await loadGLB("./models/books.glb");
+  scene.add(books);
+  prep(books);
+  scaleTo(books,0.22);
+  books.position.set(right-0.16, top+0.01, back+0.34);
+
+  const stand = await loadGLB("./models/marble_table_2.glb");
+  scene.add(stand);
+  prep(stand);
+  scaleWidth(stand,0.90);
+  stand.position.set(1.40,0,-0.25);
+
+})();
+
+renderer.domElement.addEventListener("mousedown",e=>{
+  drag=true;
+  lastX=e.clientX;
+  lastY=e.clientY;
+});
+
+window.addEventListener("mouseup",()=>drag=false);
+
+window.addEventListener("mousemove",e=>{
+  if(!drag) return;
+  const dx=e.clientX-lastX;
+  const dy=e.clientY-lastY;
+  lastX=e.clientX;
+  lastY=e.clientY;
+  yaw-=dx*0.005;
+  pitch-=dy*0.004;
+  pitch=Math.max(-1.2,Math.min(1.2,pitch));
+  updateLook();
+});
+
+function animate(){
+  requestAnimationFrame(animate);
+  renderer.render(scene,camera);
+}
+animate();
+
+window.addEventListener("resize",()=>{
+  camera.aspect=window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth,window.innerHeight);
+});
+
+</script>
+</body>
+</html>

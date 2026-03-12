@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elythera Portal Hub</title>
+<style>
+:root{
+  --line:rgba(255,255,255,0.08);
+  --text:#ecf7ff;
+  --muted:rgba(236,247,255,0.72);
+  --blue:#5edbff;
+  --green:#4cff79;
+  --violet:#b96bff;
+  --orange:#ffb347;
+}
+*{box-sizing:border-box}
+html,body{
+  margin:0;
+  width:100%;
+  min-height:100%;
+  background:#000;
+  color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
+}
+body{
+  background:
+    radial-gradient(circle at 50% 8%, rgba(94,156,255,.10), transparent 24%),
+    linear-gradient(180deg,#02040a 0%,#000 45%,#02040a 100%);
+}
+
+/* Welcome screen */
+#welcome{
+position:fixed;
+inset:0;
+background:#000;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:28px;
+letter-spacing:4px;
+z-index:999;
+animation:fadeOut 3s forwards;
+animation-delay:1.5s;
+}
+@keyframes fadeOut{
+to{opacity:0;visibility:hidden;}
+}
+
+.page{
+  width:min(1440px,100%);
+  margin:0 auto;
+  padding:0 16px 26px;
+}
+.hero{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  padding:20px 10px;
+}
+.team{
+  position:relative;
+  width:1000px;
+  max-width:95%;
+  aspect-ratio:1536/1024;
+}
+.team img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  opacity:0;
+  transition:opacity 1s;
+  user-select:none;
+  pointer-events:none;
+}
+.team img.active{opacity:1}
+
+.systems{
+  text-align:center;
+  margin-top:40px;
+  width:min(1100px,100%);
+  opacity:0;
+  transition:opacity .9s ease;
+}
+.systems.show{opacity:1}
+
+.systems h2{
+  margin:0 0 8px;
+  letter-spacing:4px;
+}
+.systems .intro{
+  margin:0 0 24px;
+  color:var(--muted);
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:20px;
+}
+
+.card{
+  background:#000;
+  border-radius:15px;
+  padding:20px;
+  border:1px solid var(--line);
+  text-decoration:none;
+  color:var(--text);
+  transition:.3s;
+}
+
+.card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 0 20px rgba(255,255,255,.12);
+}
+
+.logo-shell{
+  width:110px;
+  height:110px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:0 auto 10px;
+  animation:hoverFloat 3.8s ease-in-out infinite;
+}
+
+.logo-shell img{
+  max-width:100%;
+  max-height:100%;
+}
+
+.identifier h3,.identifier p{color:var(--blue)}
+.pond h3,.pond p{color:var(--green)}
+.archive h3,.archive p{color:var(--violet)}
+.photohouse h3,.photohouse p{color:var(--orange)}
+.locator h3,.locator p{color:var(--blue)}
+
+.card h3{
+  margin:0 0 8px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+
+.card p{
+  margin:0;
+  line-height:1.5;
+  opacity:.92;
+  font-size:13px;
+}
+
+@keyframes hoverFloat{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-7px)}
+}
+</style>
+</head>
+<body>
+
+<div id="welcome">WELCOME TO ELYTHERA</div>
+
+<div class="page">
+<section class="hero">
+
+<div class="team">
+<img class="frame active" src="assets/elythera/frame0_base.png">
+<img class="frame" src="assets/elythera/frame1_glow.png">
+<img class="frame" src="assets/elythera/frame2_glowstrong.png">
+<img class="frame" src="assets/elythera/frame3_orb.png">
+<img class="frame" src="assets/elythera/frame5_logo.png">
+</div>
+
+<div class="systems" id="systems">
+
+<h2>ELYTHERA SYSTEMS</h2>
+<p class="intro">After the palm logos appear, the portal buttons unlock below.</p>
+
+<div class="grid">
+
+<a class="card identifier" href="identifier.html">
+<div class="logo-shell"><img src="assets/elythera/logo_identifier_black.png"></div>
+<h3>Identifier</h3>
+<p>Helps to identify algae based on simple questions.</p>
+</a>
+
+<a class="card pond" href="pond.html">
+<div class="logo-shell"><img src="assets/elythera/logo_pond_black.png"></div>
+<h3>Algal Pond</h3>
+<p>Algae pond built by members of Elythera.</p>
+</a>
+
+<a class="card archive" href="archive.html">
+<div class="logo-shell"><img src="assets/elythera/logo_archive_black.png"></div>
+<h3>Archive</h3>
+<p>Visual encyclopedia of algae.</p>
+</a>
+
+<a class="card photohouse" href="photohouse.html">
+<div class="logo-shell"><img src="assets/elythera/logo_camera_black.png"></div>
+<h3>PhotoHouse</h3>
+<p>Enhance your image.</p>
+</a>
+
+<a class="card locator" href="locator.html">
+<div class="logo-shell"><img src="assets/elythera/logo_locator_black.png"></div>
+<h3>Locator</h3>
+<p>Geological location and their common algaes.</p>
+</a>
+
+</div>
+</div>
+</section>
+</div>
+
+<script>
+
+const frames = document.querySelectorAll(".frame")
+const systems = document.getElementById("systems")
+let i = 0
+
+function startAnimation(){
+
+setTimeout(()=>{
+
+const interval = setInterval(()=>{
+
+frames[i].classList.remove("active")
+i++
+frames[i].classList.add("active")
+
+if(i === frames.length-1){
+systems.classList.add("show")
+clearInterval(interval)
+}
+
+},2200)
+
+},4500)
+
+}
+
+window.onload = startAnimation
+
+</script>
+
+</body>
+</html>

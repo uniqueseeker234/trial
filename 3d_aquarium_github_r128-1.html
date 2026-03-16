@@ -267,7 +267,8 @@ draw()
 
 draw()
 
-return{update}
+// ✅ FIX: return object with update function, not array
+return { update }
 }
 
 function makeEarthBoard(x,y,z,w,h){

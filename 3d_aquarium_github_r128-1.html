@@ -267,8 +267,7 @@ draw()
 
 draw()
 
-// FIX: return object
-return { update }
+return{update}
 }
 
 function makeEarthBoard(x,y,z,w,h){
@@ -312,7 +311,6 @@ ctx.beginPath()
 ctx.ellipse(cx+36,cy+22,30,50,-0.3,0,Math.PI*2)
 ctx.fill()
 
-// SAFE: normal indexing
 const pins=[
 [cx+10,cy-25],
 [cx+25,cy+0],
@@ -321,18 +319,17 @@ const pins=[
 [cx+28,cy+72]
 ]
 
-pins.forEach(function(pin){
-
-var px = pin[0]
-var py = pin[1]
+pins.forEach(([px,py])=>{
 
 ctx.fillStyle="#10d3a9"
+
 ctx.beginPath()
 ctx.arc(px,py,6,0,Math.PI*2)
 ctx.fill()
 
 ctx.strokeStyle="#7affef"
 ctx.lineWidth=3
+
 ctx.beginPath()
 ctx.arc(px,py,13,0,Math.PI*2)
 ctx.stroke()
@@ -360,7 +357,7 @@ scene.add(board)
 
 }
 
-const animatedPanels=[]
+const animatedPanels=[];
 
 (async function(){
 

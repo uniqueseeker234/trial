@@ -44,7 +44,31 @@ line-height:1.4;
 Mission Elythera Lab V5.5<br>
 Drag mouse to look around
 </div>
+<div style="
+position:fixed;
+bottom:10px;
+left:10px;
+background:rgba(0,0,0,0.6);
+padding:10px;
+border-radius:10px;
+color:white;
+z-index:999;
+font-size:12px;
+">
 
+Width<br>
+<input type="range" id="w" min="0.5" max="2" step="0.01" value="1"><br>
+
+Height<br>
+<input type="range" id="h" min="0.5" max="2" step="0.01" value="1"><br>
+
+X Move<br>
+<input type="range" id="x" min="2.0" max="2.5" step="0.01" value="2.18"><br>
+
+Y Move<br>
+<input type="range" id="y" min="1.0" max="1.5" step="0.01" value="1.25"><br>
+
+</div>
 <script type="module">
 
 import * as THREE from 'three'
@@ -305,6 +329,21 @@ wallFix.scale.set(1.2,1.2,1)
 wallFix.rotation.y = -Math.PI / 2
 
 scene.add(wallFix)
+    const w = document.getElementById("w")
+const h = document.getElementById("h")
+const x = document.getElementById("x")
+const y = document.getElementById("y")
+
+function updateWall(){
+    wallFix.scale.set(parseFloat(w.value), parseFloat(h.value), 1)
+    wallFix.position.x = parseFloat(x.value)
+    wallFix.position.y = parseFloat(y.value)
+}
+
+w.oninput = updateWall
+h.oninput = updateWall
+x.oninput = updateWall
+y.oninput = updateWall
 const roomBox=boxMinMax(room)
 eye.set(0,roomBox.size.y*0.18,roomBox.size.z*0.35)
 updateLook()

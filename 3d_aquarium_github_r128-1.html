@@ -284,7 +284,35 @@ const animatedPanels=[];
 const room=await loadGLB("./room.glb")
 scene.add(room)
 prep(room)
+// 🔥 COPY GOOD MATERIAL TO BAD WALL
 
+let goodMaterial = null;
+
+// find a nice wall/roof material
+room.traverse(obj=>{
+if(obj.isMesh && obj.material && !goodMaterial){
+const col = obj.material.color
+const brightness = (col.r + col.g + col.b) / 3
+
+// pick medium grey surface (not too dark, not too bright)
+if(brightness > 0.3 && brightness < 0.8){
+goodMaterial = obj.material
+}
+}
+})
+
+// apply it to bright white wall
+room.traverse(obj=>{
+if(obj.isMesh && obj.material){
+const col = obj.material.color
+const brightness = (col.r + col.g + col.b) / 3
+
+// detect bright wall
+if(brightness > 0.9){
+obj.material = goodMaterial.clone()
+}
+}
+})
 const roomBox=boxMinMax(room)
 eye.set(0,roomBox.size.y*0.18,roomBox.size.z*0.35)
 updateLook()

@@ -284,8 +284,25 @@ const animatedPanels=[];
 const room=await loadGLB("./room.glb")
 scene.add(room)
 prep(room)
+// 🔥 ATTACH PANEL TO REAL WALL
+
+room.traverse(obj=>{
+if(!obj.isMesh) return
+
+const col = obj.material?.color
+if(!col) return
+
+const brightness = (col.r + col.g + col.b) / 3
+
+// detect that bright wall
+if(brightness > 0.9){
+
+// create panel SAME SIZE as wall
+const box = new THREE.Box3().setFromObject(obj)
+const size = box.getSize(new THREE.Vector3())
+
 const fixWall = new THREE.Mesh(
-    new THREE.PlaneGeometry(4.8, 2.7), // 👈 slightly bigger
+    new THREE.PlaneGeometry(size.z, size.y),
     new THREE.MeshStandardMaterial({
         color: 0xdfe5ec,
         roughness: 0.95,
@@ -293,13 +310,20 @@ const fixWall = new THREE.Mesh(
     })
 )
 
-// 👇 move slightly right + forward
-fixWall.position.set(2.28, 1.25, -0.30)
+// position EXACTLY on wall center
+const center = box.getCenter(new THREE.Vector3())
+fixWall.position.copy(center)
 
-// 👇 same rotation
-fixWall.rotation.y = -Math.PI / 2
+// align with wall
+fixWall.rotation.copy(obj.rotation)
+
+// slight offset to avoid z-fighting
+fixWall.position.x += 0.01
 
 scene.add(fixWall)
+
+}
+})
 const roomBox=boxMinMax(room)
 eye.set(0,roomBox.size.y*0.18,roomBox.size.z*0.35)
 updateLook()

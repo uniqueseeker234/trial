@@ -125,16 +125,13 @@ else mat.color.set(0xdfe5ec)
 }
 if('metalness' in mat) mat.metalness*=0.55
 if('roughness' in mat) mat.roughness=Math.min(1,mat.roughness+0.04)
-  if(mat.map){
-mat.map = null
-}
-
+// ✅ ONLY FIX PURE WHITE WALLS (safe)
 if(mat.color){
 const b = (mat.color.r + mat.color.g + mat.color.b) / 3
 
-// target only bright white walls
-if(b > 0.85){
-mat.color.set(0xdfe5ec) // soft lab grey
+// detect ONLY pure white surfaces
+if(b > 0.95){
+mat.color.set(0xdfe5ec)
 }
 }
 mat.needsUpdate=true

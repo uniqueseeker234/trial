@@ -112,26 +112,19 @@ if(s.x>0) obj.scale.multiplyScalar(w/s.x)
 function prep(root){
 root.traverse(c=>{
 if(!c.isMesh) return
-
 const mats = Array.isArray(c.material)?c.material:[c.material]
-
 mats.forEach(mat=>{
 if(!mat) return
-
 mat.side = THREE.DoubleSide
-
 if(mat.map) mat.map.colorSpace = THREE.SRGBColorSpace
-
 if(mat.color){
 const b=(mat.color.r+mat.color.g+mat.color.b)/3
 if(b<0.12) mat.color.set(0xd8dee6)
 else if(b<0.55) mat.color.lerp(new THREE.Color(0xdfe5ec),0.48)
 else mat.color.lerp(new THREE.Color(0xecf1f5),0.18)
 }
-
 if('metalness' in mat) mat.metalness*=0.55
 if('roughness' in mat) mat.roughness=Math.min(1,mat.roughness+0.04)
-
 mat.needsUpdate=true
 })
 })
@@ -149,7 +142,6 @@ Math.cos(pitch)*Math.sin(yaw),
 Math.sin(pitch),
 -Math.cos(pitch)*Math.cos(yaw)
 )
-
 camera.position.copy(eye)
 camera.lookAt(eye.clone().add(dir))
 }
@@ -203,28 +195,21 @@ let timer=0
 function draw(){
 ctx.fillStyle="#101923"
 ctx.fillRect(0,0,canvas.width,canvas.height)
-
 ctx.strokeStyle="#3fe5ff"
 ctx.lineWidth=6
 ctx.strokeRect(16,16,canvas.width-32,canvas.height-32)
-
 ctx.fillStyle="#90f7ff"
 ctx.font="bold 42px Arial"
-
 ctx.fillText(lines[0].slice(0,lineIndex===0?charCount:lines[0].length),34,72)
-
 ctx.fillStyle="#ddfdff"
 ctx.font="29px Arial"
-
 const y=[150,205,260]
-
 for(let i=1;i<lines.length;i++){
 let txt=""
 if(i<lineIndex) txt=lines[i]
 else if(i===lineIndex) txt=lines[i].slice(0,charCount)
 ctx.fillText(txt,34,y[i-1])
 }
-
 tex.needsUpdate=true
 }
 
@@ -244,7 +229,7 @@ charCount=0
 draw()
 }}
 draw()
-return{update}
+return { update, mesh: frame } // ✅ FIX
 }
 
 function makeEarthBoard(x,y,z,w,h){
@@ -293,6 +278,8 @@ new THREE.MeshBasicMaterial({map:tex})
 
 board.position.set(x,y,z+0.001)
 scene.add(board)
+
+return frame // ✅ FIX
 }
 
 const animatedPanels=[];
@@ -307,20 +294,14 @@ const roomBox=boxMinMax(room)
 eye.set(0,roomBox.size.y*0.18,roomBox.size.z*0.35)
 updateLook()
 
-// ✅ WALL FIX
-// ===== MOVE TO FRONT WALL =====
-// ===== RIGHT WALL PLACEMENT =====
+// ===== RIGHT WALL FIX =====
+const monitorObj = makeAnimatedMonitor(2.15,1.65,-0.90,1.28,0.74)
+monitorObj.mesh.rotation.y = -Math.PI/2
+animatedPanels.push(monitorObj)
 
-// monitor
-const monitor = makeAnimatedMonitor(2.15,1.65,-0.90,1.28,0.74)
-monitor.rotation.y = -Math.PI/2
-animatedPanels.push(monitor)
+const boardObj = makeEarthBoard(2.15,0.85,-0.90,1.18,0.74)
+boardObj.rotation.y = -Math.PI/2
 
-// map
-const board = makeEarthBoard(2.15,0.85,-0.90,1.18,0.74)
-board.rotation.y = -Math.PI/2
-
-// glow strip
 const glow = new THREE.Mesh(
 new THREE.PlaneGeometry(0.92,0.04),
 new THREE.MeshBasicMaterial({color:0x96f5ff,transparent:true,opacity:0.75})
@@ -329,7 +310,7 @@ glow.position.set(2.15,2.15,-0.90)
 glow.rotation.y = -Math.PI/2
 scene.add(glow)
 
-// TABLE
+// TABLE (unchanged)
 const table=await loadGLB("./models/research_table.glb")
 scene.add(table)
 prep(table)
@@ -343,7 +324,6 @@ const right=tbox.max.x
 const front=tbox.max.z
 const back=tbox.min.z
 
-// LEFT
 const microscope=await loadGLB("./models/microscope.glb")
 scene.add(microscope)
 prep(microscope)
@@ -356,14 +336,12 @@ prep(jar)
 scaleTo(jar,0.14)
 jar.position.set(left+0.45,top+0.01,front-0.25)
 
-// CENTER
 const laptop=await loadGLB("./models/laptop.glb")
 scene.add(laptop)
 prep(laptop)
 scaleTo(laptop,0.35)
 laptop.position.set(left+0.65,top+0.01,front-0.25)
 
-// RIGHT
 const journal=await loadGLB("./models/journal.glb")
 scene.add(journal)
 prep(journal)
@@ -390,7 +368,6 @@ prep(globe)
 scaleTo(globe,0.22)
 globe.position.set(right-0.05,top+0.01,back+0.05)
 
-// STAND
 const stand=await loadGLB("./models/marble_table_2.glb")
 scene.add(stand)
 prep(stand)

@@ -284,25 +284,24 @@ const animatedPanels=[];
 const room=await loadGLB("./room.glb")
 scene.add(room)
 prep(room)
-// 🔥 COPY GOOD MATERIAL TO BAD WALL
+// 🔥 FIX WHITE WALL (overlay panel)
 
-// 🔥 FORCE FIX RIGHT WALL ONLY
+const fixWall = new THREE.Mesh(
+    new THREE.PlaneGeometry(2.5, 2.2), // size adjust if needed
+    new THREE.MeshStandardMaterial({
+        color: 0xdfe5ec,
+        roughness: 0.9,
+        metalness: 0
+    })
+)
 
-room.traverse(obj=>{
-if(!obj.isMesh) return
+// position exactly on that wall
+fixWall.position.set(2.24, 1.2, -0.65)
 
-// detect right wall using position
-if(obj.position.x > 1.8){
+// rotate to match wall
+fixWall.rotation.y = -Math.PI / 2
 
-// create clean wall material
-obj.material = new THREE.MeshStandardMaterial({
-color: 0xdfe5ec,
-roughness: 0.9,
-metalness: 0
-})
-
-}
-})
+scene.add(fixWall)
 const roomBox=boxMinMax(room)
 eye.set(0,roomBox.size.y*0.18,roomBox.size.z*0.35)
 updateLook()

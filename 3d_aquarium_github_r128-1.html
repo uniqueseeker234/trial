@@ -284,10 +284,8 @@ const animatedPanels=[];
 const room=await loadGLB("./room.glb")
 scene.add(room)
 prep(room)
-// 🔥 FIX WHITE WALL (overlay panel)
-
 const fixWall = new THREE.Mesh(
-    new THREE.PlaneGeometry(2.5, 2.2), // size adjust if needed
+    new THREE.PlaneGeometry(4.2, 2.6), // 👈 bigger size
     new THREE.MeshStandardMaterial({
         color: 0xdfe5ec,
         roughness: 0.9,
@@ -295,10 +293,10 @@ const fixWall = new THREE.Mesh(
     })
 )
 
-// position exactly on that wall
-fixWall.position.set(2.24, 1.2, -0.65)
+// 👇 adjust position
+fixWall.position.set(2.26, 1.25, -0.35)
 
-// rotate to match wall
+// 👇 keep rotation same
 fixWall.rotation.y = -Math.PI / 2
 
 scene.add(fixWall)

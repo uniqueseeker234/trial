@@ -285,18 +285,18 @@ const room=await loadGLB("./room.glb")
 scene.add(room)
 prep(room)
 const fixWall = new THREE.Mesh(
-    new THREE.PlaneGeometry(4.2, 2.6), // 👈 bigger size
+    new THREE.PlaneGeometry(4.8, 2.7), // 👈 slightly bigger
     new THREE.MeshStandardMaterial({
         color: 0xdfe5ec,
-        roughness: 0.9,
+        roughness: 0.95,
         metalness: 0
     })
 )
 
-// 👇 adjust position
-fixWall.position.set(2.26, 1.25, -0.35)
+// 👇 move slightly right + forward
+fixWall.position.set(2.28, 1.25, -0.30)
 
-// 👇 keep rotation same
+// 👇 same rotation
 fixWall.rotation.y = -Math.PI / 2
 
 scene.add(fixWall)

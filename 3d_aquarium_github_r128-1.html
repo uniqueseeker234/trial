@@ -69,6 +69,11 @@ Y Move<br>
 <input type="range" id="y" min="1.0" max="1.5" step="0.01" value="1.25"><br>
 Z Depth<br>
 <input type="range" id="z" min="-1" max="0" step="0.01" value="-0.62"><br>
+    Trim Width<br>
+<input type="range" id="tw" min="0.5" max="1.5" step="0.01" value="1"><br>
+
+Trim Height<br>
+<input type="range" id="th" min="0.5" max="1.5" step="0.01" value="1"><br>
 </div>
 <script type="module">
 
@@ -318,7 +323,19 @@ prep(room)
 // ✅ PERFECT MANUAL WALL (LOCKED FIX)
 
 const wallFix = new THREE.Mesh(
-    new THREE.PlaneGeometry(3.2, 2.2),
+   let baseWidth = 3.2
+let baseHeight = 2.2
+
+let geometry = new THREE.PlaneGeometry(baseWidth, baseHeight)
+
+const wallFix = new THREE.Mesh(
+    geometry,
+    new THREE.MeshStandardMaterial({
+        color: 0xdfe5ec,
+        roughness: 0.95,
+        metalness: 0
+    })
+)
     new THREE.MeshStandardMaterial({
         color: 0xdfe5ec,
         roughness: 0.95,
@@ -339,11 +356,24 @@ const h = document.getElementById("h")
 const x = document.getElementById("x")
 const y = document.getElementById("y")
 const z = document.getElementById("z")
+    const tw = document.getElementById("tw")
+const th = document.getElementById("th")
 function updateWall(){
+
+    // scale
     wallFix.scale.set(parseFloat(w.value), parseFloat(h.value), 1)
+
+    // position
     wallFix.position.x = parseFloat(x.value)
     wallFix.position.y = parseFloat(y.value)
     wallFix.position.z = parseFloat(z.value)
+
+    // 🔥 crop effect (geometry resize)
+    const newWidth = baseWidth * parseFloat(tw.value)
+    const newHeight = baseHeight * parseFloat(th.value)
+
+    wallFix.geometry.dispose()
+    wallFix.geometry = new THREE.PlaneGeometry(newWidth, newHeight)
 }
 
 w.oninput = updateWall
@@ -351,6 +381,8 @@ h.oninput = updateWall
 x.oninput = updateWall
 y.oninput = updateWall
 z.oninput = updateWall
+    tw.oninput = updateWall
+    th.oniput = updateWall
 const roomBox=boxMinMax(room)
 eye.set(0,roomBox.size.y*0.18,roomBox.size.z*0.35)
 updateLook()

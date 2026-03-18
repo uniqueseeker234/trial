@@ -181,7 +181,7 @@ new THREE.PlaneGeometry(w*0.92,h*0.84),
 new THREE.MeshBasicMaterial({map:tex})
 )
 
-screen.position.set(x,y,z)
+screen.position.set(x,y,z+0.01)
 scene.add(screen)
 
 const lines=[
@@ -272,7 +272,7 @@ new THREE.PlaneGeometry(w*0.94,h*0.90),
 new THREE.MeshBasicMaterial({map:tex})
 )
 
-board.position.set(x,y,z)
+board.position.set(x,y,z+0.01)
 scene.add(board)
 
 return board // ✅ FIX

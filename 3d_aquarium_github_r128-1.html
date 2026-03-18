@@ -165,20 +165,13 @@ const ctx=canvas.getContext("2d")
 const tex=new THREE.CanvasTexture(canvas)
 tex.colorSpace=THREE.SRGBColorSpace
 
-const frame=new THREE.Mesh(
-new THREE.PlaneGeometry(w,h),
-new THREE.MeshBasicMaterial({color:0x101923})
-)
-
-frame.position.set(x,y,z)
-scene.add(frame)
 
 const screen=new THREE.Mesh(
 new THREE.PlaneGeometry(w*0.92,h*0.84),
 new THREE.MeshBasicMaterial({map:tex})
 )
 
-screen.position.set(x,y,z+0.001)
+screen.position.set(x,y,z)
 scene.add(screen)
 
 const lines=[
@@ -229,7 +222,7 @@ charCount=0
 draw()
 }}
 draw()
-return { update, mesh: frame } // ✅ FIX
+return { update, mesh: screen } // ✅ FIX
 }
 
 function makeEarthBoard(x,y,z,w,h){
@@ -263,23 +256,16 @@ ctx.fill()
 const tex=new THREE.CanvasTexture(canvas)
 tex.colorSpace=THREE.SRGBColorSpace
 
-const frame=new THREE.Mesh(
-new THREE.PlaneGeometry(w,h),
-new THREE.MeshBasicMaterial({color:0xe1dbd0})
-)
-
-frame.position.set(x,y,z)
-scene.add(frame)
 
 const board=new THREE.Mesh(
 new THREE.PlaneGeometry(w*0.94,h*0.90),
 new THREE.MeshBasicMaterial({map:tex})
 )
 
-board.position.set(x,y,z+0.001)
+board.position.set(x,y,z)
 scene.add(board)
 
-return frame // ✅ FIX
+return board // ✅ FIX
 }
 
 const animatedPanels=[];

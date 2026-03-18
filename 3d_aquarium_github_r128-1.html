@@ -317,14 +317,14 @@ const animatedPanels=[];
 (async function(){
 
 const room=await loadGLB("./room.glb")
+      let baseWidth = 3.2
+let baseHeight = 2.2
 scene.add(room)
 prep(room)
 // 🔥 PERFECT WALL PANEL (manual but precise)
 // ✅ PERFECT MANUAL WALL (LOCKED FIX)
 
 const wallFix = new THREE.Mesh(
-   let baseWidth = 3.2
-let baseHeight = 2.2
 
 let geometry = new THREE.PlaneGeometry(baseWidth, baseHeight)
 

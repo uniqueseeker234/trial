@@ -67,7 +67,8 @@ X Move<br>
 
 Y Move<br>
 <input type="range" id="y" min="1.0" max="1.5" step="0.01" value="1.25"><br>
-
+Z Depth<br>
+<input type="range" id="z" min="-1" max="0" step="0.01" value="-0.62"><br>
 </div>
 <script type="module">
 
@@ -337,17 +338,19 @@ scene.add(wallFix)
 const h = document.getElementById("h")
 const x = document.getElementById("x")
 const y = document.getElementById("y")
-
+const z = document.getElementById("z")
 function updateWall(){
     wallFix.scale.set(parseFloat(w.value), parseFloat(h.value), 1)
     wallFix.position.x = parseFloat(x.value)
     wallFix.position.y = parseFloat(y.value)
+    wallFix.position.z = parseFloat(z.value)
 }
 
 w.oninput = updateWall
 h.oninput = updateWall
 x.oninput = updateWall
 y.oninput = updateWall
+z.oninput = updateWall
 const roomBox=boxMinMax(room)
 eye.set(0,roomBox.size.y*0.18,roomBox.size.z*0.35)
 updateLook()

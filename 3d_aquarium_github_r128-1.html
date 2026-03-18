@@ -121,7 +121,7 @@ if(mat.color){
 const b=(mat.color.r+mat.color.g+mat.color.b)/3
 if(b<0.12) mat.color.set(0xd8dee6)
 else if(b<0.55) mat.color.lerp(new THREE.Color(0xdfe5ec),0.48)
-else mat.color.lerp(new THREE.Color(0xecf1f5),0.18)
+else mat.color.set(0xdfe5ec)
 }
 if('metalness' in mat) mat.metalness*=0.55
 if('roughness' in mat) mat.roughness=Math.min(1,mat.roughness+0.04)

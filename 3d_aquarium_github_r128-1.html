@@ -90,6 +90,10 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio,2))
 renderer.outputColorSpace = THREE.SRGBColorSpace
 
 document.body.appendChild(renderer.domElement)
+    renderer.domElement.style.position = "fixed"
+renderer.domElement.style.top = "0"
+renderer.domElement.style.left = "0"
+renderer.domElement.style.zIndex = "0"
 
 const loader = new GLTFLoader()
 

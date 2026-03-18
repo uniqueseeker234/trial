@@ -126,12 +126,13 @@ else mat.color.set(0xdfe5ec)
 if('metalness' in mat) mat.metalness*=0.55
 if('roughness' in mat) mat.roughness=Math.min(1,mat.roughness+0.04)
 // ✅ ONLY FIX PURE WHITE WALLS (safe)
+// 🎯 Only fix overly bright white walls (safe detection)
 if(mat.color){
 const b = (mat.color.r + mat.color.g + mat.color.b) / 3
 
-// detect ONLY pure white surfaces
-if(b > 0.95){
-mat.color.set(0xdfe5ec)
+// target only extreme white surfaces (not everything)
+if(b > 0.92 && mat.roughness > 0.5){
+mat.color.lerp(new THREE.Color(0xdfe5ec), 0.6)
 }
 }
 mat.needsUpdate=true
@@ -286,22 +287,7 @@ scene.add(room)
 prep(room)
 // 🔥 PERFECT WALL PANEL (manual but precise)
 
-const fixWall = new THREE.Mesh(
-    new THREE.PlaneGeometry(3.9, 2.5), // exact wall size
-    new THREE.MeshStandardMaterial({
-        color: 0xdfe5ec,
-        roughness: 0.95,
-        metalness: 0
-    })
-)
 
-// position tuned to match wall exactly
-fixWall.position.set(2.22, 1.25, -0.45)
-
-// align with wall
-fixWall.rotation.y = -Math.PI / 2
-
-scene.add(fixWall)
 const roomBox=boxMinMax(room)
 eye.set(0,roomBox.size.y*0.18,roomBox.size.z*0.35)
 updateLook()

@@ -308,9 +308,26 @@ eye.set(0,roomBox.size.y*0.18,roomBox.size.z*0.35)
 updateLook()
 
 // ✅ WALL FIX
-animatedPanels.push(makeAnimatedMonitor(-1.55,1.65,-1.47,1.28,0.74))
-makeEarthBoard(-1.55,0.85,-1.46,1.18,0.74)
-makeGlowStrip(-1.55,2.15,-1.42,0.92,0.04)
+// ===== MOVE TO FRONT WALL =====
+// ===== RIGHT WALL PLACEMENT =====
+
+// monitor
+const monitor = makeAnimatedMonitor(2.15,1.65,-0.90,1.28,0.74)
+monitor.rotation.y = -Math.PI/2
+animatedPanels.push(monitor)
+
+// map
+const board = makeEarthBoard(2.15,0.85,-0.90,1.18,0.74)
+board.rotation.y = -Math.PI/2
+
+// glow strip
+const glow = new THREE.Mesh(
+new THREE.PlaneGeometry(0.92,0.04),
+new THREE.MeshBasicMaterial({color:0x96f5ff,transparent:true,opacity:0.75})
+)
+glow.position.set(2.15,2.15,-0.90)
+glow.rotation.y = -Math.PI/2
+scene.add(glow)
 
 // TABLE
 const table=await loadGLB("./models/research_table.glb")

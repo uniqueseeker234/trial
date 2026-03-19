@@ -44,7 +44,45 @@ line-height:1.4;
 Mission Elythera Lab V5.5<br>
 Drag mouse to look around
 </div>
+<div style="
+position:fixed;
+bottom:10px;
+left:10px;
+background:rgba(0,0,0,0.6);
+padding:10px;
+border-radius:10px;
+color:white;
+z-index:999;
+font-size:12px;
+">
 
+<b>Monitor</b><br>
+Width<br>
+<input type="range" id="mw" min="1" max="4" step="0.05" value="3"><br>
+
+Height<br>
+<input type="range" id="mh" min="1" max="3" step="0.05" value="1.8"><br>
+
+X<br>
+<input type="range" id="mx" min="1.5" max="2.8" step="0.01" value="2.15"><br>
+
+Y<br>
+<input type="range" id="my" min="1.2" max="2.2" step="0.01" value="1.6"><br>
+
+<b>Globe</b><br>
+Width<br>
+<input type="range" id="gw" min="1" max="4" step="0.05" value="3"><br>
+
+Height<br>
+<input type="range" id="gh" min="1" max="3" step="0.05" value="1.5"><br>
+
+X<br>
+<input type="range" id="gx" min="1.5" max="2.8" step="0.01" value="2.15"><br>
+
+Y<br>
+<input type="range" id="gy" min="0.2" max="1.2" step="0.01" value="0.4"><br>
+
+</div>
 <script type="module">
 
 import * as THREE from 'three'
@@ -351,14 +389,45 @@ eye.set(0,roomBox.size.y*0.18,roomBox.size.z*0.35)
 updateLook()
 
 // ===== RIGHT WALL FIX =====
-const monitorObj = makeAnimatedMonitor(2.15,1.6,-0.55,3.2,1.8)
+  const monitorObj = makeAnimatedMonitor(2.15,1.6,-0.55,3.2,1.8)
 monitorObj.mesh.rotation.y = -Math.PI/2
 animatedPanels.push(monitorObj)
 
 const boardObj = makeEarthBoard(2.15,0.4,-0.55,3.0,1.5)
 boardObj.rotation.y = -Math.PI/2
+    const mw = document.getElementById("mw")
+const mh = document.getElementById("mh")
+const mx = document.getElementById("mx")
+const my = document.getElementById("my")
 
-  
+const gw = document.getElementById("gw")
+const gh = document.getElementById("gh")
+const gx = document.getElementById("gx")
+const gy = document.getElementById("gy")
+
+function updateUI(){
+
+// monitor
+monitorObj.mesh.scale.set(parseFloat(mw.value)/3.2, parseFloat(mh.value)/1.8,1)
+monitorObj.mesh.position.x = parseFloat(mx.value)
+monitorObj.mesh.position.y = parseFloat(my.value)
+
+// globe
+boardObj.scale.set(parseFloat(gw.value)/3.0, parseFloat(gh.value)/1.5,1)
+boardObj.position.x = parseFloat(gx.value)
+boardObj.position.y = parseFloat(gy.value)
+}
+
+// events
+mw.oninput = updateUI
+mh.oninput = updateUI
+mx.oninput = updateUI
+my.oninput = updateUI
+
+gw.oninput = updateUI
+gh.oninput = updateUI
+gx.oninput = updateUI
+gy.oninput = updateUI
 function makeNeonText(text,x,y,z,w,h){
 const canvas=document.createElement("canvas")
 canvas.width=1024

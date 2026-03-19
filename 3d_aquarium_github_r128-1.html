@@ -292,7 +292,21 @@ let baseHeight = 2.2
 
 scene.add(room)
 prep(room)
+let referenceMaterial = null
 
+scene.traverse(obj=>{
+    if(obj.isMesh && obj.material && obj.material.color){
+
+        const c = obj.material.color
+        const brightness = (c.r + c.g + c.b) / 3
+
+        // pick a light surface (wall/sofa area)
+        if(brightness > 0.75 && !referenceMaterial){
+            referenceMaterial = obj.material.clone()
+            console.log("Picked material from:", obj.name)
+        }
+    }
+})
 // ✅ CLEAN WALL (correct structure)
 // ===== FINAL WALL FIX =====
 
@@ -304,13 +318,12 @@ const finalHeight = baseHeight * 1
 
 const wallFix = new THREE.Mesh(
     new THREE.PlaneGeometry(finalWidth, finalHeight),
-    new THREE.MeshStandardMaterial({
-       color: 0xd6dde5,
+    referenceMaterial || new THREE.MeshStandardMaterial({
+        color: 0xd6dde5,
         roughness: 0.95,
         metalness: 0
     })
 )
-
 // apply your calibrated transform
 wallFix.scale.set(2, 1.78, 1)
 wallFix.position.set(2.5, 1.12, 0)

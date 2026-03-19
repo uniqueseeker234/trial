@@ -315,16 +315,13 @@ scene.traverse(obj=>{
 // apply trim (your final values)
 const finalWidth = baseWidth * 0.86
 const finalHeight = baseHeight * 1
-
 const wallFix = new THREE.Mesh(
     new THREE.PlaneGeometry(finalWidth, finalHeight),
-    referenceMaterial || new THREE.MeshStandardMaterial({
-        color: 0xd6dde5,
-        roughness: 0.95,
-        metalness: 0
+    new THREE.MeshLambertMaterial({
+        color: 0xd9e0e7
     })
 )
-// apply your calibrated transform
+
 wallFix.scale.set(2, 1.78, 1)
 wallFix.position.set(2.5, 1.12, 0)
 wallFix.rotation.y = -Math.PI / 2

@@ -320,13 +320,45 @@ eye.set(0,roomBox.size.y*0.18,roomBox.size.z*0.35)
 updateLook()
 
 // ===== RIGHT WALL FIX =====
-const monitorObj = makeAnimatedMonitor(2.25,1.70,-0.65,1.28,0.74)
+const monitorObj = makeAnimatedMonitor(2.25,1.55,-0.65,2.6,1.4)
 monitorObj.mesh.rotation.y = -Math.PI/2
 animatedPanels.push(monitorObj)
 
-const boardObj = makeEarthBoard(2.25,0.95,-0.65,1.18,0.74)
+const boardObj = makeEarthBoard(2.25,0.45,-0.65,2.3,1.2)
 boardObj.rotation.y = -Math.PI/2
+    makeNeonText(
+"Welcome to Uniqueseeker's Room",
+2.25,2.25,-0.65,
+2.6,0.5
+)
+function makeNeonText(text,x,y,z,w,h){
+const canvas=document.createElement("canvas")
+canvas.width=1024
+canvas.height=256
+const ctx=canvas.getContext("2d")
 
+ctx.fillStyle="#0b1118"
+ctx.fillRect(0,0,canvas.width,canvas.height)
+
+ctx.shadowColor="#5dfcff"
+ctx.shadowBlur=25
+
+ctx.fillStyle="#9dfcff"
+ctx.font="bold 60px Arial"
+ctx.textAlign="center"
+ctx.fillText(text,canvas.width/2,150)
+
+const tex=new THREE.CanvasTexture(canvas)
+
+const mesh=new THREE.Mesh(
+new THREE.PlaneGeometry(w,h),
+new THREE.MeshBasicMaterial({map:tex,transparent:true})
+)
+
+mesh.position.set(x,y,z)
+mesh.rotation.y=-Math.PI/2
+scene.add(mesh)
+}
 const glow = new THREE.Mesh(
 new THREE.PlaneGeometry(0.92,0.04),
 new THREE.MeshBasicMaterial({color:0x96f5ff,transparent:true,opacity:0.75})

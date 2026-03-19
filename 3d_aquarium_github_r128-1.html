@@ -287,46 +287,33 @@ const animatedPanels=[];
 (async function(){
 
 const room=await loadGLB("./room.glb")
-let baseWidth = 3.2
-let baseHeight = 2.2
 
 scene.add(room)
 prep(room)
-let referenceMaterial = null
+// ===== CLONE REAL WALL FROM ROOM =====
+
+let wallClone = null
 
 scene.traverse(obj=>{
-    if(obj.isMesh && obj.material && obj.material.color){
+    if(obj.isMesh){
 
-        const c = obj.material.color
-        const brightness = (c.r + c.g + c.b) / 3
+        const size = new THREE.Box3().setFromObject(obj).getSize(new THREE.Vector3())
 
-        // pick a light surface (wall/sofa area)
-        if(brightness > 0.75 && !referenceMaterial){
-            referenceMaterial = obj.material.clone()
-            console.log("Picked material from:", obj.name)
+        // detect wall-like object
+        if(size.x > 2 && size.y > 1.5 && size.z < 0.5 && !wallClone){
+            wallClone = obj.clone()
+            console.log("Wall found:", obj.name)
         }
     }
 })
-// ✅ CLEAN WALL (correct structure)
-// ===== FINAL WALL FIX =====
 
-// base size
+if(wallClone){
+    wallClone.position.set(2.5, 1.12, 0)
+    wallClone.scale.set(1.2, 1.78, 1)
+    wallClone.rotation.y = -Math.PI / 2
 
-// apply trim (your final values)
-const finalWidth = baseWidth * 0.86
-const finalHeight = baseHeight * 1
-const wallFix = new THREE.Mesh(
-    new THREE.PlaneGeometry(finalWidth, finalHeight),
-    new THREE.MeshLambertMaterial({
-        color: 0xd9e0e7
-    })
-)
-
-wallFix.scale.set(2, 1.78, 1)
-wallFix.position.set(2.5, 1.12, 0)
-wallFix.rotation.y = -Math.PI / 2
-
-scene.add(wallFix)
+    scene.add(wallClone)
+}
   
 const roomBox=boxMinMax(room)
 eye.set(0,roomBox.size.y*0.18,roomBox.size.z*0.35)

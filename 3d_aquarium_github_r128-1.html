@@ -44,37 +44,7 @@ line-height:1.4;
 Mission Elythera Lab V5.5<br>
 Drag mouse to look around
 </div>
-<div style="
-position:fixed;
-bottom:10px;
-left:10px;
-background:rgba(0,0,0,0.6);
-padding:10px;
-border-radius:10px;
-color:white;
-z-index:999;
-font-size:12px;
-">
 
-Width<br>
-<input type="range" id="w" min="0.5" max="2" step="0.01" value="1"><br>
-
-Height<br>
-<input type="range" id="h" min="0.5" max="2" step="0.01" value="1"><br>
-
-X Move<br>
-<input type="range" id="x" min="2.0" max="2.5" step="0.01" value="2.18"><br>
-
-Y Move<br>
-<input type="range" id="y" min="1.0" max="1.5" step="0.01" value="1.25"><br>
-Z Depth<br>
-<input type="range" id="z" min="-1" max="0" step="0.01" value="-0.62"><br>
-    Trim Width<br>
-<input type="range" id="tw" min="0.5" max="1.5" step="0.01" value="1"><br>
-
-Trim Height<br>
-<input type="range" id="th" min="0.5" max="1.5" step="0.01" value="1"><br>
-</div>
 <script type="module">
 
 import * as THREE from 'three'
@@ -324,10 +294,18 @@ scene.add(room)
 prep(room)
 
 // ✅ CLEAN WALL (correct structure)
-let geometry = new THREE.PlaneGeometry(baseWidth, baseHeight)
+// ===== FINAL WALL FIX =====
+
+// base size
+const baseWidth = 3.2
+const baseHeight = 2.2
+
+// apply trim (your final values)
+const finalWidth = baseWidth * 0.86
+const finalHeight = baseHeight * 1
 
 const wallFix = new THREE.Mesh(
-    geometry,
+    new THREE.PlaneGeometry(finalWidth, finalHeight),
     new THREE.MeshStandardMaterial({
         color: 0xdfe5ec,
         roughness: 0.95,
@@ -335,43 +313,13 @@ const wallFix = new THREE.Mesh(
     })
 )
 
-// position + rotation
-wallFix.position.set(5.5, 1.25, -0.62)
+// apply your calibrated transform
+wallFix.scale.set(2, 1.78, 1)
+wallFix.position.set(2.5, 1.12, 0)
 wallFix.rotation.y = -Math.PI / 2
 
 scene.add(wallFix)
-    const w = document.getElementById("w")
-const h = document.getElementById("h")
-const x = document.getElementById("x")
-const y = document.getElementById("y")
-const z = document.getElementById("z")
-    const tw = document.getElementById("tw")
-const th = document.getElementById("th")
-function updateWall(){
-
-    // scale
-    wallFix.scale.set(parseFloat(w.value), parseFloat(h.value), 1)
-
-    // position
-    wallFix.position.x = parseFloat(x.value)
-    wallFix.position.y = parseFloat(y.value)
-    wallFix.position.z = parseFloat(z.value)
-
-    // 🔥 crop effect (geometry resize)
-    const newWidth = baseWidth * parseFloat(tw.value)
-    const newHeight = baseHeight * parseFloat(th.value)
-
-    wallFix.geometry.dispose()
-    wallFix.geometry = new THREE.PlaneGeometry(newWidth, newHeight)
-}
-
-w.oninput = updateWall
-h.oninput = updateWall
-x.oninput = updateWall
-y.oninput = updateWall
-z.oninput = updateWall
-    tw.oninput = updateWall
-    th.oninput = updateWall
+  
 const roomBox=boxMinMax(room)
 eye.set(0,roomBox.size.y*0.18,roomBox.size.z*0.35)
 updateLook()

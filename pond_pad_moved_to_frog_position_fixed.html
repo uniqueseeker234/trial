@@ -461,10 +461,39 @@ if (bigfishData.animations.length > 0) {
   action.timeScale = 2.0;   // speed (optional)
   action.play();
 }
-  
-      
 
       animate();
+      setTimeout(async () => {
+  console.log("Loading plants (delayed)...");
+
+  const plantData = await loadOne({
+    k: 'plants',
+    f: 'underwater_plant_pack.glb'
+  });
+
+  if (!plantData) return;
+
+  const plantsSrc = plantData.scene;
+
+  const plantPositions = [
+    [-1.05, -0.55],
+    [-0.95,  0.65],
+    [ 0.15, -0.85],
+    [ 0.35,  0.85],
+    [ 1.05, -0.55]
+  ];
+
+  plantPositions.forEach((pz,i) => {
+    const p = plantsSrc.clone(true);
+    fitCenter(p, 0.85);
+
+    p.scale.multiplyScalar(0.65 + (i%3)*0.12);
+    p.position.set(pz[0], soil.position.y + 0.10, pz[1]);
+
+    underwater.add(p);
+  });
+
+}, 1500); // delay 1.5 seconds
       
     }catch(e){
       console.error(e);

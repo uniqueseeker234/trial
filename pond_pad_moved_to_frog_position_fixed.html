@@ -259,9 +259,6 @@
 
   const loader = new THREE.GLTFLoader();
   const assets = [
-    {k:'lotus',  f:'lotus_flower_with_lillypad.glb'},
-    {k:'pad',    f:'giant_lily_pad_only.glb'},
-    {k:'frog',   f:'frog.glb'},
     {k:'fish',   f:'koi_fish.glb'},
     {k:'plants', f:'underwater_plant_pack.glb'}
   ];
@@ -271,16 +268,6 @@
 
   const plantInstances = [];
   const fishSwimmers = [];
-  let lotusPink = null;
-  let lotusWhite = null;
-  let frogObj = null;
-  let lilyPad = null;
-  let frogBaseY = 0;
-  let lilyBaseY = 0;
-  const frogOffset = { x: 0.35, z: 0.25 };
-  const clampX = (TANK.w - TANK.glass*2) * 0.44;
-  const clampZ = (TANK.d - TANK.glass*2) * 0.44;
-  let surfY = 0;
   const clock = new THREE.Clock();
 
   function loadOne(a){
@@ -312,29 +299,7 @@
       p.position.y = soil.position.y + 0.10 + Math.sin(t*1.1+i) * 0.008;
     });
 
-    if (lilyPad){
-      lilyPad.position.y = lilyBaseY + Math.sin(t*0.9) * 0.0016;
-      lilyPad.rotation.y = Math.sin(t*0.55) * 0.010;
-      lilyPad.rotation.z = Math.sin(t*0.42) * 0.004;
-    }
-
-    if (frogObj && lilyPad){
-      frogObj.position.y = frogBaseY + Math.sin(t*0.9) * 0.0016;
-      frogObj.position.x = lilyPad.position.x + frogOffset.x;
-      frogObj.position.z = lilyPad.position.z + frogOffset.z;
-      frogObj.rotation.y = Math.PI*0.52 + Math.sin(t*0.45) * 0.008;
-    }
-
-    if (lotusPink){
-      lotusPink.position.y = surfY + 0.014 + Math.sin(t*0.8 + 0.6)*0.002;
-      lotusPink.rotation.y = Math.sin(t*0.85) * 0.014;
-      lotusPink.rotation.z = Math.sin(t*0.7)*0.008;
-    }
-    if (lotusWhite){
-      lotusWhite.position.y = surfY + 0.014 + Math.sin(t*0.82 + 1.4)*0.002;
-      lotusWhite.rotation.y = Math.sin(t*0.83 + 1.7) * 0.014;
-      lotusWhite.rotation.z = Math.sin(t*0.72+0.5)*0.008;
-    }
+   
 
     fishSwimmers.forEach((sw,i) => {
       sw.u = (sw.u + sw.uSpeed * (1/60)) % 1;
@@ -378,48 +343,7 @@
       setProgress(100, 'Done');
       setTimeout(() => loadingEl.style.display='none', 250);
 
-      const lotusSrc = loaded.lotus.scene;
-      lotusWhite = lotusSrc.clone(true);
-      lotusPink = lotusSrc.clone(true);
-
-      fitCenter(lotusPink, 0.84);
-      lotusWhite.scale.copy(lotusPink.scale);
-
-      surfY = surface.position.y;
-
-      lilyPad = loaded.pad.scene.clone(true);
-      fitCenter(lilyPad, 0.68);
-      lilyPad.position.set(0.00, surfY + 0.014, 0.00);
-      lilyBaseY = lilyPad.position.y;
-      tank.add(lilyPad);
-
-      lotusPink.position.set(-1.02, surfY + 0.014, -0.10);
-      lotusWhite.position.set(1.02, surfY + 0.014, 0.10);
-
-      tint(lotusPink,  '#ff9acb', flowerPredicate);
-      tint(lotusWhite, '#ffffff', flowerPredicate);
-
-      lotusWhite.traverse(o=>{
-        if(!o.isMesh) return;
-        const mats = Array.isArray(o.material) ? o.material : [o.material];
-        mats.forEach(m=>{
-          if(!m || !m.color) return;
-          if(flowerPredicate(o,m)){
-            m.color.set('#ffffff');
-            m.needsUpdate = true;
-          }
-        });
-      });
-
-      tank.add(lotusPink, lotusWhite);
-
-      frogObj = loaded.frog.scene.clone(true);
-      fitCenter(frogObj, 0.32);
-      frogObj.position.set(lilyPad.position.x + frogOffset.x, surfY + 0.022, lilyPad.position.z + frogOffset.z);
-      frogObj.rotation.set(0, Math.PI*0.52, 0);
-      frogBaseY = frogObj.position.y;
-      tank.add(frogObj);
-
+    
       const plantsSrc = loaded.plants.scene;
       const plantPositions = [
         [-1.05, -0.55],

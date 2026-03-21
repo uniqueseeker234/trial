@@ -317,78 +317,25 @@ const clampZ = (TANK.d - TANK.glass*2) * 0.44;
 fishSwimmers.forEach((sw,i) => {
   const t = clock.getElapsedTime();
 
-  // path size (inside tank)
-  const w = TANK.w * 0.4;
-  const d = TANK.d * 0.4;
+  // VERY slow speed
+  sw.angle += sw.turnSpeed;
 
-  // speed
-  sw.u = (sw.u + 0.08 * (1/60)) % 4;   // 4 sides of rectangle
+  // smooth circular wandering
+  sw.obj.position.x += Math.cos(sw.angle) * sw.speed;
+  sw.obj.position.z += Math.sin(sw.angle) * sw.speed;
 
-  let x=0, z=0;
+  // gentle up-down movement
+  sw.obj.position.y = sw.baseY + Math.sin(t * 0.5 + i) * 0.05;
 
-  // rectangle path (4 segments)
-  if(sw.u < 1){
-    x = -w + (sw.u * 2*w);
-    z = -d;
-  } 
-  else if(sw.u < 2){
-    x = w;
-    z = -d + ((sw.u-1) * 2*d);
-  }
-  else if(sw.u < 3){
-    x = w - ((sw.u-2) * 2*w);
-    z = d;
-  }
-  else {
-    x = -w;
-    z = d - ((sw.u-3) * 2*d);
-  }
-
-  // smooth turning (important!)
-  const lookAhead = sw.u + 0.05;
-  let nx = x, nz = z;
-
-  if(lookAhead < 1){
-    nx = -w + (lookAhead * 2*w);
-    nz = -d;
-  } 
-  else if(lookAhead < 2){
-    nx = w;
-    nz = -d + ((lookAhead-1) * 2*d);
-  }
-  else if(lookAhead < 3){
-    nx = w - ((lookAhead-2) * 2*w);
-    nz = d;
-  }
-  else {
-    nx = -w;
-    nz = d - ((lookAhead-3) * 2*d);
-  }
-
-  // breathing motion (rise occasionally)
-  const breathe = Math.sin(t * 0.15+ i*2);
-  let y = sw.y;
-
-  if(breathe > 0.8){
-    y += (breathe - 0.8) * 0.8; // go up
-  }
-
-  // apply position
-  sw.obj.position.set(x, y, z);
+  // boundary limit (keep inside tank)
+  sw.obj.position.x = THREE.MathUtils.clamp(sw.obj.position.x, -1.2, 1.2);
+  sw.obj.position.z = THREE.MathUtils.clamp(sw.obj.position.z, -0.9, 0.9);
 
   // face movement direction
-  const dx = nx - x;
-  const dz = nz - z;
-  // determine direction based on side
-// make fish face movement direction
-const direction = new THREE.Vector3(nx - x, 0, nz - z).normalize();
+  sw.obj.rotation.y = -sw.angle + Math.PI/2;
 
-// make fish look forward
-sw.obj.lookAt(
-  sw.obj.position.x + direction.x,
-  sw.obj.position.y,
-  sw.obj.position.z + direction.z
-);
+  // slight body sway
+  sw.obj.rotation.z = Math.sin(t*3 + i) * 0.1;
 });
     renderer.render(scene, camera);
   }
@@ -497,11 +444,22 @@ tank.add(shell);
 
       underwater.add(fishA, fishB);
 
-      fishSwimmers.push(
-        {obj:fishA, rX:1.10, rZ:0.72, y:water.position.y - waterH*0.10, phase:0.2, bob:0.04, breathLift: waterH*0.36, wiggleAmt:0.26, u:0.12, uSpeed:0.20},
-        {obj:fishB, rX:0.88, rZ:1.02, y:water.position.y - waterH*0.22, phase:2.5, bob:0.035, breathLift: waterH*0.40, wiggleAmt:0.24, u:0.46, uSpeed:0.17}
-      );
-
+    fishSwimmers.push(
+  {
+    obj: fishA,
+    angle: Math.random() * Math.PI * 2,
+    speed: 0.005,
+    turnSpeed: 0.01,
+    baseY: water.position.y - 0.2
+  },
+  {
+    obj: fishB,
+    angle: Math.random() * Math.PI * 2,
+    speed: 0.004,
+    turnSpeed: -0.008,
+    baseY: water.position.y - 0.3
+  }
+);
       animate();
     }catch(e){
       console.error(e);

@@ -265,6 +265,7 @@ soil.visible = false;
   ];
 
   const loaded = {};
+  let env = null;
   let done = 0;
 
   const plantInstances = [];
@@ -349,7 +350,7 @@ const clampZ = (TANK.d - TANK.glass*2) * 0.44;
       setProgress(100, 'Done');
       setTimeout(() => loadingEl.style.display='none', 250);
       // ===== ADD YOUR LIGHTHOUSE MODEL =====
-const env = loaded.env.scene;
+env = loaded.env.scene;
 
 // scale + center
 // ===== FIT GLB PERFECTLY INSIDE TANK =====

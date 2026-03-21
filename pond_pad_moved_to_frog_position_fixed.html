@@ -352,15 +352,15 @@ if (clownMixer) {
 if (bigfish && bigfishMixer && house) {
   bigfishMixer.update(delta);
 
-  // keep fixed position
+  // lock XZ near house
   bigfish.position.x = house.position.x + 0.6;
   bigfish.position.z = house.position.z;
 
-  // gentle breathing motion (not floating away)
-  bigfish.position.y = water.position.y - 0.15 + Math.sin(t * 2) * 0.01;
+  // FLOAT slightly above ground (realistic)
+  const baseY = house.position.y + 0.15;
+
+  bigfish.position.y = baseY + Math.sin(t * 2) * 0.03;
 }
-    renderer.render(scene, camera);
-  }
 
   (async () => {
     try{
@@ -495,13 +495,13 @@ if (clownData.animations.length > 0) {
       const bigfishData = loaded.bigfish;
 bigfish = bigfishData.scene;
 
-fitCenter(bigfish, 0.9);
+fitCenter(bigfish, 0.6);
 bigfish.position.set(-0.5, water.position.y + 0.35, -0.3);
 
 underwater.add(bigfish);
       bigfish.position.set(
   house.position.x + 0.6,
-  water.position.y - 0.15,
+  house.position.y,   // SAME LEVEL AS HOUSE
   house.position.z
 );
 

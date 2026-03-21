@@ -312,11 +312,6 @@ function loadOne(a){
 
   underwater.add(b);
 
-  bubbles.push({
-    mesh: b,
-    speed: 0.01 + Math.random() * 0.01
-  });
-}
   function animate(){
     requestAnimationFrame(animate);
     controls.update();
@@ -374,8 +369,7 @@ z = THREE.MathUtils.clamp(z, -waterHalfZ, waterHalfZ);
 
   underwater.add(tPart);
 
-  trail.push({ mesh: tPart });
-}
+ 
 // --- big fish (fake swim) ---
 if (bigfish && bigfishMixer && house) {
   bigfishMixer.update(delta);

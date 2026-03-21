@@ -281,9 +281,12 @@ soil.visible = false;
 
   const plantInstances = [];
   const fishSwimmers = [];
+  let guppy;
+  let guppyMixer;
   const clock = new THREE.Clock();
       const t = clock.getElapsedTime();
   let swimArea = [];
+  
 const clampX = (TANK.w - TANK.glass*2) * 0.44;
 const clampZ = (TANK.d - TANK.glass*2) * 0.44;
   function loadOne(a){
@@ -445,11 +448,11 @@ obstacles = [
       const fishA = fishSrc.clone(true);
       const fishB = fishSrc.clone(true);
       const guppyData = loaded.guppy;
-      const guppy = guppyData.scene;
+     guppy = guppyData.scene;
       fitCenter(guppy,1.2);
       guppy.position.set(0,water.position.y + 0.3,0);
       underwater.add(guppy);
-      const guppyMixer = new THREE.AnimationMixer(guppy);
+      guppyMixer = new THREE.AnimationMixer(guppy);
 const guppyAction = guppyMixer.clipAction(guppyData.animations[0]);
 guppyAction.play();
       fitCenter(fishA, 1.7);
@@ -486,11 +489,12 @@ guppyAction.play();
   yMin: water.position.y + 0.1,
   yMax: water.position.y + 0.6
 };
-      animate();
       const delta = clock.getDelta();
 if(guppyMixer) guppyMixer.update(delta);
       guppy.position.x += Math.cos(clock.elapsedTime * 0.2) * 0.002;
 guppy.position.z += Math.sin(clock.elapsedTime * 0.2) * 0.002;
+      animate();
+      
     }catch(e){
       console.error(e);
       setProgress(100, 'Error');

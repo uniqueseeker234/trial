@@ -287,18 +287,21 @@ soil.visible = false;
   
 const clampX = (TANK.w - TANK.glass*2) * 0.44;
 const clampZ = (TANK.d - TANK.glass*2) * 0.44;
-  function loadOne(a){
-    return new Promise((resolve,reject) => {
-      setProgress((done/assets.length)*100, 'Loading ' + a.f + '…');
-     loader.load(
-  a.f,
-  gltf => resolve(gltf),
-  undefined,
-  err => {
-    console.warn("Failed:", a.f);
-    resolve(null); // don't stop loading
-  }
-);
+ function loadOne(a){
+  return new Promise((resolve) => {
+    setProgress((done/assets.length)*100, 'Loading ' + a.f + '…');
+
+    loader.load(
+      a.f,
+      gltf => resolve(gltf),
+      undefined,
+      err => {
+        console.warn("Failed:", a.f);
+        resolve(null);
+      }
+    );
+  });
+}
 
   function animate(){
     requestAnimationFrame(animate);
@@ -323,32 +326,7 @@ const clampZ = (TANK.d - TANK.glass*2) * 0.44;
     });
 
    
-fishSwimmers.forEach((sw,i) => {
-  const t = clock.getElapsedTime();
 
-  // slow direction change
-  sw.angle += sw.turnSpeed + (Math.random()-0.5)*0.002;
-
-  const dx = Math.cos(sw.angle);
-  const dz = Math.sin(sw.angle);
-
-  // move
-  sw.obj.position.x += dx * sw.speed;
-  sw.obj.position.z += dz * sw.speed;
-
-  // keep inside tank (bigger area now)
-  sw.obj.position.x = THREE.MathUtils.clamp(sw.obj.position.x, swimArea.xMin, swimArea.xMax);
-  sw.obj.position.z = THREE.MathUtils.clamp(sw.obj.position.z, swimArea.zMin, swimArea.zMax);
-
-  // smooth floating height (no ground collision needed)
-  sw.obj.position.y = sw.baseY + Math.sin(t*0.4+i)*0.05;
-
-  // face direction
-  sw.obj.rotation.y = -Math.atan2(dz, dx) + Math.PI/2;
-
-  // gentle sway
-  sw.obj.rotation.z = Math.sin(t*2+i)*0.06;
-});
   
 // --- clown (real animation) ---
 if (clownMixer) {
@@ -380,7 +358,7 @@ const results = await Promise.all(promises);
 assets.forEach((a, i) => {
   loaded[a.k] = results[i];
 });
-   setProgresss(100, "Done");
+   setProgress(100, "Done");
       setTimeout(() => loadingEl.style.display='none', 250);
       // ===== ADD YOUR LIGHTHOUSE MODEL =====
 env = loaded.env.scene;

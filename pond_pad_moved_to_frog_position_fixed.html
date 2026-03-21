@@ -352,13 +352,15 @@ if (clownMixer) {
 if (bigfish && bigfishMixer && house) {
   bigfishMixer.update(delta);
 
-  // lock XZ near house
+  // stay near house (right side)
   bigfish.position.x = house.position.x + 0.6;
   bigfish.position.z = house.position.z;
 
-  // FLOAT slightly above ground (realistic)
- const baseY = water.position.y - 0.25;  // deeper inside water
-bigfish.position.y = baseY + Math.sin(t * 2) * 0.02;
+  // SAME LEVEL AS HOUSE (fixed)
+  const baseY = house.position.y + 0.05;
+
+  // gentle breathing motion
+  bigfish.position.y = baseY + Math.sin(t * 2) * 0.02;
 }
 renderer.render(scene, camera);
 }
@@ -430,13 +432,13 @@ tank.add(house);
 // --- DRIFT WOOD ---
 const wood = loaded.wood.scene;
 fitCenter(wood, 1.9);
-wood.position.set(-0.5, baseY, 0.2);
+wood.position.set(-0.5, baseY + 0.08, 0.2);
 tank.add(wood);
 
 // --- SEA SHELL ---
 const shell = loaded.shell.scene;
-fitCenter(shell,0.50);
-shell.position.set(0.7, baseY, 0.4);
+fitCenter(shell,0.57);
+shell.position.set(0.7, baseY - 0.05, 0.4);
 tank.add(shell);
 
       const plantSrc = loaded.plant.scene;

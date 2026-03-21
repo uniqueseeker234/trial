@@ -379,7 +379,19 @@ fishSwimmers.forEach((sw,i) => {
   // face movement direction
   const dx = nx - x;
   const dz = nz - z;
-  sw.obj.rotation.y = Math.atan2(dx, dz);
+  // determine direction based on side
+if(sw.u < 1){
+  sw.obj.rotation.y = Math.PI / 2;   // moving right
+}
+else if(sw.u < 2){
+  sw.obj.rotation.y = 0;             // moving forward
+}
+else if(sw.u < 3){
+  sw.obj.rotation.y = -Math.PI / 2;  // moving left
+}
+else {
+  sw.obj.rotation.y = Math.PI;       // moving backward
+}
 
   // small body sway
   sw.obj.rotation.z = Math.sin(t*2 + i) * 0.05;
@@ -438,24 +450,24 @@ tank.add(env);
 // ===== DECOR OBJECTS ON SOIL =====
 
 // base Y (same as soil top)
-const baseY = -TANK.h/2 + TANK.glass + 0.18;
+const baseY = -TANK.h/2 + TANK.glass + 0.28;
 
 // --- SMALL HOUSE ---
 const house = loaded.house.scene;
-fitCenter(house, 0.77);   // small size
+fitCenter(house, 0.54);   // small size
 house.position.set(0.4, baseY, -0.4);
 tank.add(house);
 
 // --- DRIFT WOOD ---
 const wood = loaded.wood.scene;
-fitCenter(wood, 2.3);
+fitCenter(wood, 1.9);
 wood.position.set(-0.5, baseY, 0.2);
 tank.add(wood);
 
 // --- SEA SHELL ---
 const shell = loaded.shell.scene;
-fitCenter(shell,0.70);
-shell.position.set(0.0, baseY, 0.4);
+fitCenter(shell,0.50);
+shell.position.set(0.7, baseY, 0.4);
 tank.add(shell);
     
       const plantsSrc = loaded.plants.scene;

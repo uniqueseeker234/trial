@@ -352,12 +352,17 @@ if (bigfishMixer) {
 
   (async () => {
     try{
-      const promises = assets.map(a => loadOne(a));
-const results = await Promise.all(promises);
+      const promises = assets.map((a, index) =>
+  loadOne(a).then(gltf => {
+    loaded[a.k] = gltf;
 
-assets.forEach((a, i) => {
-  loaded[a.k] = results[i];
-});
+    // ✅ update progress correctly
+    const progress = ((index + 1) / assets.length) * 100;
+    setProgress(progress, 'Loaded ' + a.f);
+  })
+);
+
+await Promise.all(promises);
    setProgress(100, "Done");
       setTimeout(() => loadingEl.style.display='none', 250);
       // ===== ADD YOUR LIGHTHOUSE MODEL =====

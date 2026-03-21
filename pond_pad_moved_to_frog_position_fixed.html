@@ -376,7 +376,8 @@ box.getCenter(center);
 
 // center it
 env.position.sub(center);
-      env.scale.set(stretch.x, stretch.y, stretch.z);
+      // reduce Y influence automatically
+env.scale.set(stretch.x, stretch.y * 0.6, stretch.z);
 
 //// get new bounding after scaling
 box.setFromObject(env);

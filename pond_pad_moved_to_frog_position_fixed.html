@@ -473,9 +473,9 @@ function updateScale(){
   stretch.z = parseFloat(document.getElementById("sz").value);
 
   if(env){
-    // reduce Y influence automatically
-env.scale.set(stretch.x, stretch.y, stretch.z);
-
+    // reduce Y influence automaticallyenv.scale.set(stretch.x, stretch.y, stretch.z);
+// reduce Y influence automatically
+env.scale.set(stretch.x, stretch.y * 0.6, stretch.z);
     const box = new THREE.Box3().setFromObject(env);
     env.position.y += (-TANK.h/2 + TANK.glass) - box.min.y;
   }

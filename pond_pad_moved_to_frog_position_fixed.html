@@ -360,22 +360,27 @@ const clampZ = (TANK.d - TANK.glass*2) * 0.44;
       // ===== ADD YOUR LIGHTHOUSE MODEL =====
 env = loaded.env.scene;
 env.traverse(obj => {
-  if (obj.isMesh) {
-    const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+  if (obj.isMesh && obj.material && obj.material.transparent) {
 
+    // Clone the mesh
+    const backMesh = obj.clone();
+
+    // Flip it
+    backMesh.scale.z *= -1;
+
+    // Keep same position
+    backMesh.position.copy(obj.position);
+    backMesh.rotation.copy(obj.rotation);
+
+    // Fix material
+    const mats = Array.isArray(backMesh.material) ? backMesh.material : [backMesh.material];
     mats.forEach(m => {
-      if (!m) return;
-
-      m.side = THREE.DoubleSide;
-      m.depthWrite = true;
-      m.depthTest = true;
-
-      if (m.transparent) {
-        m.opacity = Math.max(m.opacity || 1, 0.9);
-      }
-
+      m.side = THREE.BackSide;
+      m.depthWrite = false;
       m.needsUpdate = true;
     });
+
+    obj.parent.add(backMesh);
   }
 });
 // scale + center

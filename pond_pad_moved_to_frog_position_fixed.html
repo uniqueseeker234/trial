@@ -266,7 +266,6 @@ soil.visible = false;
   const loader = new THREE.GLTFLoader();
   const assets = [
   {k:'env',    f:'under_water_light_house.glb'},
-  {k:'plants', f:'underwater_plant_pack.glb'},
  {k:'clown', f:'clown_fish_low_poly_animated.glb'},
 {k:'bigfish', f:'Animation_fish_low_poly.glb'},
   {k:'house',  f:'small_house.glb'},
@@ -278,7 +277,7 @@ soil.visible = false;
   let env = null;
   let done = 0;
 
-  const plantInstances = [];
+  
  let clown, clownMixer;
   let bigfish, bigfishMixer;
   const clock = new THREE.Clock();
@@ -319,12 +318,7 @@ function loadOne(a){
     pos.needsUpdate = true;
    
 
-    plantInstances.forEach((p,i) => {
-      p.rotation.z = Math.sin(t*0.8 + i) * 0.15;
-      p.rotation.x = Math.cos(t*0.60 + i*1.5) * 0.08;
-      p.position.y = soil.position.y + 0.02;
-    });
-
+  
    
 
   
@@ -432,27 +426,8 @@ obstacles = [
   { pos: wood.position, radius: 0.6 },
   { pos: shell.position, radius: 0.3 },
   { pos: env.position, radius: 1.0 }
-];    
-      const plantsSrc = loaded.plants.scene;
-      const plantPositions = [
-        [-1.05, -0.55],
-        [-0.95,  0.65],
-        [ 0.15, -0.85],
-        [ 0.35,  0.85],
-        [ 1.05, -0.55]
-      ];
-      const greens = ['#2fa46a','#1f8f67','#2aa98d','#2f9f90','#3aa86f'];
-
-      plantPositions.forEach((pz,i) => {
-        const p = plantsSrc.clone(true);
-        fitCenter(p, 0.85);
-        p.scale.multiplyScalar(0.65 + (i%3)*0.12);
-        p.position.set(pz[0], soil.position.y + 0.10, pz[1]);
-        p.rotation.y = (i*0.95) % (Math.PI*2);
-        tint(p, greens[i%greens.length], (mesh,mat)=>!mat.color || looksGreenish(mat.color) || mat.color.g>0.22);
-        underwater.add(p);
-        plantInstances.push(p);
-      });
+];   
+  
 const clownData = loaded.clown;
 clown = clownData.scene;
 

@@ -212,7 +212,7 @@
   soil.position.y = -TANK.h/2 + TANK.glass + 0.09;
   soil.receiveShadow = true;
   tank.add(soil);
-
+soil.visible = false;
   const underwater = new THREE.Group();
   tank.add(underwater);
 
@@ -259,6 +259,7 @@
 
   const loader = new THREE.GLTFLoader();
   const assets = [
+    {k:'env',    f:'under_water_light_house.glb'},
     {k:'fish',   f:'koi_fish.glb'},
     {k:'plants', f:'underwater_plant_pack.glb'}
   ];
@@ -343,6 +344,17 @@ const clampZ = (TANK.d - TANK.glass*2) * 0.44;
       }
       setProgress(100, 'Done');
       setTimeout(() => loadingEl.style.display='none', 250);
+      // ===== ADD YOUR LIGHTHOUSE MODEL =====
+const env = loaded.env.scene;
+
+// scale + center
+fitCenter(env, 2.5);
+
+// place at tank bottom
+env.position.y = soil.position.y + 0.05;
+
+// add to tank
+tank.add(env);
 
     
       const plantsSrc = loaded.plants.scene;

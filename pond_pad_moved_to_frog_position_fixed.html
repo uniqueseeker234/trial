@@ -267,9 +267,9 @@ soil.visible = false;
   const assets = [
   {k:'env',    f:'under_water_light_house.glb'},
   {k:'fish',   f:'koi_fish.glb'},
-    {k:'guppy',  f:'guppies.glb'},
   {k:'plants', f:'underwater_plant_pack.glb'},
-
+ {k:'clown', f:'clown_fish_low_poly_animated.glb'},
+{k:'bigfish', f:'Animation_fish_low_poly.glb'},
   {k:'house',  f:'small_house.glb'},
   {k:'wood',   f:'drift_wood.glb'},
   {k:'shell',  f:'sea_shell_photogrammetry.glb'}
@@ -281,8 +281,8 @@ soil.visible = false;
 
   const plantInstances = [];
   const fishSwimmers = [];
-  let guppy;
-  let guppyMixer;
+ let clown, clownMixer;
+  let bigfish
   const clock = new THREE.Clock();
       const t = clock.getElapsedTime();
   let swimArea = [];
@@ -343,6 +343,27 @@ fishSwimmers.forEach((sw,i) => {
   // gentle sway
   sw.obj.rotation.z = Math.sin(t*2+i)*0.06;
 });
+    const delta = clock.getDelta();
+
+// --- clown (real animation) ---
+if (clownMixer) {
+  clownMixer.update(delta);
+
+  clown.position.x += Math.cos(clock.elapsedTime * 0.2) * 0.002;
+  clown.position.z += Math.sin(clock.elapsedTime * 0.2) * 0.002;
+}
+
+// --- big fish (fake swim) ---
+if (bigfish) {
+  bigfish.position.x += Math.cos(clock.elapsedTime * 0.15) * 0.0015;
+  bigfish.position.z += Math.sin(clock.elapsedTime * 0.15) * 0.0015;
+
+  // face direction
+  bigfish.rotation.y += 0.01;
+
+  // body sway
+  bigfish.rotation.z = Math.sin(clock.elapsedTime * 2) * 0.05;
+}
     renderer.render(scene, camera);
   }
 
@@ -443,18 +464,35 @@ obstacles = [
         underwater.add(p);
         plantInstances.push(p);
       });
+const clownData = loaded.clown;
+clown = clownData.scene;
 
+fitCenter(clown, 1.2);
+clown.position.set(0.3, water.position.y + 0.3, 0.2);
+
+underwater.add(clown);
+
+// animation
+clownMixer = new THREE.AnimationMixer(clown);
+
+if (clownData.animations.length > 0) {
+  const action = clownMixer.clipAction(clownData.animations[0]);
+  action.play();
+}
+      const bigfishData = loaded.bigfish;
+bigfish = bigfishData.scene;
+
+fitCenter(bigfish, 1.5);
+bigfish.position.set(-0.5, water.position.y + 0.35, -0.3);
+
+underwater.add(bigfish);
+
+// DEBUG
+console.log("BIG FISH animations:", bigfishData.animations);
       const fishSrc = loaded.fish.scene;
       const fishA = fishSrc.clone(true);
       const fishB = fishSrc.clone(true);
-      const guppyData = loaded.guppy;
-     guppy = guppyData.scene;
-      fitCenter(guppy,1.2);
-      guppy.position.set(0,water.position.y + 0.3,0);
-      underwater.add(guppy);
-      guppyMixer = new THREE.AnimationMixer(guppy);
-const guppyAction = guppyMixer.clipAction(guppyData.animations[0]);
-guppyAction.play();
+    
       fitCenter(fishA, 1.7);
       fishB.scale.copy(fishA.scale);
 
@@ -490,9 +528,7 @@ guppyAction.play();
   yMax: water.position.y + 0.6
 };
       const delta = clock.getDelta();
-if(guppyMixer) guppyMixer.update(delta);
-      guppy.position.x += Math.cos(clock.elapsedTime * 0.2) * 0.002;
-guppy.position.z += Math.sin(clock.elapsedTime * 0.2) * 0.002;
+
       animate();
       
     }catch(e){

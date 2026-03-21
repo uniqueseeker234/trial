@@ -359,7 +359,23 @@ const clampZ = (TANK.d - TANK.glass*2) * 0.44;
       setTimeout(() => loadingEl.style.display='none', 250);
       // ===== ADD YOUR LIGHTHOUSE MODEL =====
 env = loaded.env.scene;
+env.traverse(obj => {
+  if (obj.isMesh && obj.material) {
+    const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
 
+    mats.forEach(m => {
+      if (!m) return;
+
+      // detect water (transparent material)
+      if (m.transparent || m.opacity < 1) {
+        m.side = THREE.DoubleSide;   // show both sides
+        m.depthWrite = false;        // prevent flicker
+      }
+
+      m.needsUpdate = true;
+    });
+  }
+});
 // scale + center
 // ===== FIT GLB PERFECTLY INSIDE TANK =====
 const box = new THREE.Box3().setFromObject(env);

@@ -287,8 +287,8 @@ soil.visible = false;
   
 const clampX = (TANK.w - TANK.glass*2) * 0.44;
 const clampZ = (TANK.d - TANK.glass*2) * 0.44;
- function loadOne(a){
-  return new Promise((resolve) => {
+function loadOne(a){
+  return new Promise((resolve, reject) => {
     setProgress((done/assets.length)*100, 'Loading ' + a.f + '…');
 
     loader.load(
@@ -296,8 +296,8 @@ const clampZ = (TANK.d - TANK.glass*2) * 0.44;
       gltf => resolve(gltf),
       undefined,
       err => {
-        console.warn("Failed:", a.f);
-        resolve(null);
+        console.error("ERROR loading:", a.f);
+        reject(err);   // ✅ STOP SILENT FAIL
       }
     );
   });
@@ -317,7 +317,7 @@ const clampZ = (TANK.d - TANK.glass*2) * 0.44;
       pos.setZ(i, w1+w2);
     }
     pos.needsUpdate = true;
-    surface.geometry.computeVertexNormals();
+   
 
     plantInstances.forEach((p,i) => {
       p.rotation.z = Math.sin(t*0.8 + i) * 0.15;

@@ -282,7 +282,6 @@ soil.visible = false;
   const fishSwimmers = [];
   const clock = new THREE.Clock();
       const t = clock.getElapsedTime();
-let  obstacles = [];
   let swimArea = [];
 const clampX = (TANK.w - TANK.glass*2) * 0.44;
 const clampZ = (TANK.d - TANK.glass*2) * 0.44;
@@ -317,42 +316,28 @@ const clampZ = (TANK.d - TANK.glass*2) * 0.44;
 fishSwimmers.forEach((sw,i) => {
   const t = clock.getElapsedTime();
 
-  // direction movement
-  sw.angle += sw.turnSpeed;
+  // slow direction change
+  sw.angle += sw.turnSpeed + (Math.random()-0.5)*0.002;
 
-  let dx = Math.cos(sw.angle);
-  let dz = Math.sin(sw.angle);
+  const dx = Math.cos(sw.angle);
+  const dz = Math.sin(sw.angle);
 
-  // --- COLLISION AVOIDANCE ---
-  obstacles.forEach(o => {
-    const distX = sw.obj.position.x - o.pos.x;
-    const distZ = sw.obj.position.z - o.pos.z;
-    const dist = Math.sqrt(distX*distX + distZ*distZ);
-
-    if(dist < o.radius){
-      // push away
-      dx += distX * 0.05;
-      dz += distZ * 0.05;
-    }
-  });
-
-  // apply movement
+  // move
   sw.obj.position.x += dx * sw.speed;
   sw.obj.position.z += dz * sw.speed;
 
-  // --- LIMIT INSIDE GLB WATER ---
+  // keep inside tank (bigger area now)
   sw.obj.position.x = THREE.MathUtils.clamp(sw.obj.position.x, swimArea.xMin, swimArea.xMax);
   sw.obj.position.z = THREE.MathUtils.clamp(sw.obj.position.z, swimArea.zMin, swimArea.zMax);
 
-  // --- Y LEVEL (WATER ONLY) ---
-  sw.obj.position.y = sw.baseY + Math.sin(t*0.5+i)*0.03;
-  sw.obj.position.y = THREE.MathUtils.clamp(sw.obj.position.y, swimArea.yMin, swimArea.yMax);
+  // smooth floating height (no ground collision needed)
+  sw.obj.position.y = sw.baseY + Math.sin(t*0.4+i)*0.05;
 
   // face direction
   sw.obj.rotation.y = -Math.atan2(dz, dx) + Math.PI/2;
 
-  // body sway
-  sw.obj.rotation.z = Math.sin(t*3+i)*0.08;
+  // gentle sway
+  sw.obj.rotation.z = Math.sin(t*2+i)*0.06;
 });
     renderer.render(scene, camera);
   }
@@ -473,23 +458,25 @@ obstacles = [
     angle: Math.random() * Math.PI * 2,
     speed: 0.005,
     turnSpeed: 0.01,
-    baseY: water.position.y - 0.2
+    baseY: water.position.y + 0.25
   },
   {
     obj: fishB,
     angle: Math.random() * Math.PI * 2,
     speed: 0.004,
     turnSpeed: -0.008,
-    baseY: water.position.y - 0.3
+    baseY: water.position.y + 0.3
   }
 );
-     swimArea = {
-  xMin: -1.2,
-  xMax:  1.2,
-  zMin: -0.9,
-  zMax:  0.9,
-  yMin: water.position.y - 0.35,
-  yMax: water.position.y - 0.05
+    swimArea = {
+  xMin: -1.5,
+  xMax:  1.5,
+  zMin: -1.2,
+  zMax:  1.2,
+
+  // IMPORTANT → higher water layer
+  yMin: water.position.y + 0.1,
+  yMax: water.position.y + 0.6
 };
       animate();
     }catch(e){

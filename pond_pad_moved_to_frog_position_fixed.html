@@ -313,29 +313,45 @@ const clampZ = (TANK.d - TANK.glass*2) * 0.44;
     });
 
    
-
 fishSwimmers.forEach((sw,i) => {
   const t = clock.getElapsedTime();
 
-  // VERY slow speed
+  // direction movement
   sw.angle += sw.turnSpeed;
 
-  // smooth circular wandering
-  sw.obj.position.x += Math.cos(sw.angle) * sw.speed;
-  sw.obj.position.z += Math.sin(sw.angle) * sw.speed;
+  let dx = Math.cos(sw.angle);
+  let dz = Math.sin(sw.angle);
 
-  // gentle up-down movement
-  sw.obj.position.y = sw.baseY + Math.sin(t * 0.5 + i) * 0.05;
+  // --- COLLISION AVOIDANCE ---
+  obstacles.forEach(o => {
+    const distX = sw.obj.position.x - o.pos.x;
+    const distZ = sw.obj.position.z - o.pos.z;
+    const dist = Math.sqrt(distX*distX + distZ*distZ);
 
-  // boundary limit (keep inside tank)
-  sw.obj.position.x = THREE.MathUtils.clamp(sw.obj.position.x, -1.2, 1.2);
-  sw.obj.position.z = THREE.MathUtils.clamp(sw.obj.position.z, -0.9, 0.9);
+    if(dist < o.radius){
+      // push away
+      dx += distX * 0.05;
+      dz += distZ * 0.05;
+    }
+  });
 
-  // face movement direction
-  sw.obj.rotation.y = -sw.angle + Math.PI/2;
+  // apply movement
+  sw.obj.position.x += dx * sw.speed;
+  sw.obj.position.z += dz * sw.speed;
 
-  // slight body sway
-  sw.obj.rotation.z = Math.sin(t*3 + i) * 0.1;
+  // --- LIMIT INSIDE GLB WATER ---
+  sw.obj.position.x = THREE.MathUtils.clamp(sw.obj.position.x, swimArea.xMin, swimArea.xMax);
+  sw.obj.position.z = THREE.MathUtils.clamp(sw.obj.position.z, swimArea.zMin, swimArea.zMax);
+
+  // --- Y LEVEL (WATER ONLY) ---
+  sw.obj.position.y = sw.baseY + Math.sin(t*0.5+i)*0.03;
+  sw.obj.position.y = THREE.MathUtils.clamp(sw.obj.position.y, swimArea.yMin, swimArea.yMax);
+
+  // face direction
+  sw.obj.rotation.y = -Math.atan2(dz, dx) + Math.PI/2;
+
+  // body sway
+  sw.obj.rotation.z = Math.sin(t*3+i)*0.08;
 });
     renderer.render(scene, camera);
   }
@@ -410,7 +426,13 @@ const shell = loaded.shell.scene;
 fitCenter(shell,0.50);
 shell.position.set(0.7, baseY, 0.4);
 tank.add(shell);
-    
+// ===== OBSTACLES FOR FISH COLLISION =====
+const obstacles = [
+  { pos: house.position, radius: 0.4 },
+  { pos: wood.position, radius: 0.6 },
+  { pos: shell.position, radius: 0.3 },
+  { pos: env.position, radius: 1.0 }
+];    
       const plantsSrc = loaded.plants.scene;
       const plantPositions = [
         [-1.05, -0.55],
@@ -460,6 +482,14 @@ tank.add(shell);
     baseY: water.position.y - 0.3
   }
 );
+      const swimArea = {
+  xMin: -1.2,
+  xMax:  1.2,
+  zMin: -0.9,
+  zMax:  0.9,
+  yMin: water.position.y - 0.35,
+  yMax: water.position.y - 0.05
+};
       animate();
     }catch(e){
       console.error(e);

@@ -193,7 +193,7 @@
   );
   water.position.y = -TANK.h/2 + TANK.glass + waterH/2;
   tank.add(water);
-
+water.visible = false;
   const surfaceGeo = new THREE.PlaneGeometry(TANK.w - TANK.glass*2 - 0.05, TANK.d - TANK.glass*2 - 0.05, 110, 110);
   const surfaceMat = new THREE.MeshStandardMaterial({
     color:new THREE.Color('#5FC2A7'),
@@ -204,7 +204,7 @@
   surface.rotation.x = -Math.PI/2;
   surface.position.y = water.position.y + waterH/2 + 0.01;
   tank.add(surface);
-
+surface.visible = false;
   const soil = new THREE.Mesh(
     new THREE.BoxGeometry(TANK.w - TANK.glass*2 - 0.06, 0.18, TANK.d - TANK.glass*2 - 0.06),
     new THREE.MeshStandardMaterial({ color:0x6b5338, roughness:0.98, metalness:0.02 })
@@ -348,10 +348,32 @@ const clampZ = (TANK.d - TANK.glass*2) * 0.44;
 const env = loaded.env.scene;
 
 // scale + center
-fitCenter(env, 2.5);
+// ===== FIT GLB PERFECTLY INSIDE TANK =====
+const box = new THREE.Box3().setFromObject(env);
+const size = new THREE.Vector3();
+box.getSize(size);
+
+// calculate scale to match tank inner size
+const scaleX = (TANK.w - TANK.glass*2) / size.x;
+const scaleY = (TANK.h * 0.8) / size.y;
+const scaleZ = (TANK.d - TANK.glass*2) / size.z;
+
+// use smallest scale to avoid overflow
+const scale = Math.min(scaleX, scaleY, scaleZ);
+
+env.scale.setScalar(scale);
+
+// recalc after scaling
+box.setFromObject(env);
+const center = new THREE.Vector3();
+box.getCenter(center);
+
+// center it
+env.position.sub(center);
 
 // place at tank bottom
-env.position.y = soil.position.y + 0.05;
+// move to tank bottom
+env.position.y = -TANK.h/2 + TANK.glass + (size.y * scale)/2;
 
 // add to tank
 tank.add(env);

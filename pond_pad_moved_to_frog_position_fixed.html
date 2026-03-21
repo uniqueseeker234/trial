@@ -288,6 +288,8 @@ soil.visible = false;
   
 const clampX = (TANK.w - TANK.glass*2) * 0.44;
 const clampZ = (TANK.d - TANK.glass*2) * 0.44;
+  const waterHalfX = (TANK.w - TANK.glass*2) / 2 - 0.25;
+const waterHalfZ = (TANK.d - TANK.glass*2) / 2 - 0.25;
 function loadOne(a){
   return new Promise((resolve, reject) => {
     setProgress((done/assets.length)*100, 'Loading ' + a.f + '…');
@@ -334,8 +336,8 @@ if (clownMixer) {
   let z = Math.sin(t * 0.5) * radius;
 
   // 🔒 CLAMP INSIDE WATER
-  x = THREE.MathUtils.clamp(x, -clampX, clampX);
-  z = THREE.MathUtils.clamp(z, -clampZ, clampZ);
+ x = THREE.MathUtils.clamp(x, -waterHalfX, waterHalfX);
+z = THREE.MathUtils.clamp(z, -waterHalfZ, waterHalfZ);
 
   clown.position.x = x;
   clown.position.z = z;

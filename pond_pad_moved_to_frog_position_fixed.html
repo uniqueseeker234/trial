@@ -199,7 +199,7 @@ glassGroup.scale.set(1,1,1.1);
   water.position.y = -TANK.h/2 + TANK.glass + waterH/2;
   tank.add(water);
 water.visible = false;
-  const surfaceGeo = new THREE.PlaneGeometry(TANK.w - TANK.glass*2 - 0.05, TANK.d - TANK.glass*2 - 0.05, 110, 110);
+  const surfaceGeo = new THREE.PlaneGeometry(TANK.w - TANK.glass*2 - 0.05, TANK.d - TANK.glass*2 - 0.05, 40, 40);
   const surfaceMat = new THREE.MeshStandardMaterial({
     color:new THREE.Color('#5FC2A7'),
     roughness:0.22, metalness:0.02,
@@ -266,7 +266,6 @@ soil.visible = false;
   const loader = new THREE.GLTFLoader();
   const assets = [
   {k:'env',    f:'under_water_light_house.glb'},
-  {k:'fish',   f:'koi_fish.glb'},
   {k:'plants', f:'underwater_plant_pack.glb'},
  {k:'clown', f:'clown_fish_low_poly_animated.glb'},
 {k:'bigfish', f:'Animation_fish_low_poly.glb'},
@@ -280,7 +279,6 @@ soil.visible = false;
   let done = 0;
 
   const plantInstances = [];
-  const fishSwimmers = [];
  let clown, clownMixer;
   let bigfish, bigfishMixer;
   const clock = new THREE.Clock();
@@ -292,9 +290,15 @@ const clampZ = (TANK.d - TANK.glass*2) * 0.44;
   function loadOne(a){
     return new Promise((resolve,reject) => {
       setProgress((done/assets.length)*100, 'Loading ' + a.f + '…');
-      loader.load(a.f, gltf => resolve(gltf), undefined, err => reject(err));
-    });
+     loader.load(
+  a.f,
+  gltf => resolve(gltf),
+  undefined,
+  err => {
+    console.warn("Failed:", a.f);
+    resolve(null); // don't stop loading
   }
+);
 
   function animate(){
     requestAnimationFrame(animate);
@@ -370,13 +374,13 @@ if (bigfishMixer) {
 
   (async () => {
     try{
-      for(const a of assets){
-        const gltf = await loadOne(a);
-        loaded[a.k] = gltf;
-        done++;
-        setProgress((done/assets.length)*100, 'Loaded ' + a.f);
-      }
-      setProgress(100, 'Done');
+      const promises = assets.map(a => loadOne(a));
+const results = await Promise.all(promises);
+
+assets.forEach((a, i) => {
+  loaded[a.k] = results[i];
+});
+   setProgresss(100, "Done");
       setTimeout(() => loadingEl.style.display='none', 250);
       // ===== ADD YOUR LIGHTHOUSE MODEL =====
 env = loaded.env.scene;
@@ -498,44 +502,7 @@ if (bigfishData.animations.length > 0) {
   action.timeScale = 2.0;   // speed (optional)
   action.play();
 }
-      const fishSrc = loaded.fish.scene;
-      const fishA = fishSrc.clone(true);
-      const fishB = fishSrc.clone(true);
-    
-      fitCenter(fishA, 1.7);
-      fishB.scale.copy(fishA.scale);
-
-      tint(fishA, '#ff7a00');
-      tint(fishB, '#ffffff');
-
-      underwater.add(fishA, fishB);
-
-    fishSwimmers.push(
-  {
-    obj: fishA,
-    angle: Math.random() * Math.PI * 2,
-    speed: 0.005,
-    turnSpeed: 0.01,
-    baseY: water.position.y + 0.25
-  },
-  {
-    obj: fishB,
-    angle: Math.random() * Math.PI * 2,
-    speed: 0.004,
-    turnSpeed: -0.008,
-    baseY: water.position.y + 0.3
-  }
-);
-    swimArea = {
-  xMin: -1.5,
-  xMax:  1.5,
-  zMin: -1.2,
-  zMax:  1.2,
-
-  // IMPORTANT → higher water layer
-  yMin: water.position.y + 0.1,
-  yMax: water.position.y + 0.6
-};
+  
       
 
       animate();

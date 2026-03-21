@@ -367,7 +367,13 @@ const clampZ = (TANK.d - TANK.glass*2) * 0.44;
       setTimeout(() => loadingEl.style.display='none', 250);
       // ===== ADD YOUR LIGHTHOUSE MODEL =====
 env = loaded.env.scene;
-
+env.traverse(obj => {
+  if (obj.isMesh) {
+    if (obj.material) {
+      obj.material.side = THREE.DoubleSide;
+    }
+  }
+});
 // scale + center
 // ===== FIT GLB PERFECTLY INSIDE TANK =====
 const box = new THREE.Box3().setFromObject(env);

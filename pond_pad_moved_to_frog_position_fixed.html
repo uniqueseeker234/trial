@@ -371,10 +371,11 @@ box.getCenter(center);
 // center it
 env.position.sub(center);
 
-// place at tank bottom
-// move to tank bottom
-env.position.y = -TANK.h/2 + TANK.glass + (size.y * scale)/2;
-
+//// get new bounding after scaling
+box.setFromObject(env);
+env.position.y += (-TANK.h/2 + TANK.glass) - box.min.y;
+env.position.x = 0;
+      env.position.z = 0;
 // add to tank
 tank.add(env);
 

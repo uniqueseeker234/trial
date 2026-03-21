@@ -265,10 +265,14 @@ soil.visible = false;
 
   const loader = new THREE.GLTFLoader();
   const assets = [
-    {k:'env',    f:'under_water_light_house.glb'},
-    {k:'fish',   f:'koi_fish.glb'},
-    {k:'plants', f:'underwater_plant_pack.glb'}
-  ];
+  {k:'env',    f:'under_water_light_house.glb'},
+  {k:'fish',   f:'koi_fish.glb'},
+  {k:'plants', f:'underwater_plant_pack.glb'},
+
+  {k:'house',  f:'small_house.glb'},
+  {k:'wood',   f:'drift_wood.glb'},
+  {k:'shell',  f:'sea_shell_photogrammetry.glb'}
+];
 
   const loaded = {};
   let env = null;
@@ -397,7 +401,28 @@ env.position.x = 0;
       env.position.z = 0;
 // add to tank
 tank.add(env);
+// ===== DECOR OBJECTS ON SOIL =====
 
+// base Y (same as soil top)
+const baseY = -TANK.h/2 + TANK.glass + 0.05;
+
+// --- SMALL HOUSE ---
+const house = loaded.house.scene;
+fitCenter(house, 0.35);   // small size
+house.position.set(0.4, baseY, -0.4);
+tank.add(house);
+
+// --- DRIFT WOOD ---
+const wood = loaded.wood.scene;
+fitCenter(wood, 0.45);
+wood.position.set(-0.5, baseY, 0.2);
+tank.add(wood);
+
+// --- SEA SHELL ---
+const shell = loaded.shell.scene;
+fitCenter(shell, 0.25);
+shell.position.set(0.0, baseY, 0.4);
+tank.add(shell);
     
       const plantsSrc = loaded.plants.scene;
       const plantPositions = [

@@ -282,7 +282,8 @@ soil.visible = false;
   const fishSwimmers = [];
   const clock = new THREE.Clock();
       const t = clock.getElapsedTime();
-
+let  obstacles = [];
+  let swimArea = [];
 const clampX = (TANK.w - TANK.glass*2) * 0.44;
 const clampZ = (TANK.d - TANK.glass*2) * 0.44;
   function loadOne(a){
@@ -427,7 +428,7 @@ fitCenter(shell,0.50);
 shell.position.set(0.7, baseY, 0.4);
 tank.add(shell);
 // ===== OBSTACLES FOR FISH COLLISION =====
-const obstacles = [
+obstacles = [
   { pos: house.position, radius: 0.4 },
   { pos: wood.position, radius: 0.6 },
   { pos: shell.position, radius: 0.3 },
@@ -482,7 +483,7 @@ const obstacles = [
     baseY: water.position.y - 0.3
   }
 );
-      const swimArea = {
+     swimArea = {
   xMin: -1.2,
   xMax:  1.2,
   zMin: -0.9,

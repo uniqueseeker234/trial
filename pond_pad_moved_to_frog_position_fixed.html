@@ -322,7 +322,7 @@ fishSwimmers.forEach((sw,i) => {
   const d = TANK.d * 0.4;
 
   // speed
-  sw.u = (sw.u + 0.05) % 4;   // 4 sides of rectangle
+  sw.u = (sw.u + 0.08 * (1/60)) % 4;   // 4 sides of rectangle
 
   let x=0, z=0;
 
@@ -366,7 +366,7 @@ fishSwimmers.forEach((sw,i) => {
   }
 
   // breathing motion (rise occasionally)
-  const breathe = Math.sin(t * 0.3 + i*2);
+  const breathe = Math.sin(t * 0.15+ i*2);
   let y = sw.y;
 
   if(breathe > 0.8){
@@ -382,7 +382,7 @@ fishSwimmers.forEach((sw,i) => {
   sw.obj.rotation.y = Math.atan2(dx, dz);
 
   // small body sway
-  sw.obj.rotation.z = Math.sin(t*5 + i) * 0.05;
+  sw.obj.rotation.z = Math.sin(t*2 + i) * 0.05;
 });
     renderer.render(scene, camera);
   }
@@ -442,19 +442,19 @@ const baseY = -TANK.h/2 + TANK.glass + 0.18;
 
 // --- SMALL HOUSE ---
 const house = loaded.house.scene;
-fitCenter(house, 1.3);   // small size
+fitCenter(house, 0.77;   // small size
 house.position.set(0.4, baseY, -0.4);
 tank.add(house);
 
 // --- DRIFT WOOD ---
 const wood = loaded.wood.scene;
-fitCenter(wood, 3.5);
+fitCenter(wood, 2.3);
 wood.position.set(-0.5, baseY, 0.2);
 tank.add(wood);
 
 // --- SEA SHELL ---
 const shell = loaded.shell.scene;
-fitCenter(shell, 0.25);
+fitCenter(shell,0.70);
 shell.position.set(0.0, baseY, 0.4);
 tank.add(shell);
     

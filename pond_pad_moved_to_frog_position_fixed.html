@@ -267,6 +267,7 @@ soil.visible = false;
   const assets = [
   {k:'env',    f:'under_water_light_house.glb'},
   {k:'fish',   f:'koi_fish.glb'},
+    {k:'guppy',  f:'guppies.glb'},
   {k:'plants', f:'underwater_plant_pack.glb'},
 
   {k:'house',  f:'small_house.glb'},
@@ -443,7 +444,14 @@ obstacles = [
       const fishSrc = loaded.fish.scene;
       const fishA = fishSrc.clone(true);
       const fishB = fishSrc.clone(true);
-
+      const guppyData = loaded.guppy;
+      const guppy = guppyData.scene;
+      fitCenter(guppy,1.2);
+      guppy.position.set(0,water.position.y + 0.3,0);
+      underwater.add(guppy);
+      const guppyMixer = new THREE.AnimationMixer(guppy);
+const guppyAction = guppyMixer.clipAction(guppyData.animations[0]);
+guppyAction.play();
       fitCenter(fishA, 1.7);
       fishB.scale.copy(fishA.scale);
 
@@ -479,6 +487,10 @@ obstacles = [
   yMax: water.position.y + 0.6
 };
       animate();
+      const delta = clock.getDelta();
+if(guppyMixer) guppyMixer.update(delta);
+      guppy.position.x += Math.cos(clock.elapsedTime * 0.2) * 0.002;
+guppy.position.z += Math.sin(clock.elapsedTime * 0.2) * 0.002;
     }catch(e){
       console.error(e);
       setProgress(100, 'Error');

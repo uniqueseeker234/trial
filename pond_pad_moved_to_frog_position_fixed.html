@@ -93,7 +93,6 @@
   };
 
   const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
-  renderer.localClippingEnabled = true;
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.setSize(innerWidth, innerHeight);
   renderer.outputEncoding = THREE.sRGBEncoding;
@@ -106,7 +105,7 @@
   const scene = new THREE.Scene();
   scene.fog = new THREE.Fog(0x070a12, 10, 45);
 
-  const camera = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, 0.05, 200);
+  const camera = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, 0.01, 200);
   camera.position.set(6.0, 3.3, 6.2);
 
   const controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -143,14 +142,7 @@
   scene.add(floor);
 
   const TANK = { w:3.25, h:1.95, d:2.25, glass:0.04, waterFill:0.80 };
-  const clipPlanes = [
-  new THREE.Plane(new THREE.Vector3( 1, 0, 0),  TANK.w/2),
-  new THREE.Plane(new THREE.Vector3(-1, 0, 0),  TANK.w/2),
-  new THREE.Plane(new THREE.Vector3( 0, 0, 1),  TANK.d/2),
-  new THREE.Plane(new THREE.Vector3( 0, 0,-1),  TANK.d/2),
-  new THREE.Plane(new THREE.Vector3( 0, 1, 0),  TANK.h/2),
-  new THREE.Plane(new THREE.Vector3( 0,-1, 0),  TANK.h/2)
-];
+ 
   const tank = new THREE.Group();
   tank.position.set(0, 1.0, 0);
   scene.add(tank);
@@ -369,9 +361,21 @@ const clampZ = (TANK.d - TANK.glass*2) * 0.44;
 env = loaded.env.scene;
 env.traverse(obj => {
   if (obj.isMesh) {
-    if (obj.material) {
-      obj.material.side = THREE.DoubleSide;
-    }
+    const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+
+    mats.forEach(m => {
+      if (!m) return;
+
+      m.side = THREE.DoubleSide;
+      m.depthWrite = true;
+      m.depthTest = true;
+
+      if (m.transparent) {
+        m.opacity = Math.max(m.opacity || 1, 0.9);
+      }
+
+      m.needsUpdate = true;
+    });
   }
 });
 // scale + center

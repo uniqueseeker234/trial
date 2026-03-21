@@ -180,7 +180,7 @@ const glassMat = new THREE.MeshPhysicalMaterial({
     new THREE.LineBasicMaterial({ color:0x7fe7d2, transparent:true, opacity:0.35 })
   );
   glassGroup.add(edge);
-
+glassGroup.scale.set(1,1,1.1);
   const waterH = (TANK.h - TANK.glass*2) * TANK.waterFill;
   const waterMat = new THREE.MeshPhysicalMaterial({
     color:new THREE.Color('#3CC19E'),
@@ -282,16 +282,7 @@ soil.visible = false;
   const fishSwimmers = [];
   const clock = new THREE.Clock();
       const t = clock.getElapsedTime();
-let stretch = {
-  x: 1.8,
-  y: 1.2,
-  z: 1.8
-};
-  let tankScale = {
-  x: 1,
-  y: 1,
-  z: 1
-};
+
 const clampX = (TANK.w - TANK.glass*2) * 0.44;
 const clampZ = (TANK.d - TANK.glass*2) * 0.44;
   function loadOne(a){
@@ -392,7 +383,7 @@ box.getCenter(center);
 // center it
 env.position.sub(center);
       // reduce Y influence automatically
-env.scale.set(stretch.x, stretch.y * 0.6, stretch.z);
+env.scale.set(3.2,1.5,2.2);
 
 //// get new bounding after scaling
 box.setFromObject(env);
@@ -484,52 +475,7 @@ tank.add(shell);
     camera.updateProjectionMatrix();
     renderer.setSize(innerWidth, innerHeight);
   });
-  // ===== SLIDER CONTROL =====
-const panel = document.createElement("div");
-panel.style.position = "fixed";
-panel.style.right = "10px";
-panel.style.top = "10px";
-panel.style.background = "rgba(0,0,0,0.6)";
-panel.style.padding = "10px";
-panel.style.borderRadius = "10px";
-panel.style.color = "white";
-panel.style.zIndex = "100";
-
-panel.innerHTML = `
-X <input id="sx" type="range" min="0.5" max="4" step="0.1" value="1.8"><br>
-Y <input id="sy" type="range" min="0.2" max="1.5" step="0.05" value="0.8">
-Z <input id="sz" type="range" min="0.5" max="4" step="0.1" value="1.8">
-<br><br><b>Tank Size</b><br>
-TX <input id="tx" type="range" min="0.5" max="2.5" step="0.1" value="1"><br>
-TY <input id="ty" type="range" min="0.5" max="2.5" step="0.1" value="1"><br>
-TZ <input id="tz" type="range" min="0.5" max="2.5" step="0.1" value="1">
-;`
-
-document.body.appendChild(panel);
-
-function updateScale(){
-  stretch.x = parseFloat(document.getElementById("sx").value);
-  stretch.y = parseFloat(document.getElementById("sy").value);
-  stretch.z = parseFloat(document.getElementById("sz").value);
-
-  if(env){
-    env.scale.set(stretch.x, stretch.y, stretch.z);
-  }
-}
-  function updateTankScale(){
-  tankScale.x = parseFloat(document.getElementById("tx").value);
-  tankScale.y = parseFloat(document.getElementById("ty").value);
-  tankScale.z = parseFloat(document.getElementById("tz").value);
-
-  glassGroup.scale.set(tankScale.x, tankScale.y, tankScale.z);
-}
-
-document.getElementById("sx").oninput = updateScale;
-document.getElementById("sy").oninput = updateScale;
-document.getElementById("sz").oninput = updateScale;
-  document.getElementById("tx").oninput = updateTankScale;
-document.getElementById("ty").oninput = updateTankScale;
-document.getElementById("tz").oninput = updateTankScale;
+  
 })();
 </script>
 </body>

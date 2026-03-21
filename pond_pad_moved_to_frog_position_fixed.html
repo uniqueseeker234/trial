@@ -269,7 +269,8 @@
   const plantInstances = [];
   const fishSwimmers = [];
   const clock = new THREE.Clock();
-
+const clampX = (TANK.w - TANK.glass*2) * 0.44;
+const clampZ = (TANK.d - TANK.glass*2) * 0.44;
   function loadOne(a){
     return new Promise((resolve,reject) => {
       setProgress((done/assets.length)*100, 'Loading ' + a.f + '…');

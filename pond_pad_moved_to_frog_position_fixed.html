@@ -357,9 +357,8 @@ if (bigfish && bigfishMixer && house) {
   bigfish.position.z = house.position.z;
 
   // FLOAT slightly above ground (realistic)
-  const baseY = house.position.y + 0.15;
-
-  bigfish.position.y = baseY + Math.sin(t * 2) * 0.03;
+ const baseY = water.position.y - 0.25;  // deeper inside water
+bigfish.position.y = baseY + Math.sin(t * 2) * 0.02;
 }
 renderer.render(scene, camera);
 }

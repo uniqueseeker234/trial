@@ -307,40 +307,34 @@ const clampZ = (TANK.d - TANK.glass*2) * 0.44;
     surface.geometry.computeVertexNormals();
 
     plantInstances.forEach((p,i) => {
-      p.rotation.z = Math.sin(t*0.95 + i) * 0.10;
-      p.rotation.x = Math.cos(t*0.70 + i*1.5) * 0.05;
-      p.position.y = soil.position.y + 0.10 + Math.sin(t*1.1+i) * 0.008;
+      p.rotation.z = Math.sin(t*0.8 + i) * 0.15;
+      p.rotation.x = Math.cos(t*0.60 + i*1.5) * 0.08;
+      p.position.y = soil.position.y + 0.02;
     });
 
    
 
-    fishSwimmers.forEach((sw,i) => {
-      sw.u = (sw.u + sw.uSpeed * (1/60)) % 1;
-      const ang = sw.u * Math.PI * 2 + sw.phase;
-      const x = Math.cos(ang) * sw.rX;
-      const z = Math.sin(ang) * sw.rZ;
-      const bob = Math.sin(t*1.6 + i*1.9) * sw.bob;
-      const breath = Math.pow(Math.max(0, Math.sin(t*0.18 + sw.phase*0.7)), 5);
-      const y = sw.y + bob + breath * sw.breathLift;
+fishSwimmers.forEach((sw,i) => {
+  const t = clock.getElapsedTime();
 
-      sw.obj.position.set(
-        THREE.MathUtils.clamp(x, -clampX, clampX),
-        y,
-        THREE.MathUtils.clamp(z, -clampZ, clampZ)
-      );
+  // move left ↔ right
+  const x = Math.sin(t * 0.6 + i) * sw.rX;
 
-      const dx = -Math.sin(ang) * sw.rX;
-      const dz =  Math.cos(ang) * sw.rZ;
-      const heading = Math.atan2(dx, dz);
-      const tail = Math.sin(t*10.0 + i*2.3) * sw.wiggleAmt;
-      sw.obj.rotation.y = heading + tail;
-      sw.obj.rotation.z = Math.sin(t*4.2 + i*1.7) * 0.08;
-      sw.obj.rotation.x = Math.sin(t*3.1 + i*1.2) * 0.03;
+  // small forward/back drift
+  const z = Math.sin(t * 0.3 + i*2) * sw.rZ * 0.5;
 
-      const pulse = 0.02 * Math.sin(t*6.0 + i);
-      sw.obj.position.x += Math.cos(heading) * pulse;
-      sw.obj.position.z += Math.sin(heading) * pulse;
-    });
+  // slight up-down motion
+  const y = sw.y + Math.sin(t * 1.5 + i) * 0.05;
+
+  sw.obj.position.set(x, y, z);
+
+  // face direction of movement
+  const dx = Math.cos(t * 0.6 + i);
+  sw.obj.rotation.y = Math.atan2(dx, 0);
+
+  // slight body sway
+  sw.obj.rotation.z = Math.sin(t * 3 + i) * 0.05;
+});
 
     renderer.render(scene, camera);
   }
@@ -396,7 +390,7 @@ tank.add(env);
 // ===== DECOR OBJECTS ON SOIL =====
 
 // base Y (same as soil top)
-const baseY = -TANK.h/2 + TANK.glass + 0.05;
+const baseY = -TANK.h/2 + TANK.glass + 0.18;
 
 // --- SMALL HOUSE ---
 const house = loaded.house.scene;
@@ -406,7 +400,7 @@ tank.add(house);
 
 // --- DRIFT WOOD ---
 const wood = loaded.wood.scene;
-fitCenter(wood, 0.45);
+fitCenter(wood, 0.90);
 wood.position.set(-0.5, baseY, 0.2);
 tank.add(wood);
 
@@ -441,7 +435,7 @@ tank.add(shell);
       const fishA = fishSrc.clone(true);
       const fishB = fishSrc.clone(true);
 
-      fitCenter(fishA, 2.56);
+      fitCenter(fishA, 1.7);
       fishB.scale.copy(fishA.scale);
 
       tint(fishA, '#ff7a00');

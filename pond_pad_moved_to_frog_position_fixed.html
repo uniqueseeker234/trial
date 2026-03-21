@@ -222,6 +222,7 @@ soil.visible = false;
   );
   haze.position.copy(water.position);
   underwater.add(haze);
+  haze.visible = false;
 
   const looksGreenish = (c) => c && (c.g > c.r*1.08) && (c.g > c.b*1.08);
   const flowerPredicate = (_,mat) => !(mat && mat.color && looksGreenish(mat.color));

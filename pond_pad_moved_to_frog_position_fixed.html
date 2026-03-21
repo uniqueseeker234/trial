@@ -282,8 +282,7 @@ soil.visible = false;
  let clown, clownMixer;
   let bigfish, bigfishMixer;
   let house
-  const bubbles = [];
-const trail = [];
+
   const clock = new THREE.Clock();
       
   let swimArea = [];
@@ -307,13 +306,6 @@ function loadOne(a){
     );
   });
 }
-function spawnBubble(x, y, z) {
-  const geo = new THREE.SphereGeometry(0.03, 8, 8);
-  const mat = new THREE.MeshBasicMaterial({
-    color: 0xffffff,
-    transparent: true,
-    opacity: 0.6
-  });
 
   const b = new THREE.Mesh(geo, mat);
   b.position.set(x, y, z);
@@ -398,33 +390,9 @@ if (bigfish && bigfishMixer && house) {
   // gentle breathing motion
   bigfish.position.y = baseY + Math.sin(t * 2) * 0.02;
 }
-    if (Math.random() < 0.03) {
-  spawnBubble(
-    bigfish.position.x,
-    bigfish.position.y + 0.1,
-    bigfish.position.z
-  );
-}
+   
     // bubbles movement
-bubbles.forEach((b, i) => {
-  b.mesh.position.y += b.speed;
-  b.mesh.material.opacity -= 0.002;
 
-  if (b.mesh.material.opacity <= 0) {
-    underwater.remove(b.mesh);
-    bubbles.splice(i, 1);
-  }
-});
-
-// trail fade
-trail.forEach((t, i) => {
-  t.mesh.material.opacity -= 0.01;
-
-  if (t.mesh.material.opacity <= 0) {
-    underwater.remove(t.mesh);
-    trail.splice(i, 1);
-  }
-});
 renderer.render(scene, camera);
 }
   (async () => {

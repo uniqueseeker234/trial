@@ -93,6 +93,7 @@
   };
 
   const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
+  renderer.localClippingEnabled = true;
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.setSize(innerWidth, innerHeight);
   renderer.outputEncoding = THREE.sRGBEncoding;
@@ -142,6 +143,14 @@
   scene.add(floor);
 
   const TANK = { w:3.25, h:1.95, d:2.25, glass:0.04, waterFill:0.80 };
+  const clipPlanes = [
+  new THREE.Plane(new THREE.Vector3( 1, 0, 0),  TANK.w/2),
+  new THREE.Plane(new THREE.Vector3(-1, 0, 0),  TANK.w/2),
+  new THREE.Plane(new THREE.Vector3( 0, 0, 1),  TANK.d/2),
+  new THREE.Plane(new THREE.Vector3( 0, 0,-1),  TANK.d/2),
+  new THREE.Plane(new THREE.Vector3( 0, 1, 0),  TANK.h/2),
+  new THREE.Plane(new THREE.Vector3( 0,-1, 0),  TANK.h/2)
+];
   const tank = new THREE.Group();
   tank.position.set(0, 1.0, 0);
   scene.add(tank);

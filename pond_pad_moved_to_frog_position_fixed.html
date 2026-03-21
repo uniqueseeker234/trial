@@ -353,8 +353,8 @@ if (bigfish && bigfishMixer && house) {
   bigfishMixer.update(delta);
 
   // stay near house (right side)
-  bigfish.position.x = house.position.x + 1.2;
-  bigfish.position.z = house.position.z;
+  bigfish.position.x = house.position.x + 0.6;
+  bigfish.position.z = house.position.z + 0.5;
 
   // SAME LEVEL AS HOUSE (fixed)
   const baseY = house.position.y - 0.03;

@@ -281,6 +281,7 @@ soil.visible = false;
   
  let clown, clownMixer;
   let bigfish, bigfishMixer;
+  let house
   const clock = new THREE.Clock();
       
   let swimArea = [];
@@ -348,7 +349,7 @@ if (clownMixer) {
   clown.rotation.y = -Math.atan2(dz, dx) + Math.PI / 2;
 }
 // --- big fish (fake swim) ---
-if (bigfishMixer) {
+if (bigfish && bigfishMixer && house) {
   bigfishMixer.update(delta);
 
   // keep fixed position
@@ -421,7 +422,7 @@ tank.add(env);
 const baseY = -TANK.h/2 + TANK.glass + 0.19;
 
 // --- SMALL HOUSE ---
-const house = loaded.house.scene;
+house = loaded.house.scene;
 fitCenter(house, 0.54);   // small size
 house.position.set(0.4, baseY, -0.4);
 tank.add(house);

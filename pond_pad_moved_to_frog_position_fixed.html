@@ -357,7 +357,7 @@ if (bigfish && bigfishMixer && house) {
   bigfish.position.z = house.position.z;
 
   // SAME LEVEL AS HOUSE (fixed)
-  const baseY = house.position.y + 0.05;
+  const baseY = house.position.y - 0.03;
 
   // gentle breathing motion
   bigfish.position.y = baseY + Math.sin(t * 2) * 0.02;
@@ -431,7 +431,7 @@ tank.add(house);
 
 // --- DRIFT WOOD ---
 const wood = loaded.wood.scene;
-fitCenter(wood, 1.9);
+fitCenter(wood, 1.7);
 wood.position.set(-0.5, baseY + 0.08, 0.2);
 tank.add(wood);
 

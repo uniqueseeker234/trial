@@ -390,6 +390,7 @@ box.setFromObject(env);
 env.position.y += (-TANK.h/2 + TANK.glass) - box.min.y;
 env.position.x = 0;
       env.position.z = 0;
+      env.renderOrder = 1;
 // add to tank
 tank.add(env);
 // ===== DECOR OBJECTS ON SOIL =====

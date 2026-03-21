@@ -380,22 +380,15 @@ fishSwimmers.forEach((sw,i) => {
   const dx = nx - x;
   const dz = nz - z;
   // determine direction based on side
-if(sw.u < 1){
-  sw.obj.rotation.y = Math.PI / 2;   // moving right
-}
-else if(sw.u < 2){
-  sw.obj.rotation.y = 0;             // moving forward
-}
-else if(sw.u < 3){
-  sw.obj.rotation.y = -Math.PI / 2;  // moving left
-}
-else {
-  sw.obj.rotation.y = Math.PI;       // moving backward
-}
+// make fish face movement direction
+const direction = new THREE.Vector3(nx - x, 0, nz - z).normalize();
 
-  // small body sway
-  sw.obj.rotation.z = Math.sin(t*2 + i) * 0.05;
-});
+// make fish look forward
+sw.obj.lookAt(
+  sw.obj.position.x + direction.x,
+  sw.obj.position.y,
+  sw.obj.position.z + direction.z
+);
     renderer.render(scene, camera);
   }
 

@@ -317,7 +317,230 @@ scene.add(mesh)
 const animatedPanels=[];
 let aquarium
 // ===== ADD OBJECTS (UNCHANGED LOGIC) =====
+function createAquarium(scene){
 
+// ===== ORIGINAL VARIABLES (UNCHANGED) =====
+const loadingEl = document.getElementById('loading') || {style:{display:'none'}}
+const pctEl = document.getElementById('pct') || {textContent:''}
+const fileEl = document.getElementById('file') || {textContent:''}
+const fillEl = document.getElementById('fill') || {style:{width:'0%'}}
+
+const setProgress = (p,label) => {
+p=Math.max(0,Math.min(100,p))
+pctEl.textContent = Math.round(p) + '%'
+fillEl.style.width = p + '%'
+if(label) fileEl.textContent = label
+}
+
+// ❌ REMOVED renderer, camera, controls (room already has them)
+
+// ===== SCENE ELEMENTS (KEPT) =====
+const TANK = { w:3.25, h:1.95, d:2.25, glass:0.04, waterFill:0.80 }
+
+const tank = new THREE.Group()
+tank.position.set(0, 0, 0)
+scene.add(tank)
+
+// ===== GLASS =====
+const glassGroup = new THREE.Group()
+tank.add(glassGroup)
+
+const glassMat = new THREE.MeshPhysicalMaterial({
+color:0xffffff,
+transmission:1.0,
+transparent:true,
+opacity:1.0,
+roughness:0.02,
+metalness:0,
+ior:1.02,
+thickness:0.05,
+depthWrite:false
+})
+
+const glass = new THREE.Mesh(
+new THREE.BoxGeometry(TANK.w,TANK.h,TANK.d),
+glassMat
+)
+glassGroup.add(glass)
+
+const innerMat = glassMat.clone()
+innerMat.side = THREE.BackSide
+innerMat.roughness = 0.06
+
+const inner = new THREE.Mesh(
+new THREE.BoxGeometry(
+TANK.w - TANK.glass*2,
+TANK.h - TANK.glass*2,
+TANK.d - TANK.glass*2
+),
+innerMat
+)
+glassGroup.add(inner)
+
+const edge = new THREE.LineSegments(
+new THREE.EdgesGeometry(new THREE.BoxGeometry(TANK.w,TANK.h,TANK.d)),
+new THREE.LineBasicMaterial({color:0x7fe7d2,transparent:true,opacity:0.35})
+)
+glassGroup.add(edge)
+
+glassGroup.scale.set(1,1,1.1)
+
+// ===== WATER =====
+const waterH = (TANK.h - TANK.glass*2) * TANK.waterFill
+
+const waterMat = new THREE.MeshPhysicalMaterial({
+color:new THREE.Color('#3CC19E'),
+transmission:0.70,
+transparent:true,
+opacity:0.86,
+roughness:0.10,
+metalness:0,
+ior:1.33,
+thickness:0.9
+})
+
+const water = new THREE.Mesh(
+new THREE.BoxGeometry(
+TANK.w - TANK.glass*2 - 0.03,
+waterH,
+TANK.d - TANK.glass*2 - 0.03
+),
+waterMat
+)
+
+water.position.y = -TANK.h/2 + TANK.glass + waterH/2
+tank.add(water)
+
+// ===== SURFACE =====
+const surfaceGeo = new THREE.PlaneGeometry(
+TANK.w - TANK.glass*2 - 0.05,
+TANK.d - TANK.glass*2 - 0.05,
+40,40
+)
+
+const surfaceMat = new THREE.MeshStandardMaterial({
+color:new THREE.Color('#5FC2A7'),
+roughness:0.22,
+metalness:0.02,
+transparent:true,
+opacity:0.50
+})
+
+const surface = new THREE.Mesh(surfaceGeo,surfaceMat)
+surface.rotation.x = -Math.PI/2
+surface.position.y = water.position.y + waterH/2 + 0.01
+tank.add(surface)
+
+// ===== SOIL =====
+const soil = new THREE.Mesh(
+new THREE.BoxGeometry(
+TANK.w - TANK.glass*2 - 0.06,
+0.18,
+TANK.d - TANK.glass*2 - 0.06
+),
+new THREE.MeshStandardMaterial({color:0x6b5338,roughness:0.98})
+)
+
+soil.position.y = -TANK.h/2 + TANK.glass + 0.09
+tank.add(soil)
+
+// ===== UNDERWATER GROUP =====
+const underwater = new THREE.Group()
+tank.add(underwater)
+
+// ===== HELPERS =====
+function fitCenter(obj,targetMax){
+const box = new THREE.Box3().setFromObject(obj)
+const size = new THREE.Vector3()
+box.getSize(size)
+const maxDim = Math.max(size.x,size.y,size.z)||1
+const s = targetMax/maxDim
+obj.scale.setScalar(s)
+box.setFromObject(obj)
+const center = new THREE.Vector3()
+box.getCenter(center)
+obj.position.sub(center)
+}
+
+// ===== LOADER =====
+const loader = new THREE.GLTFLoader()
+
+const assets = [
+{k:'env',f:'under_water_light_house.glb'},
+{k:'clown',f:'clown_fish_low_poly_animated.glb'},
+{k:'plant',f:'marine_plant.glb'},
+{k:'bigfish',f:'Animation_fish_low_poly.glb'},
+{k:'house',f:'small_house.glb'},
+{k:'wood',f:'drift_wood.glb'},
+{k:'shell',f:'sea_shell_photogrammetry.glb'}
+]
+
+const loaded = {}
+let clown, clownMixer
+let bigfish, bigfishMixer
+let house
+
+const clock = new THREE.Clock()
+
+function loadOne(a){
+return new Promise((resolve,reject)=>{
+loader.load(a.f,g=>resolve(g),undefined,reject)
+})
+}
+
+// ===== LOAD EVERYTHING =====
+;(async()=>{
+for(const a of assets){
+const gltf = await loadOne(a)
+loaded[a.k] = gltf
+}
+
+// ===== ADD OBJECTS (UNCHANGED LOGIC) =====
+house = loaded.house.scene
+fitCenter(house,0.54)
+house.position.set(0.4, soil.position.y+0.1, -0.4)
+tank.add(house)
+
+// fish
+clown = loaded.clown.scene
+fitCenter(clown,0.6)
+underwater.add(clown)
+
+clownMixer = new THREE.AnimationMixer(clown)
+clownMixer.clipAction(loaded.clown.animations[0]).play()
+
+bigfish = loaded.bigfish.scene
+fitCenter(bigfish,0.6)
+underwater.add(bigfish)
+
+bigfishMixer = new THREE.AnimationMixer(bigfish)
+bigfishMixer.clipAction(loaded.bigfish.animations[0]).play()
+
+})()
+
+// ===== ANIMATION (MOVED FROM ORIGINAL animate()) =====
+tank.userData.update = (dt)=>{
+
+const t = clock.getElapsedTime()
+
+// surface wave
+const pos = surface.geometry.attributes.position
+for(let i=0;i<pos.count;i++){
+const x = pos.getX(i)
+const z = pos.getY(i)
+pos.setZ(i,
+Math.sin(t*0.85 + x*2.3)*0.006 +
+Math.cos(t*0.75 + z*2.1)*0.006
+)
+}
+pos.needsUpdate = true
+
+if(clownMixer) clownMixer.update(dt)
+if(bigfishMixer) bigfishMixer.update(dt)
+}
+
+return tank
+}
 (async function(){
 
 const room=await loadGLB("./room.glb")

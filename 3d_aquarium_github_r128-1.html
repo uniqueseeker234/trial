@@ -315,7 +315,7 @@ scene.add(mesh)
 }
 
 const animatedPanels=[];
-
+let aquarium;
 // 👉 PASTE HERE
 function createAquarium(){
 
@@ -520,7 +520,7 @@ prep(stand)
 scaleWidth(stand,0.90)
 stand.position.set(1.25,0,-0.30)
 // 👉 ADD HERE
-const aquarium = createAquarium()
+aquarium = createAquarium()
 
 // place on table
 aquarium.position.set(left+0.9, top+0.05, front-0.3)

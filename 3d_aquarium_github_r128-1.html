@@ -316,52 +316,8 @@ scene.add(mesh)
 
 const animatedPanels=[];
 let aquarium
-    // ===== ADD OBJECTS (UNCHANGED LOGIC) =====
-house = loaded.house.scene
-fitCenter(house,0.54)
-house.position.set(0.4, soil.position.y+0.1, -0.4)
-tank.add(house)
+// ===== ADD OBJECTS (UNCHANGED LOGIC) =====
 
-// fish
-clown = loaded.clown.scene
-fitCenter(clown,0.6)
-underwater.add(clown)
-
-clownMixer = new THREE.AnimationMixer(clown)
-clownMixer.clipAction(loaded.clown.animations[0]).play()
-
-bigfish = loaded.bigfish.scene
-fitCenter(bigfish,0.6)
-underwater.add(bigfish)
-
-bigfishMixer = new THREE.AnimationMixer(bigfish)
-bigfishMixer.clipAction(loaded.bigfish.animations[0]).play()
-
-})()
-
-// ===== ANIMATION (MOVED FROM ORIGINAL animate()) =====
-tank.userData.update = (dt)=>{
-
-const t = clock.getElapsedTime()
-
-// surface wave
-const pos = surface.geometry.attributes.position
-for(let i=0;i<pos.count;i++){
-const x = pos.getX(i)
-const z = pos.getY(i)
-pos.setZ(i,
-Math.sin(t*0.85 + x*2.3)*0.006 +
-Math.cos(t*0.75 + z*2.1)*0.006
-)
-}
-pos.needsUpdate = true
-
-if(clownMixer) clownMixer.update(dt)
-if(bigfishMixer) bigfishMixer.update(dt)
-}
-
-return tank
-}
 (async function(){
 
 const room=await loadGLB("./room.glb")

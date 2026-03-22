@@ -324,15 +324,12 @@ const tank = new THREE.Group()
 const TANK = { w:0.6, h:0.35, d:0.4 }
 
 // GLASS
-const glassMat = new THREE.MeshPhysicalMaterial({
-color:0xffffff,
-transmission:1,
-transparent:true,
-opacity:1,
-roughness:0.05,
-metalness:0,
-ior:1.02,
-thickness:0.02
+const glassMat = new THREE.MeshStandardMaterial({
+color: 0xaeefff,
+transparent: true,
+opacity: 0.25,
+roughness: 0.2,
+metalness: 0
 })
 
 const glass = new THREE.Mesh(
@@ -341,14 +338,18 @@ glassMat
 )
 
 tank.add(glass)
-
+const edges = new THREE.LineSegments(
+    new THREE.EdgesGeometry(new THREE.BoxGeometry(TANK.w, TANK.h, TANK.d)),
+    new THREE.LineBasicMaterial({ color: 0x66ffff })
+)
+tank.add(edges)
 // WATER
 const water = new THREE.Mesh(
 new THREE.BoxGeometry(TANK.w*0.95, TANK.h*0.6, TANK.d*0.95),
 new THREE.MeshStandardMaterial({
-color:0x5FC2A7,
+color:0x3cc1a0,
 transparent:true,
-opacity:0.6
+opacity:0.75
 })
 )
 

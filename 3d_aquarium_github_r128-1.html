@@ -516,7 +516,26 @@ globe.position.set(right-0.05,top+0.01,back+0.05)
 
 const stand=await loadGLB("./models/marble_table_2.glb")
 console.log("STAND LOADED:", stand)
-scene.add(stand)
+let realStand = null;
+
+stand.traverse(obj=>{
+    if(obj.isMesh && !realStand){
+        realStand = obj;
+    }
+});
+
+if(realStand){
+    scene.add(realStand);
+    prep(realStand);
+
+    // FORCE visibility
+    realStand.scale.set(4,4,4);
+    realStand.position.set(0,1,-2);
+
+    // debug box
+    const box = new THREE.BoxHelper(realStand, 0xff0000);
+    scene.add(box);
+}
 prep(stand)
 
 // 🔥 FORCE SIZE

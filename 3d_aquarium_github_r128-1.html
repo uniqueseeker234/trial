@@ -518,8 +518,16 @@ const stand=await loadGLB("./models/marble_table_2.glb")
 console.log("STAND LOADED:", stand)
 scene.add(stand)
 prep(stand)
-scaleWidth(stand,2.0)
-stand.position.set(0,0.3,-0.5)
+
+// 🔥 FORCE SIZE
+stand.scale.set(4,4,4)
+
+// 🔥 FORCE POSITION IN FRONT OF CAMERA
+stand.position.set(0, 1, -2)
+
+// 🔥 ADD DEBUG BOX (you WILL see this)
+const box = new THREE.BoxHelper(stand, 0xff0000)
+scene.add(box)
 // 👉 ADD HERE
 aquarium = createAquarium()
 

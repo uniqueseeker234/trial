@@ -514,37 +514,6 @@ prep(globe)
 scaleTo(globe,0.22)
 globe.position.set(right-0.05,top+0.01,back+0.05)
 
-const stand=await loadGLB("./models/marble_table_2.glb")
-console.log("STAND LOADED:", stand)
-let realStand = null;
-
-stand.traverse(obj=>{
-    if(obj.isMesh && !realStand){
-        realStand = obj;
-    }
-});
-
-if(realStand){
-    scene.add(realStand);
-    prep(realStand);
-
-    // FORCE visibility
-    realStand.scale.set(0.6,0.6,0.6);
-    realStand.position.set(1.25,0,-30);
-
-    // debug bo
-}
-prep(stand)
-
-// 🔥 FORCE SIZE
-stand.scale.set(4,4,4)
-
-// 🔥 FORCE POSITION IN FRONT OF CAMERA
-stand.position.set(0, 1, -2)
-
-// 🔥 ADD DEBUG BOX (you WILL see this)
-const box = new THREE.BoxHelper(stand, 0xff0000)
-scene.add(box)
 // 👉 ADD HERE
 aquarium = createAquarium()
 

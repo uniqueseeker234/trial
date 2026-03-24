@@ -143,42 +143,23 @@ mat.needsUpdate=true
 })
 })
 }
-function stylizeRoom(root){
+    function forceColor(root){
 root.traverse(obj=>{
 if(!obj.isMesh) return
 
-const mat = obj.material
-if(!mat || !mat.color) return
-
-// WALLS → warm white
-if(obj.name.toLowerCase().includes("wall")){
-mat.color.set(0xf5f2eb)
-}
-
-// FLOOR → soft grey
-else if(obj.name.toLowerCase().includes("floor")){
-mat.color.set(0xd4d9df)
-mat.roughness = 0.95
-}
-
-// TABLE → dark wood tone
-else if(obj.name.toLowerCase().includes("table")){
-mat.color.set(0x2f2a26)
-}
-
-// SOFA / BED → soft fabric tone
-else if(obj.name.toLowerCase().includes("sofa") || obj.name.toLowerCase().includes("bed")){
-mat.color.set(0xc8d0d8)
-}
-
-// DEFAULT → subtle boost
-else{
-mat.color.offsetHSL(0, 0.1, 0.05)
-}
-
-mat.needsUpdate = true
+obj.material = new THREE.MeshStandardMaterial({
+color: new THREE.Color().setHSL(
+Math.random()*0.1 + 0.05,   // subtle warm hue
+0.25,                       // saturation
+0.75                        // brightness
+),
+roughness: 0.7,
+metalness: 0.1
 })
-}
+
+})
+    }
+
 let eye=new THREE.Vector3(0,1.2,0.8)
 let yaw=0
 let pitch=0
@@ -357,7 +338,7 @@ const room=await loadGLB("./room.glb")
 
 scene.add(room)
 prep(room)
-stylizeRoom(room)
+forceColor(room)
 let wallClone = null
 
 scene.traverse(obj=>{
@@ -437,6 +418,7 @@ scene.add(glow)
 const table=await loadGLB("./models/research_table.glb")
 scene.add(table)
 prep(table)
+    forceColor(table)
 scaleWidth(table,1.50)
 table.position.set(-0.40,0,-1.40)
 
@@ -450,24 +432,28 @@ const back=tbox.min.z
 const microscope=await loadGLB("./models/microscope.glb")
 scene.add(microscope)
 prep(microscope)
+    forceColor(microscope)
 scaleTo(microscope,0.25)
 microscope.position.set(left+0.25,top+0.01,back+0.15)
 
 const jar=await loadGLB("./models/algae_specimen_jar_lowpoly.glb")
 scene.add(jar)
 prep(jar)
+    forceColor(jar)
 scaleTo(jar,0.14)
 jar.position.set(left+0.45,top+0.01,front-0.25)
 
 const laptop=await loadGLB("./models/laptop.glb")
 scene.add(laptop)
 prep(laptop)
+    forceColor(laptop)
 scaleTo(laptop,0.35)
 laptop.position.set(left+0.65,top+0.01,front-0.25)
 
 const journal=await loadGLB("./models/journal.glb")
 scene.add(journal)
 prep(journal)
+    forceColor(journal)
 scaleTo(journal,0.27)
 journal.rotation.x=-Math.PI/2
 journal.rotation.z=0.25
@@ -476,18 +462,21 @@ journal.position.set(right-0.35,top+0.02,front-0.22)
 const cup=await loadGLB("./models/coffee_cup.glb")
 scene.add(cup)
 prep(cup)
+    forceColor(cup)
 scaleTo(cup,0.10)
 cup.position.set(right-0.15,top+0.01,front-0.18)
 
 const books=await loadGLB("./models/books.glb")
 scene.add(books)
 prep(books)
+    forceColor(books)
 scaleTo(books,0.22)
 books.position.set(right-0.20,top+0.01,back+0.20)
 
 const globe=await loadGLB("./models/glass_globe.glb")
 scene.add(globe)
 prep(globe)
+    forceColor(globe)
 scaleTo(globe,0.22)
 globe.position.set(right-0.05,top+0.01,back+0.05)
 

@@ -75,8 +75,7 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 
 <script>
@@ -109,25 +108,22 @@ scene.add(shuttle);
   scene.fog = new THREE.Fog(0x070a12, 10, 45);
 
   const camera = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, 0.01, 200);
-  camera.position.set(6.0, 3.3, 6.2);
+ let eye = new THREE.Vector3(0, 1.4, 2.2)
+let yaw = 0
+let pitch = 0
+let drag = false
+let lastX = 0, lastY = 0
 
- const controls = new THREE.OrbitControls(camera, renderer.domElement);
-// 🎯 INSIDE ROOM CAMERA BEHAVIOR
-controls.enablePan = false;
-// smooth movement
-controls.enableDamping = true;
-controls.dampingFactor = 0.08;
-
-// keep zoom natural
-controls.minDistance = 1.5;
-controls.maxDistance = 12;
-
-// 👁️ LIMIT LEFT-RIGHT (no outside walls)
-controls.minAzimuthAngle = -Math.PI / 6;
-controls.maxAzimuthAngle =  Math.PI / 6;
-// 👁️ LIMIT UP-DOWN (no ceiling / no floor)
-controls.minPolarAngle = Math.PI / 3;     // prevents looking down under floor
-controls.maxPolarAngle = Math.PI / 2.05;   // prevents looking above ceiling
+function updateLook(){
+  const dir = new THREE.Vector3(
+    Math.cos(pitch)*Math.sin(yaw),
+    Math.sin(pitch),
+    -Math.cos(pitch)*Math.cos(yaw)
+  )
+  camera.position.copy(eye)
+  camera.lookAt(eye.clone().add(dir))
+}
+  // prevents looking above ceiling
   scene.add(new THREE.HemisphereLight(0x9fdcff, 0x07101f, 0.55));
 
   const key = new THREE.DirectionalLight(0xffffff, 1.05);
@@ -336,10 +332,34 @@ function loadOne(a){
     );
   });
 }
+renderer.domElement.addEventListener("mousedown", e=>{
+  drag = true
+  lastX = e.clientX
+  lastY = e.clientY
+})
 
+window.addEventListener("mouseup", ()=>drag=false)
+
+window.addEventListener("mousemove", e=>{
+  if(!drag) return
+
+  const dx = e.clientX - lastX
+  const dy = e.clientY - lastY
+
+  lastX = e.clientX
+  lastY = e.clientY
+
+  yaw -= dx * 0.005
+  pitch -= dy * 0.004
+
+  // limit vertical look
+  pitch = Math.max(-1.1, Math.min(0.6, pitch))
+
+  updateLook()
+})
   function animate(){
     requestAnimationFrame(animate);
-    controls.update();
+  
     // 🎯 ALWAYS KEEP LOOKING INSIDE ROOM
     // 🔒 HARD LOCK — NEVER GO BEHIND WALL
       const delta = clock.getDelta();
@@ -407,7 +427,7 @@ renderer.render(scene, camera);
    // ===== LOAD SHUTTLE MODELS =====
 
 const room = await loadShuttle("./room.glb");
-      controls.update();
+     
 shuttle.add(room);
 
 // FIX MATERIALS (same as original)
@@ -429,17 +449,16 @@ room.traverse(o=>{
 const roomBox = new THREE.Box3().setFromObject(room);
 const roomSize = new THREE.Vector3();
 roomBox.getSize(roomSize);
+eye.set(0, 1.4, 2.2)   // inside room
+yaw = 0
+pitch = -0.1
 
+updateLook()
 // camera inside room (same feeling as shuttle)
 // Camera INSIDE room (near black wall)
-// 🎯 PERFECT START VIEW (inside room, not outside)
-camera.position.set(2.8, 1.6, 3.2);
 
 // look at center of room
-controls.target.set(0, 1.2, -0.8);
 
-camera.lookAt(0, 1.2, -0.8);
-controls.update();
 const table = await loadShuttle("./models/research_table.glb");
 shuttle.add(table);
 scaleWidth(table,1.50);

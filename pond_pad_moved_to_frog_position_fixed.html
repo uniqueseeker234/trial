@@ -147,8 +147,7 @@ scene.add(shuttle);
   const TANK = { w:3.25, h:1.95, d:2.25, glass:0.04, waterFill:0.80 };
  
   const tank = new THREE.Group();
-  tank.position.set(0, 1.0, 0);
-  scene.add(tank);
+ shuttle.add(tank);
 const glassGroup = new THREE.Group();
 tank.add(glassGroup);
 const glassMat = new THREE.MeshPhysicalMaterial({
@@ -267,6 +266,25 @@ soil.visible = false;
   }
 
   const loader = new THREE.GLTFLoader();
+  function boxSize(obj){
+  return new THREE.Box3().setFromObject(obj).getSize(new THREE.Vector3())
+}
+
+function boxMinMax(obj){
+  const b = new THREE.Box3().setFromObject(obj)
+  return {min:b.min.clone(),max:b.max.clone(),size:b.getSize(new THREE.Vector3())}
+}
+
+function scaleTo(obj,target){
+  const s = boxSize(obj)
+  const m = Math.max(s.x,s.y,s.z)
+  if(m>0) obj.scale.multiplyScalar(target/m)
+}
+
+function scaleWidth(obj,w){
+  const s = boxSize(obj)
+  if(s.x>0) obj.scale.multiplyScalar(w/s.x)
+}
   function loadShuttle(path){
   return new Promise((resolve,reject)=>{
     loader.load(path,g=>resolve(g.scene),undefined,reject)
@@ -411,7 +429,17 @@ camera.position.set(0, size.y * 0.2, size.z * 0.35);
 controls.target.set(0, size.y * 0.2, 0);
 const table = await loadShuttle("./models/research_table.glb");
 shuttle.add(table);
+scaleWidth(table,1.50);
+table.position.set(-0.40,0,-1.40);
 
+// get bounds
+const tbox = boxMinMax(table);
+
+const top = tbox.max.y;
+const left = tbox.min.x;
+const right = tbox.max.x;
+const front = tbox.max.z;
+const back = tbox.min.z;
 const microscope = await loadShuttle("./models/microscope.glb");
 shuttle.add(microscope);
 
@@ -432,6 +460,28 @@ shuttle.add(books);
 
 const globe = await loadShuttle("./models/glass_globe.glb");
 shuttle.add(globe);
+      scaleTo(microscope,0.25);
+microscope.position.set(left+0.25,top+0.01,back+0.15);
+
+scaleTo(jar,0.14);
+jar.position.set(left+0.45,top+0.01,front-0.25);
+
+scaleTo(laptop,0.35);
+laptop.position.set(left+0.65,top+0.01,front-0.25);
+
+scaleTo(journal,0.27);
+journal.rotation.x=-Math.PI/2;
+journal.rotation.z=0.25;
+journal.position.set(right-0.35,top+0.02,front-0.22);
+
+scaleTo(cup,0.10);
+cup.position.set(right-0.15,top+0.01,front-0.18);
+
+scaleTo(books,0.22);
+books.position.set(right-0.20,top+0.01,back+0.20);
+
+scaleTo(globe,0.22);
+globe.position.set(right-0.05,top+0.01,back+0.05);
       // temporary placement
 shuttle.position.set(0, 0, 0);
 shuttle.scale.set(1, 1, 1);

@@ -446,6 +446,18 @@ room.traverse(o=>{
     if('roughness' in m) m.roughness=Math.min(1,m.roughness+0.04);
   });
 });
+      room.traverse(o => {
+  if (!o.isMesh) return;
+
+  const box = new THREE.Box3().setFromObject(o);
+  const center = new THREE.Vector3();
+  box.getCenter(center);
+
+  // highlight meshes on right side
+  if (center.x > 1.5 && center.y > 0.5) {
+    o.material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+  }
+});
       // ===== FIX BLACK VOID USING ROOM MATERIAL =====
 
 let wallMaterial = null;

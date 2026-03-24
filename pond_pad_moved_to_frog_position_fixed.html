@@ -96,7 +96,7 @@
   renderer.setSize(innerWidth, innerHeight);
   renderer.outputEncoding = THREE.sRGBEncoding;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.12;
+  renderer.toneMappingExposure = 1.35;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   document.body.appendChild(renderer.domElement);
@@ -141,7 +141,9 @@ function updateLook(){
   const rim = new THREE.DirectionalLight(0x7fe7d2, 0.55);
   rim.position.set(-8.0, 4.0, -2.0);
   scene.add(rim);
-
+const doorLight = new THREE.PointLight(0xaecbff, 0.8, 4);
+doorLight.position.set(2.5, 1.5, 0.4);
+scene.add(doorLight);
 
 
   const TANK = { w:3.25, h:1.95, d:2.25, glass:0.04, waterFill:0.80 };
@@ -465,6 +467,45 @@ scaleWidth(table,1.50);
 table.position.set(-0.40,0,-1.40);
       const door = await loadShuttle("./spaceship_door.glb");
 shuttle.add(door);
+      door.traverse(o=>{
+  if(!o.isMesh) return;
+
+  const mats = Array.isArray(o.material)?o.material:[o.material];
+
+  mats.forEach(m=>{
+    if(!m) return;
+
+    // 🔥 FIX TEXTURES
+    if(m.map){
+      m.map.encoding = THREE.sRGBEncoding;
+    }
+
+    // 🎯 DETECT GLASS PART (blue parts)
+    if(m.color && m.color.b > m.color.r && m.color.b > m.color.g){
+
+      // replace with glowing purple glass
+      o.material = new THREE.MeshPhysicalMaterial({
+        color: new THREE.Color("#b9a7ff"),   // soft purple
+        emissive: new THREE.Color("#6a5cff"),
+        emissiveIntensity: 0.6,
+        transparent: true,
+        opacity: 0.75,
+        roughness: 0.2,
+        metalness: 0,
+        transmission: 0.6
+      });
+
+    } else {
+
+      // frame (white parts)
+      m.color.set("#f2f4f7");
+      m.metalness = 0.3;
+      m.roughness = 0.5;
+    }
+
+    m.needsUpdate = true;
+  });
+});
 
 // get bounds
 const tbox = boxMinMax(table);

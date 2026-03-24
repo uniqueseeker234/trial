@@ -499,6 +499,7 @@ const table = await loadShuttle("./models/lumen_hologram_table.glb");
 shuttle.add(table);
 scaleWidth(table,1.50);
 table.position.set(-0.40,0,-1.40);
+      table.rotation.y = Math.PI;
     
 // get bounds
 const tbox = boxMinMax(table);

@@ -495,7 +495,7 @@ updateLook()
 
 // look at center of room
 
-const table = await loadShuttle("./models/research_table.glb");
+const table = await loadShuttle("./models/lumen_hologram_table.glb");
 shuttle.add(table);
 scaleWidth(table,1.50);
 table.position.set(-0.40,0,-1.40);
@@ -511,7 +511,8 @@ const back = tbox.min.z;
       // ===== PLACE AQUARIUM ON TABLE =====
 const microscope = await loadShuttle("./models/microscope.glb");
 shuttle.add(microscope);
-
+const chair = await loadShuttle("./models/round_chair.glb");
+      shuttle.add.(chair);
 const jar = await loadShuttle("./models/algae_specimen_jar_lowpoly.glb");
 shuttle.add(jar);
 
@@ -544,7 +545,7 @@ tank.position.set(
   top + 0.02,
   (front + back) / 2
 );
-
+scaleTo(chair, 0.6);
 scaleTo(journal,0.27);
 journal.rotation.x=-Math.PI/2;
 journal.rotation.z=0.25;

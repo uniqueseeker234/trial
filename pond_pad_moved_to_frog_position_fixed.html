@@ -116,7 +116,17 @@ scene.add(shuttle);
   controls.dampingFactor = 0.08;
   controls.target.set(0, 1.0, 0);
   controls.maxPolarAngle = Math.PI * 0.49;
+  
+controls.enablePan = false;
 
+controls.minDistance = 1.2;
+controls.maxDistance = 3.0;
+
+controls.maxPolarAngle = Math.PI / 2.05;
+controls.minPolarAngle = Math.PI / 3;
+
+controls.minAzimuthAngle = -Math.PI / 6;
+controls.maxAzimuthAngle = Math.PI / 6;
   scene.add(new THREE.HemisphereLight(0x9fdcff, 0x07101f, 0.55));
 
   const key = new THREE.DirectionalLight(0xffffff, 1.05);
@@ -135,14 +145,7 @@ scene.add(shuttle);
   rim.position.set(-8.0, 4.0, -2.0);
   scene.add(rim);
 
-  const floor = new THREE.Mesh(
-    new THREE.PlaneGeometry(60, 60),
-    new THREE.MeshStandardMaterial({ color:0x0b1220, roughness:0.95, metalness:0.20 })
-  );
-  floor.rotation.x = -Math.PI/2;
-  floor.position.y = 0;
-  floor.receiveShadow = true;
-  scene.add(floor);
+
 
   const TANK = { w:3.25, h:1.95, d:2.25, glass:0.04, waterFill:0.80 };
  
@@ -336,6 +339,7 @@ function loadOne(a){
   function animate(){
     requestAnimationFrame(animate);
     controls.update();
+    controls.target.lerp(new THREE.Vector3(0,1.2,-0.5), 0.08);
       const delta = clock.getDelta();
     const t = clock.getElapsedTime();
     const pos = surface.geometry.attributes.position;
@@ -425,8 +429,9 @@ const roomSize = new THREE.Vector3();
 roomBox.getSize(roomSize);
 
 // camera inside room (same feeling as shuttle)
-camera.position.set(0, roomSize.y * 0.2, roomSize.z * 0.35);
-controls.target.set(0, roomSize.y * 0.2, 0);
+camera.position.set(0, 1.4, 2.2);
+controls.target.set(0, 1.2, -0.5);
+camera.lookAt(0, 1.2, -0.5);
 const table = await loadShuttle("./models/research_table.glb");
 shuttle.add(table);
 scaleWidth(table,1.50);
@@ -441,13 +446,6 @@ const right = tbox.max.x;
 const front = tbox.max.z;
 const back = tbox.min.z;
       // ===== PLACE AQUARIUM ON TABLE =====
-tank.scale.set(0.28,0.28,0.28);
-
-tank.position.set(
-  (left + right) / 2,
-  top + 0.02,
-  (front + back) / 2
-);
 const microscope = await loadShuttle("./models/microscope.glb");
 shuttle.add(microscope);
 
@@ -476,6 +474,14 @@ jar.position.set(left+0.45,top+0.01,front-0.25);
 
 scaleTo(laptop,0.35);
 laptop.position.set(left+0.65,top+0.01,front-0.25);
+      // ===== AQUARIUM ON CENTER DESK =====
+tank.scale.set(0.22,0.22,0.22);
+
+tank.position.set(
+  laptop.position.x,
+  laptop.position.y + 0.18,
+  laptop.position.z
+);
 
 scaleTo(journal,0.27);
 journal.rotation.x=-Math.PI/2;

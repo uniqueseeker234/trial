@@ -386,6 +386,29 @@ renderer.render(scene, camera);
 const room = await loadShuttle("./room.glb");
 shuttle.add(room);
 
+// FIX MATERIALS (same as original)
+room.traverse(o=>{
+  if(!o.isMesh) return;
+  const mats = Array.isArray(o.material)?o.material:[o.material];
+  mats.forEach(m=>{
+    if(!m) return;
+    m.side = THREE.DoubleSide;
+    if(m.map) m.map.encoding = THREE.sRGBEncoding;
+    if(m.color){
+      const brightness = (m.color.r+m.color.g+m.color.b)/3;
+      if(brightness<0.5) m.color.multiplyScalar(1.2);
+    }
+    if('metalness' in m) m.metalness*=0.55;
+    if('roughness' in m) m.roughness=Math.min(1,m.roughness+0.04);
+  });
+});
+const box = new THREE.Box3().setFromObject(room);
+const size = new THREE.Vector3();
+box.getSize(size);
+
+// camera inside room (same feeling as shuttle)
+camera.position.set(0, size.y * 0.2, size.z * 0.35);
+controls.target.set(0, size.y * 0.2, 0);
 const table = await loadShuttle("./models/research_table.glb");
 shuttle.add(table);
 

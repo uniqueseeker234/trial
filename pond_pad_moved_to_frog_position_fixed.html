@@ -507,13 +507,13 @@ scene.add(wallFix);
 };
 
 function updateWall() {
-  wallClone.position.set(
+  wallFix.position.set(
     parseFloat(sliders.x.value),
     parseFloat(sliders.y.value),
     parseFloat(sliders.z.value)
   );
 
-  wallClone.scale.set(
+  wallFix.scale.set(
     parseFloat(sliders.sx.value),
     parseFloat(sliders.sy.value),
     parseFloat(sliders.sz.value)

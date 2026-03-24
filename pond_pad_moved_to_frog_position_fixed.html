@@ -446,6 +446,38 @@ room.traverse(o=>{
     if('roughness' in m) m.roughness=Math.min(1,m.roughness+0.04);
   });
 });
+      // ===== FIX BLACK VOID USING ROOM MATERIAL =====
+
+let wallMaterial = null;
+
+room.traverse(o => {
+  if (o.isMesh && o.material && !wallMaterial) {
+    wallMaterial = o.material;
+  }
+});
+
+const wallFix = new THREE.Mesh(
+  new THREE.PlaneGeometry(3, 2.5),
+  wallMaterial.clone()
+);
+
+// IMPORTANT fixes
+wallFix.material.side = THREE.DoubleSide;
+
+if (wallFix.material.map) {
+  wallFix.material.map.encoding = THREE.sRGBEncoding;
+}
+
+// position exactly at gap
+wallFix.position.set(2.5, 1.12, 0);
+
+// face inward
+wallFix.rotation.y = -Math.PI / 2;
+
+// avoid flicker
+wallFix.position.z += 0.02;
+
+scene.add(wallFix);
 const roomBox = new THREE.Box3().setFromObject(room);
 const roomSize = new THREE.Vector3();
 roomBox.getSize(roomSize);

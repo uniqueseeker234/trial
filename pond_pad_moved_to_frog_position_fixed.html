@@ -420,13 +420,13 @@ room.traverse(o=>{
     if('roughness' in m) m.roughness=Math.min(1,m.roughness+0.04);
   });
 });
-const box = new THREE.Box3().setFromObject(room);
-const size = new THREE.Vector3();
-box.getSize(size);
+const roomBox = new THREE.Box3().setFromObject(room);
+const roomSize = new THREE.Vector3();
+roomBox.getSize(roomSize);
 
 // camera inside room (same feeling as shuttle)
-camera.position.set(0, size.y * 0.2, size.z * 0.35);
-controls.target.set(0, size.y * 0.2, 0);
+camera.position.set(0, roomSize.y * 0.2, size.z * 0.35);
+controls.target.set(0, roomSize.y * 0.2, 0);
 const table = await loadShuttle("./models/research_table.glb");
 shuttle.add(table);
 scaleWidth(table,1.50);
@@ -440,6 +440,14 @@ const left = tbox.min.x;
 const right = tbox.max.x;
 const front = tbox.max.z;
 const back = tbox.min.z;
+      // ===== PLACE AQUARIUM ON TABLE =====
+tank.scale.set(0.28,0.28,0.28);
+
+tank.position.set(
+  (left + right) / 2,
+  top + 0.02,
+  (front + back) / 2
+);
 const microscope = await loadShuttle("./models/microscope.glb");
 shuttle.add(microscope);
 
@@ -503,9 +511,9 @@ env = loaded.env.scene;
 
 // scale + center
 // ===== FIT GLB PERFECTLY INSIDE TANK =====
-const box = new THREE.Box3().setFromObject(env);
-const size = new THREE.Vector3();
-box.getSize(size);
+const envBox = new THREE.Box3().setFromObject(env);
+const envSize = new THREE.Vector3();
+envBox.getSize(envSize);
 
 // calculate scale to match tank inner size
 const scaleX = (TANK.w - TANK.glass*2) / size.x;
@@ -519,9 +527,9 @@ const scale = Math.min(scaleX, scaleY, scaleZ);
 env.scale.set(1, 1, 1);
 
 // recalc after scaling
-box.setFromObject(env);
+envBox.setFromObject(env);
 const center = new THREE.Vector3();
-box.getCenter(center);
+envBox.getCenter(center);
 
 // center it
 env.position.sub(center);
@@ -529,7 +537,7 @@ env.position.sub(center);
 env.scale.set(3.2,1.5,2.4);
 
 //// get new bounding after scaling
-box.setFromObject(env);
+envBox.setFromObject(env);
 env.position.y += (-TANK.h/2 + TANK.glass) - box.min.y;
 env.position.x = 0;
       env.position.z = 0;

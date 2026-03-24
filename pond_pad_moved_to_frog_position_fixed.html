@@ -111,10 +111,20 @@ scene.add(shuttle);
   const camera = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, 0.01, 200);
   camera.position.set(6.0, 3.3, 6.2);
 
-  const controls = new THREE.OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
-  controls.dampingFactor = 0.08;
+ const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
 
+// ✅ FREE CAMERA (no restrictions)
+controls.enablePan = true;
+controls.minDistance = 1.5;
+controls.maxDistance = 20;
+
+// allow full natural movement
+controls.minPolarAngle = 0;
+controls.maxPolarAngle = Math.PI;
+controls.minAzimuthAngle = -Infinity;
+controls.maxAzimuthAngle = Infinity;
   scene.add(new THREE.HemisphereLight(0x9fdcff, 0x07101f, 0.55));
 
   const key = new THREE.DirectionalLight(0xffffff, 1.05);
@@ -393,6 +403,7 @@ renderer.render(scene, camera);
    // ===== LOAD SHUTTLE MODELS =====
 
 const room = await loadShuttle("./room.glb");
+      controls.update();
 shuttle.add(room);
 
 // FIX MATERIALS (same as original)
@@ -417,8 +428,13 @@ roomBox.getSize(roomSize);
 
 // camera inside room (same feeling as shuttle)
 // Camera INSIDE room (near black wall)
-camera.position.set(6.0, 3.3, 6.2);
-controls.target.set(0, 1.0, 0);
+// 🎯 PERFECT START VIEW (inside room, not outside)
+camera.position.set(2.8, 1.6, 3.2);
+
+// look at center of room
+controls.target.set(0, 1.2, -0.8);
+
+camera.lookAt(0, 1.2, -0.8);
 
 const table = await loadShuttle("./models/research_table.glb");
 shuttle.add(table);

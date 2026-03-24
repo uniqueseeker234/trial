@@ -514,6 +514,12 @@ const microscope = await loadShuttle("./models/microscope.glb");
 shuttle.add(microscope);
 const chair = await loadShuttle("./models/round_chair.glb");
       shuttle.add(chair);
+      // 🔴 DEBUG — MAKE CHAIR RED
+chair.traverse(o=>{
+  if(o.isMesh){
+    o.material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+  }
+});
 const jar = await loadShuttle("./models/algae_specimen_jar_lowpoly.glb");
 shuttle.add(jar);
 

@@ -499,10 +499,10 @@ const table = await loadShuttle("./models/lumen_hologram_table.glb");
 shuttle.add(table);
 scaleWidth(table,1.50);
 table.position.set(-0.40,0,-1.40);
-      table.rotation.y = Math.PI;
+      table.rotation.y = Math.PI * 0.9;
     
 // get bounds
-const tbox = boxMinMax(table);
+//const tbox = boxMinMax(table);
 
 const top = tbox.max.y;
 const left = tbox.min.x;
@@ -546,9 +546,10 @@ tank.position.set(
   top + 0.02,
   (front + back) / 2
 );
-scaleTo(chair, 0.6);
-      chair.position.set(-1.2,0,-0.8);
-      chair.rotation.y = Math.PI / 4;
+scaleTo(chair, 1.5);
+      chair.position.set(0,0.5,0);
+      chair.rotation.y = Math.PI * 0.75;
+      
 scaleTo(journal,0.27);
 journal.rotation.x=-Math.PI/2;
 journal.rotation.z=0.25;

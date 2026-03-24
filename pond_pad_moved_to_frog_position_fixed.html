@@ -119,14 +119,13 @@ scene.add(shuttle);
   
 controls.enablePan = false;
 
-controls.minDistance = 1.2;
-controls.maxDistance = 3.0;
+controls.minDistance = 1.5;
+controls.maxDistance = 6.0;
 
 controls.maxPolarAngle = Math.PI / 2.05;
-controls.minPolarAngle = Math.PI / 3;
 
-controls.minAzimuthAngle = -Math.PI / 6;
-controls.maxAzimuthAngle = Math.PI / 6;
+controls.minAzimuthAngle = -Math.PI / 2.2;
+controls.maxAzimuthAngle = Math.PI / 2.2;
   scene.add(new THREE.HemisphereLight(0x9fdcff, 0x07101f, 0.55));
 
   const key = new THREE.DirectionalLight(0xffffff, 1.05);
@@ -339,7 +338,6 @@ function loadOne(a){
   function animate(){
     requestAnimationFrame(animate);
     controls.update();
-    controls.target.lerp(new THREE.Vector3(0,1.2,-0.5), 0.08);
       const delta = clock.getDelta();
     const t = clock.getElapsedTime();
     const pos = surface.geometry.attributes.position;
@@ -429,9 +427,9 @@ const roomSize = new THREE.Vector3();
 roomBox.getSize(roomSize);
 
 // camera inside room (same feeling as shuttle)
-camera.position.set(0, 1.4, 2.2);
-controls.target.set(0, 1.2, -0.5);
-camera.lookAt(0, 1.2, -0.5);
+camera.position.set(0, 1.5, 3.8);
+controls.target.set(0, 1.2, -0.8);
+camera.lookAt(0, 1.2, -0.8);
 const table = await loadShuttle("./models/research_table.glb");
 shuttle.add(table);
 scaleWidth(table,1.50);

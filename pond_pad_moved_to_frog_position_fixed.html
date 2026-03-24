@@ -112,19 +112,23 @@ scene.add(shuttle);
   camera.position.set(6.0, 3.3, 6.2);
 
  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+// 🎯 INSIDE ROOM CAMERA BEHAVIOR
+
+// smooth movement
 controls.enableDamping = true;
 controls.dampingFactor = 0.08;
 
-// ✅ FREE CAMERA (no restrictions)
-controls.enablePan = true;
+// keep zoom natural
 controls.minDistance = 1.5;
-controls.maxDistance = 20;
+controls.maxDistance = 12;
 
-// allow full natural movement
-controls.minPolarAngle = 0;
-controls.maxPolarAngle = Math.PI;
-controls.minAzimuthAngle = -Infinity;
-controls.maxAzimuthAngle = Infinity;
+// 👁️ LIMIT LEFT-RIGHT (no outside walls)
+controls.minAzimuthAngle = -Math.PI / 2.2;
+controls.maxAzimuthAngle =  Math.PI / 2.2;
+
+// 👁️ LIMIT UP-DOWN (no ceiling / no floor)
+controls.minPolarAngle = Math.PI / 3;     // prevents looking down under floor
+controls.maxPolarAngle = Math.PI / 2.1;   // prevents looking above ceiling
   scene.add(new THREE.HemisphereLight(0x9fdcff, 0x07101f, 0.55));
 
   const key = new THREE.DirectionalLight(0xffffff, 1.05);

@@ -512,19 +512,21 @@ const back = tbox.min.z;
       // ===== PLACE AQUARIUM ON TABLE =====
 const microscope = await loadShuttle("./models/microscope.glb");
 shuttle.add(microscope);
-const chair = await loadShuttle("./models/round_chair.glb");
-shuttle.add(chair);
+const chair = await loadShuttle("./round_chair.glb");
+scene.add(chair); // ⚠️ IMPORTANT — NOT shuttle
 
-// 🔴 DEBUG COLOR (so we can't miss it)
+// 🔴 MAKE IT BRIGHT RED
 chair.traverse(o=>{
   if(o.isMesh){
     o.material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
   }
 });
 
-// 🚨 FORCE INTO CAMERA VIEW
-chair.position.set(0, 1.0, 1.5); // RIGHT IN FRONT OF YOU
-chair.scale.set(1,1,1);
+// 🚨 EXTREME SCALE
+chair.scale.set(20, 20, 20);
+
+// 🚨 CENTER OF WORLD
+chair.position.set(0, 0, 0);
 const jar = await loadShuttle("./models/algae_specimen_jar_lowpoly.glb");
 shuttle.add(jar);
 

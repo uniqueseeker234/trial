@@ -143,7 +143,42 @@ mat.needsUpdate=true
 })
 })
 }
+function stylizeRoom(root){
+root.traverse(obj=>{
+if(!obj.isMesh) return
 
+const mat = obj.material
+if(!mat || !mat.color) return
+
+// WALLS → warm white
+if(obj.name.toLowerCase().includes("wall")){
+mat.color.set(0xf5f2eb)
+}
+
+// FLOOR → soft grey
+else if(obj.name.toLowerCase().includes("floor")){
+mat.color.set(0xd4d9df)
+mat.roughness = 0.95
+}
+
+// TABLE → dark wood tone
+else if(obj.name.toLowerCase().includes("table")){
+mat.color.set(0x2f2a26)
+}
+
+// SOFA / BED → soft fabric tone
+else if(obj.name.toLowerCase().includes("sofa") || obj.name.toLowerCase().includes("bed")){
+mat.color.set(0xc8d0d8)
+}
+
+// DEFAULT → subtle boost
+else{
+mat.color.offsetHSL(0, 0.1, 0.05)
+}
+
+mat.needsUpdate = true
+})
+}
 let eye=new THREE.Vector3(0,1.2,0.8)
 let yaw=0
 let pitch=0
@@ -322,8 +357,7 @@ const room=await loadGLB("./room.glb")
 
 scene.add(room)
 prep(room)
-// ===== CLONE REAL WALL FROM ROOM =====
-
+stylizeRoom(room)
 let wallClone = null
 
 scene.traverse(obj=>{

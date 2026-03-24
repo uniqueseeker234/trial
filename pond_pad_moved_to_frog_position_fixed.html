@@ -114,9 +114,6 @@ scene.add(shuttle);
   const controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.dampingFactor = 0.08;
-controls.maxPolarAngle = Math.PI * 0.49;
-  
-controls.enablePan = false;
 
   scene.add(new THREE.HemisphereLight(0x9fdcff, 0x07101f, 0.55));
 
@@ -389,9 +386,6 @@ if (bigfish && bigfishMixer && house) {
 }
    
     // bubbles movement
-// HARD CLAMP INSIDE ROOM
-camera.position.x = THREE.MathUtils.clamp(camera.position.x, -2.2, 2.2);
-camera.position.z = THREE.MathUtils.clamp(camera.position.z, 1.6, 3.0);
 renderer.render(scene, camera);
 }
   (async () => {
@@ -423,9 +417,9 @@ roomBox.getSize(roomSize);
 
 // camera inside room (same feeling as shuttle)
 // Camera INSIDE room (near black wall)
-camera.position.set(0, 1.5, 3.8);
-controls.target.set(0, 1.2, -0.8);
-camera.lookAt(0, 1.2, -0.8);
+camera.position.set(6.0, 3.3, 6.2);
+controls.target.set(0, 1.0, 0);
+
 const table = await loadShuttle("./models/research_table.glb");
 shuttle.add(table);
 scaleWidth(table,1.50);

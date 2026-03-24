@@ -123,11 +123,11 @@ controls.minDistance = 1.5;
 controls.maxDistance = 12;
 
 // 👁️ LIMIT LEFT-RIGHT (no outside walls)
-
-
+controls.minAzimuthAngle = -Math.PI / 2.4;
+controls.maxAzimuthAngle =  Math.PI / 2.0;
 // 👁️ LIMIT UP-DOWN (no ceiling / no floor)
 controls.minPolarAngle = Math.PI / 3;     // prevents looking down under floor
-controls.maxPolarAngle = Math.PI / 2.1;   // prevents looking above ceiling
+controls.maxPolarAngle = Math.PI / 2.05;   // prevents looking above ceiling
   scene.add(new THREE.HemisphereLight(0x9fdcff, 0x07101f, 0.55));
 
   const key = new THREE.DirectionalLight(0xffffff, 1.05);
@@ -341,11 +341,6 @@ function loadOne(a){
     requestAnimationFrame(animate);
     controls.update();
     // 🎯 ALWAYS KEEP LOOKING INSIDE ROOM
-controls.target.x = THREE.MathUtils.clamp(controls.target.x, -1.2, 1.2);
-controls.target.z = THREE.MathUtils.clamp(controls.target.z, -1.5, 0.5);
-
-// optional: keep height stable
-controls.target.y = 1.2;
     // 🔒 HARD LOCK — NEVER GO BEHIND WALL
       const delta = clock.getDelta();
     const t = clock.getElapsedTime();

@@ -592,12 +592,16 @@ jar.position.set(left+0.45,top+0.01,front-0.25);
 scaleTo(laptop,0.35);
 laptop.position.set(left+0.65,top+0.01,front-0.25);
       // ===== AQUARIUM ON CENTER DESK =====
-//tank.scale.set(0.22,0.22,0.22);
-//tank.position.set(
- // (left + right) / 2,   // center of table
- // top + 0.02,
-     // (front + back) / 2
-//);
+// ===== AQUARIUM FINAL LOCK =====
+
+// position
+tank.position.set(-0.20, 0.35, 0.00);
+
+// scale
+tank.scale.set(0.18, 0.18, 0.18);
+
+// rotation
+tank.rotation.y = 1.58;
       // ===== AQUARIUM SLIDER CONTROL =====
 const tx2 = document.getElementById("tx2");
 const ty2 = document.getElementById("ty2");
@@ -629,14 +633,14 @@ function updateTank(){
 }
 
 // attach sliders
-tx2.oninput = updateTank;
-ty2.oninput = updateTank;
-tz2.oninput = updateTank;
-ts2.oninput = updateTank;
-try2.oninput = updateTank;
+//tx2.oninput = updateTank;
+//ty2.oninput = updateTank;
+//tz2.oninput = updateTank;
+//ts2.oninput = updateTank;
+//try2.oninput = updateTank;
 
 // run once
-updateTank();
+//updateTank();
 scaleTo(journal,0.27);
 journal.rotation.x=-Math.PI/2;
 journal.rotation.z=0.25;

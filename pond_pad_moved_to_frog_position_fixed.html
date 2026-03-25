@@ -546,7 +546,7 @@ box.getCenter(chairCenter);
 chair.position.sub(chairCenter);
 
 // 🎯 UPDATED FINAL VALUES
-chair.position.set(-1.45, -0.25, 0.90);
+chair.position.set(-1.45, -0.25, 1.25);
 chair.scale.set(0.46, 0.46, 0.46);
 chair.rotation.y = 0.18;
 chair.rotation.x = 0.00;
@@ -586,14 +586,14 @@ function updateChair(){
     "RX:", chair.rotation.x.toFixed(2)
   );
 }
-cx.oninput = updateChair;
-cy.oninput = updateChair;
-cz.oninput = updateChair;
-cs.oninput = updateChair;
-cry.oninput = updateChair;
-crx.oninput = updateChair;
+//cx.oninput = updateChair;
+//cy.oninput = updateChair;
+//cz.oninput = updateChair;
+//cs.oninput = updateChair;
+//cry.oninput = updateChair;
+//crx.oninput = updateChair;
  //run once
-updateChair();
+//updateChair();
       // 🎯 TEMP ROTATION CONTROL (REMOVE LATER)
      
 const jar = await loadShuttle("./models/algae_specimen_jar_lowpoly.glb");

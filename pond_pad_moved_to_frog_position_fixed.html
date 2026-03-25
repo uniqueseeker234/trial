@@ -169,7 +169,6 @@ scene.add(soft);
   const TANK = { w:3.25, h:1.95, d:2.25, glass:0.04, waterFill:0.80 };
  
   const tank = new THREE.Group();
-room.add(tank);
 const glassGroup = new THREE.Group();
 tank.add(glassGroup);
 const glassMat = new THREE.MeshPhysicalMaterial({
@@ -451,6 +450,7 @@ renderer.render(scene, camera);
 const room = await loadShuttle("./room.glb");
      
 shuttle.add(room);
+      room.add(tank);
 
 // FIX MATERIALS (same as original)
 room.traverse(o=>{

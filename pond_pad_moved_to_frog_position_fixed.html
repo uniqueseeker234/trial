@@ -57,6 +57,24 @@
     <br><span style="opacity:.92">Top: frog fixed on center pad resting on surface • lotus flowers spaced on left and right • Underwater: fish + plants</span>
   </p>
 </div>
+  <div id="tableUI" style="
+position:fixed;
+bottom:10px;
+right:10px;
+background:rgba(0,0,0,0.6);
+padding:10px;
+color:white;
+z-index:20;
+font-size:12px;
+border-radius:10px;
+">
+
+X <input id="tx" type="range" min="-5" max="5" step="0.05" value="-0.40"><br>
+Y <input id="ty" type="range" min="-2" max="2" step="0.05" value="0"><br>
+Z <input id="tz" type="range" min="-5" max="5" step="0.05" value="-1.40"><br>
+Scale <input id="ts" type="range" min="0.1" max="3" step="0.05" value="1"><br>
+RotY <input id="try" type="range" min="-3.14" max="3.14" step="0.01" value="3.14"><br>
+RotX <input id="trx" type="range" min="-3.14" max="3.14" step="0.01" value="0"><br>
 <div id="loading">
   <div class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
@@ -502,10 +520,54 @@ camera.lookAt(0, 1, 0);
 // look at center of room
 
 const table = await loadShuttle("./models/lumen_hologram_table.glb");
-shuttle.add(table);
-scaleWidth(table,1.50);
-table.position.set(-0.40,0,-1.40);
-      table.rotation.y = Math.PI;
+      room.add(table);
+      const tx = document.getElementById("tx");
+const ty = document.getElementById("ty");
+const tz = document.getElementById("tz");
+const ts = document.getElementById("ts");
+const tryy = document.getElementById("try");
+const trx = document.getElementById("trx");
+
+function updateTable(){
+
+  // position
+  table.position.set(
+    parseFloat(tx.value),
+    parseFloat(ty.value),
+    parseFloat(tz.value)
+  );
+
+  // scale
+  const s = parseFloat(ts.value);
+  table.scale.set(s, s, s);
+
+  // rotation
+  table.rotation.y = parseFloat(tryy.value);
+  table.rotation.x = parseFloat(trx.value);
+
+  console.log(
+    "TABLE FINAL:",
+    table.position.x.toFixed(2),
+    table.position.y.toFixed(2),
+    table.position.z.toFixed(2),
+    "S:", s.toFixed(2),
+    "RY:", table.rotation.y.toFixed(2),
+    "RX:", table.rotation.x.toFixed(2)
+  );
+}
+
+// connect sliders
+tx.oninput = updateTable;
+ty.oninput = updateTable;
+tz.oninput = updateTable;
+ts.oninput = updateTable;
+      tryy.oninput = updateTable;
+trx.oninput = updateTable;
+
+// run once
+updateTable();
+
+
     
 // get bounds
 const tbox = boxMinMax(table);
@@ -528,7 +590,7 @@ chair.position.sub(chairCenter);
 
 // 🎯 UPDATED FINAL VALUES
 chair.position.set(-1.45, -0.25, 2);
-chair.scale.set(0.46, 0.46, 0.46);
+chair.scale.set(0.35, 0.35, 0.35);
 chair.rotation.y = 0.18;
 chair.rotation.x = 0.00;
 

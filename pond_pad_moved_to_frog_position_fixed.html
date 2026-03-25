@@ -515,9 +515,9 @@ shuttle.add(microscope);
 const chair = await loadShuttle("./round_chair.glb");
 // 🔧 FIX CENTER
 const box = new THREE.Box3().setFromObject(chair);
-const center = new THREE.Vector3();
-box.getCenter(center);
-chair.position.sub(center);
+const chairCenter = new THREE.Vector3();
+box.getCenter(chairCenter);
+chair.position.sub(chairCenter);
 
 // 🔧 SCALE (NORMAL)
 chair.scale.set(0.6,0.6,0.6);

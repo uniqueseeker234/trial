@@ -65,6 +65,31 @@ F <input id="stretchF" type="range" min="0" max="1" step="0.01" value="0.42"><br
 B <input id="stretchB" type="range" min="-1" max="1" step="0.01" value="0.21"><br>
 
 </div>
+  <div id="controlUI" style="
+position:fixed;
+bottom:10px;
+right:20px;
+background:rgba(0,0,0,0.7);
+padding:10px;
+color:white;
+z-index:20;
+border-radius:10px;
+font-size:12px;
+">
+
+<b id="objName">Object</b><br>
+
+X <input id="px" type="range" min="-3" max="3" step="0.01"><br>
+Y <input id="py" type="range" min="-3" max="3" step="0.01"><br>
+Z <input id="pz" type="range" min="-3" max="3" step="0.01"><br>
+
+Scale <input id="ps" type="range" min="0.05" max="2" step="0.01"><br>
+
+Rot X <input id="rx" type="range" min="-3.14" max="3.14" step="0.01"><br>
+Rot Y <input id="ry" type="range" min="-3.14" max="3.14" step="0.01"><br>
+Rot Z <input id="rz" type="range" min="-3.14" max="3.14" step="0.01"><br>
+
+</div>
 <div id="loading">
   <div class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
@@ -289,6 +314,53 @@ soil.visible = false;
   }
 
   const loader = new THREE.GLTFLoader();
+  let currentObject = null;
+
+function attachControls(obj, name){
+  currentObject = obj;
+  document.getElementById("objName").innerText = name;
+
+  // load current values
+  px.value = obj.position.x;
+  py.value = obj.position.y;
+  pz.value = obj.position.z;
+
+  ps.value = obj.scale.x;
+
+  rx.value = obj.rotation.x;
+  ry.value = obj.rotation.y;
+  rz.value = obj.rotation.z;
+}
+
+function updateControls(){
+  if(!currentObject) return;
+
+  currentObject.position.set(
+    parseFloat(px.value),
+    parseFloat(py.value),
+    parseFloat(pz.value)
+  );
+
+  const s = parseFloat(ps.value);
+  currentObject.scale.set(s,s,s);
+
+  currentObject.rotation.set(
+    parseFloat(rx.value),
+    parseFloat(ry.value),
+    parseFloat(rz.value)
+  );
+
+  console.log("VALUES:",
+    currentObject.position,
+    currentObject.scale,
+    currentObject.rotation
+  );
+}
+
+// bind sliders
+["px","py","pz","ps","rx","ry","rz"].forEach(id=>{
+  document.getElementById(id).oninput = updateControls;
+});
   function boxSize(obj){
   return new THREE.Box3().setFromObject(obj).getSize(new THREE.Vector3())
 }
@@ -627,6 +699,7 @@ shuttle.add(jar);
 
 const laptop = await loadShuttle("./models/laptop.glb");
 shuttle.add(laptop);
+      attachControls(laptop, "Laptop");
 
 const journal = await loadShuttle("./models/journal.glb");
 shuttle.add(journal);

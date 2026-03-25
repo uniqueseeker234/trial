@@ -57,6 +57,21 @@
     <br><span style="opacity:.92">Top: frog fixed on center pad resting on surface • lotus flowers spaced on left and right • Underwater: fish + plants</span>
   </p>
 </div>
+  <div id="chairControls" style="
+position:fixed;
+bottom:20px;
+left:20px;
+background:rgba(0,0,0,0.7);
+padding:12px;
+border-radius:10px;
+color:white;
+z-index:999;
+font-size:12px;
+">
+X: <input id="cx" type="range" min="-5" max="5" step="0.01" value="0"><br>
+Y: <input id="cy" type="range" min="-2" max="3" step="0.01" value="0"><br>
+Z: <input id="cz" type="range" min="-5" max="5" step="0.01" value="0">
+</div>
 <div id="loading">
   <div class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
@@ -518,7 +533,7 @@ const back = tbox.min.z;
       // ===== PLACE AQUARIUM ON TABLE =====
 const microscope = await loadShuttle("./models/microscope.glb");
 shuttle.add(microscope);
-const chair = await loadShuttle("./round_chair.glb");
+let chair = await loadShuttle("./round_chair.glb");
 const box = new THREE.Box3().setFromObject(chair);
 const chairCenter = new THREE.Vector3();
 box.getCenter(chairCenter);
@@ -536,6 +551,28 @@ chair.rotation.y = Math.PI;
 
 // ✅ ADD TO SHUTTLE
 shuttle.add(chair);
+      const sx = document.getElementById("cx");
+const sy = document.getElementById("cy");
+const sz = document.getElementById("cz");
+
+function updateChair(){
+  if(!chair) return;
+
+  chair.position.x = parseFloat(sx.value);
+  chair.position.y = parseFloat(sy.value);
+  chair.position.z = parseFloat(sz.value);
+
+  console.log(
+    "CHAIR POS:",
+    chair.position.x.toFixed(2),
+    chair.position.y.toFixed(2),
+    chair.position.z.toFixed(2)
+  );
+}
+
+sx.oninput = updateChair;
+sy.oninput = updateChair;
+sz.oninput = updateChair;
 const jar = await loadShuttle("./models/algae_specimen_jar_lowpoly.glb");
 shuttle.add(jar);
 

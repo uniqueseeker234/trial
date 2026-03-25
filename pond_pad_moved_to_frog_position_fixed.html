@@ -57,7 +57,7 @@
     <br><span style="opacity:.92">Top: frog fixed on center pad resting on surface • lotus flowers spaced on left and right • Underwater: fish + plants</span>
   </p>
 </div>
-  <div id="tableUI" style="
+  <div id="tableUI" style="display:none;">
 position:fixed;
 bottom:10px;
 right:10px;
@@ -521,6 +521,13 @@ camera.lookAt(0, 1, 0);
 
 const table = await loadShuttle("./models/lumen_hologram_table.glb");
       room.add(table);
+      // 🎯 FINAL LOCKED TABLE POSITION
+table.position.set(1.60, 0.10, -0.80);
+
+table.scale.set(0.75, 0.75, 0.75);   // ✅ corrected scale
+
+table.rotation.y = -3.14;
+table.rotation.x = -0.01;
       const tx = document.getElementById("tx");
 const ty = document.getElementById("ty");
 const tz = document.getElementById("tz");
@@ -557,15 +564,15 @@ function updateTable(){
 }
 
 // connect sliders
-tx.oninput = updateTable;
-ty.oninput = updateTable;
-tz.oninput = updateTable;
-ts.oninput = updateTable;
-      tryy.oninput = updateTable;
-trx.oninput = updateTable;
+//tx.oninput = updateTable;
+//ty.oninput = updateTable;
+//tz.oninput = updateTable;
+//ts.oninput = updateTable;
+     // tryy.oninput = updateTable;
+//trx.oninput = updateTable;
 
 // run once
-updateTable();
+//updateTable();
 
 
     

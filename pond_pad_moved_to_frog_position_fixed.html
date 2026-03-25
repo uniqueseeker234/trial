@@ -57,25 +57,7 @@
     <br><span style="opacity:.92">Top: frog fixed on center pad resting on surface • lotus flowers spaced on left and right • Underwater: fish + plants</span>
   </p>
 </div>
-  <div id="tankUI" style="
-position:fixed;
-bottom:10px;
-right:10px;
-background:rgba(0,0,0,0.6);
-padding:10px;
-color:white;
-z-index:20;
-font-size:12px;
-border-radius:10px;
-">
-
-X <input id="tx2" type="range" min="-3" max="3" step="0.05" value="0"><br>
-Y <input id="ty2" type="range" min="-1" max="3" step="0.05" value="0"><br>
-Z <input id="tz2" type="range" min="-3" max="3" step="0.05" value="0"><br>
-Scale <input id="ts2" type="range" min="0.05" max="1" step="0.01" value="0.22"><br>
-RotY <input id="try2" type="range" min="-3.14" max="3.14" step="0.01" value="0"><br>
-
-</div>
+  
 <div id="loading">
   <div class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
@@ -603,44 +585,6 @@ tank.scale.set(0.18, 0.18, 0.18);
 // rotation
 tank.rotation.y = 1.58;
       // ===== AQUARIUM SLIDER CONTROL =====
-const tx2 = document.getElementById("tx2");
-const ty2 = document.getElementById("ty2");
-const tz2 = document.getElementById("tz2");
-const ts2 = document.getElementById("ts2");
-const try2 = document.getElementById("try2");
-
-function updateTank(){
-
-  tank.position.set(
-    parseFloat(tx2.value),
-    parseFloat(ty2.value),
-    parseFloat(tz2.value)
-  );
-
-  const s = parseFloat(ts2.value);
-  tank.scale.set(s, s, s);
-
-  tank.rotation.y = parseFloat(try2.value);
-
-  console.log(
-    "TANK FINAL:",
-    tank.position.x.toFixed(2),
-    tank.position.y.toFixed(2),
-    tank.position.z.toFixed(2),
-    "S:", s.toFixed(2),
-    "RY:", tank.rotation.y.toFixed(2)
-  );
-}
-
-// attach sliders
-//tx2.oninput = updateTank;
-//ty2.oninput = updateTank;
-//tz2.oninput = updateTank;
-//ts2.oninput = updateTank;
-//try2.oninput = updateTank;
-
-// run once
-//updateTank();
 scaleTo(journal,0.27);
 journal.rotation.x=-Math.PI/2;
 journal.rotation.z=0.25;

@@ -704,7 +704,7 @@ shuttle.add(laptop);
 
 const journal = await loadShuttle("./models/journal.glb");
 shuttle.add(journal);
-
+attachControls(journal, "Journal");
 const cup = await loadShuttle("./models/coffee_cup.glb");
 shuttle.add(cup);
 

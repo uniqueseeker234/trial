@@ -56,6 +56,7 @@
     <br>Drag = orbit • Scroll = zoom • Right-drag = pan
     <br><span style="opacity:.92">Top: frog fixed on center pad resting on surface • lotus flowers spaced on left and right • Underwater: fish + plants</span>
   </p>
+  </div>
 <div id="stretchUI" style="
 position:fixed;
 bottom:10px;
@@ -669,7 +670,8 @@ const scaleZ = (TANK.d - TANK.glass*2) / envSize.z;
 const scale = Math.min(scaleX, scaleY, scaleZ);
 
 // base scale
-//env.scale.set(1, 1, 1);
+// LOCK BASE SCALE ONCE
+env.scale.set(scale, scale, scale);
 
 // recalc after scaling
 envBox.setFromObject(env);
@@ -701,19 +703,18 @@ function updateStretch(){
   const B = parseFloat(stretchB.value);
 
   // reset base
-  env.scale.set(3.32, 1.89, 2.19);
-  env.position.x = 0;
-  env.position.z = 0;
+  env.scale.set(scale,scale,scale);
+
 
   // apply stretch
   env.position.x -= (R - L) * 0.5;
   env.position.z -= (F - B) * 0.5;
 
-  env.scale.set(
-    3.32 + R + L,
-    1.89,
-    2.19 + F + B
-  );
+ env.scale.set(
+  scale + R + L,
+  scale,
+  scale + F + B
+);
 
   env.position.x += (R - L) * 0.5;
   env.position.z += (F - B) * 0.5;

@@ -699,7 +699,12 @@ shuttle.add(jar);
 
 const laptop = await loadShuttle("./models/laptop.glb");
 shuttle.add(laptop);
-      attachControls(laptop, "Laptop");
+     // attachControls(laptop, "Laptop");
+      laptop.position.set(1.66, 0.45, -1);
+
+laptop.scale.set(0.35, 0.35, 0.35);
+
+laptop.rotation.set(0.07, 1.48, -0.05);
 
 const journal = await loadShuttle("./models/journal.glb");
 shuttle.add(journal);

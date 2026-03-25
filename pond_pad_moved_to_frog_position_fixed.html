@@ -56,23 +56,22 @@
     <br>Drag = orbit • Scroll = zoom • Right-drag = pan
     <br><span style="opacity:.92">Top: frog fixed on center pad resting on surface • lotus flowers spaced on left and right • Underwater: fish + plants</span>
   </p>
-</div>
- <div style="
+<div style="
 position:fixed;
 bottom:10px;
-right:200px;
-background:rgba(0,0,0,0.6);
+left:10px;
+background:#0008;
 padding:10px;
 color:white;
-z-index:20;
-border-radius:10px;
 font-size:12px;
+border-radius:10px;
+z-index:20;
 ">
 
-Stretch Right <input id="stretchR" type="range" min="0" max="2" step="0.01" value="0"><br>
-Stretch Left <input id="stretchL" type="range" min="0" max="2" step="0.01" value="0"><br>
-Stretch Front <input id="stretchF" type="range" min="0" max="2" step="0.01" value="0"><br>
-Stretch Back <input id="stretchB" type="range" min="-2" max="2" step="0.01" value="0"><br>
+Front <input id="fz" type="range" min="0" max="2" step="0.01" value="1.2"><br>
+Back <input id="bz" type="range" min="-2" max="0" step="0.01" value="-1.2"><br>
+Left <input id="lx" type="range" min="-2" max="0" step="0.01" value="-1.5"><br>
+Right <input id="rx" type="range" min="0" max="2" step="0.01" value="1.5"><br>
 
 </div>
 <div id="loading">
@@ -417,7 +416,86 @@ const room = await loadShuttle("./room.glb");
      
 shuttle.add(room);
       room.add(tank);
+// ===== CUSTOM GLASS WALLS =====
 
+const glassMat = new THREE.MeshPhysicalMaterial({
+  color: 0xffffff,
+  transmission: 1.0,
+  transparent: true,
+  opacity: 1.0,
+  roughness: 0.02,
+  metalness: 0,
+  ior: 1.02,
+  thickness: 0.05,
+  depthWrite: false,
+  side: THREE.DoubleSide
+});
+
+const glassGroup = new THREE.Group();
+room.add(glassGroup);
+
+// FRONT WALL
+const frontWall = new THREE.Mesh(
+  new THREE.PlaneGeometry(3, 2),
+  glassMat
+);
+frontWall.position.set(0, 1.2, 1.2);
+glassGroup.add(frontWall);
+
+// BACK WALL
+const backWall = new THREE.Mesh(
+  new THREE.PlaneGeometry(3, 2),
+  glassMat
+);
+backWall.position.set(0, 1.2, -1.2);
+backWall.rotation.y = Math.PI;
+glassGroup.add(backWall);
+
+// LEFT WALL
+const leftWall = new THREE.Mesh(
+  new THREE.PlaneGeometry(2.4, 2),
+  glassMat
+);
+leftWall.position.set(-1.5, 1.2, 0);
+leftWall.rotation.y = Math.PI / 2;
+glassGroup.add(leftWall);
+
+// RIGHT WALL
+const rightWall = new THREE.Mesh(
+  new THREE.PlaneGeometry(2.4, 2),
+  glassMat
+);
+rightWall.position.set(1.5, 1.2, 0);
+rightWall.rotation.y = -Math.PI / 2;
+glassGroup.add(rightWall);
+      glassGroup.position.copy(tank.position);
+glassGroup.scale.copy(tank.scale);
+      const fz = document.getElementById("fz");
+const bz = document.getElementById("bz");
+const lx = document.getElementById("lx");
+const rx = document.getElementById("rx");
+
+function updateWalls(){
+  frontWall.position.z = parseFloat(fz.value);
+  backWall.position.z = parseFloat(bz.value);
+  leftWall.position.x = parseFloat(lx.value);
+  rightWall.position.x = parseFloat(rx.value);
+
+  console.log(
+    "Walls:",
+    frontWall.position.z,
+    backWall.position.z,
+    leftWall.position.x,
+    rightWall.position.x
+  );
+}
+
+fz.oninput = updateWalls;
+bz.oninput = updateWalls;
+lx.oninput = updateWalls;
+rx.oninput = updateWalls;
+
+updateWalls();
 // FIX MATERIALS (same as original)
 room.traverse(o=>{
   if(!o.isMesh) return;

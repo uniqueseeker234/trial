@@ -515,11 +515,6 @@ const back = tbox.min.z;
 const microscope = await loadShuttle("./models/microscope.glb");
 shuttle.add(microscope);
 const chair = await loadShuttle("./round_chair.glb");
-// 🔧 FIX CENTER
-const box = new THREE.Box3().setFromObject(chair);
-const chair = await loadShuttle("./round_chair.glb");
-
-// ✅ CENTER (same as test)
 const box = new THREE.Box3().setFromObject(chair);
 const chairCenter = new THREE.Vector3();
 box.getCenter(chairCenter);

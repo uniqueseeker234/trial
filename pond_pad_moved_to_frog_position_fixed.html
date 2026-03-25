@@ -57,28 +57,7 @@
     <br><span style="opacity:.92">Top: frog fixed on center pad resting on surface • lotus flowers spaced on left and right • Underwater: fish + plants</span>
   </p>
 </div>
-  <div id="waterSizeUI" style="
-position:fixed;
-bottom:10px;
-right:180px;
-background:rgba(0,0,0,0.6);
-padding:10px;
-color:white;
-z-index:20;
-font-size:12px;
-border-radius:10px;
-">
-
-Water X <input id="wx" type="range" min="0.5" max="1.5" step="0.01" value="1"><br>
-Water Z <input id="wz" type="range" min="0.5" max="1.5" step="0.01" value="1"><br>
-
-Soil X <input id="sx" type="range" min="0.5" max="1.5" step="0.01" value="1"><br>
-Soil Z <input id="sz" type="range" min="0.5" max="1.5" step="0.01" value="1"><br>
-
-Surface X <input id="surfX" type="range" min="0.5" max="1.5" step="0.01" value="1"><br>
-Surface Z <input id="surfZ" type="range" min="0.5" max="1.5" step="0.01" value="1"><br>
-
-</div>
+ 
 <div id="loading">
   <div class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
@@ -245,47 +224,6 @@ surface.visible = false;
   tank.add(soil);
 soil.visible = false;
   // ===== WATER SIZE CONTROL (X/Z) =====
-const wx = document.getElementById("wx");
-const wz = document.getElementById("wz");
-
-const sx = document.getElementById("sx");
-const sz = document.getElementById("sz");
-
-const surfX = document.getElementById("surfX");
-const surfZ = document.getElementById("surfZ");
-
-function updateWaterSize(){
-
-  // water
-  water.scale.x = parseFloat(wx.value);
-  water.scale.z = parseFloat(wz.value);
-
-  // soil
-  soil.scale.x = parseFloat(sx.value);
-  soil.scale.z = parseFloat(sz.value);
-
-  // surface
-  surface.scale.x = parseFloat(surfX.value);
-  surface.scale.z = parseFloat(surfZ.value);
-
-  console.log(
-    "SIZE:",
-    "Water:", water.scale.x.toFixed(2), water.scale.z.toFixed(2),
-    "Soil:", soil.scale.x.toFixed(2), soil.scale.z.toFixed(2),
-    "Surface:", surface.scale.x.toFixed(2), surface.scale.z.toFixed(2)
-  );
-}
-
-// connect sliders
-wx.oninput = updateWaterSize;
-wz.oninput = updateWaterSize;
-sx.oninput = updateWaterSize;
-sz.oninput = updateWaterSize;
-surfX.oninput = updateWaterSize;
-  surfZ.oninput = updateWaterSize;
-
-// run once
-updateWaterSize();
   const underwater = new THREE.Group();
   tank.add(underwater);
 

@@ -537,23 +537,21 @@ const back = tbox.min.z;
       // ===== PLACE AQUARIUM ON TABLE =====
 const microscope = await loadShuttle("./models/microscope.glb");
 shuttle.add(microscope);
-let chair = await loadShuttle("./round_chair.glb");
+const chair = await loadShuttle("./round_chair.glb");
+
+// 🔧 center pivot
 const box = new THREE.Box3().setFromObject(chair);
 const chairCenter = new THREE.Vector3();
 box.getCenter(chairCenter);
 chair.position.sub(chairCenter);
 
-// ✅ SCALE (same as test)
-chair.scale.set(0.4,0.4,0.4);
+// 🎯 FINAL LOCKED VALUES
+chair.position.set(-0.60, -0.20, 1.00);
+chair.scale.set(0.33, 0.33, 0.33);
+chair.rotation.y = 0.18;
+chair.rotation.x = 0.00;
 
-// ✅ POSITION (IMPORTANT CHANGE)
-// bring it slightly forward in room
-chair.position.set(4.45, -0.25, -2.85);
-
-// ✅ ROTATION (face user sitting direction)
-chair.rotation.y = Math.PI * 0.5;
-
-// ✅ ADD TO SHUTTLE
+// add to room (important)
 room.add(chair);
       const cx = document.getElementById("cx");
 const cy = document.getElementById("cy");

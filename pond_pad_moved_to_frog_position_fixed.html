@@ -137,7 +137,7 @@ function updateLook(){
   // prevents looking above ceiling
   scene.add(new THREE.HemisphereLight(0x9fdcff, 0x07101f, 0.55));
 
-  const key = new THREE.DirectionalLight(0xffffff, 1.05);
+  const key = new THREE.DirectionalLight(0xffffff, 0.8);
   key.position.set(6.0, 8.0, 4.0);
   key.castShadow = true;
   key.shadow.mapSize.set(2048,2048);
@@ -526,6 +526,31 @@ camera.lookAt(0, 1, 0);
 
 const table = await loadShuttle("./models/lumen_hologram_table.glb");
       room.add(table);
+      table.traverse(o => {
+  if (!o.isMesh) return;
+
+  o.castShadow = true;
+  o.receiveShadow = true;
+
+  const mats = Array.isArray(o.material) ? o.material : [o.material];
+
+  mats.forEach(m => {
+    if (!m) return;
+
+    // 🔴 THIS FIXES LIGHT LEAK
+    m.side = THREE.FrontSide;
+
+    // reduce glowing
+    if ("metalness" in m) m.metalness = 0.2;
+    if ("roughness" in m) m.roughness = 0.8;
+
+    // kill transparency
+    m.transparent = false;
+    m.opacity = 1;
+
+    m.needsUpdate = true;
+  });
+});
       // 🎯 FINAL LOCKED TABLE POSITION
 table.position.set(1.60, 0.10, -0.80);
 
@@ -533,7 +558,23 @@ table.scale.set(0.75, 0.75, 0.75);   // ✅ corrected scale
 
 table.rotation.y = -3.14;
 table.rotation.x = -0.01;
-      
+  const blocker = new THREE.Mesh(
+  new THREE.BoxGeometry(1.5, 0.5, 1.5),
+  new THREE.MeshStandardMaterial({
+    color: 0x000000,
+    roughness: 1,
+    metalness: 0
+  })
+);
+
+blocker.position.copy(table.position);
+blocker.position.y += 0.2;
+
+blocker.visible = false; // invisible but blocks light
+blocker.castShadow = true;
+blocker.receiveShadow = true;
+
+room.add(blocker);    
 
     
 // get bounds

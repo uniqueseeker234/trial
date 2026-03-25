@@ -609,20 +609,22 @@ const microscope = await loadShuttle("./models/microscope.glb");
 shuttle.add(microscope);
 const chair = await loadShuttle("./round_chair.glb");
 
-// 🔧 center pivot
+// center pivot (keep this)
 const box = new THREE.Box3().setFromObject(chair);
 const chairCenter = new THREE.Vector3();
 box.getCenter(chairCenter);
 chair.position.sub(chairCenter);
 
-// 🎯 UPDATED FINAL VALUES
-//chair.position.set(-1.45, -0.25, 2);
-//chair.scale.set(0.35, 0.35, 0.35);
-//chair.rotation.y = 0.18;
-//chair.rotation.x = 0.00;
+// add to room FIRST
+room.add(chair);
 
-// add to room
-     room.add(chair);
+// 🎯 FINAL LOCKED VALUES
+chair.position.set(-0.35, -0.15, 1.50);
+
+chair.scale.set(0.40, 0.40, 0.40);
+
+chair.rotation.y = 0.05;
+chair.rotation.x = -0.02;
 
 // 🔧 SLIDER CONTROL STARTS HERE
 const cx = document.getElementById("cx");
@@ -658,15 +660,15 @@ function updateChair(){
 }
 
 // attach sliders
-cx.oninput = updateChair;
-cy.oninput = updateChair;
-cz.oninput = updateChair;
-cs.oninput = updateChair;
-cry.oninput = updateChair;
-crx.oninput = updateChair;
+//cx.oninput = updateChair;
+//cy.oninput = updateChair;
+//cz.oninput = updateChair;
+//cs.oninput = updateChair;
+//cry.oninput = updateChair;
+//crx.oninput = updateChair;
 
 // run once
-updateChair();
+//updateChair();
       // 🎯 TEMP ROTATION CONTROL (REMOVE LATER)
      
 const jar = await loadShuttle("./models/algae_specimen_jar_lowpoly.glb");

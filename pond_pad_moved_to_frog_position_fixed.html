@@ -530,13 +530,13 @@ chair.scale.set(0.4,0.4,0.4);
 
 // ✅ POSITION (IMPORTANT CHANGE)
 // bring it slightly forward in room
-chair.position.set(4.45, -0.25, -4);
+chair.position.set(4.45, -0.25, -2.85);
 
 // ✅ ROTATION (face user sitting direction)
 chair.rotation.y = Math.PI * 0.5;
 
 // ✅ ADD TO SHUTTLE
-shuttle.add(chair);
+room.add(chair);
       // 🎯 TEMP ROTATION CONTROL (REMOVE LATER)
      
 const jar = await loadShuttle("./models/algae_specimen_jar_lowpoly.glb");

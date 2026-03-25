@@ -702,22 +702,21 @@ function updateStretch(){
   const F = parseFloat(stretchF.value);
   const B = parseFloat(stretchB.value);
 
-  // reset base
-  env.scale.set(scale,scale,scale);
+  // base scale
+  const baseX = scale;
+  const baseY = scale;
+  const baseZ = scale;
 
+  // new size
+  const newX = baseX + R + L;
+  const newZ = baseZ + F + B;
 
-  // apply stretch
-  env.position.x -= (R - L) * 0.5;
-  env.position.z -= (F - B) * 0.5;
+  // apply scale
+  env.scale.set(newX, baseY, newZ);
 
- env.scale.set(
-  scale + R + L,
-  scale,
-  scale + F + B
-);
-
-  env.position.x += (R - L) * 0.5;
-  env.position.z += (F - B) * 0.5;
+  // 🔥 SHIFT ONLY ONE SIDE
+  env.position.x = (R - L) * 0.5;
+  env.position.z = (F - B) * 0.5;
 
   console.log("R:",R,"L:",L,"F:",F,"B:",B);
 }

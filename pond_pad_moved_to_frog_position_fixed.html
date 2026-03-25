@@ -674,9 +674,28 @@ env.position.x = 0;
 // add to tank
 tank.add(env);
       // ===== GLB SCALE CONTROL =====
-env.scale.set(3.53, 1.89, 2.36);
-env.position.x -= 0.005;   // slight left adjust
-env.position.z += 0.145;   // forward adjust
+// ===== FINAL DIRECTIONAL TRANSFORM =====
+
+// base scale (your original before stretch)
+const baseX = 3.32;
+const baseZ = 2.19;
+
+// your stretch values
+const R = 0.10;
+const L = 0.11;
+const F = 0.23;
+const B = -0.06;
+
+// FINAL SCALE
+env.scale.set(
+  baseX + R + L,
+  1.89,
+  baseZ + F + B
+);
+
+// FINAL POSITION (THIS IS THE KEY FIX)
+env.position.x += (R - L) * 0.5;
+env.position.z += (F - B) * 0.5;  // forward adjust
 // ===== DECOR OBJECTS ON SOIL =====
 
 // base Y (same as soil top)

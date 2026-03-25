@@ -76,7 +76,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script>
 (() => {
   const loadingEl = document.getElementById('loading');
@@ -102,11 +102,15 @@
 
   const scene = new THREE.Scene();
   // ===== SHUTTLE GROUP =====
+  scene.add(new THREE.AxesHelper(5));
 const shuttle = new THREE.Group();
 scene.add(shuttle);
   scene.fog = new THREE.Fog(0x070a12, 10, 45);
 
   const camera = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, 0.01, 200);
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.05;
  let eye = new THREE.Vector3(0, 1.4, 2.2)
 let yaw = 0
 let pitch = 0
@@ -354,7 +358,7 @@ window.addEventListener("mousemove", e=>{
   // limit vertical look
   pitch = Math.max(-1.1, Math.min(0.6, pitch))
 
-  updateLook()
+ // updateLook()
 })
   function animate(){
     requestAnimationFrame(animate);
@@ -490,7 +494,7 @@ yaw = 0
 pitch = -0.1
 
 // updateLook()
-camera.position.set(0, 1.5, 3);
+camera.position.set(0,2, 5);
 camera.lookAt(0, 1, 0);
 // camera inside room (same feeling as shuttle)
 // Camera INSIDE room (near black wall)

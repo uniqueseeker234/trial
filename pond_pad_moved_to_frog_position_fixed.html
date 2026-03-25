@@ -56,22 +56,22 @@
     <br>Drag = orbit • Scroll = zoom • Right-drag = pan
     <br><span style="opacity:.92">Top: frog fixed on center pad resting on surface • lotus flowers spaced on left and right • Underwater: fish + plants</span>
   </p>
-<div style="
+<div id="stretchUI" style="
 position:fixed;
 bottom:10px;
-left:10px;
-background:#0008;
+right:20px;
+background:rgba(0,0,0,0.6);
 padding:10px;
 color:white;
-font-size:12px;
-border-radius:10px;
 z-index:20;
+border-radius:10px;
+font-size:12px;
 ">
 
-Front <input id="fz" type="range" min="0" max="2" step="0.01" value="1.2"><br>
-Back <input id="bz" type="range" min="-2" max="0" step="0.01" value="-1.2"><br>
-Left <input id="lx" type="range" min="-2" max="0" step="0.01" value="-1.5"><br>
-Right <input id="rx" type="range" min="0" max="2" step="0.01" value="1.5"><br>
+R <input id="stretchR" type="range" min="0" max="1" step="0.01" value="0.05"><br>
+L <input id="stretchL" type="range" min="0" max="1" step="0.01" value="0.06"><br>
+F <input id="stretchF" type="range" min="0" max="1" step="0.01" value="0.23"><br>
+B <input id="stretchB" type="range" min="-1" max="1" step="0.01" value="-0.10"><br>
 
 </div>
 <div id="loading">
@@ -167,7 +167,53 @@ scene.add(soft);
   const TANK = { w:3.25, h:1.95, d:2.25, glass:0.04, waterFill:0.80 };
  
   const tank = new THREE.Group();
+// ===== RESTORE ORIGINAL GLASS TANK =====
 
+const glassGroup = new THREE.Group();
+tank.add(glassGroup);
+
+const glassMat = new THREE.MeshPhysicalMaterial({
+  color: 0xffffff,
+  transmission: 1.0,
+  transparent: true,
+  opacity: 1.0,
+  roughness: 0.02,
+  metalness: 0,
+  ior: 1.02,
+  thickness: 0.05,
+  depthWrite: false
+});
+
+const glass = new THREE.Mesh(
+  new THREE.BoxGeometry(TANK.w, TANK.h, TANK.d),
+  glassMat
+);
+glassGroup.add(glass);
+
+const innerMat = glassMat.clone();
+innerMat.side = THREE.BackSide;
+
+const inner = new THREE.Mesh(
+  new THREE.BoxGeometry(
+    TANK.w - TANK.glass*2,
+    TANK.h - TANK.glass*2,
+    TANK.d - TANK.glass*2
+  ),
+  innerMat
+);
+glassGroup.add(inner);
+
+const edge = new THREE.LineSegments(
+  new THREE.EdgesGeometry(
+    new THREE.BoxGeometry(TANK.w, TANK.h, TANK.d)
+  ),
+  new THREE.LineBasicMaterial({
+    color:0x7fe7d2,
+    transparent:true,
+    opacity:0.35
+  })
+);
+glassGroup.add(edge);
   const waterH = (TANK.h - TANK.glass*2) * TANK.waterFill;
   const waterMat = new THREE.MeshPhysicalMaterial({
     color:new THREE.Color('#3CC19E'),
@@ -605,6 +651,8 @@ setProgress(100, "Done");
 loadingEl.style.display = 'none';
       // ===== ADD YOUR LIGHTHOUSE MODEL =====
 env = loaded.env.scene;
+// ===== STRETCH CONTROL =====
+
 
 // scale + center
 // ===== FIT GLB PERFECTLY INSIDE TANK =====
@@ -640,6 +688,45 @@ env.position.x = 0;
       env.renderOrder = 1;
 // add to tank
 tank.add(env);
+      const stretchR = document.getElementById("stretchR");
+const stretchL = document.getElementById("stretchL");
+const stretchF = document.getElementById("stretchF");
+const stretchB = document.getElementById("stretchB");
+
+function updateStretch(){
+
+  const R = parseFloat(stretchR.value);
+  const L = parseFloat(stretchL.value);
+  const F = parseFloat(stretchF.value);
+  const B = parseFloat(stretchB.value);
+
+  // reset base
+  env.scale.set(3.32, 1.89, 2.19);
+  env.position.x = 0;
+  env.position.z = 0;
+
+  // apply stretch
+  env.position.x -= (R - L) * 0.5;
+  env.position.z -= (F - B) * 0.5;
+
+  env.scale.set(
+    3.32 + R + L,
+    1.89,
+    2.19 + F + B
+  );
+
+  env.position.x += (R - L) * 0.5;
+  env.position.z += (F - B) * 0.5;
+
+  console.log("R:",R,"L:",L,"F:",F,"B:",B);
+}
+
+stretchR.oninput = updateStretch;
+stretchL.oninput = updateStretch;
+stretchF.oninput = updateStretch;
+stretchB.oninput = updateStretch;
+
+updateStretch();
       // ===== GLB SCALE CONTROL =====
 // ===== FINAL DIRECTIONAL TRANSFORM =====
 
@@ -647,26 +734,6 @@ tank.add(env);
 // ===== PERFECT MATCH TO SLIDER RESULT =====
 
 // your values
-const R = 0.05;
-const L = 0.06;
-const F = 0.23;
-const B = -0.1;
-
-// 🔴 STEP A — SHIFT PIVOT (VERY IMPORTANT)
-env.position.x -= (R - L) * 0.5;
-env.position.z -= (F - B) * 0.5;
-
-// 🔵 STEP B — APPLY SCALE
-env.scale.set(
-  3.32 + R + L,
-  1.89,
-  2.19 + F + B
-);
-
-// 🟢 STEP C — RESTORE POSITION
-env.position.x += (R - L) * 0.5;
-env.position.z += (F - B) * 0.5;
-      // forward adjust
 // ===== DECOR OBJECTS ON SOIL =====
 
 // base Y (same as soil top)

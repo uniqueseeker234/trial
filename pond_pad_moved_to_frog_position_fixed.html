@@ -545,13 +545,13 @@ const chairCenter = new THREE.Vector3();
 box.getCenter(chairCenter);
 chair.position.sub(chairCenter);
 
-// 🎯 FINAL LOCKED VALUES
-chair.position.set(-0.60, -0.20, 1.00);
-chair.scale.set(0.33, 0.33, 0.33);
+// 🎯 UPDATED FINAL VALUES
+chair.position.set(-1.45, -0.25, 0.90);
+chair.scale.set(0.46, 0.46, 0.46);
 chair.rotation.y = 0.18;
 chair.rotation.x = 0.00;
 
-// add to room (important)
+// add to room
 room.add(chair);
       const cx = document.getElementById("cx");
 const cy = document.getElementById("cy");

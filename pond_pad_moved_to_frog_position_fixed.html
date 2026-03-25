@@ -533,17 +533,11 @@ chair.scale.set(0.4,0.4,0.4);
 chair.position.set(4.45, -0.25, -2.85);
 
 // ✅ ROTATION (face user sitting direction)
-chair.rotation.y = Math.PI * 0.75;
+chair.rotation.y = Math.PI * 0.5;
 
 // ✅ ADD TO SHUTTLE
 shuttle.add(chair);
       // 🎯 TEMP ROTATION CONTROL (REMOVE LATER)
-document.addEventListener("keydown", (e) => {
-  if(e.key === "ArrowLeft") chair.rotation.y += 0.1;
-  if(e.key === "ArrowRight") chair.rotation.y -= 0.1;
-
-  console.log("CHAIR ROT:", chair.rotation.y.toFixed(2));
-});
      
 const jar = await loadShuttle("./models/algae_specimen_jar_lowpoly.glb");
 shuttle.add(jar);

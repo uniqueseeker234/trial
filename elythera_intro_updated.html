@@ -177,11 +177,23 @@ font-size:13px;
 <section class="hero">
 
 <div class="team">
-<img class="frame active" src="assets/elythera/frame0_base.png">
-<img class="frame" src="assets/elythera/frame1_glow.png">
-<img class="frame" src="assets/elythera/frame2_glowstrong.png">
-<img class="frame" src="assets/elythera/frame3_orb.png">
-<img class="frame" src="assets/elythera/frame5_logo.png">
+
+<video id="elytheraVideo"
+style="
+position:absolute;
+inset:0;
+width:100%;
+height:100%;
+object-fit:contain;
+"
+muted
+playsinline
+preload="auto">
+
+<source src="assets/elythera/elythera_intro.mp4" type="video/mp4">
+
+</video>
+
 </div>
 
 <div class="systems" id="systems">
@@ -245,32 +257,22 @@ startAnimation()
 }
 
 window.onload=type
-
-const frames=document.querySelectorAll(".frame")
-const systems=document.getElementById("systems")
-let f=0
+const video = document.getElementById("elytheraVideo")
+const systems = document.getElementById("systems")
 
 function startAnimation(){
 
 setTimeout(()=>{
 
-const interval=setInterval(()=>{
+video.play()
 
-frames[f].classList.remove("active")
-f++
-frames[f].classList.add("active")
-
-if(f===frames.length-1){
+video.onended = () => {
 systems.classList.add("show")
-clearInterval(interval)
 }
 
-},1400)
-
-},2000)
+},500)
 
 }
-
 </script>
 
 </body>

@@ -704,7 +704,7 @@ shuttle.add(laptop);
 
 const journal = await loadShuttle("./models/journal.glb");
 shuttle.add(journal);
-attachControls(journal, "Journal");
+//attachControls(journal, "Journal");
 const cup = await loadShuttle("./models/coffee_cup.glb");
 shuttle.add(cup);
 
@@ -742,6 +742,10 @@ scaleTo(journal,0.27);
 journal.rotation.x=-Math.PI/2;
 journal.rotation.z=0.25;
 journal.position.set(right-0.35,top+0.02,front-0.22);
+      // 🔥 FINAL PERFECT POSITION
+journal.position.set(1.58, 0.37, -0.62);
+journal.scale.set(0.05, 0.05, 0.05);
+journal.rotation.set(-1.66, 0.68, 1.69);
 
 scaleTo(cup,0.10);
 cup.position.set(right-0.15,top+0.01,front-0.18);

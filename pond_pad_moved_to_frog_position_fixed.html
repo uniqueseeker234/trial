@@ -57,7 +57,23 @@
     <br><span style="opacity:.92">Top: frog fixed on center pad resting on surface • lotus flowers spaced on left and right • Underwater: fish + plants</span>
   </p>
 </div>
- 
+ <div id="envScaleUI" style="
+position:fixed;
+bottom:10px;
+right:350px;
+background:rgba(0,0,0,0.6);
+padding:10px;
+color:white;
+z-index:20;
+font-size:12px;
+border-radius:10px;
+">
+
+GLB X <input id="ex" type="range" min="1" max="5" step="0.01" value="3.2"><br>
+GLB Y <input id="ey" type="range" min="0.5" max="3" step="0.01" value="1.5"><br>
+GLB Z <input id="ez" type="range" min="1" max="5" step="0.01" value="2.4"><br>
+
+</div>
 <div id="loading">
   <div class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
@@ -657,6 +673,34 @@ env.position.x = 0;
       env.renderOrder = 1;
 // add to tank
 tank.add(env);
+      // ===== GLB SCALE CONTROL =====
+const ex = document.getElementById("ex");
+const ey = document.getElementById("ey");
+const ez = document.getElementById("ez");
+
+function updateEnvScale(){
+  if(!env) return;
+
+  env.scale.set(
+    parseFloat(ex.value),
+    parseFloat(ey.value),
+    parseFloat(ez.value)
+  );
+
+  console.log(
+    "ENV SCALE:",
+    env.scale.x.toFixed(2),
+    env.scale.y.toFixed(2),
+    env.scale.z.toFixed(2)
+  );
+}
+
+ex.oninput = updateEnvScale;
+ey.oninput = updateEnvScale;
+ez.oninput = updateEnvScale;
+
+// run once
+updateEnvScale();
 // ===== DECOR OBJECTS ON SOIL =====
 
 // base Y (same as soil top)

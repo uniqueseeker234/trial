@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Chair Test</title>
+  <style>
+    body { margin:0; overflow:hidden; }
+  </style>
+</head>
+<body>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+
+<script>
+const scene = new THREE.Scene();
+
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 100);
+camera.position.set(0, 1.5, 3);
+
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+// simple light
+const light = new THREE.HemisphereLight(0xffffff, 0x444444, 1);
+scene.add(light);
+
+// loader
+const loader = new THREE.GLTFLoader();
+
+loader.load("./round_chair.glb", (gltf) => {
+  const chair = gltf.scene;
+
+  console.log("CHAIR LOADED:", chair);
+
+  // center it
+  const box = new THREE.Box3().setFromObject(chair);
+  const center = new THREE.Vector3();
+  box.getCenter(center);
+  chair.position.sub(center);
+
+  // scale it
+  chair.scale.set(1.5,1.5,1.5);
+
+  scene.add(chair);
+});
+
+// animate
+function animate(){
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+}
+animate();
+</script>
+
+</body>
+</html>

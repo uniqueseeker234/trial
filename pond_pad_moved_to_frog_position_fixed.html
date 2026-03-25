@@ -677,25 +677,29 @@ tank.add(env);
 // ===== FINAL DIRECTIONAL TRANSFORM =====
 
 // base scale (your original before stretch)
-const baseX = 3.32;
-const baseZ = 2.19;
+// ===== PERFECT MATCH TO SLIDER RESULT =====
 
-// your stretch values
+// your values
 const R = 0.10;
 const L = 0.11;
 const F = 0.23;
 const B = -0.06;
 
-// FINAL SCALE
+// 🔴 STEP A — SHIFT PIVOT (VERY IMPORTANT)
+env.position.x -= (R - L) * 0.5;
+env.position.z -= (F - B) * 0.5;
+
+// 🔵 STEP B — APPLY SCALE
 env.scale.set(
-  baseX + R + L,
+  3.32 + R + L,
   1.89,
-  baseZ + F + B
+  2.19 + F + B
 );
 
-// FINAL POSITION (THIS IS THE KEY FIX)
+// 🟢 STEP C — RESTORE POSITION
 env.position.x += (R - L) * 0.5;
-env.position.z += (F - B) * 0.5;  // forward adjust
+env.position.z += (F - B) * 0.5;
+      // forward adjust
 // ===== DECOR OBJECTS ON SOIL =====
 
 // base Y (same as soil top)

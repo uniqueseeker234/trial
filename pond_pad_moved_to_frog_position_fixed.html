@@ -489,7 +489,9 @@ eye.set(0, 1.4, 2.2)   // inside room
 yaw = 0
 pitch = -0.1
 
-updateLook()
+// updateLook()
+camera.position.set(0, 1.5, 3);
+camera.lookAt(0, 1, 0);
 // camera inside room (same feeling as shuttle)
 // Camera INSIDE room (near black wall)
 
@@ -515,20 +517,25 @@ shuttle.add(microscope);
 const chair = await loadShuttle("./round_chair.glb");
 // 🔧 FIX CENTER
 const box = new THREE.Box3().setFromObject(chair);
+const chair = await loadShuttle("./round_chair.glb");
+
+// ✅ CENTER (same as test)
+const box = new THREE.Box3().setFromObject(chair);
 const chairCenter = new THREE.Vector3();
 box.getCenter(chairCenter);
 chair.position.sub(chairCenter);
 
-// 🔧 SCALE (NORMAL)
-chair.scale.set(0.6,0.6,0.6);
+// ✅ SCALE (same as test)
+chair.scale.set(1.5,1.5,1.5);
 
-// 🔧 POSITION BESIDE TABLE (SAFE AREA)
-chair.position.set(-1.2, 0, -0.8);
+// ✅ POSITION (IMPORTANT CHANGE)
+// bring it slightly forward in room
+chair.position.set(0, 0.6, 1.2);
 
-// 🔧 FACE USER
+// ✅ ROTATION (face user sitting direction)
 chair.rotation.y = Math.PI;
 
-// ✅ ADD TO SHUTTLE (IMPORTANT)
+// ✅ ADD TO SHUTTLE
 shuttle.add(chair);
 const jar = await loadShuttle("./models/algae_specimen_jar_lowpoly.glb");
 shuttle.add(jar);

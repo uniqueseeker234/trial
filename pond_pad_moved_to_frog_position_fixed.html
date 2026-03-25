@@ -559,7 +559,7 @@ const cz = document.getElementById("cz");
 const cs = document.getElementById("cs");
 const cry = document.getElementById("cry");
 const crx = document.getElementById("crx");
-//function updateChair(){
+function updateChair(){
 
   // position
   chair.position.set(
@@ -586,14 +586,14 @@ const crx = document.getElementById("crx");
     "RX:", chair.rotation.x.toFixed(2)
   );
 }
-cx.oninput = updateChair;
-cy.oninput = updateChair;
-cz.oninput = updateChair;
-cs.oninput = updateChair;
-cry.oninput = updateChair;
-crx.oninput = updateChair;
+//cx.oninput = updateChair;
+//cy.oninput = updateChair;
+//cz.oninput = updateChair;
+//cs.oninput = updateChair;
+//cry.oninput = updateChair;
+//crx.oninput = updateChair;
 // run once
-updateChair();
+// updateChair();
       // 🎯 TEMP ROTATION CONTROL (REMOVE LATER)
      
 const jar = await loadShuttle("./models/algae_specimen_jar_lowpoly.glb");

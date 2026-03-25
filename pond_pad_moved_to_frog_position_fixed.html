@@ -586,14 +586,14 @@ function updateChair(){
     "RX:", chair.rotation.x.toFixed(2)
   );
 }
-//cx.oninput = updateChair;
-//cy.oninput = updateChair;
-//cz.oninput = updateChair;
-//cs.oninput = updateChair;
-//cry.oninput = updateChair;
-//crx.oninput = updateChair;
-// run once
-// updateChair();
+cx.oninput = updateChair;
+cy.oninput = updateChair;
+cz.oninput = updateChair;
+cs.oninput = updateChair;
+cry.oninput = updateChair;
+crx.oninput = updateChair;
+ run once
+updateChair();
       // 🎯 TEMP ROTATION CONTROL (REMOVE LATER)
      
 const jar = await loadShuttle("./models/algae_specimen_jar_lowpoly.glb");

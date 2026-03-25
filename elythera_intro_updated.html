@@ -37,7 +37,7 @@ linear-gradient(180deg,#02040a 0%,#000 45%,#02040a 100%);
 position:fixed;
 inset:0;
 background:#000;
-display:flex;
+display:none;
 align-items:center;
 justify-content:center;
 font-size:28px;
@@ -164,7 +164,7 @@ font-size:13px;
 0%,100%{transform:translateY(0)}
 50%{transform:translateY(-7px)}
 }
-  #tapStart{
+ #tapStart{
 position:fixed;
 inset:0;
 background:#000;
@@ -173,7 +173,7 @@ align-items:center;
 justify-content:center;
 font-size:20px;
 letter-spacing:3px;
-z-index:998;
+z-index:10000;
 cursor:pointer;
 }
 </style>
@@ -256,51 +256,63 @@ preload="auto">
 
 <script>
 
-const text="WELCOME TO ELYTHERA"
-const el=document.getElementById("welcomeText")
-let i=0
+// TEXT
+const text = "WELCOME TO ELYTHERA"
+let i = 0
 
-function type(){
-if(i<text.length){
-el.innerHTML+=text.charAt(i)
-i++
-setTimeout(type,80)
-}else{
-setTimeout(()=>{
-document.getElementById("welcome").style.display="none"
-startAnimation()
-},1000)
-}
-}
-
-window.onload=type
-  tap.addEventListener("click", () => {
-
-tap.style.display = "none"
-
-music.volume = 0.5
-music.play()
-
-startAnimation()
-
-})
+// ELEMENTS (MUST COME FIRST)
 const video = document.getElementById("elytheraVideo")
 const systems = document.getElementById("systems")
 const tap = document.getElementById("tapStart")
 const music = document.getElementById("bgMusic")
+const el = document.getElementById("welcomeText")
+
+// TYPE EFFECT
+function type(){
+  if(i < text.length){
+    el.innerHTML += text.charAt(i)
+    i++
+    setTimeout(type, 80)
+  } else {
+    setTimeout(()=>{
+      document.getElementById("welcome").style.display = "none"
+      startAnimation()
+    },1000)
+  }
+}
+
+// TAP FIRST → THEN EVERYTHING
+tap.addEventListener("click", () => {
+
+  tap.style.display = "none"
+
+  // show welcome AFTER tap
+  document.getElementById("welcome").style.display = "flex"
+
+  // start music
+  music.volume = 0.5
+  music.play()
+
+  // start typing
+  type()
+
+})
+
+// VIDEO FLOW
 function startAnimation(){
 
-setTimeout(()=>{
+  setTimeout(()=>{
 
-video.play()
+    video.play()
 
-video.onended = () => {
-systems.classList.add("show")
+    video.onended = () => {
+      systems.classList.add("show")
+    }
+
+  },500)
+
 }
 
-},500)
-
-}
 </script>
 
 </body>

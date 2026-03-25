@@ -168,41 +168,7 @@ scene.add(soft);
   const TANK = { w:3.25, h:1.95, d:2.25, glass:0.04, waterFill:0.80 };
  
   const tank = new THREE.Group();
-const glassGroup = new THREE.Group();
-tank.add(glassGroup);
-const glassMat = new THREE.MeshPhysicalMaterial({
-  color: 0xffffff,
 
-  transmission: 1.0,   // full transparency
-  transparent: true,
-  opacity: 1.0,        // IMPORTANT (remove whiteness)
-
-  roughness: 0.02,     // smooth glass
-  metalness: 0,
-
-  ior: 1.02,           // very low distortion (key fix)
-  thickness: 0.05,     // reduce fog effect
-
-  depthWrite: false
-});
-  const glass = new THREE.Mesh(new THREE.BoxGeometry(TANK.w, TANK.h, TANK.d), glassMat);
-  glassGroup.add(glass);
-
-  const innerMat = glassMat.clone();
-  innerMat.side = THREE.BackSide;
-  innerMat.roughness = 0.06;
-  const inner = new THREE.Mesh(
-    new THREE.BoxGeometry(TANK.w - TANK.glass*2, TANK.h - TANK.glass*2, TANK.d - TANK.glass*2),
-    innerMat
-  );
-  glassGroup.add(inner);
-
-  const edge = new THREE.LineSegments(
-    new THREE.EdgesGeometry(new THREE.BoxGeometry(TANK.w, TANK.h, TANK.d)),
-    new THREE.LineBasicMaterial({ color:0x7fe7d2, transparent:true, opacity:0.35 })
-  );
-  glassGroup.add(edge);
-glassGroup.scale.set(1,1,1.1);
   const waterH = (TANK.h - TANK.glass*2) * TANK.waterFill;
   const waterMat = new THREE.MeshPhysicalMaterial({
     color:new THREE.Color('#3CC19E'),

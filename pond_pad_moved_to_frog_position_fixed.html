@@ -703,13 +703,14 @@ neon.position.set(0, 2.2, -2.9);
 const textureLoader = new THREE.TextureLoader();
 
 const photoTex = textureLoader.load("./models/elythera_group.jpg");
-
+photoTex.encoding = THREE.sRGBEncoding;
 const photoGeo = new THREE.PlaneGeometry(1.5, 1); // adjust aspect later
-const photoMat = new THREE.MeshBasicMaterial({
+const photoMat = new THREE.MeshStandardMaterial({
   map: photoTex,
+  roughness: 1,
+  metalness: 0,
   side: THREE.DoubleSide
 });
-
 const photo = new THREE.Mesh(photoGeo, photoMat);
 
 room.add(photo);

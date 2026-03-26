@@ -686,9 +686,17 @@ collage.rotation.set(1.54, 0.01, 0.04);
 room.add(clock);
 
 scaleTo(clock, 0.6);
-attachControls(clock, "Clock");
+//attachControls(clock, "Clock");
 
 clock.position.set(1.5, 1.8, -3);
+    
+      const neon = await loadShuttle("./models/planet_neon_sign_neon_sign_for_room.glb");
+room.add(neon);
+
+scaleTo(neon, 1.2);
+attachControls(neon, "Neon");
+
+neon.position.set(0, 2.2, -2.9);
 // get bounds
 const tbox = boxMinMax(table);
 

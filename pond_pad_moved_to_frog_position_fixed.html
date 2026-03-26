@@ -692,36 +692,6 @@ clock.rotation.set(-0.19, -1.59, -0.18);
 
 //clock.position.set(1.5, 1.8, -3);
     
-      const neon = await loadShuttle("./models/planet_neon_sign_neon_sign_for_room.glb");
-room.add(neon);
-neon.traverse(o => {
-  if (!o.isMesh) return;
-
-  const mats = Array.isArray(o.material) ? o.material : [o.material];
-
-  mats.forEach(m => {
-    if (!m) return;
-
-    // 🔥 FORCE EMISSIVE GLOW
-    if (m.color) {
-      m.emissive = m.color.clone();   // use same color
-      m.emissiveIntensity = 2.5;      // glow strength
-    }
-
-    // 🔥 REMOVE LIGHT DEPENDENCE
-    m.toneMapped = false;
-
-    // optional tweak
-    if ("metalness" in m) m.metalness = 0;
-    if ("roughness" in m) m.roughness = 0.3;
-
-    m.needsUpdate = true;
-  });
-});
-scaleTo(neon, 1.2);
-//attachControls(neon, "Neon");
-
-neon.position.set(0, 2.2, -2.9);
 
 const textureLoader = new THREE.TextureLoader();
 

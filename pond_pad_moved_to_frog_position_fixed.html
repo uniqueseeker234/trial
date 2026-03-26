@@ -671,6 +671,7 @@ const back = tbox.min.z;
       // ===== PLACE AQUARIUM ON TABLE =====
 const microscope = await loadShuttle("./models/microscope.glb");
 shuttle.add(microscope);
+      attachControls(microscope, "Microscope");
 const chair = await loadShuttle("./round_chair.glb");
 
 // center pivot (keep this)
@@ -716,7 +717,7 @@ shuttle.add(globe);
      // attachControls(globe, "Globe");
       scaleTo(microscope,0.25);
 microscope.position.set(left+0.25,top+0.01,back+0.15);
-attachControls(microscope, "Microscope");
+
 scaleTo(jar,0.14);
 jar.position.set(left+0.45,top+0.01,front-0.25);
 

@@ -670,6 +670,13 @@ scaleTo(frame, 0.8);
 attachControls(frame, "Frame");
 
 frame.position.set(0.5, 1.5, -3);
+      const collage = await loadShuttle("./models/photo_collage_wall.glb");
+room.add(collage);
+
+scaleTo(collage, 1.5);
+attachControls(collage, "Collage");
+
+collage.position.set(-1.2, 1.5, -3);
 // get bounds
 const tbox = boxMinMax(table);
 

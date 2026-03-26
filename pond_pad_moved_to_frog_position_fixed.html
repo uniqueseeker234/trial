@@ -666,10 +666,13 @@ door.rotation.set(0, 0, 0);
       const frame = await loadShuttle("./models/wall_decor_photoframe.glb");
 room.add(frame);
 
-scaleTo(frame, 0.8);
-attachControls(frame, "Frame");
+//scaleTo(frame, 0.8);
+//attachControls(frame, "Frame");
 
-frame.position.set(0.5, 1.5, -3);
+//frame.position.set(0.5, 1.5, -3);
+      frame.position.set(-1.35, 1.81, -2.43);
+frame.scale.set(0.07, 0.07, 0.07);
+frame.rotation.set(0.03, -1.59, 0.04);
       const collage = await loadShuttle("./models/photo_collage_wall.glb");
 room.add(collage);
 

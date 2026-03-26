@@ -697,7 +697,7 @@ chair.rotation.x = -0.02;
      
 const jar = await loadShuttle("./models/algae_specimen_jar_lowpoly.glb");
 shuttle.add(jar);
- attachControls(jar, "Jar");
+// attachControls(jar, "Jar");
 const laptop = await loadShuttle("./models/laptop.glb");
 shuttle.add(laptop);
      // attachControls(laptop, "Laptop");
@@ -708,7 +708,7 @@ shuttle.add(journal);
 //attachControls(journal, "Journal");
 const cup = await loadShuttle("./models/coffee_cup.glb");
 shuttle.add(cup);
-
+ attachControls(cup, "Cup");
 const books = await loadShuttle("./models/books.glb");
 shuttle.add(books);
 
@@ -724,7 +724,10 @@ microscope.rotation.set(-0.02, 1.7, 0);
 
 scaleTo(jar,0.14);
 jar.position.set(left+0.45,top+0.01,front-0.25);
-
+// 🔥 FINAL PERFECT POSITION
+jar.position.set(1.66, 0.45, -0.11);
+jar.scale.set(0.18, 0.18, 0.18);
+jar.rotation.set(-1.62, 0, 0);
 scaleTo(laptop,0.35);
 laptop.position.set(left+0.65,top+0.01,front-0.25);
         laptop.position.set(1.66, 0.45, -1);

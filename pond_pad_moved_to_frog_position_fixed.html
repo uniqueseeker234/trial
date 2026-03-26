@@ -713,6 +713,7 @@ shuttle.add(books);
 
 const globe = await loadShuttle("./models/glass_globe.glb");
 shuttle.add(globe);
+      attachControls(globe, "Globe");
       scaleTo(microscope,0.25);
 microscope.position.set(left+0.25,top+0.01,back+0.15);
 

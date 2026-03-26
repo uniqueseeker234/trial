@@ -699,28 +699,25 @@ scaleTo(neon, 1.2);
 //attachControls(neon, "Neon");
 
 neon.position.set(0, 2.2, -2.9);
-      const textureLoader = new THREE.TextureLoader();
 
-const teamTex = textureLoader.load("elythera_group.jpg");
+const textureLoader = new THREE.TextureLoader();
 
-const teamMat = new THREE.MeshBasicMaterial({
-  map: teamTex,
+const photoTex = textureLoader.load("./models/elythera_group.jpg");
+
+const photoGeo = new THREE.PlaneGeometry(1.5, 1); // adjust aspect later
+const photoMat = new THREE.MeshBasicMaterial({
+  map: photoTex,
   side: THREE.DoubleSide
 });
 
-const teamFrame = new THREE.Mesh(
-  new THREE.PlaneGeometry(2, 1.2),
-  teamMat
-);
+const photo = new THREE.Mesh(photoGeo, photoMat);
 
-room.add(teamFrame);
+room.add(photo);
 
-// slider control
-attachControls(teamFrame, "Team Photo");
-
-// initial position
-teamFrame.position.set(0, 1.6, -2.95);
-// get bounds
+// 🔥 APPLY YOUR FINAL VALUES
+photo.position.set(3.28, 1.6, -1.74);
+photo.scale.set(1, 1, 1);
+photo.rotation.set(0, -1.59, 0);
 const tbox = boxMinMax(table);
 
 const top = tbox.max.y;

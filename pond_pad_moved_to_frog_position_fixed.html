@@ -711,7 +711,6 @@ shuttle.add(cup);
 // attachControls(cup, "Cup");
 const books = await loadShuttle("./models/books.glb");
 shuttle.add(books);
- attachControls(books, "Books");
 const globe = await loadShuttle("./models/glass_globe.glb");
 shuttle.add(globe);
      // attachControls(globe, "Globe");
@@ -764,6 +763,10 @@ cup.scale.set(0.01, 0.01, 0.01);
 cup.rotation.set(0, 0, 0);
 scaleTo(books,0.22);
 books.position.set(right-0.20,top+0.01,back+0.20);
+      // 🔥 FINAL PERFECT POSITION
+books.position.set(1.41, -0.48, -3.72);
+books.scale.set(0.11, 0.11, 0.11);
+books.rotation.set(-0.37, -1.77, -0.27);
 
 scaleTo(globe,0.22);
 globe.position.set(right-0.05,top+0.01,back+0.05);

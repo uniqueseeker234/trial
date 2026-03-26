@@ -658,7 +658,17 @@ blocker.castShadow = true;
 blocker.receiveShadow = true;
 
 room.add(blocker);    
+const door = await loadShuttle("./models/futuristic_sci_fi_door_game_asset.glb");
+room.add(door);
 
+// initial scale
+scaleTo(door, 1.5);
+
+// temporary slider
+attachControls(door, "Door");
+
+// starter position (you will adjust)
+door.position.set(0, 0, -3);
     
 // get bounds
 const tbox = boxMinMax(table);

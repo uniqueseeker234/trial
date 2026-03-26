@@ -684,11 +684,13 @@ collage.rotation.set(1.54, 0.01, 0.04);
 //collage.position.set(-1.2, 1.5, -3);
       const clock = await loadShuttle("./models/low_poly_wall_clock.glb");
 room.add(clock);
+clock.position.set(3.38, 1.3, -0.25);
+clock.scale.set(0.21, 0.21, 0.21);
+clock.rotation.set(-0.19, -1.59, -0.18);
+//scaleTo(clock, 0.6);
+//attachControls(clock, "Clock");
 
-scaleTo(clock, 0.6);
-attachControls(clock, "Clock");
-
-clock.position.set(1.5, 1.8, -3);
+//clock.position.set(1.5, 1.8, -3);
     
       const neon = await loadShuttle("./models/planet_neon_sign_neon_sign_for_room.glb");
 room.add(neon);
@@ -697,6 +699,27 @@ scaleTo(neon, 1.2);
 //attachControls(neon, "Neon");
 
 neon.position.set(0, 2.2, -2.9);
+      const textureLoader = new THREE.TextureLoader();
+
+const teamTex = textureLoader.load("elythera_group.jpg");
+
+const teamMat = new THREE.MeshBasicMaterial({
+  map: teamTex,
+  side: THREE.DoubleSide
+});
+
+const teamFrame = new THREE.Mesh(
+  new THREE.PlaneGeometry(2, 1.2),
+  teamMat
+);
+
+room.add(teamFrame);
+
+// slider control
+attachControls(teamFrame, "Team Photo");
+
+// initial position
+teamFrame.position.set(0, 1.6, -2.95);
 // get bounds
 const tbox = boxMinMax(table);
 

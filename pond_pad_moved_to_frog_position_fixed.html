@@ -675,11 +675,20 @@ frame.scale.set(0.07, 0.07, 0.07);
 frame.rotation.set(0.03, -1.59, 0.04);
       const collage = await loadShuttle("./models/photo_collage_wall.glb");
 room.add(collage);
+collage.position.set(2.04, 1.47, -2.43);
+collage.scale.set(1, 1, 1);
+collage.rotation.set(1.54, 0.01, 0.04);
+//scaleTo(collage, 1.5);
+//attachControls(collage, "Collage");
 
-scaleTo(collage, 1.5);
-attachControls(collage, "Collage");
+//collage.position.set(-1.2, 1.5, -3);
+      const clock = await loadShuttle("./models/low_poly_wall_clock.glb");
+room.add(clock);
 
-collage.position.set(-1.2, 1.5, -3);
+scaleTo(clock, 0.6);
+attachControls(clock, "Clock");
+
+clock.position.set(1.5, 1.8, -3);
 // get bounds
 const tbox = boxMinMax(table);
 

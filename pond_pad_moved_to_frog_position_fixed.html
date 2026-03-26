@@ -671,7 +671,7 @@ const back = tbox.min.z;
       // ===== PLACE AQUARIUM ON TABLE =====
 const microscope = await loadShuttle("./models/microscope.glb");
 shuttle.add(microscope);
-      attachControls(microscope, "Microscope");
+    //  attachControls(microscope, "Microscope");
 const chair = await loadShuttle("./round_chair.glb");
 
 // center pivot (keep this)
@@ -697,7 +697,7 @@ chair.rotation.x = -0.02;
      
 const jar = await loadShuttle("./models/algae_specimen_jar_lowpoly.glb");
 shuttle.add(jar);
-
+ attachControls(jar, "Jar");
 const laptop = await loadShuttle("./models/laptop.glb");
 shuttle.add(laptop);
      // attachControls(laptop, "Laptop");
@@ -717,6 +717,10 @@ shuttle.add(globe);
      // attachControls(globe, "Globe");
       scaleTo(microscope,0.25);
 microscope.position.set(left+0.25,top+0.01,back+0.15);
+      // 🔥 FINAL PERFECT POSITION
+microscope.position.set(1.54, 0.45, -0.28);
+microscope.scale.set(0.14, 0.14, 0.14);
+microscope.rotation.set(-0.02, 1.7, 0);
 
 scaleTo(jar,0.14);
 jar.position.set(left+0.45,top+0.01,front-0.25);

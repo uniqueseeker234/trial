@@ -660,18 +660,16 @@ blocker.receiveShadow = true;
 room.add(blocker);    
 const door = await loadShuttle("./models/futuristic_sci_fi_door_game_asset.glb");
 room.add(door);
-
-// initial scale
-//scaleTo(door, 1.5);
-
-// temporary slider
-//attachControls(door, "Door");
-
-// starter position (you will adjust)
-//door.position.set(0, 0, -3);
 door.position.set(0.22, 0.11, -0.75);
 door.scale.set(0.38, 0.38, 0.38);
 door.rotation.set(0, 0, 0);
+      const frame = await loadShuttle("./models/wall_decor_photoframe.glb");
+room.add(frame);
+
+scaleTo(frame, 0.8);
+attachControls(frame, "Frame");
+
+frame.position.set(0.5, 1.5, -3);
 // get bounds
 const tbox = boxMinMax(table);
 

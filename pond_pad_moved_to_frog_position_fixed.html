@@ -752,21 +752,7 @@ shuttle.add(jar);
 
 // ===== DARK GREEN LID =====
 
-const lidGeo = new THREE.CylinderGeometry(
-  0.085,  // radius (slightly smaller than jar)
-  0.085,
-  0.01,   // very thin
-  32
-);
-
-const lidMat = new THREE.MeshStandardMaterial({
-  color: 0x0b3d1f,   // dark green
-  roughness: 0.9,
-  metalness: 0
-});
-
-const gelLid = new THREE.Mesh(lidGeo, lidMat);
-
+const gelLid = await loadShuttle("./models/algae_gallery.glb");
 jar.add(gelLid);
 
 // TEMP position

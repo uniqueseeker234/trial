@@ -750,15 +750,6 @@ const jar = await loadShuttle("./models/algae_specimen_jar_lowpoly.glb");
 shuttle.add(jar);
       // ===== GREEN GEL INSIDE JAR =====
 // ===== DARK GREEN LID =====
-
-const gelLid =  await loadShuttle("./models/cylinder-2-green.glb");
-jar.add(gelLid);
-
-// TEMP position
-gelLid.position.set(0, 0.085, 0);
-// ===== DARK GREEN LID =====
-attachControls(gelLid, "Gel Lid");
-// attachControls(jar, "Jar");
 const laptop = await loadShuttle("./models/laptop.glb");
 shuttle.add(laptop);
      // attachControls(laptop, "Laptop");

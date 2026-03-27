@@ -748,6 +748,29 @@ chair.rotation.x = -0.02;
      
 const jar = await loadShuttle("./models/algae_specimen_jar_lowpoly.glb");
 shuttle.add(jar);
+      // ===== GREEN GEL INSIDE JAR =====
+
+const gelGeo = new THREE.SphereGeometry(0.12, 32, 32);
+
+const gelMat = new THREE.MeshPhysicalMaterial({
+  color: 0x00ff88,
+  transmission: 0.6,   // semi-transparent
+  transparent: true,
+  opacity: 0.9,
+  roughness: 0.2,
+  metalness: 0,
+  ior: 1.2,
+  thickness: 0.5
+});
+
+const gel = new THREE.Mesh(gelGeo, gelMat);
+
+// attach INSIDE jar
+jar.add(gel);
+
+// initial position (temporary)
+gel.position.set(0, 0.05, 0);
+      attachControls(gel, "Gel");
 // attachControls(jar, "Jar");
 const laptop = await loadShuttle("./models/laptop.glb");
 shuttle.add(laptop);

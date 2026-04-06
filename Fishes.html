@@ -3,10 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Algae Archive System</title>
 
-<!-- GOOGLE FONT (FUTURISTIC) -->
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Inter:wght@300;500&display=swap" rel="stylesheet">
+<!-- FONTS -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&family=Inter:wght@300;500&display=swap" rel="stylesheet">
+
+<title>Algae System</title>
 
 <style>
 
@@ -21,90 +22,97 @@ body {
 /* ===== TITLE ===== */
 .title {
   text-align: center;
-  margin-top: 25px;
+  margin-top: 20px;
   font-family: 'Orbitron', sans-serif;
-  font-size: 26px;
-  letter-spacing: 2px;
+  font-size: 22px;
   color: cyan;
 
-  text-shadow:
-    0 0 10px cyan,
-    0 0 30px rgba(0,255,255,0.5);
+  text-shadow: 0 0 10px cyan;
 }
 
 /* ===== CONTAINER ===== */
 .container {
   margin-top: 20px;
-  padding: 15px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 15px;
 }
 
-/* ===== GLASS PANEL BUTTON ===== */
-.card-btn {
-  position: relative;
-  height: 120px;
-  border-radius: 20px;
+/* ===== BUTTON ===== */
+.btn {
+  height: 80px;
+  border-radius: 18px;
 
   backdrop-filter: blur(14px);
-  background: rgba(255,255,255,0.05);
 
   border: 1px solid rgba(255,255,255,0.15);
 
-  overflow: hidden;
-  padding: 20px;
-
   display: flex;
-  align-items: flex-end;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 16px;
+  letter-spacing: 1px;
 
   transition: 0.3s;
 }
 
-/* ===== COLOR GLOW CENTER ===== */
-.card-btn::before {
-  content: "";
-  position: absolute;
-  width: 120px;
-  height: 120px;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  filter: blur(40px);
-  opacity: 0.8;
+/* ===== COLOR THEMES ===== */
+
+/* SEARCH */
+.search {
+  background: rgba(0,255,255,0.08);
+  border: 1px solid cyan;
+}
+.search:hover {
+  box-shadow: 0 0 25px cyan, 0 0 50px cyan;
 }
 
-/* COLORS */
-.green::before { background: #00ff88; }
-.blue::before { background: #00eaff; }
-.brown::before { background: #ffb347; }
-.red::before { background: #ff4d6d; }
-.yellow::before { background: #ccff33; }
+/* EXPLORE */
+.explore {
+  background: rgba(0,255,100,0.08);
+  border: 1px solid lime;
+}
+.explore:hover {
+  box-shadow: 0 0 25px lime, 0 0 50px lime;
+}
+
+/* COMPARE */
+.compare {
+  background: rgba(180,0,255,0.08);
+  border: 1px solid violet;
+}
+.compare:hover {
+  box-shadow: 0 0 25px violet, 0 0 50px violet;
+}
+
+/* INDIA */
+.india {
+  background: rgba(255,150,0,0.08);
+  border: 1px solid orange;
+}
+.india:hover {
+  box-shadow: 0 0 25px orange, 0 0 50px orange;
+}
 
 /* ===== TEXT ===== */
-.card-btn h2 {
-  margin: 0;
-  font-size: 18px;
-  letter-spacing: 1px;
-  z-index: 2;
-}
-
-/* ===== HOVER EFFECT ===== */
-.card-btn:hover {
-  transform: scale(1.03);
-  box-shadow: 0 0 30px rgba(0,255,255,0.3);
+.btn span {
+  display: block;
+  font-size: 12px;
+  color: #aaa;
 }
 
 /* ===== RESPONSIVE ===== */
 @media (min-width: 600px) {
   .container {
-    max-width: 500px;
+    max-width: 450px;
     margin: auto;
   }
 }
 
 </style>
+
 </head>
 
 <body>
@@ -113,20 +121,32 @@ body {
 
 <div class="container">
 
-  <div class="card-btn green">
-    <h2>SEARCH ALGAE</h2>
+  <div class="btn search">
+    <div>
+      SEARCH ALGAE
+      <span>Find specific algae</span>
+    </div>
   </div>
 
-  <div class="card-btn blue">
-    <h2>EXPLORE ALGAE WORLD</h2>
+  <div class="btn explore">
+    <div>
+      EXPLORE WORLD
+      <span>Browse all algae</span>
+    </div>
   </div>
 
-  <div class="card-btn brown">
-    <h2>COMPARE ALGAE</h2>
+  <div class="btn compare">
+    <div>
+      COMPARE
+      <span>Compare 2 algae</span>
+    </div>
   </div>
 
-  <div class="card-btn red">
-    <h2>COMMON ALGAE IN INDIA</h2>
+  <div class="btn india">
+    <div>
+      INDIA ALGAE
+      <span>Common species</span>
+    </div>
   </div>
 
 </div>

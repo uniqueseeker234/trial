@@ -13,110 +13,87 @@ body {
   font-family: 'Segoe UI', sans-serif;
   background: radial-gradient(circle at center, #000814, #000);
   color: white;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100vh;
 }
 
 /* TITLE */
 .title {
-  text-align: center;
-  margin-top: 25px;
-  font-size: 28px;
+  margin-top: 20px;
+  font-size: 26px;
   color: cyan;
 }
 
-/* ===== MENU ===== */
-.menu {
+/* ===== CENTER AREA ===== */
+.center-area {
+  flex: 1;
   display: flex;
-  justify-content: center;
-  gap: 25px;
-  margin-top: 40px;
-}
-
-/* BUTTONS */
-.btn {
-  padding: 18px 28px;
-  border-radius: 15px;
-  backdrop-filter: blur(10px);
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.2);
-  cursor: pointer;
-  transition: 0.3s;
-  text-align: center;
-}
-
-/* GLOW COLORS */
-.btn.search:hover { box-shadow: 0 0 20px cyan; }
-.btn.explore:hover { box-shadow: 0 0 20px lime; }
-.btn.compare:hover { box-shadow: 0 0 20px violet; }
-.btn.india:hover { box-shadow: 0 0 20px orange; }
-
-/* ===== VELMORANE ===== */
-.velmorane {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  width: 120px;
-  opacity: 0;
-  transition: 0.5s;
-}
-
-.velmorane img {
+  flex-direction: column;
+  justify-content: center; /* THIS FIXES YOUR ISSUE */
+  align-items: center;
   width: 100%;
+  gap: 20px;
 }
 
-/* TEXT */
-.vel-text {
-  position: fixed;
-  bottom: 140px;
-  left: 20px;
-  background: rgba(0,255,255,0.1);
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid cyan;
-  font-size: 14px;
-  opacity: 0;
-  transition: 0.5s;
-}
-
-/* ===== PANEL ===== */
-.panel {
-  display: none;
-  margin: 50px auto;
-  width: 550px;
-  padding: 25px;
-  border-radius: 16px;
+/* ===== HUD BUTTON ===== */
+.hud-btn {
+  width: 80%;
+  max-width: 500px;
+  padding: 18px;
+  text-align: center;
+  font-size: 18px;
+  border-radius: 12px;
 
   background: rgba(0,255,255,0.05);
   backdrop-filter: blur(12px);
 
-  border: 1px solid rgba(0,255,255,0.4);
+  border: 1px solid rgba(255,255,255,0.2);
 
-  box-shadow:
-    0 0 25px cyan,
-    0 0 70px rgba(0,255,255,0.4),
-    inset 0 0 25px rgba(0,255,255,0.2);
+  position: relative;
+  overflow: hidden;
+
+  transition: 0.3s;
 }
 
-/* IMAGES */
-.images {
-  display: flex;
-  gap: 10px;
+/* INNER NEON LINE */
+.hud-btn::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 4px;
 }
 
-.images img {
-  width: 50%;
-  border-radius: 10px;
+/* COLORS */
+.search::before { background: cyan; }
+.explore::before { background: lime; }
+.compare::before { background: violet; }
+.india::before { background: orange; }
+
+/* HOVER GLOW */
+.search:hover {
+  box-shadow: 0 0 20px cyan, 0 0 40px cyan;
+}
+.explore:hover {
+  box-shadow: 0 0 20px lime, 0 0 40px lime;
+}
+.compare:hover {
+  box-shadow: 0 0 20px violet, 0 0 40px violet;
+}
+.india:hover {
+  box-shadow: 0 0 20px orange, 0 0 40px orange;
 }
 
-/* CLOSE */
-.close {
-  float: right;
-  cursor: pointer;
-  color: red;
-}
-
-/* SHOW */
-.show {
+/* TEXT */
+.hud-btn span {
   display: block;
+  font-size: 13px;
+  color: #aaa;
 }
 
 </style>
@@ -126,83 +103,29 @@ body {
 
 <div class="title">ALGAE ARCHIVE SYSTEM</div>
 
-<!-- MENU -->
-<div class="menu">
-  <div class="btn search" onclick="openCard()">Search</div>
-  <div class="btn explore">Explore</div>
-  <div class="btn compare">Compare</div>
-  <div class="btn india">India</div>
-</div>
+<div class="center-area">
 
-<!-- VELMORANE -->
-<div class="velmorane" id="velmorane">
-  <img src="images2/velmorane.png">
-</div>
-
-<div class="vel-text" id="velText"></div>
-
-<!-- CLADOPHORA PANEL -->
-<div class="panel" id="card">
-
-  <div class="close" onclick="closeCard()">✖</div>
-
-  <div class="images">
-    <img src="images2/Cladophora1.jpg">
-    <img src="images2/Cladophora2.jpg">
+  <div class="hud-btn search">
+    Search Algae
+    <span>Find specific algae</span>
   </div>
 
-  <h2>Cladophora</h2>
+  <div class="hud-btn explore">
+    Explore Algae World
+    <span>View all algae</span>
+  </div>
 
-  <p>
-  Filamentous green algae forming dense mats in aquatic environments.
-  </p>
+  <div class="hud-btn compare">
+    Compare Algae
+    <span>Compare two algae</span>
+  </div>
+
+  <div class="hud-btn india">
+    Common Algae in India
+    <span>View Indian species</span>
+  </div>
 
 </div>
-
-<script>
-
-/* ===== OPEN CARD ===== */
-function openCard() {
-  document.getElementById("card").classList.add("show");
-}
-
-/* ===== CLOSE CARD ===== */
-function closeCard() {
-  document.getElementById("card").classList.remove("show");
-}
-
-/* ===== VELMORANE GUIDE ===== */
-const messages = [
-  "Use SEARCH to find specific algae 🔍",
-  "Explore all algae in one view 🌊",
-  "Compare two algae side-by-side ⚖",
-  "View common algae in India 🇮🇳"
-];
-
-let index = 0;
-
-function showGuide() {
-  const vel = document.getElementById("velmorane");
-  const text = document.getElementById("velText");
-
-  vel.style.opacity = 1;
-  text.style.opacity = 1;
-  text.innerText = messages[index];
-
-  setTimeout(() => {
-    text.style.opacity = 0;
-    index++;
-
-    if(index < messages.length){
-      setTimeout(showGuide, 1000);
-    }
-  }, 2000);
-}
-
-/* START GUIDE */
-setTimeout(showGuide, 1000);
-
-</script>
 
 </body>
 </html>

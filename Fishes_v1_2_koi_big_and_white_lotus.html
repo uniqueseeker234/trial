@@ -43,10 +43,43 @@ body {
   border-radius: 18px;
   overflow: hidden;
 
-  border: 1px solid rgba(255,255,255,0.15);
   backdrop-filter: blur(12px);
 
   transition: 0.3s;
+
+  /* REMOVE generic border */
+  border: none;
+}
+  /* SEARCH (CYAN) */
+.search {
+  border: 1px solid cyan;
+}
+.search:hover {
+  box-shadow: 0 0 20px cyan, 0 0 40px cyan;
+}
+
+/* EXPLORE (GREEN) */
+.explore {
+  border: 1px solid lime;
+}
+.explore:hover {
+  box-shadow: 0 0 20px lime, 0 0 40px lime;
+}
+
+/* COMPARE (PURPLE) */
+.compare {
+  border: 1px solid violet;
+}
+.compare:hover {
+  box-shadow: 0 0 20px violet, 0 0 40px violet;
+}
+
+/* INDIA (ORANGE) */
+.india {
+  border: 1px solid orange;
+}
+.india:hover {
+  box-shadow: 0 0 20px orange, 0 0 40px orange;
 }
 
 /* ===== IMAGE BACKGROUND (FIXED PATH) ===== */

@@ -104,14 +104,13 @@ body {
 /* INDIA IMAGE */
 .india-img {
   position: absolute;
-  width: 70%;
+  width: 48%;
 
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, calc(-50% - 1px));
 
   z-index: 1;
-  pointer-events: none;
 }
 /* INDIA TEXT */
 .india h2 {
@@ -140,27 +139,23 @@ body {
   width: 100%;
   margin-bottom: 10px;
 }
-  @media (min-width: 768px) {
+@media (min-width: 768px) {
 
-  /* Container smaller width on laptop */
   .container {
     max-width: 700px;
     margin: auto;
   }
 
-  /* Bigger cards for laptop */
   .card {
     height: 150px;
   }
 
-  /* Adjust India image */
   .india-img {
-    width: 60%;
+    width: 40%;
     transform: translate(-50%, -50%);
   }
 
-  }
-
+}
 </style>
 </head>
 

@@ -185,14 +185,21 @@ const img = document.querySelector(".india-img");
 const sizeSlider = document.getElementById("sizeSlider");
 const ySlider = document.getElementById("ySlider");
 
+function updateTransform() {
+  img.style.transform =
+    "translate(-50%, calc(-50% + " + ySlider.value + "px))";
+}
+
 sizeSlider.addEventListener("input", () => {
   img.style.width = sizeSlider.value + "%";
 });
 
-ySlider.addEventListener("input", () => {
-  img.style.transform = "translateY(" + ySlider.value + "px)";
-});
+ySlider.addEventListener("input", updateTransform);
+
+/* INITIAL APPLY */
+updateTransform();
 </script>
+
 
 </body>
 </html>

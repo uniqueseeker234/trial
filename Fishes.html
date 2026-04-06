@@ -5,95 +5,103 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Algae Archive System</title>
 
+<!-- GOOGLE FONT (FUTURISTIC) -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Inter:wght@300;500&display=swap" rel="stylesheet">
+
 <style>
 
 /* ===== BODY ===== */
 body {
   margin: 0;
-  font-family: 'Segoe UI', sans-serif;
   background: radial-gradient(circle at center, #000814, #000);
+  font-family: 'Inter', sans-serif;
   color: white;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  height: 100vh;
 }
 
-/* TITLE */
+/* ===== TITLE ===== */
 .title {
-  margin-top: 20px;
+  text-align: center;
+  margin-top: 25px;
+  font-family: 'Orbitron', sans-serif;
   font-size: 26px;
+  letter-spacing: 2px;
   color: cyan;
+
+  text-shadow:
+    0 0 10px cyan,
+    0 0 30px rgba(0,255,255,0.5);
 }
 
-/* ===== CENTER AREA ===== */
-.center-area {
-  flex: 1;
+/* ===== CONTAINER ===== */
+.container {
+  margin-top: 20px;
+  padding: 15px;
   display: flex;
   flex-direction: column;
-  justify-content: center; /* THIS FIXES YOUR ISSUE */
-  align-items: center;
-  width: 100%;
   gap: 20px;
 }
 
-/* ===== HUD BUTTON ===== */
-.hud-btn {
-  width: 80%;
-  max-width: 500px;
-  padding: 18px;
-  text-align: center;
-  font-size: 18px;
-  border-radius: 12px;
-
-  background: rgba(0,255,255,0.05);
-  backdrop-filter: blur(12px);
-
-  border: 1px solid rgba(255,255,255,0.2);
-
+/* ===== GLASS PANEL BUTTON ===== */
+.card-btn {
   position: relative;
+  height: 120px;
+  border-radius: 20px;
+
+  backdrop-filter: blur(14px);
+  background: rgba(255,255,255,0.05);
+
+  border: 1px solid rgba(255,255,255,0.15);
+
   overflow: hidden;
+  padding: 20px;
+
+  display: flex;
+  align-items: flex-end;
 
   transition: 0.3s;
 }
 
-/* INNER NEON LINE */
-.hud-btn::before {
+/* ===== COLOR GLOW CENTER ===== */
+.card-btn::before {
   content: "";
   position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 4px;
+  width: 120px;
+  height: 120px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  filter: blur(40px);
+  opacity: 0.8;
 }
 
 /* COLORS */
-.search::before { background: cyan; }
-.explore::before { background: lime; }
-.compare::before { background: violet; }
-.india::before { background: orange; }
+.green::before { background: #00ff88; }
+.blue::before { background: #00eaff; }
+.brown::before { background: #ffb347; }
+.red::before { background: #ff4d6d; }
+.yellow::before { background: #ccff33; }
 
-/* HOVER GLOW */
-.search:hover {
-  box-shadow: 0 0 20px cyan, 0 0 40px cyan;
-}
-.explore:hover {
-  box-shadow: 0 0 20px lime, 0 0 40px lime;
-}
-.compare:hover {
-  box-shadow: 0 0 20px violet, 0 0 40px violet;
-}
-.india:hover {
-  box-shadow: 0 0 20px orange, 0 0 40px orange;
+/* ===== TEXT ===== */
+.card-btn h2 {
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: 1px;
+  z-index: 2;
 }
 
-/* TEXT */
-.hud-btn span {
-  display: block;
-  font-size: 13px;
-  color: #aaa;
+/* ===== HOVER EFFECT ===== */
+.card-btn:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 30px rgba(0,255,255,0.3);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (min-width: 600px) {
+  .container {
+    max-width: 500px;
+    margin: auto;
+  }
 }
 
 </style>
@@ -103,26 +111,22 @@ body {
 
 <div class="title">ALGAE ARCHIVE SYSTEM</div>
 
-<div class="center-area">
+<div class="container">
 
-  <div class="hud-btn search">
-    Search Algae
-    <span>Find specific algae</span>
+  <div class="card-btn green">
+    <h2>SEARCH ALGAE</h2>
   </div>
 
-  <div class="hud-btn explore">
-    Explore Algae World
-    <span>View all algae</span>
+  <div class="card-btn blue">
+    <h2>EXPLORE ALGAE WORLD</h2>
   </div>
 
-  <div class="hud-btn compare">
-    Compare Algae
-    <span>Compare two algae</span>
+  <div class="card-btn brown">
+    <h2>COMPARE ALGAE</h2>
   </div>
 
-  <div class="hud-btn india">
-    Common Algae in India
-    <span>View Indian species</span>
+  <div class="card-btn red">
+    <h2>COMMON ALGAE IN INDIA</h2>
   </div>
 
 </div>

@@ -192,11 +192,13 @@ body {
 
 <!-- SLIDER CONTROLS -->
 <div class="controls">
-  <label>Size</label>
+
+  <label>Size: <span id="sizeValue">70</span>%</label>
   <input type="range" min="40" max="100" value="70" id="sizeSlider">
 
-  <label>Vertical Position</label>
+  <label>Vertical Position: <span id="yValue">0</span>px</label>
   <input type="range" min="-50" max="50" value="0" id="ySlider">
+
 </div>
 
 <script>
@@ -205,18 +207,29 @@ const img = document.querySelector(".india-img");
 const sizeSlider = document.getElementById("sizeSlider");
 const ySlider = document.getElementById("ySlider");
 
+const sizeValue = document.getElementById("sizeValue");
+const yValue = document.getElementById("yValue");
+
 function updateTransform() {
   img.style.transform =
     "translate(-50%, calc(-50% + " + ySlider.value + "px))";
 }
 
+/* UPDATE SIZE */
 sizeSlider.addEventListener("input", () => {
   img.style.width = sizeSlider.value + "%";
+  sizeValue.textContent = sizeSlider.value;
 });
 
-ySlider.addEventListener("input", updateTransform);
+/* UPDATE POSITION */
+ySlider.addEventListener("input", () => {
+  updateTransform();
+  yValue.textContent = ySlider.value;
+});
 
-/* INITIAL APPLY */
+/* INITIAL LOAD */
+sizeValue.textContent = sizeSlider.value;
+yValue.textContent = ySlider.value;
 updateTransform();
 </script>
 

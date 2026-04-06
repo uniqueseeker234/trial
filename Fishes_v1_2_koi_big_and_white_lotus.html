@@ -50,6 +50,7 @@ body {
 }
 
 /* ===== IMAGE BACKGROUND (FIXED PATH) ===== */
+/* IMAGE */
 .card::before {
   content: "";
   position: absolute;
@@ -57,17 +58,19 @@ body {
 
   background: url("images2/search-bg.jpg") center/cover no-repeat;
 
-  filter: brightness(0.6);
+  z-index: 0;
 }
 
-/* ===== GLASS LAYER ===== */
+/* LIGHT OVERLAY (VERY SOFT) */
 .card::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(255,255,255,0.05);
-}
 
+  background: rgba(0, 0, 0, 0.2); /* MUCH lighter */
+
+  z-index: 1;
+}
 /* ===== TEXT ===== */
 .card h2 {
   position: absolute;

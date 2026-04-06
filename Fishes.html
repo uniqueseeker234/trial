@@ -3,186 +3,127 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Algae Archive System</title>
+<title>Algae System Panel</title>
 
 <style>
 
-/* ===== GLOBAL ===== */
 body {
   margin: 0;
+  background: radial-gradient(circle at center, #000814, #000);
   font-family: 'Segoe UI', sans-serif;
-  background: radial-gradient(circle at center, #020617, #000);
-  color: white;
-  overflow-x: hidden;
-}
-
-/* ===== TITLE ===== */
-.title {
-  text-align: center;
-  margin-top: 30px;
-  font-size: 28px;
-  color: cyan;
-  letter-spacing: 2px;
-}
-
-/* ===== MENU ===== */
-.menu {
   display: flex;
   justify-content: center;
-  gap: 25px;
-  margin-top: 40px;
+  align-items: center;
+  height: 100vh;
 }
 
-/* ===== GLASS BUTTON ===== */
-.btn {
-  padding: 18px 28px;
-  border-radius: 15px;
-  backdrop-filter: blur(12px);
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.2);
-  cursor: pointer;
-  transition: 0.3s;
+/* ===== MAIN PANEL ===== */
+.panel {
+  width: 500px;
+  padding: 25px;
   position: relative;
-  overflow: hidden;
+  border-radius: 15px;
+
+  /* GLASS */
+  background: rgba(0, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+
+  /* NEON BORDER */
+  border: 1px solid rgba(0,255,255,0.4);
+
+  /* OUTER GLOW */
+  box-shadow:
+    0 0 20px cyan,
+    0 0 60px rgba(0,255,255,0.4),
+    inset 0 0 20px rgba(0,255,255,0.2);
+
+  transition: 0.4s;
 }
 
-/* GLOW COLORS */
-.btn.search:hover { box-shadow: 0 0 25px cyan; }
-.btn.explore:hover { box-shadow: 0 0 25px lime; }
-.btn.compare:hover { box-shadow: 0 0 25px violet; }
-.btn.india:hover { box-shadow: 0 0 25px orange; }
-
-/* BUTTON TEXT */
-.btn span {
-  display: block;
-  font-size: 14px;
-  color: #aaa;
+/* ANIMATION GLOW */
+.panel::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 15px;
+  background: linear-gradient(90deg, transparent, cyan, transparent);
+  animation: scan 4s linear infinite;
+  opacity: 0.6;
 }
 
-/* ===== CARD GRID ===== */
-.cards {
-  margin-top: 70px;
-  padding: 0 40px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 25px;
+@keyframes scan {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
-/* ===== GLASS CARD ===== */
-.card {
-  backdrop-filter: blur(14px);
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 18px;
-  overflow: hidden;
-  transition: 0.35s;
-  transform-style: preserve-3d;
-}
-
-/* HOVER 3D + GLOW */
-.card:hover {
-  transform: rotateX(6deg) rotateY(6deg) scale(1.05);
-  box-shadow: 0 0 30px #00ffc8;
-}
-
-/* IMAGE */
-.card img {
-  width: 100%;
-  height: 140px;
-  object-fit: cover;
-}
-
-/* CONTENT */
-.card-content {
-  padding: 12px;
-}
-
-.card-content h3 {
-  margin: 5px 0;
+/* HEADER */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
   color: cyan;
+  font-weight: bold;
+  letter-spacing: 1px;
 }
 
-.card-content p {
-  font-size: 13px;
-  color: #bbb;
+/* TITLE */
+.title {
+  font-size: 22px;
+  color: white;
+  margin-bottom: 10px;
 }
 
-/* ===== FADE ANIMATION ===== */
-.fade {
-  animation: fadein 1s;
+/* TEXT */
+.text {
+  color: #bdfcff;
+  line-height: 1.5;
+  font-size: 14px;
 }
 
-@keyframes fadein {
-  from { opacity: 0; transform: translateY(10px);}
-  to { opacity: 1; transform: translateY(0);}
+/* IMAGE SECTION */
+.images {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.images img {
+  width: 50%;
+  border-radius: 8px;
+  border: 1px solid cyan;
+}
+
+/* HOVER EFFECT */
+.panel:hover {
+  transform: scale(1.05);
+  box-shadow:
+    0 0 40px cyan,
+    0 0 80px rgba(0,255,255,0.6),
+    inset 0 0 25px rgba(0,255,255,0.4);
 }
 
 </style>
-
 </head>
 
 <body>
 
-<div class="title">ALGAE ARCHIVE SYSTEM</div>
+<div class="panel">
 
-<!-- ===== BUTTON MENU ===== -->
-<div class="menu fade">
-
-  <div class="btn search">
-    Search
-    <span>Find specific algae</span>
+  <div class="header">
+    ⚠ SYSTEM DATA
   </div>
 
-  <div class="btn explore">
-    Explore
-    <span>View all algae</span>
+  <div class="images">
+    <img src="https://via.placeholder.com/200">
+    <img src="https://via.placeholder.com/200">
   </div>
 
-  <div class="btn compare">
-    Compare
-    <span>Compare 2 algae</span>
-  </div>
+  <div class="title">Cladophora</div>
 
-  <div class="btn india">
-    India
-    <span>Common algae in India</span>
-  </div>
-
-</div>
-
-<!-- ===== SAMPLE CARDS ===== -->
-<div class="cards fade">
-
-  <div class="card">
-    <img src="https://via.placeholder.com/300">
-    <div class="card-content">
-      <h3>Cladophora</h3>
-      <p>Filamentous green algae found in freshwater and marine habitats.</p>
-    </div>
-  </div>
-
-  <div class="card">
-    <img src="https://via.placeholder.com/300">
-    <div class="card-content">
-      <h3>Volvox</h3>
-      <p>Colonial algae showing early multicellular organization.</p>
-    </div>
-  </div>
-
-  <div class="card">
-    <img src="https://via.placeholder.com/300">
-    <div class="card-content">
-      <h3>Ulva lactuca</h3>
-      <p>Marine sheet-like algae commonly known as sea lettuce.</p>
-    </div>
-  </div>
-
-  <div class="card">
-    <img src="https://via.placeholder.com/300">
-    <div class="card-content">
-      <h3>Sargassum</h3>
-      <p>Floating brown algae forming oceanic mats.</p>
-    </div>
+  <div class="text">
+    Filamentous green algae commonly found in freshwater and marine environments. 
+    Exhibits rapid growth and forms dense mats.
   </div>
 
 </div>

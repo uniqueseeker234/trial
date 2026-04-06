@@ -47,22 +47,38 @@ body {
 }
 
 /* ===== IMAGE BACKGROUND ===== */
-.card::before {
+.search::before {
   content: "";
   position: absolute;
   inset: 0;
   background: url("images2/file_0000000022fc7208a8adcba8c24ad6da.png") center/cover no-repeat;
   z-index: 0;
 }
-
-/* LIGHT OVERLAY */
-.card::after {
+.explore::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.15);
+  background: url("images2/explore.jpg") center/cover no-repeat;
+  z-index: 0;
+}
+  .compare::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("images2/compare.jpg") center/cover no-repeat;
+  z-index: 0;
+  }
+  .search::after,
+.explore::after,
+.compare::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
   z-index: 1;
 }
+/* LIGHT OVERLAY */
+
 
 /* TEXT */
 .card h2 {

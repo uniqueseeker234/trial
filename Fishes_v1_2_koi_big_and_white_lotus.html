@@ -52,8 +52,9 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  top: 0;
-  left: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   z-index: 0;
 }
 
@@ -97,23 +98,8 @@ body {
   justify-content: center;
 }
 
-/* REMOVE BG IMAGE */
-.india::before {
-  display: none;
-}
-.india::after {
-  display: none;
-}
-
-/* INDIA IMAGE */
-.india-img {
-  position: absolute;
-  width: 48%;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, calc(-50% - 1px));
-  z-index: 1;
-}
+.india::before { display: none; }
+.india::after { display: none; }
 
 /* INDIA TEXT */
 .india h2 {
@@ -128,20 +114,18 @@ body {
   box-shadow: 0 0 25px cyan, 0 0 50px cyan;
 }
 
-/* ===== CONTROLS ===== */
-.controls {
-  display:none;
+/* ===== NEW VIDEO CONTROLS ===== */
+.video-controls {
   margin: 20px;
   padding: 10px;
   background: rgba(255,255,255,0.05);
   border-radius: 10px;
-  backdrop-filter: blur(10px);
   font-size: 12px;
 }
 
-.controls input {
+.video-controls input {
   width: 100%;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 @media (min-width: 768px) {
@@ -153,11 +137,6 @@ body {
 
   .card {
     height: 150px;
-  }
-
-  .india-img {
-    width: 40%;
-    transform: translate(-50%, -50%);
   }
 
 }
@@ -173,7 +152,7 @@ body {
 
   <!-- SEARCH -->
   <div class="card search">
-    <video autoplay muted loop playsinline class="bg-video">
+    <video autoplay muted loop playsinline class="bg-video" id="searchVid">
       <source src="images2/search.mp4" type="video/mp4">
     </video>
     <h2>SEARCH ALGAE</h2>
@@ -181,7 +160,7 @@ body {
 
   <!-- EXPLORE -->
   <div class="card explore">
-    <video autoplay muted loop playsinline class="bg-video">
+    <video autoplay muted loop playsinline class="bg-video" id="exploreVid">
       <source src="images2/explore.mp4" type="video/mp4">
     </video>
     <h2>EXPLORE WORLD</h2>
@@ -189,56 +168,79 @@ body {
 
   <!-- COMPARE -->
   <div class="card compare">
-    <video autoplay muted loop playsinline class="bg-video">
+    <video autoplay muted loop playsinline class="bg-video" id="compareVid">
       <source src="images2/compare.mp4" type="video/mp4">
     </video>
     <h2>COMPARE ALGAE</h2>
   </div>
 
-  <!-- INDIA CARD -->
+  <!-- INDIA (NOW VIDEO) -->
   <div class="card india">
-    <img src="images2/india-map.jpg" class="india-img">
+    <video autoplay muted loop playsinline class="bg-video" id="indiaVid">
+      <source src="images2/india.mp4" type="video/mp4">
+    </video>
     <h2>COMMON ALGAE IN INDIA</h2>
   </div>
 
 </div>
 
-<!-- SLIDER CONTROLS -->
-<div class="controls">
-  <label>Size: <span id="sizeValue">70</span>%</label>
-  <input type="range" min="40" max="100" value="70" id="sizeSlider">
+<!-- 🎛 VIDEO SLIDERS -->
+<div class="video-controls">
 
-  <label>Vertical Position: <span id="yValue">0</span>px</label>
-  <input type="range" min="-50" max="50" value="0" id="ySlider">
+  <h3>SEARCH</h3>
+  Size: <span id="sSizeVal">100</span>%  
+  <input type="range" min="50" max="150" value="100" id="sSize">
+  Y: <span id="sYVal">0</span>px  
+  <input type="range" min="-50" max="50" value="0" id="sY">
+
+  <h3>EXPLORE</h3>
+  Size: <span id="eSizeVal">100</span>%  
+  <input type="range" min="50" max="150" value="100" id="eSize">
+  Y: <span id="eYVal">0</span>px  
+  <input type="range" min="-50" max="50" value="0" id="eY">
+
+  <h3>COMPARE</h3>
+  Size: <span id="cSizeVal">100</span>%  
+  <input type="range" min="50" max="150" value="100" id="cSize">
+  Y: <span id="cYVal">0</span>px  
+  <input type="range" min="-50" max="50" value="0" id="cY">
+
+  <h3>INDIA</h3>
+  Size: <span id="iSizeVal">100</span>%  
+  <input type="range" min="50" max="150" value="100" id="iSize">
+  Y: <span id="iYVal">0</span>px  
+  <input type="range" min="-50" max="50" value="0" id="iY">
+
 </div>
 
 <script>
-const img = document.querySelector(".india-img");
 
-const sizeSlider = document.getElementById("sizeSlider");
-const ySlider = document.getElementById("ySlider");
+function setup(id, sizeId, yId, sizeVal, yVal) {
+  const v = document.getElementById(id);
+  const s = document.getElementById(sizeId);
+  const y = document.getElementById(yId);
+  const sv = document.getElementById(sizeVal);
+  const yv = document.getElementById(yVal);
 
-const sizeValue = document.getElementById("sizeValue");
-const yValue = document.getElementById("yValue");
+  function update() {
+    v.style.width = s.value + "%";
+    v.style.transform =
+      "translate(-50%, calc(-50% + " + y.value + "px))";
+    sv.textContent = s.value;
+    yv.textContent = y.value;
+  }
 
-function updateTransform() {
-  img.style.transform =
-    "translate(-50%, calc(-50% + " + ySlider.value + "px))";
+  s.addEventListener("input", update);
+  y.addEventListener("input", update);
+
+  update();
 }
 
-sizeSlider.addEventListener("input", () => {
-  img.style.width = sizeSlider.value + "%";
-  sizeValue.textContent = sizeSlider.value;
-});
+setup("searchVid","sSize","sY","sSizeVal","sYVal");
+setup("exploreVid","eSize","eY","eSizeVal","eYVal");
+setup("compareVid","cSize","cY","cSizeVal","cYVal");
+setup("indiaVid","iSize","iY","iSizeVal","iYVal");
 
-ySlider.addEventListener("input", () => {
-  updateTransform();
-  yValue.textContent = ySlider.value;
-});
-
-sizeValue.textContent = sizeSlider.value;
-yValue.textContent = ySlider.value;
-updateTransform();
 </script>
 
 </body>

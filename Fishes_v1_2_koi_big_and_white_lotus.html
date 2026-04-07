@@ -46,29 +46,19 @@ body {
   transition: 0.3s;
 }
 
-/* ===== IMAGE BACKGROUND ===== */
-.search::before {
-  content: "";
+/* ===== VIDEO BACKGROUND ===== */
+.bg-video {
   position: absolute;
-  inset: 0;
-  background: url("images2/file_0000000022fc7208a8adcba8c24ad6da.png") center/cover no-repeat;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  top: 0;
+  left: 0;
   z-index: 0;
 }
-.explore::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: url("images2/explore.jpg") center/cover no-repeat;
-  z-index: 0;
-}
-  .compare::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: url("images2/compare1.jpg") center/cover no-repeat;
-  z-index: 0;
-  }
-  .search::after,
+
+/* ===== OVERLAY ===== */
+.search::after,
 .explore::after,
 .compare::after {
   content: "";
@@ -77,8 +67,6 @@ body {
   background: rgba(0,0,0,0.35);
   z-index: 1;
 }
-/* LIGHT OVERLAY */
-
 
 /* TEXT */
 .card h2 {
@@ -121,13 +109,12 @@ body {
 .india-img {
   position: absolute;
   width: 48%;
-
   top: 50%;
   left: 50%;
   transform: translate(-50%, calc(-50% - 1px));
-
   z-index: 1;
 }
+
 /* INDIA TEXT */
 .india h2 {
   position: absolute;
@@ -156,6 +143,7 @@ body {
   width: 100%;
   margin-bottom: 10px;
 }
+
 @media (min-width: 768px) {
 
   .container {
@@ -173,6 +161,7 @@ body {
   }
 
 }
+
 </style>
 </head>
 
@@ -182,21 +171,33 @@ body {
 
 <div class="container">
 
+  <!-- SEARCH -->
   <div class="card search">
+    <video autoplay muted loop playsinline class="bg-video">
+      <source src="images2/search.mp4" type="video/mp4">
+    </video>
     <h2>SEARCH ALGAE</h2>
   </div>
 
+  <!-- EXPLORE -->
   <div class="card explore">
+    <video autoplay muted loop playsinline class="bg-video">
+      <source src="images2/explore.mp4" type="video/mp4">
+    </video>
     <h2>EXPLORE WORLD</h2>
   </div>
 
+  <!-- COMPARE -->
   <div class="card compare">
+    <video autoplay muted loop playsinline class="bg-video">
+      <source src="images2/compare.mp4" type="video/mp4">
+    </video>
     <h2>COMPARE ALGAE</h2>
   </div>
 
   <!-- INDIA CARD -->
   <div class="card india">
-  <img src="images2/india-map.jpg" class="india-img">
+    <img src="images2/india-map.jpg" class="india-img">
     <h2>COMMON ALGAE IN INDIA</h2>
   </div>
 
@@ -204,13 +205,11 @@ body {
 
 <!-- SLIDER CONTROLS -->
 <div class="controls">
-
   <label>Size: <span id="sizeValue">70</span>%</label>
   <input type="range" min="40" max="100" value="70" id="sizeSlider">
 
   <label>Vertical Position: <span id="yValue">0</span>px</label>
   <input type="range" min="-50" max="50" value="0" id="ySlider">
-
 </div>
 
 <script>
@@ -227,24 +226,20 @@ function updateTransform() {
     "translate(-50%, calc(-50% + " + ySlider.value + "px))";
 }
 
-/* UPDATE SIZE */
 sizeSlider.addEventListener("input", () => {
   img.style.width = sizeSlider.value + "%";
   sizeValue.textContent = sizeSlider.value;
 });
 
-/* UPDATE POSITION */
 ySlider.addEventListener("input", () => {
   updateTransform();
   yValue.textContent = ySlider.value;
 });
 
-/* INITIAL LOAD */
 sizeValue.textContent = sizeSlider.value;
 yValue.textContent = ySlider.value;
 updateTransform();
 </script>
-
 
 </body>
 </html>

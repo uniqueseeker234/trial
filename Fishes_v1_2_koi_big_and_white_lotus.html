@@ -44,7 +44,17 @@ body {
   transition: 0.3s;
   margin-bottom: 18px;
 }
+.card video {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 
+  top: 0;
+  left: 0;
+
+  transform: scale(1); /* reset */
+}
 /* ===== VIDEO ===== */
 .search .bg-video {
   animation: zoomLoop 8s linear infinite;
@@ -58,15 +68,15 @@ body {
 .india .bg-video {
   animation: zoomLoop 2s linear infinite;
 }
-  @keyframes zoomLoop {
+ @keyframes zoomLoop {
   0% {
-    transform: translate(-50%, -50%) scale(1);
+    transform: scale(1);
   }
   90% {
-    transform: translate(-50%, -50%) scale(1.08);
+    transform: scale(1.025); /* VERY subtle */
   }
   100% {
-    transform: translate(-50%, -50%) scale(1);
+    transform: scale(1);
   }
 }
 /* TEXT */

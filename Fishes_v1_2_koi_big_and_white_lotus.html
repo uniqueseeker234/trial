@@ -68,15 +68,18 @@ body {
 .india .bg-video {
   animation: zoomLoop 2s linear infinite;
 }
- @keyframes zoomLoop {
+@keyframes zoomLoop {
   0% {
     transform: scale(1);
+    opacity: 1;
   }
-  70% {
-    transform: scale(1.06); /* VERY subtle */
+  90% {
+    transform: scale(1.05);
+    opacity: 0.98;
   }
   100% {
     transform: scale(1);
+    opacity: 1;
   }
 }
 /* TEXT */

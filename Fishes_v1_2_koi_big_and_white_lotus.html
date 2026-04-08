@@ -40,33 +40,22 @@ body {
 .card {
   position: relative;
   height: 110px;
+  width: 100%;
   border-radius: 18px;
   overflow: hidden;
   backdrop-filter: blur(12px);
   transition: 0.3s;
 }
 
-/* ===== VIDEO BACKGROUND ===== */
+/* ===== VIDEO ===== */
 .bg-video {
   position: absolute;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  top: 0;
+  left: 0;
   z-index: 0;
-}
-
-/* ===== OVERLAY ===== */
-.search::after,
-.explore::after,
-.compare::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.35);
-  z-index: 1;
 }
 
 /* TEXT */
@@ -89,56 +78,32 @@ body {
 .compare { border: 1px solid violet; }
 .compare:hover { box-shadow: 0 0 20px violet, 0 0 40px violet; }
 
-/* ===== INDIA SPECIAL ===== */
-.india {
-  background: black;
-  border: 1px solid cyan;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+.india { border: 1px solid cyan; }
+.india:hover { box-shadow: 0 0 25px cyan, 0 0 50px cyan; }
 
-.india::before { display: none; }
-.india::after { display: none; }
-
-/* INDIA TEXT */
-.india h2 {
-  position: absolute;
-  bottom: 10px;
-  left: 15px;
-  z-index: 2;
-}
-
-/* INDIA GLOW */
-.india:hover {
-  box-shadow: 0 0 25px cyan, 0 0 50px cyan;
-}
-
-/* ===== NEW VIDEO CONTROLS ===== */
-.video-controls {
+/* ===== CONTROLS ===== */
+.controls {
   margin: 20px;
   padding: 10px;
   background: rgba(255,255,255,0.05);
   border-radius: 10px;
+  backdrop-filter: blur(10px);
   font-size: 12px;
 }
 
-.video-controls input {
+.controls input {
   width: 100%;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 @media (min-width: 768px) {
-
   .container {
     max-width: 700px;
     margin: auto;
   }
-
   .card {
     height: 150px;
   }
-
 }
 
 </style>
@@ -150,33 +115,29 @@ body {
 
 <div class="container">
 
-  <!-- SEARCH -->
-  <div class="card search">
-    <video autoplay muted loop playsinline class="bg-video" id="searchVid">
+  <div class="card search" id="searchCard">
+    <video autoplay muted loop playsinline class="bg-video">
       <source src="images2/search.mp4" type="video/mp4">
     </video>
     <h2>SEARCH ALGAE</h2>
   </div>
 
-  <!-- EXPLORE -->
-  <div class="card explore">
-    <video autoplay muted loop playsinline class="bg-video" id="exploreVid">
+  <div class="card explore" id="exploreCard">
+    <video autoplay muted loop playsinline class="bg-video">
       <source src="images2/explore.mp4" type="video/mp4">
     </video>
     <h2>EXPLORE WORLD</h2>
   </div>
 
-  <!-- COMPARE -->
-  <div class="card compare">
-    <video autoplay muted loop playsinline class="bg-video" id="compareVid">
+  <div class="card compare" id="compareCard">
+    <video autoplay muted loop playsinline class="bg-video">
       <source src="images2/compare.mp4" type="video/mp4">
     </video>
     <h2>COMPARE ALGAE</h2>
   </div>
 
-  <!-- INDIA (NOW VIDEO) -->
-  <div class="card india">
-    <video autoplay muted loop playsinline class="bg-video" id="indiaVid">
+  <div class="card india" id="indiaCard">
+    <video autoplay muted loop playsinline class="bg-video">
       <source src="images2/india.mp4" type="video/mp4">
     </video>
     <h2>COMMON ALGAE IN INDIA</h2>
@@ -184,62 +145,89 @@ body {
 
 </div>
 
-<!-- 🎛 VIDEO SLIDERS -->
-<div class="video-controls">
+<!-- ===== BUTTON SLIDERS ===== -->
+<div class="controls">
 
-  <h3>SEARCH</h3>
-  Size: <span id="sSizeVal">100</span>%  
-  <input type="range" min="50" max="150" value="100" id="sSize">
-  Y: <span id="sYVal">0</span>px  
-  <input type="range" min="-50" max="50" value="0" id="sY">
+  <h3>SEARCH BUTTON</h3>
+  Width: <span id="swVal">100</span>%  
+  <input type="range" min="60" max="120" value="100" id="sw">
+  Height: <span id="shVal">110</span>px  
+  <input type="range" min="80" max="200" value="110" id="sh">
+  Y: <span id="syVal">0</span>px  
+  <input type="range" min="-50" max="50" value="0" id="sy">
 
-  <h3>EXPLORE</h3>
-  Size: <span id="eSizeVal">100</span>%  
-  <input type="range" min="50" max="150" value="100" id="eSize">
-  Y: <span id="eYVal">0</span>px  
-  <input type="range" min="-50" max="50" value="0" id="eY">
+  <h3>EXPLORE BUTTON</h3>
+  Width: <span id="ewVal">100</span>%  
+  <input type="range" min="60" max="120" value="100" id="ew">
+  Height: <span id="ehVal">110</span>px  
+  <input type="range" min="80" max="200" value="110" id="eh">
+  Y: <span id="eyVal">0</span>px  
+  <input type="range" min="-50" max="50" value="0" id="ey">
 
-  <h3>COMPARE</h3>
-  Size: <span id="cSizeVal">100</span>%  
-  <input type="range" min="50" max="150" value="100" id="cSize">
-  Y: <span id="cYVal">0</span>px  
-  <input type="range" min="-50" max="50" value="0" id="cY">
+  <h3>COMPARE BUTTON</h3>
+  Width: <span id="cwVal">100</span>%  
+  <input type="range" min="60" max="120" value="100" id="cw">
+  Height: <span id="chVal">110</span>px  
+  <input type="range" min="80" max="200" value="110" id="ch">
+  Y: <span id="cyVal">0</span>px  
+  <input type="range" min="-50" max="50" value="0" id="cy">
 
-  <h3>INDIA</h3>
-  Size: <span id="iSizeVal">100</span>%  
-  <input type="range" min="50" max="150" value="100" id="iSize">
-  Y: <span id="iYVal">0</span>px  
-  <input type="range" min="-50" max="50" value="0" id="iY">
+  <h3>INDIA BUTTON</h3>
+  Width: <span id="iwVal">100</span>%  
+  <input type="range" min="60" max="120" value="100" id="iw">
+  Height: <span id="ihVal">110</span>px  
+  <input type="range" min="80" max="200" value="110" id="ih">
+  Y: <span id="iyVal">0</span>px  
+  <input type="range" min="-50" max="50" value="0" id="iy">
 
 </div>
 
 <script>
 
-function setup(id, sizeId, yId, sizeVal, yVal) {
-  const v = document.getElementById(id);
-  const s = document.getElementById(sizeId);
-  const y = document.getElementById(yId);
-  const sv = document.getElementById(sizeVal);
-  const yv = document.getElementById(yVal);
+function control(cardId, w, h, y, wVal, hVal, yVal) {
+
+  const card = document.getElementById(cardId);
 
   function update() {
-    v.style.width = s.value + "%";
-    v.style.transform =
-      "translate(-50%, calc(-50% + " + y.value + "px))";
-    sv.textContent = s.value;
-    yv.textContent = y.value;
+    card.style.width = w.value + "%";
+    card.style.height = h.value + "px";
+    card.style.transform = "translateY(" + y.value + "px)";
+
+    wVal.textContent = w.value;
+    hVal.textContent = h.value;
+    yVal.textContent = y.value;
   }
 
-  s.addEventListener("input", update);
+  w.addEventListener("input", update);
+  h.addEventListener("input", update);
   y.addEventListener("input", update);
 
   update();
 }
 
-setup("searchVid","sSize","sY","sSizeVal","sYVal");
-setup("exploreVid","eSize","eY","eSizeVal","eYVal");
-setup("compareVid","cSize","cY","cSizeVal","cYVal");
-setup("indiaVid","iSize","iY","iSizeVal","iYVal");
+control(
+  "searchCard",
+  sw, sh, sy,
+  swVal, shVal, syVal
+);
+
+control(
+  "exploreCard",
+  ew, eh, ey,
+  ewVal, ehVal, eyVal
+);
+
+control(
+  "compareCard",
+  cw, ch, cy,
+  cwVal, chVal, cyVal
+);
+
+control(
+  "indiaCard",
+  iw, ih, iy,
+  iwVal, ihVal, iyVal
+);
 
 </script>
 

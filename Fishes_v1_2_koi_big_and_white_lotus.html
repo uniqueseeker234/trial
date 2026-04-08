@@ -51,11 +51,24 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  top: 0;
-  left: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1);
   z-index: 0;
-}
 
+  animation: zoomLoop 6s linear infinite;
+}
+  @keyframes zoomLoop {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  90% {
+    transform: translate(-50%, -50%) scale(1.08);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
 /* TEXT */
 .card h2 {
   position: absolute;

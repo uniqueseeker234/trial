@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Algae System</title>
+<title>Algae Archive System</title>
 
 <style>
 
@@ -17,27 +17,25 @@ body {
 }
 
 /* TITLE */
-.title {
+.title-main {
   text-align: center;
   margin: 20px;
-  font-size: 22px;
   color: cyan;
-  text-shadow: 0 0 15px cyan;
+  text-shadow: 0 0 10px cyan;
 }
 
-/* PANEL */
-.panel-filter {
+/* FILTER PANEL */
+.filter-panel {
   margin: 15px;
   padding: 15px;
   border-radius: 14px;
-  border: 1px solid rgba(0,255,255,0.3);
   background: rgba(0,255,255,0.05);
+  border: 1px solid rgba(0,255,255,0.3);
 }
 
-/* BUTTON */
 .filter-btn {
+  padding: 8px 14px;
   margin: 5px;
-  padding: 8px 12px;
   border-radius: 10px;
   border: 1px solid rgba(255,255,255,0.2);
   cursor: pointer;
@@ -53,60 +51,104 @@ input {
   width: 100%;
   padding: 10px;
   border-radius: 10px;
-  margin-top: 10px;
 }
 
-/* RESULT GRID */
+/* CARDS */
 .results {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
 }
 
-/* ===== YOUR CARD ===== */
+.card {
+  width: 200px;
+  margin: 10px;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid cyan;
+  cursor: pointer;
+}
+
+.card img {
+  width: 100%;
+  border-radius: 10px;
+}
+
+/* MODAL */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  overflow:auto;
+}
+
+.close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  font-size: 25px;
+  cursor: pointer;
+  color: red;
+}
+
+/* ===== YOUR PANEL STYLE (UNCHANGED) ===== */
 .panel {
-  width: 500px;
-  margin: 15px;
-  padding: 20px;
+  width: 560px;
+  padding: 25px;
+  position: relative;
   border-radius: 16px;
+
   background: rgba(0,255,255,0.05);
+  backdrop-filter: blur(12px);
+
   border: 1px solid rgba(0,255,255,0.4);
-  box-shadow: 0 0 20px cyan;
+
+  box-shadow:
+    0 0 25px cyan,
+    0 0 70px rgba(0,255,255,0.4),
+    inset 0 0 25px rgba(0,255,255,0.2);
 }
 
-.images {
-  display: flex;
-  gap: 10px;
+.panel::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 16px;
+  background: linear-gradient(90deg, transparent, cyan, transparent);
+  animation: scan 4s linear infinite;
 }
 
-.images img {
-  width: 50%;
+@keyframes scan {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
-.title-card {
-  font-size: 20px;
-  margin: 10px 0;
-}
+.header { color: cyan; margin-bottom: 10px; }
 
-.section {
-  margin-top: 10px;
-}
+.images { display: flex; gap: 10px; }
+.images img { width: 50%; border: 1px solid cyan; }
+
+.section { margin-top: 10px; }
+.section h4 { color: cyan; }
 
 </style>
 </head>
 
 <body>
 
-<div class="title">ALGAE SYSTEM</div>
+<div class="title-main">ALGAE ARCHIVE SYSTEM</div>
 
 <!-- SEARCH -->
-<div class="panel-filter">
-  <input type="text" id="searchInput" placeholder="Search algae name...">
+<div class="filter-panel">
+  <input type="text" id="search" placeholder="Search algae...">
 </div>
 
 <!-- CLASS -->
-<div class="panel-filter">
-  <div>Class:</div>
+<div class="filter-panel">
+  <div>Class</div>
   <div class="filter-btn">Chlorophyceae</div>
   <div class="filter-btn">Cyanophyceae</div>
   <div class="filter-btn">Phaeophyceae</div>
@@ -114,93 +156,123 @@ input {
 </div>
 
 <!-- HABITAT -->
-<div class="panel-filter">
-  <div>Habitat:</div>
+<div class="filter-panel">
+  <div>Habitat</div>
   <div class="filter-btn">Freshwater</div>
   <div class="filter-btn">Marine</div>
   <div class="filter-btn">Soil</div>
 </div>
 
-<!-- RESULTS -->
 <div class="results" id="results"></div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <div class="close" onclick="closeModal()">X</div>
+  <div id="modalContent"></div>
+</div>
 
 <script>
 
-/* ===== DATA (ADD ALL 50 HERE) ===== */
-const algaeData = [
-  {
-    name: "Cladophora",
-    class: "Chlorophyceae",
-    habitat: "Freshwater",
-    desc: "Filamentous branched green algae"
-  },
-  {
-    name: "Spirogyra",
-    class: "Chlorophyceae",
-    habitat: "Freshwater",
-    desc: "Spiral chloroplast filamentous algae"
-  }
-];
+/* DATA */
+const algae = [
+{
+  name:"Cladophora",
+  class:"Chlorophyceae",
+  habitat:"Freshwater",
+  short:"Filamentous green algae",
+  full: `
+  <div class="panel">
 
-/* FILTER LOGIC */
-const buttons = document.querySelectorAll(".filter-btn");
+  <div class="header">⚠ ALGAE SYSTEM DATA</div>
 
-buttons.forEach(btn => {
-  btn.onclick = () => {
-    btn.classList.toggle("active");
-    update();
-  };
-});
+  <div class="images">
+    <img src="images2/Cladophora1.jpg">
+    <img src="images2/Cladophora2.jpg">
+  </div>
 
-document.getElementById("searchInput").addEventListener("input", update);
+  <div class="title">Cladophora</div>
 
-function update() {
+  <div class="section">
+    <h4>Systematic Position</h4>
+    <p>Division: Chlorophyta <br> Class: Ulvophyceae <br> Order: Cladophorales</p>
+  </div>
 
-  const active = [...document.querySelectorAll(".filter-btn.active")]
-    .map(b => b.innerText);
+  <div class="section">
+    <h4>Morphology</h4>
+    <p>• Filamentous, branched multicellular thallus</p>
+  </div>
 
-  const search = document.getElementById("searchInput").value.toLowerCase();
+  <div class="section">
+    <h4>Economic Importance</h4>
+    <p>• Primary producer</p>
+  </div>
 
-  const filtered = algaeData.filter(a => {
+  </div>
+  `
+},
 
-    const matchSearch = a.name.toLowerCase().includes(search);
-
-    const matchFilter = active.every(f =>
-      a.class === f || a.habitat === f
-    );
-
-    return matchSearch && matchFilter;
-  });
-
-  display(filtered);
+{
+  name:"Spirogyra",
+  class:"Chlorophyceae",
+  habitat:"Freshwater",
+  short:"Spiral chloroplast algae",
+  full:`<div class="panel"><h2>Spirogyra</h2></div>`
 }
 
-/* DISPLAY CARDS */
-function display(list) {
+];
 
-  const results = document.getElementById("results");
+/* FILTER */
+const btns=document.querySelectorAll(".filter-btn");
 
-  if (list.length === 0) {
-    results.innerHTML = "<p>No algae found</p>";
-    return;
+btns.forEach(b=>{
+ b.onclick=()=>{
+  b.classList.toggle("active");
+
+  if(b.innerText==="Phaeophyceae"){
+    document.querySelectorAll(".filter-btn").forEach(x=>{
+      if(x.innerText==="Freshwater"||x.innerText==="Soil"){
+        x.style.display="none";
+      }
+    });
   }
 
-  results.innerHTML = list.map(a => `
-    <div class="panel">
+  update();
+ }
+});
 
-      <div class="images">
-        <img src="images2/${a.name}1.jpg">
-        <img src="images2/${a.name}2.jpg">
-      </div>
+document.getElementById("search").oninput=update;
 
-      <div class="title-card">${a.name}</div>
+function update(){
+ const active=[...document.querySelectorAll(".active")].map(x=>x.innerText);
+ const s=document.getElementById("search").value.toLowerCase();
 
-      <div class="section">
-        ${a.desc}
-      </div>
+ const f=algae.filter(a=>
+  a.name.toLowerCase().includes(s) &&
+  active.every(x=>a.class===x||a.habitat===x)
+ );
 
-    </div>
-  `).join("");
+ show(f);
+}
+
+function show(list){
+ const r=document.getElementById("results");
+
+ r.innerHTML=list.map(a=>`
+ <div class="card" onclick="openCard('${a.name}')">
+  <img src="images2/${a.name}1.jpg">
+  <h4>${a.name}</h4>
+  <p>${a.short}</p>
+ </div>`).join("");
+}
+
+function openCard(name){
+ const a=algae.find(x=>x.name===name);
+ document.getElementById("modal").style.display="flex";
+ document.getElementById("modalContent").innerHTML=a.full;
+}
+
+function closeModal(){
+ document.getElementById("modal").style.display="none";
 }
 
 update();

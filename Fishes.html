@@ -3,106 +3,93 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cladophora System Card</title>
+
+<title>Algae System</title>
 
 <style>
 
+/* ===== BODY ===== */
 body {
   margin: 0;
   background: radial-gradient(circle at center, #000814, #000);
   font-family: 'Segoe UI', sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
-
-/* PANEL */
-.panel {
-  width: 560px;
-  padding: 25px;
-  position: relative;
-  border-radius: 16px;
-
-  background: rgba(0,255,255,0.05);
-  backdrop-filter: blur(12px);
-
-  border: 1px solid rgba(0,255,255,0.4);
-
-  box-shadow:
-    0 0 25px cyan,
-    0 0 70px rgba(0,255,255,0.4),
-    inset 0 0 25px rgba(0,255,255,0.2);
-
-  transition: 0.4s;
-}
-
-/* SCAN EFFECT */
-.panel::before {
-  content: "";
-  position: absolute;
-  inset: -2px;
-  border-radius: 16px;
-  background: linear-gradient(90deg, transparent, cyan, transparent);
-  animation: scan 4s linear infinite;
-  opacity: 0.6;
-}
-
-@keyframes scan {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-/* HEADER */
-.header {
-  color: cyan;
-  font-weight: bold;
-  margin-bottom: 12px;
-}
-
-/* IMAGES */
-.images {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.images img {
-  width: 50%;
-  border-radius: 10px;
-  border: 1px solid cyan;
+  color: white;
 }
 
 /* TITLE */
 .title {
-  font-size: 24px;
-  color: white;
-  margin-bottom: 10px;
+  text-align: center;
+  margin: 20px;
+  font-size: 22px;
+  color: cyan;
+  text-shadow: 0 0 15px cyan;
 }
 
-/* SECTION */
-.section {
+/* PANEL */
+.panel-filter {
+  margin: 15px;
+  padding: 15px;
+  border-radius: 14px;
+  border: 1px solid rgba(0,255,255,0.3);
+  background: rgba(0,255,255,0.05);
+}
+
+/* BUTTON */
+.filter-btn {
+  margin: 5px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.2);
+  cursor: pointer;
+}
+
+.filter-btn.active {
+  background: cyan;
+  color: black;
+}
+
+/* SEARCH */
+input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
   margin-top: 10px;
 }
 
-.section h4 {
-  color: cyan;
-  margin-bottom: 5px;
+/* RESULT GRID */
+.results {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
-.section p {
-  color: #bdfcff;
-  font-size: 14px;
-  line-height: 1.5;
+/* ===== YOUR CARD ===== */
+.panel {
+  width: 500px;
+  margin: 15px;
+  padding: 20px;
+  border-radius: 16px;
+  background: rgba(0,255,255,0.05);
+  border: 1px solid rgba(0,255,255,0.4);
+  box-shadow: 0 0 20px cyan;
 }
 
-/* HOVER */
-.panel:hover {
-  transform: scale(1.05);
-  box-shadow:
-    0 0 40px cyan,
-    0 0 90px rgba(0,255,255,0.7),
-    inset 0 0 30px rgba(0,255,255,0.5);
+.images {
+  display: flex;
+  gap: 10px;
+}
+
+.images img {
+  width: 50%;
+}
+
+.title-card {
+  font-size: 20px;
+  margin: 10px 0;
+}
+
+.section {
+  margin-top: 10px;
 }
 
 </style>
@@ -110,66 +97,115 @@ body {
 
 <body>
 
-<div class="panel">
+<div class="title">ALGAE SYSTEM</div>
 
-  <div class="header">⚠ ALGAE SYSTEM DATA</div>
-
-  <div class="images">
-    <img src="images2/Cladophora1.jpg">
-    <img src="images2/Cladophora2.jpg">
-  </div>
-
-  <div class="title">Cladophora</div>
-
-  <!-- SYSTEMATIC POSITION -->
-  <div class="section">
-    <h4>Systematic Position</h4>
-    <p>
-      Division: Chlorophyta <br>
-      Class: Ulvophyceae <br>
-      Order: Cladophorales
-    </p>
-  </div>
-
-  <!-- MORPHOLOGY -->
-  <div class="section">
-    <h4>Morphology</h4>
-    <p>
-      • Filamentous, branched multicellular thallus <br>
-      • Cells contain reticulate chloroplasts
-    </p>
-  </div>
-
-  <!-- SALIENT FEATURES -->
-  <div class="section">
-    <h4>Salient Features</h4>
-    <p>
-      • Common in freshwater and marine habitats <br>
-      • Forms dense green mats <br>
-      • Indicator of nutrient-rich (eutrophic) conditions
-    </p>
-  </div>
-
-  <!-- ECONOMIC IMPORTANCE -->
-  <div class="section">
-    <h4>Economic Importance</h4>
-    <p>
-      • Important primary producer in aquatic ecosystems <br>
-      • Used in ecological monitoring of water quality
-    </p>
-  </div>
-
-  <!-- DISTRIBUTION -->
-  <div class="section">
-    <h4>Distribution</h4>
-    <p>
-      • Australia (New South Wales) — 34.15°S, 151.2°E <br>
-      • Northern Australia — 14.1°S, 136.4°E <br>
-      • Germany — 51.6°N, 8.0°E
-    </p>
-  </div>
-
+<!-- SEARCH -->
+<div class="panel-filter">
+  <input type="text" id="searchInput" placeholder="Search algae name...">
 </div>
+
+<!-- CLASS -->
+<div class="panel-filter">
+  <div>Class:</div>
+  <div class="filter-btn">Chlorophyceae</div>
+  <div class="filter-btn">Cyanophyceae</div>
+  <div class="filter-btn">Phaeophyceae</div>
+  <div class="filter-btn">Rhodophyceae</div>
+</div>
+
+<!-- HABITAT -->
+<div class="panel-filter">
+  <div>Habitat:</div>
+  <div class="filter-btn">Freshwater</div>
+  <div class="filter-btn">Marine</div>
+  <div class="filter-btn">Soil</div>
+</div>
+
+<!-- RESULTS -->
+<div class="results" id="results"></div>
+
+<script>
+
+/* ===== DATA (ADD ALL 50 HERE) ===== */
+const algaeData = [
+  {
+    name: "Cladophora",
+    class: "Chlorophyceae",
+    habitat: "Freshwater",
+    desc: "Filamentous branched green algae"
+  },
+  {
+    name: "Spirogyra",
+    class: "Chlorophyceae",
+    habitat: "Freshwater",
+    desc: "Spiral chloroplast filamentous algae"
+  }
+];
+
+/* FILTER LOGIC */
+const buttons = document.querySelectorAll(".filter-btn");
+
+buttons.forEach(btn => {
+  btn.onclick = () => {
+    btn.classList.toggle("active");
+    update();
+  };
+});
+
+document.getElementById("searchInput").addEventListener("input", update);
+
+function update() {
+
+  const active = [...document.querySelectorAll(".filter-btn.active")]
+    .map(b => b.innerText);
+
+  const search = document.getElementById("searchInput").value.toLowerCase();
+
+  const filtered = algaeData.filter(a => {
+
+    const matchSearch = a.name.toLowerCase().includes(search);
+
+    const matchFilter = active.every(f =>
+      a.class === f || a.habitat === f
+    );
+
+    return matchSearch && matchFilter;
+  });
+
+  display(filtered);
+}
+
+/* DISPLAY CARDS */
+function display(list) {
+
+  const results = document.getElementById("results");
+
+  if (list.length === 0) {
+    results.innerHTML = "<p>No algae found</p>";
+    return;
+  }
+
+  results.innerHTML = list.map(a => `
+    <div class="panel">
+
+      <div class="images">
+        <img src="images2/${a.name}1.jpg">
+        <img src="images2/${a.name}2.jpg">
+      </div>
+
+      <div class="title-card">${a.name}</div>
+
+      <div class="section">
+        ${a.desc}
+      </div>
+
+    </div>
+  `).join("");
+}
+
+update();
+
+</script>
 
 </body>
 </html>

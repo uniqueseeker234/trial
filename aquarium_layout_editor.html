@@ -86,11 +86,23 @@ body {
 
 /* SEARCH */
 .search-box {
-  width: 100%;
-  padding: 12px;
-  border-radius: 12px;
-}
+  width: 95%;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  margin: auto;
+  display: block;
 
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 1px;
+  color: cyan;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid cyan;
+}
+.search-box:focus {
+  outline: none;
+  box-shadow: 0 0 15px cyan;
+}
 /* RESULTS */
 .results {
   padding: 10px;
@@ -301,10 +313,12 @@ function update(){
     a.name.toLowerCase().includes(search) &&
     active.every(f=>a.class===f || a.habitat===f)
   );
-
   show(filtered);
 }
-
+document.getElementById("results").scrollIntoView({
+  behavior: "smooth"
+});
+  
 function show(list){
   const r=document.getElementById("results");
 
@@ -330,7 +344,6 @@ function openCard(name){
 function closeModal(){
   document.getElementById("modal").style.display="none";
 }
-
 update();
 
 </script>

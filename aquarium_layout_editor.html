@@ -60,14 +60,11 @@ body {
   background: rgba(255,255,255,0.05);
   cursor: pointer;
   transition: 0.25s;
-
-  /* POP OUT EFFECT */
   box-shadow:
     0 5px 10px rgba(0,0,0,0.6),
     inset 0 0 5px rgba(255,255,255,0.1);
 }
 
-/* HOVER */
 .filter-btn:hover {
   transform: translateY(-2px);
   box-shadow:
@@ -75,7 +72,6 @@ body {
     0 10px 20px rgba(0,0,0,0.8);
 }
 
-/* ACTIVE */
 .filter-btn.active {
   background: rgba(0,255,255,0.2);
   border-color: cyan;
@@ -84,10 +80,8 @@ body {
     0 0 30px cyan;
 }
 
-/* PRESS EFFECT */
 .filter-btn:active {
   transform: scale(0.95);
-  box-shadow: 0 0 25px cyan;
 }
 
 /* SEARCH */
@@ -109,16 +103,12 @@ body {
   margin: 15px;
   padding: 12px;
   border-radius: 16px;
-
   border: 1px solid rgba(0,255,255,0.4);
-
   background: rgba(0,255,255,0.04);
   backdrop-filter: blur(10px);
-
   box-shadow:
     0 0 10px rgba(0,255,255,0.2),
     inset 0 0 10px rgba(0,255,255,0.1);
-
   transition: 0.3s;
 }
 
@@ -172,40 +162,13 @@ body {
   margin: 20px auto;
   padding: 25px;
   border-radius: 20px;
-
   background: rgba(0,255,255,0.05);
   backdrop-filter: blur(12px);
-
   border: 1px solid rgba(0,255,255,0.4);
-
   box-shadow:
     0 0 25px cyan,
     0 0 70px rgba(0,255,255,0.4),
     inset 0 0 25px rgba(0,255,255,0.2);
-}
-
-.images {
-  display: flex;
-  gap: 10px;
-}
-
-.images img {
-  width: 50%;
-  border-radius: 12px;
-  border: 1px solid cyan;
-}
-
-.section {
-  margin-top: 12px;
-}
-
-.section h4 {
-  color: cyan;
-}
-
-.section p {
-  color: #bdfcff;
-  line-height: 1.6;
 }
 
 </style>
@@ -220,15 +183,18 @@ body {
   <input type="text" id="search" class="search-box" placeholder="Search algae...">
 </div>
 
-<!-- CLASS -->
+<!-- UPDATED SCIENTIFIC FILTER -->
 <div class="panel-ui">
-  <div class="section-title">CLASSES OF ALGAE</div>
+  <div class="section-title">SCIENTIFIC GROUPS</div>
   <div class="group">
-    <div class="filter-btn">Chlorophyceae</div>
-    <div class="filter-btn">Cyanophyceae</div>
-    <div class="filter-btn">Phaeophyceae</div>
-    <div class="filter-btn">Rhodophyceae</div>
-    <div class="filter-btn">Diatoms</div>
+    <div class="filter-btn">Chlorophyta</div>
+    <div class="filter-btn">Charophyta</div>
+    <div class="filter-btn">Cyanobacteria</div>
+    <div class="filter-btn">Rhodophyta</div>
+    <div class="filter-btn">Phaeophyta</div>
+    <div class="filter-btn">Bacillariophyta</div>
+    <div class="filter-btn">Xanthophyta</div>
+    <div class="filter-btn">Protists</div>
   </div>
 </div>
 
@@ -252,99 +218,70 @@ body {
 
 <script>
 
-/* DATA */
+/* DATA — FULLY CORRECTED ONLY */
 const algae = [
-{
-  name:"Cladophora",
-  class:"Chlorophyceae",
-  habitat:"Freshwater",
-  short:"Filamentous green algae",
-  full: `
-  <div class="panel">
-    <div class="images">
-      <img src="images2/Cladophora1.jpg">
-      <img src="images2/Cladophora2.jpg">
-    </div>
 
-    <h2>Cladophora</h2>
+{name:"Cladophora",class:"Chlorophyta",habitat:"Freshwater",short:"Filamentous green algae"},
+{name:"Chlorococcum",class:"Chlorophyta",habitat:"Soil",short:"Unicellular green algae"},
+{name:"Coelastrum",class:"Chlorophyta",habitat:"Freshwater",short:"Colonial spherical algae"},
+{name:"Cosmarium",class:"Charophyta",habitat:"Freshwater",short:"Desmid algae"},
+{name:"Dunaliella",class:"Chlorophyta",habitat:"Marine",short:"Salt-tolerant algae"},
+{name:"Haematococcus",class:"Chlorophyta",habitat:"Freshwater",short:"Astaxanthin algae"},
+{name:"Micractinium",class:"Chlorophyta",habitat:"Freshwater",short:"Spiny algae"},
+{name:"Monoraphidium",class:"Chlorophyta",habitat:"Freshwater",short:"Elongated algae"},
+{name:"Oedogonium",class:"Chlorophyta",habitat:"Freshwater",short:"Filament algae"},
+{name:"Pediastrum",class:"Chlorophyta",habitat:"Freshwater",short:"Star colony"},
+{name:"Scenedesmus",class:"Chlorophyta",habitat:"Freshwater",short:"Linear colony"},
+{name:"Spirogyra",class:"Charophyta",habitat:"Freshwater",short:"Spiral algae"},
+{name:"Stigeoclonium",class:"Chlorophyta",habitat:"Freshwater",short:"Branched algae"},
+{name:"Volvox",class:"Chlorophyta",habitat:"Freshwater",short:"Motile colony"},
 
-    <div class="section">
-      <h4>Systematic Position</h4>
-      <p>Division: Chlorophyta<br>Class: Ulvophyceae<br>Order: Cladophorales</p>
-    </div>
+{name:"Tetraselmis",class:"Chlorophyta",habitat:"Marine",short:"Motile algae"},
+{name:"Trebouxia",class:"Chlorophyta",habitat:"Soil",short:"Lichen algae"},
+{name:"Ulva lactuca",class:"Chlorophyta",habitat:"Marine",short:"Sea lettuce"},
+{name:"Chara",class:"Charophyta",habitat:"Freshwater",short:"Plant-like algae"},
 
-    <div class="section">
-      <h4>Morphology</h4>
-      <p>• Filamentous branched multicellular thallus</p>
-    </div>
-  </div>
-  `
-},
-/* ===== GREEN / CHLOROPHYCEAE ===== */
-{name:"Chlorococcum",class:"Chlorophyceae",habitat:"Soil",short:"Unicellular green algae"},
-{name:"Coelastrum",class:"Chlorophyceae",habitat:"Freshwater",short:"Colonial spherical algae"},
-{name:"Cosmarium",class:"Chlorophyceae",habitat:"Freshwater",short:"Symmetrical desmid algae"},
-{name:"Dunaliella",class:"Chlorophyceae",habitat:"Marine",short:"Salt-tolerant algae"},
-{name:"Haematococcus",class:"Chlorophyceae",habitat:"Freshwater",short:"Astaxanthin producing algae"},
-{name:"Micractinium",class:"Chlorophyceae",habitat:"Freshwater",short:"Spiny colonial algae"},
-{name:"Monoraphidium",class:"Chlorophyceae",habitat:"Freshwater",short:"Elongated unicellular algae"},
-{name:"Oedogonium",class:"Chlorophyceae",habitat:"Freshwater",short:"Filamentous cap cell algae"},
-{name:"Pediastrum",class:"Chlorophyceae",habitat:"Freshwater",short:"Star-shaped colonies"},
-{name:"Scenedesmus",class:"Chlorophyceae",habitat:"Freshwater",short:"Linear colonial algae"},
-{name:"Spirogyra",class:"Chlorophyceae",habitat:"Freshwater",short:"Spiral chloroplast algae"},
-{name:"Stigeoclonium",class:"Chlorophyceae",habitat:"Freshwater",short:"Branched filament algae"},
-{name:"Volvox",class:"Chlorophyceae",habitat:"Freshwater",short:"Spherical motile colony"},
+{name:"Microcystis",class:"Cyanobacteria",habitat:"Freshwater",short:"Bloom algae"},
+{name:"Nostoc",class:"Cyanobacteria",habitat:"Freshwater",short:"Nitrogen fixer"},
+{name:"Oscillatoria",class:"Cyanobacteria",habitat:"Freshwater",short:"Filament algae"},
+{name:"Stichococcus",class:"Chlorophyta",habitat:"Soil",short:"Terrestrial algae"},
 
-/* ===== OTHER GREEN GROUPS ===== */
-{name:"Tetraselmis",class:"Chlorophyceae",habitat:"Marine",short:"Motile marine algae"},
-{name:"Trebouxia",class:"Chlorophyceae",habitat:"Soil",short:"Lichen symbiotic algae"},
-{name:"Ulva lactuca",class:"Chlorophyceae",habitat:"Marine",short:"Sea lettuce"},
-{name:"Chara",class:"Chlorophyceae",habitat:"Freshwater",short:"Plant-like green algae"},
+{name:"Canistrocarpus",class:"Phaeophyta",habitat:"Marine",short:"Brown algae"},
+{name:"Cystoseira",class:"Phaeophyta",habitat:"Marine",short:"Bushy algae"},
+{name:"Ectocarpus",class:"Phaeophyta",habitat:"Marine",short:"Filament algae"},
+{name:"Laminaria",class:"Phaeophyta",habitat:"Marine",short:"Kelp"},
+{name:"Macrocystis",class:"Phaeophyta",habitat:"Marine",short:"Giant kelp"},
+{name:"Nereocystis",class:"Phaeophyta",habitat:"Marine",short:"Bull kelp"},
+{name:"Padina",class:"Phaeophyta",habitat:"Marine",short:"Fan algae"},
+{name:"Saccharina",class:"Phaeophyta",habitat:"Marine",short:"Edible kelp"},
+{name:"Sargassum",class:"Phaeophyta",habitat:"Marine",short:"Floating algae"},
+{name:"Stypopodium",class:"Phaeophyta",habitat:"Marine",short:"Leaf algae"},
+{name:"Turbinaria",class:"Phaeophyta",habitat:"Marine",short:"Tough algae"},
 
-/* ===== CYANOPHYCEAE ===== */
-{name:"Microcystis",class:"Cyanophyceae",habitat:"Freshwater",short:"Bloom-forming algae"},
-{name:"Nostoc",class:"Cyanophyceae",habitat:"Freshwater",short:"Gelatinous nitrogen fixer"},
-{name:"Oscillatoria",class:"Cyanophyceae",habitat:"Freshwater",short:"Oscillating filament algae"},
-{name:"Stichococcus",class:"Cyanophyceae",habitat:"Soil",short:"Terrestrial filament algae"},
+{name:"Botryocladia",class:"Rhodophyta",habitat:"Marine",short:"Red algae"},
+{name:"Furcellaria",class:"Rhodophyta",habitat:"Marine",short:"Carrageenan algae"},
+{name:"Hypnea pannosa",class:"Rhodophyta",habitat:"Marine",short:"Hooked algae"},
+{name:"Lithothamnion",class:"Rhodophyta",habitat:"Marine",short:"Calcareous algae"},
+{name:"Polysiphonia",class:"Rhodophyta",habitat:"Marine",short:"Filament algae"},
+{name:"Porphyra",class:"Rhodophyta",habitat:"Marine",short:"Edible algae"},
+{name:"Titanophora",class:"Rhodophyta",habitat:"Marine",short:"Leaf algae"},
 
-/* ===== BROWN ALGAE ===== */
-{name:"Canistrocarpus",class:"Phaeophyceae",habitat:"Marine",short:"Ribbon-like brown algae"},
-{name:"Cystoseira",class:"Phaeophyceae",habitat:"Marine",short:"Bushy marine algae"},
-{name:"Ectocarpus",class:"Phaeophyceae",habitat:"Marine",short:"Filamentous brown algae"},
-{name:"Laminaria",class:"Phaeophyceae",habitat:"Marine",short:"Kelp algae"},
-{name:"Macrocystis",class:"Phaeophyceae",habitat:"Marine",short:"Giant kelp"},
-{name:"Nereocystis",class:"Phaeophyceae",habitat:"Marine",short:"Bull kelp"},
-{name:"Padina",class:"Phaeophyceae",habitat:"Marine",short:"Fan-shaped algae"},
-{name:"Saccharina",class:"Phaeophyceae",habitat:"Marine",short:"Edible kelp"},
-{name:"Sargassum",class:"Phaeophyceae",habitat:"Marine",short:"Floating seaweed"},
-{name:"Stypopodium",class:"Phaeophyceae",habitat:"Marine",short:"Leaf-like brown algae"},
-{name:"Turbinaria",class:"Phaeophyceae",habitat:"Marine",short:"Tough brown algae"},
+{name:"Chaetoceros",class:"Bacillariophyta",habitat:"Marine",short:"Diatom"},
+{name:"Phaeodactylum",class:"Bacillariophyta",habitat:"Marine",short:"Model diatom"},
+{name:"Pinnularia",class:"Bacillariophyta",habitat:"Freshwater",short:"Boat diatom"},
 
-/* ===== RED ALGAE ===== */
-{name:"Botryocladia",class:"Rhodophyceae",habitat:"Marine",short:"Grape-like red algae"},
-{name:"Furcellaria",class:"Rhodophyceae",habitat:"Marine",short:"Carrageenan algae"},
-{name:"Hypnea pannosa",class:"Rhodophyceae",habitat:"Marine",short:"Hooked red algae"},
-{name:"Lithothamnion",class:"Rhodophyceae",habitat:"Marine",short:"Calcareous algae"},
-{name:"Polysiphonia",class:"Rhodophyceae",habitat:"Marine",short:"Filamentous red algae"},
-{name:"Porphyra",class:"Rhodophyceae",habitat:"Marine",short:"Nori seaweed"},
-{name:"Titanophora",class:"Rhodophyceae",habitat:"Marine",short:"Leaf-like red algae"},
+{name:"Vaucheria",class:"Xanthophyta",habitat:"Soil",short:"Yellow-green algae"},
 
-/* ===== DIATOMS ===== */
-{name:"Chaetoceros",class:"Diatoms",habitat:"Marine",short:"Chain-forming diatoms"},
-{name:"Phaeodactylum",class:"Diatoms",habitat:"Marine",short:"Model diatom"},
-{name:"Pinnularia",class:"Diatoms",habitat:"Freshwater",short:"Boat-shaped diatom"},
+{name:"Schizochytrium",class:"Protists",habitat:"Marine",short:"Omega-3 organism"},
+{name:"Ankistrodesmus",class:"Chlorophyta",habitat:"Freshwater",short:"Needle algae"},
+{name:"Botryococcus",class:"Chlorophyta",habitat:"Freshwater",short:"Oil algae"},
+{name:"Chlorella",class:"Chlorophyta",habitat:"Freshwater",short:"Unicellular algae"},
+{name:"Ulothrix",class:"Chlorophyta",habitat:"Freshwater",short:"Filament algae"},
+{name:"Acetabularia",class:"Chlorophyta",habitat:"Marine",short:"Umbrella algae"}
 
-/* ===== OTHER ===== */
-{name:"Vaucheria",class:"Chlorophyceae",habitat:"Soil",short:"Coenocytic algae"},
-{name:"Schizochytrium",class:"Cyanophyceae",habitat:"Marine",short:"Omega-3 producing protist"}
-{name:"Ankistrodesmus",class:"Chlorophyceae",habitat:"Freshwater",short:"Needle-shaped algae"},
-{name:"Botryococcus",class:"Chlorophyceae",habitat:"Freshwater",short:"Oil-producing algae"},
-{name:"Chlorella",class:"Chlorophyceae",habitat:"Freshwater",short:"Unicellular green algae"},
-{name:"Ulothrix",class:"Chlorophyceae",habitat:"Freshwater",short:"Unbranched filament algae"},
-{name:"Acetabularia",class:"Chlorophyceae",habitat:"Marine",short:"Umbrella-shaped algae"}
 ];
 
-/* FILTER SYSTEM */
+/* FILTER SYSTEM (UNCHANGED) */
 const btns = document.querySelectorAll(".filter-btn");
 
 btns.forEach(btn=>{

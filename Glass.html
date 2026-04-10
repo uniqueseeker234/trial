@@ -1,117 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Pond 2 • Surface Rim Only</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&family=Inter:wght@300;500&display=swap" rel="stylesheet">
+
+<title>Algae Filter System</title>
 
 <style>
-:root{
-  --shuttleH:20vh;
-  --surfaceA:#5FC2A7;
-  --surfaceB:#3CC19E;
-  --underA:#2aa98d;
-  --underB:#146f6a;
+
+/* ===== BODY ===== */
+body {
+  margin: 0;
+  background: radial-gradient(circle at center, #000814, #000);
+  font-family: 'Inter', sans-serif;
+  color: white;
 }
 
-html,body{
-  margin:0;
-  height:100%;
-  overflow:hidden;
-  font-family:'Poppins',sans-serif;
-  background:#0b1a17;
+/* TITLE */
+.title {
+  text-align: center;
+  margin: 20px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 22px;
+  color: cyan;
+  text-shadow: 0 0 15px cyan;
 }
 
-/* ================= SHUTTLE ================= */
-#shuttleTop{
-  position:fixed;
-  top:0;
-  left:0;
-  right:0;
-  height:var(--shuttleH);
-  background:linear-gradient(to bottom,#111a24,#0b131b);
-  z-index:100;
+/* PANEL */
+.panel {
+  margin: 15px;
+  padding: 15px;
+  border-radius: 18px;
+  background: rgba(0, 255, 255, 0.03);
+  border: 1px solid rgba(0,255,255,0.3);
+  box-shadow: 0 0 20px rgba(0,255,255,0.1);
 }
 
-/* ================= POND ================= */
-#pond-layer{
-  position:fixed;
-  inset:0;
-  overflow:hidden;
+/* SECTION TITLE */
+.section-title {
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: cyan;
+  letter-spacing: 1px;
 }
 
-/* Surface */
-.surface{
-  position:absolute;
-  top:calc(var(--shuttleH) + 7vh);
-  left:50%;
-  transform:translateX(-50%);
-  width:min(980px,96vw);
-  height:26vh;
-  background:linear-gradient(to bottom,var(--surfaceA),var(--surfaceB));
-  z-index:5;
+/* BUTTON GROUP */
+.group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
-/* NEW: Surface Rim Only */
-.surfaceRim{
-  position:absolute;
-  top:calc(var(--shuttleH) + 7vh);
-  left:50%;
-  transform:translateX(-50%);
-  width:min(980px,96vw);
-  height:26vh;
-  border-radius:18px;
-  pointer-events:none;
-  z-index:8;
+/* FILTER BUTTON */
+.filter-btn {
+  padding: 8px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.05);
+  font-size: 13px;
+  cursor: pointer;
+  transition: 0.2s;
 }
 
-.surfaceRim::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  border-radius:18px;
-  box-shadow:
-    inset 0 0 0 2px rgba(255,255,255,0.35),
-    inset 0 0 25px rgba(255,255,255,0.10);
+/* HOVER */
+.filter-btn:hover {
+  border-color: cyan;
+  box-shadow: 0 0 10px cyan;
 }
 
-.surfaceRim::after{
-  content:"";
-  position:absolute;
-  inset:-6px;
-  border-radius:24px;
-  box-shadow:0 25px 45px rgba(0,0,0,0.35);
-  opacity:.8;
+/* ACTIVE */
+.filter-btn.active {
+  background: rgba(0,255,255,0.2);
+  border-color: cyan;
+  box-shadow: 0 0 15px cyan;
 }
 
-/* Underwater */
-.underwater{
-  position:absolute;
-  top:calc(var(--shuttleH) + 7vh + 26vh);
-  left:50%;
-  transform:translateX(-50%);
-  width:min(980px,96vw);
-  bottom:0;
-  background:linear-gradient(to bottom,var(--underA),var(--underB));
-}
-
-/* Simple fish demo */
-.fish{
-  position:absolute;
-  width:60px;
-  height:30px;
-  background:#ff7b7b;
-  border-radius:30px;
-  top:60%;
-  left:-80px;
-  animation:swim 15s linear infinite;
-}
-
-@keyframes swim{
-  from{transform:translateX(0);}
-  to{transform:translateX(110vw);}
+/* RESULTS PANEL */
+.results {
+  margin: 15px;
+  padding: 20px;
+  border-radius: 18px;
+  border: 1px solid rgba(0,255,255,0.2);
+  min-height: 120px;
+  text-align: center;
+  color: rgba(255,255,255,0.6);
 }
 
 </style>
@@ -119,17 +93,73 @@ html,body{
 
 <body>
 
-<div id="shuttleTop"></div>
+<div class="title">ALGAE FILTER SYSTEM</div>
 
-<div id="pond-layer">
-
-  <div class="surface"></div>
-  <div class="surfaceRim"></div>
-  <div class="underwater"></div>
-
-  <div class="fish"></div>
-
+<!-- COLOR FILTER -->
+<div class="panel">
+  <div class="section-title">COLOR TYPE</div>
+  <div class="group">
+    <div class="filter-btn">Green</div>
+    <div class="filter-btn">Blue-Green</div>
+    <div class="filter-btn">Brown</div>
+    <div class="filter-btn">Red</div>
+  </div>
 </div>
+
+<!-- HABITAT FILTER -->
+<div class="panel">
+  <div class="section-title">HABITAT</div>
+  <div class="group">
+    <div class="filter-btn">Freshwater</div>
+    <div class="filter-btn">Marine</div>
+    <div class="filter-btn">Moist Soil</div>
+  </div>
+</div>
+
+<!-- STRUCTURE FILTER -->
+<div class="panel">
+  <div class="section-title">STRUCTURE</div>
+  <div class="group">
+    <div class="filter-btn">Unicellular</div>
+    <div class="filter-btn">Colonial</div>
+    <div class="filter-btn">Filamentous</div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div class="results" id="results">
+  Select filters to see results
+</div>
+
+<script>
+
+/* TOGGLE BUTTON ACTIVE */
+const buttons = document.querySelectorAll(".filter-btn");
+
+buttons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    btn.classList.toggle("active");
+    updateResults();
+  });
+});
+
+/* SIMPLE RESULT SYSTEM (placeholder) */
+function updateResults() {
+  const active = document.querySelectorAll(".filter-btn.active");
+
+  if (active.length === 0) {
+    document.getElementById("results").innerText = "Select filters to see results";
+    return;
+  }
+
+  let selected = [];
+  active.forEach(b => selected.push(b.innerText));
+
+  document.getElementById("results").innerText =
+    "Filters Applied:\n" + selected.join(", ");
+}
+
+</script>
 
 </body>
 </html>

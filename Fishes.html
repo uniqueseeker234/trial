@@ -83,6 +83,17 @@ input {
   justify-content: center;
   align-items: center;
   overflow:auto;
+  .modal {
+  overflow-y: auto;
+  padding: 20px;
+}
+
+/* FIX PANEL FOR MOBILE */
+.panel {
+  max-width: 95%;
+  width: 560px;
+  margin: auto;
+}
 }
 
 .close {
@@ -180,36 +191,7 @@ const algae = [
   class:"Chlorophyceae",
   habitat:"Freshwater",
   short:"Filamentous green algae",
-  full: `
-  <div class="panel">
-
-  <div class="header">⚠ ALGAE SYSTEM DATA</div>
-
-  <div class="images">
-    <img src="images2/Cladophora1.jpg">
-    <img src="images2/Cladophora2.jpg">
-  </div>
-
-  <div class="title">Cladophora</div>
-
-  <div class="section">
-    <h4>Systematic Position</h4>
-    <p>Division: Chlorophyta <br> Class: Ulvophyceae <br> Order: Cladophorales</p>
-  </div>
-
-  <div class="section">
-    <h4>Morphology</h4>
-    <p>• Filamentous, branched multicellular thallus</p>
-  </div>
-
-  <div class="section">
-    <h4>Economic Importance</h4>
-    <p>• Primary producer</p>
-  </div>
-
-  </div>
-  `
-},
+  
 
 {
   name:"Spirogyra",
@@ -236,7 +218,46 @@ btns.forEach(b=>{
     });
   }
 
-  update();
+  full: `
+<div class="panel">
+
+  <div class="header">⚠ ALGAE SYSTEM DATA</div>
+
+  <div class="images">
+    <img src="images2/Cladophora1.jpg">
+    <img src="images2/Cladophora2.jpg">
+  </div>
+
+  <div class="title">Cladophora</div>
+
+  <div class="section">
+    <h4>Systematic Position</h4>
+    <p>
+      Division: Chlorophyta <br>
+      Class: Ulvophyceae <br>
+      Order: Cladophorales
+    </p>
+  </div>
+
+  <div class="section">
+    <h4>Morphology</h4>
+    <p>
+      • Filamentous, branched multicellular thallus <br>
+      • Cells contain reticulate chloroplasts
+    </p>
+  </div>
+
+  <div class="section">
+    <h4>Salient Features</h4>
+    <p>
+      • Common in freshwater and marine habitats <br>
+      • Forms dense green mats
+    </p>
+  </div>
+
+</div>
+`
+    update();
  }
 });
 

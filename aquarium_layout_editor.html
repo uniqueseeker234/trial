@@ -1,142 +1,300 @@
 <!DOCTYPE html>
-<html lang="en">    
-<head>    
-<meta charset="UTF-8">    
-<meta name="viewport" content="width=device-width, initial-scale=1.0">    
-<title>Cladophora System Card</title>  <style>    body {
-margin: 0;
-background: radial-gradient(circle at center, #000814, #000);
-font-family: 'Segoe UI', sans-serif;
-display: flex;
-justify-content: center;
-align-items: center;
-height: 100vh;
-}
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-/* PANEL */
-.panel {
-width: 560px;
-padding: 25px;
-position: relative;
-border-radius: 16px;
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&family=Inter:wght@300;500&display=swap" rel="stylesheet">
 
-background: rgba(0,255,255,0.05);
-backdrop-filter: blur(12px);
+<title>Algae Archive System</title>
 
-border: 1px solid rgba(0,255,255,0.4);
+<style>
 
-box-shadow:
-0 0 25px cyan,
-0 0 70px rgba(0,255,255,0.4),
-inset 0 0 25px rgba(0,255,255,0.2);
-
-transition: 0.4s;
-}
-
-/* SCAN EFFECT */
-.panel::before {
-content: "";
-position: absolute;
-inset: -2px;
-border-radius: 16px;
-background: linear-gradient(90deg, transparent, cyan, transparent);
-animation: scan 4s linear infinite;
-opacity: 0.6;
-}
-
-@keyframes scan {
-0% { transform: translateX(-100%); }
-100% { transform: translateX(100%); }
-}
-
-/* HEADER */
-.header {
-color: cyan;
-font-weight: bold;
-margin-bottom: 12px;
-}
-
-/* IMAGES */
-.images {
-display: flex;
-gap: 10px;
-margin-bottom: 15px;
-}
-
-.images img {
-width: 50%;
-border-radius: 10px;
-border: 1px solid cyan;
+/* ===== BODY ===== */
+body {
+  margin: 0;
+  background: radial-gradient(circle at center, #000814, #000);
+  font-family: 'Inter', sans-serif;
+  color: white;
 }
 
 /* TITLE */
 .title {
-font-size: 24px;
-color: white;
-margin-bottom: 10px;
+  text-align: center;
+  margin: 20px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 22px;
+  color: cyan;
+  text-shadow: 0 0 15px cyan;
+}
+
+/* PANEL */
+.panel-ui {
+  margin: 15px;
+  padding: 15px;
+  border-radius: 18px;
+  background: rgba(0,255,255,0.03);
+  border: 1px solid rgba(0,255,255,0.3);
+}
+
+/* FILTER BUTTON */
+.filter-btn {
+  padding: 8px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.05);
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+/* SOLO LEVELING GLOW */
+.filter-btn.active {
+  background: rgba(0,255,255,0.2);
+  border-color: cyan;
+  box-shadow: 0 0 12px cyan, 0 0 25px cyan;
+}
+
+/* SEARCH */
+.search-box {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+/* RESULTS */
+.results {
+  padding: 10px;
+}
+
+/* DEMO CARD (RECTANGLE STYLE) */
+.card {
+  display: flex;
+  gap: 10px;
+  margin: 10px;
+  padding: 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(0,255,255,0.3);
+  background: rgba(0,255,255,0.05);
+  cursor: pointer;
+}
+
+.card img {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid cyan;
+}
+
+.card-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* MODAL */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.95);
+  display: none;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.close {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  color: red;
+  font-size: 25px;
+  cursor: pointer;
+}
+
+/* ===== PERFECT CLADOPHORA PANEL ===== */
+.panel {
+  max-width: 560px;
+  margin: 20px auto;
+  padding: 25px;
+  border-radius: 20px;
+
+  background: rgba(0,255,255,0.05);
+  backdrop-filter: blur(12px);
+
+  border: 1px solid rgba(0,255,255,0.4);
+
+  box-shadow:
+    0 0 25px cyan,
+    0 0 70px rgba(0,255,255,0.4),
+    inset 0 0 25px rgba(0,255,255,0.2);
+}
+
+/* HEADER */
+.header {
+  color: cyan;
+  margin-bottom: 10px;
+}
+
+/* IMAGES */
+.images {
+  display: flex;
+  gap: 10px;
+}
+
+.images img {
+  width: 50%;
+  border-radius: 12px;
+  border: 1px solid cyan;
+}
+
+/* TITLE */
+.title-card {
+  font-size: 26px;
+  margin: 15px 0;
 }
 
 /* SECTION */
 .section {
-margin-top: 10px;
+  margin-top: 12px;
 }
 
 .section h4 {
-color: cyan;
-margin-bottom: 5px;
+  color: cyan;
 }
 
 .section p {
-color: #bdfcff;
-font-size: 14px;
-line-height: 1.5;
+  color: #bdfcff;
+  line-height: 1.6;
 }
 
-/* HOVER */
-.panel:hover {
-transform: scale(1.05);
-box-shadow:
-0 0 40px cyan,
-0 0 90px rgba(0,255,255,0.7),
-inset 0 0 30px rgba(0,255,255,0.5);
+</style>
+</head>
+
+<body>
+
+<div class="title">ALGAE ARCHIVE SYSTEM</div>
+
+<!-- SEARCH -->
+<div class="panel-ui">
+  <input type="text" id="search" class="search-box" placeholder="Search algae...">
+</div>
+
+<!-- CLASS -->
+<div class="panel-ui">
+  <div class="filter-btn">Chlorophyceae</div>
+  <div class="filter-btn">Cyanophyceae</div>
+  <div class="filter-btn">Phaeophyceae</div>
+  <div class="filter-btn">Rhodophyceae</div>
+</div>
+
+<!-- HABITAT -->
+<div class="panel-ui">
+  <div class="filter-btn">Freshwater</div>
+  <div class="filter-btn">Marine</div>
+  <div class="filter-btn">Soil</div>
+</div>
+
+<div class="results" id="results"></div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <div class="close" onclick="closeModal()">X</div>
+  <div id="modalContent"></div>
+</div>
+
+<script>
+
+/* ===== DATA (50 algae basic) ===== */
+const algae = Array.from({length:50}, (_,i)=>({
+  name: "Algae " + (i+1),
+  class: ["Chlorophyceae","Cyanophyceae","Phaeophyceae","Rhodophyceae"][i%4],
+  habitat: ["Freshwater","Marine","Soil"][i%3],
+  short: "Sample algae description"
+}));
+
+/* ADD REAL ONE */
+algae[0] = {
+  name:"Cladophora",
+  class:"Chlorophyceae",
+  habitat:"Freshwater",
+  short:"Filamentous green algae",
+  full: `
+  <div class="panel">
+    <div class="header">⚠ ALGAE SYSTEM DATA</div>
+
+    <div class="images">
+      <img src="images2/Cladophora1.jpg">
+      <img src="images2/Cladophora2.jpg">
+    </div>
+
+    <div class="title-card">Cladophora</div>
+
+    <div class="section">
+      <h4>Systematic Position</h4>
+      <p>Division: Chlorophyta<br>Class: Ulvophyceae<br>Order: Cladophorales</p>
+    </div>
+
+    <div class="section">
+      <h4>Morphology</h4>
+      <p>• Filamentous branched multicellular thallus</p>
+    </div>
+  </div>
+  `
+};
+
+/* FILTER */
+const btns = document.querySelectorAll(".filter-btn");
+
+btns.forEach(b=>{
+  b.onclick=()=>{
+    b.classList.toggle("active");
+    update();
+  }
+});
+
+document.getElementById("search").oninput = update;
+
+function update(){
+  const active=[...document.querySelectorAll(".active")].map(x=>x.innerText);
+  const search=document.getElementById("search").value.toLowerCase();
+
+  const filtered=algae.filter(a=>
+    a.name.toLowerCase().includes(search) &&
+    active.every(f=>a.class===f || a.habitat===f)
+  );
+
+  show(filtered);
 }
 
-</style>  </head>  <body>  <div class="panel">    <div class="header">⚠ ALGAE SYSTEM DATA</div>    <div class="images">
-<img src="images2/Cladophora1.jpg">
-<img src="images2/Cladophora2.jpg">
+function show(list){
+  const r=document.getElementById("results");
 
-  </div>    <div class="title">Cladophora</div>    <!-- SYSTEMATIC POSITION -->    <div class="section">    
-    <h4>Systematic Position</h4>    
-    <p>    
-      Division: Chlorophyta <br>    
-      Class: Ulvophyceae <br>    
-      Order: Cladophorales    
-    </p>    
-  </div>    <!-- MORPHOLOGY -->    <div class="section">    
-    <h4>Morphology</h4>    
-    <p>    
-      • Filamentous, branched multicellular thallus <br>    
-      • Cells contain reticulate chloroplasts    
-    </p>    
-  </div>    <!-- SALIENT FEATURES -->    <div class="section">    
-    <h4>Salient Features</h4>    
-    <p>    
-      • Common in freshwater and marine habitats <br>    
-      • Forms dense green mats <br>    
-      • Indicator of nutrient-rich (eutrophic) conditions    
-    </p>    
-  </div>    <!-- ECONOMIC IMPORTANCE -->    <div class="section">    
-    <h4>Economic Importance</h4>    
-    <p>    
-      • Important primary producer in aquatic ecosystems <br>    
-      • Used in ecological monitoring of water quality    
-    </p>    
-  </div>    <!-- DISTRIBUTION -->    <div class="section">    
-    <h4>Distribution</h4>    
-    <p>    
-      • Australia (New South Wales) — 34.15°S, 151.2°E <br>    
-      • Northern Australia — 14.1°S, 136.4°E <br>    
-      • Germany — 51.6°N, 8.0°E    
-    </p>    
-  </div>  </div>  </body>    
-</html>    
+  r.innerHTML=list.map(a=>`
+  <div class="card" onclick="openCard('${a.name}')">
+    <img src="images2/${a.name}1.jpg" onerror="this.src='images2/default.jpg'">
+    <div class="card-text">
+      <h4>${a.name}</h4>
+      <p>${a.short}</p>
+    </div>
+  </div>
+  `).join("");
+}
+
+function openCard(name){
+  const a=algae.find(x=>x.name===name);
+  document.getElementById("modal").style.display="block";
+  document.getElementById("modalContent").innerHTML = a.full || `
+    <div class="panel"><h2>${name}</h2><p>Data coming soon</p></div>
+  `;
+}
+
+function closeModal(){
+  document.getElementById("modal").style.display="none";
+}
+
+update();
+
+</script>
+
+</body>
+</html>

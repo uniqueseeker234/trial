@@ -390,7 +390,6 @@ function show(list){
   </div>
   `).join("");
 }
-
 function openCard(name){
   const a = algae.find(x => x.name === name);
 
@@ -401,26 +400,23 @@ function openCard(name){
     return;
   }
 
-  // TEMP SAFE FALLBACK (until you paste full dataset)
-  const c = a.classification  {};
+  const c = a.classification || {};
 
-  const morphology = (a.morphology  ["Data not added"])
+  const morphology = (a.morphology || ["Data not added"])
     .map(m => "• " + m).join("<br>");
 
-  const features = (a.salient_features  ["Data not added"])
+  const features = (a.salient_features || ["Data not added"])
     .map(m => "• " + m).join("<br>");
 
-  const econ = (a.economic_importance  ["Data not added"])
+  const econ = (a.economic_importance || ["Data not added"])
     .map(m => "• " + m).join("<br>");
 
   const dist = (a.distribution || [])
-    .map(d => • ${d.place} — ${d.lat}°, ${d.lon}°)
+    .map(d => "• " + d.place + " — " + d.lat + "°, " + d.lon + "°")
     .join("<br>") || "Data not added";
 
-  document.getElementById("modalContent").innerHTML = 
+  document.getElementById("modalContent").innerHTML = `
   <div class="panel">
-
-    <div class="header">⚠ ALGAE SYSTEM DATA</div>
 
     <div class="images">
       <img src="images2/${a.name}1.jpg" onerror="this.src='images2/default.jpg'">
@@ -459,7 +455,7 @@ function openCard(name){
     </div>
 
   </div>
-  ;
+  `;
 }
 
 function closeModal(){

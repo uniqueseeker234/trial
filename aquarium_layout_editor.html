@@ -2204,9 +2204,13 @@ function openCard(name){
   const econ = (a.economic_importance || ["Data not added"])
     .map(m => "• " + m).join("<br>");
 
-  const dist = (a.distribution || [])
-    .map(d => "• " + d.place + " — " + d.lat + "°, " + d.lon + "°")
-    .join("<br>") || "Data not added";
+ const dist = (a.distribution || [])
+  .map(d => • ${d.place} — 
+    <span style="color:cyan; cursor:pointer;"
+    onclick="openMap(${d.lat}, ${d.lon})">
+    ${d.lat}°, ${d.lon}°
+    </span>)
+  .join("<br>") || "Data not added";
 
   document.getElementById("modalContent").innerHTML = `
   <div class="panel">
@@ -2253,6 +2257,10 @@ function openCard(name){
 
 function closeModal(){
   document.getElementById("modal").style.display="none";
+}
+  function openMap(lat, lon){
+  const url = https://www.google.com/maps?q=${lat},${lon};
+  window.open(url, "_blank");
 }
 update();
 

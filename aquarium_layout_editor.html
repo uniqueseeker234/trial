@@ -182,7 +182,32 @@ body {
     0 0 70px rgba(0,255,255,0.4),
     inset 0 0 25px rgba(0,255,255,0.2);
 }
+.images {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
 
+.images img {
+  width: 50%;
+  border-radius: 10px;
+  border: 1px solid cyan;
+}
+
+.section {
+  margin-top: 10px;
+}
+
+.section h4 {
+  color: cyan;
+  margin-bottom: 5px;
+}
+
+.section p {
+  color: #bdfcff;
+  font-size: 14px;
+  line-height: 1.5;
+}
 </style>
 </head>
 
@@ -233,7 +258,40 @@ body {
 /* DATA — FULLY CORRECTED ONLY */
 const algae = [
 
-{name:"Cladophora",class:"Chlorophyta",habitat:"Freshwater",short:"Filamentous green algae"},
+{
+  name: "Cladophora",
+  class: "Chlorophyta",
+  habitat: "Freshwater",
+  short: "Filamentous green algae",
+
+  classification: {
+    division: "Chlorophyta",
+    class: "Ulvophyceae",
+    order: "Cladophorales"
+  },
+
+  morphology: [
+    "Filamentous, branched multicellular thallus",
+    "Cells are multinucleate with reticulate chloroplast"
+  ],
+
+  salient_features: [
+    "Forms dense green mats in water bodies",
+    "Can tolerate freshwater and marine",
+    "Indicator of eutrophic conditions"
+  ],
+
+  economic_importance: [
+    "Provides habitat for aquatic organisms",
+    "Indicator of water pollution"
+  ],
+
+  distribution: [
+    {place:"Australia", lat:-34.1, lon:151.2},
+    {place:"Northern Australia", lat:-14.1, lon:136.4},
+    {place:"Germany", lat:51.6, lon:8.0}
+  ]
+},
 {name:"Chlorococcum",class:"Chlorophyta",habitat:"Soil",short:"Unicellular green algae"},
 {name:"Coelastrum",class:"Chlorophyta",habitat:"Freshwater",short:"Colonial spherical algae"},
 {name:"Cosmarium",class:"Charophyta",habitat:"Freshwater",short:"Desmid algae"},
@@ -334,11 +392,74 @@ function show(list){
 }
 
 function openCard(name){
-  const a=algae.find(x=>x.name===name);
-  document.getElementById("modal").style.display="block";
-  document.getElementById("modalContent").innerHTML = a.full || `
-    <div class="panel"><h2>${name}</h2><p>Full data coming soon</p></div>
-  `;
+  const a = algae.find(x => x.name === name);
+
+  document.getElementById("modal").style.display = "block";
+
+  if(!a){
+    document.getElementById("modalContent").innerHTML = "No data";
+    return;
+  }
+
+  // TEMP SAFE FALLBACK (until you paste full dataset)
+  const c = a.classification  {};
+
+  const morphology = (a.morphology  ["Data not added"])
+    .map(m => "• " + m).join("<br>");
+
+  const features = (a.salient_features  ["Data not added"])
+    .map(m => "• " + m).join("<br>");
+
+  const econ = (a.economic_importance  ["Data not added"])
+    .map(m => "• " + m).join("<br>");
+
+  const dist = (a.distribution || [])
+    .map(d => • ${d.place} — ${d.lat}°, ${d.lon}°)
+    .join("<br>") || "Data not added";
+
+  document.getElementById("modalContent").innerHTML = 
+  <div class="panel">
+
+    <div class="header">⚠ ALGAE SYSTEM DATA</div>
+
+    <div class="images">
+      <img src="images2/${a.name}1.jpg" onerror="this.src='images2/default.jpg'">
+      <img src="images2/${a.name}2.jpg" onerror="this.src='images2/default.jpg'">
+    </div>
+
+    <h2>${a.name}</h2>
+
+    <div class="section">
+      <h4>Systematic Position</h4>
+      <p>
+        Division: ${c.division || a.class || "-"} <br>
+        Class: ${c.class || "-"} <br>
+        Order: ${c.order || "-"}
+      </p>
+    </div>
+
+    <div class="section">
+      <h4>Morphology</h4>
+      <p>${morphology}</p>
+    </div>
+
+    <div class="section">
+      <h4>Salient Features</h4>
+      <p>${features}</p>
+    </div>
+
+    <div class="section">
+      <h4>Economic Importance</h4>
+      <p>${econ}</p>
+    </div>
+
+    <div class="section">
+      <h4>Distribution</h4>
+      <p>${dist}</p>
+    </div>
+
+  </div>
+  ;
 }
 
 function closeModal(){

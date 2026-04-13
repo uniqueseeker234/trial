@@ -292,16 +292,384 @@ const algae = [
     {place:"Germany", lat:51.6, lon:8.0}
   ]
 },
-{name:"Chlorococcum",class:"Chlorophyta",habitat:"Soil",short:"Unicellular green algae"},
-{name:"Coelastrum",class:"Chlorophyta",habitat:"Freshwater",short:"Colonial spherical algae"},
-{name:"Cosmarium",class:"Charophyta",habitat:"Freshwater",short:"Desmid algae"},
-{name:"Dunaliella",class:"Chlorophyta",habitat:"Marine",short:"Salt-tolerant algae"},
-{name:"Haematococcus",class:"Chlorophyta",habitat:"Freshwater",short:"Astaxanthin algae"},
-{name:"Micractinium",class:"Chlorophyta",habitat:"Freshwater",short:"Spiny algae"},
-{name:"Monoraphidium",class:"Chlorophyta",habitat:"Freshwater",short:"Elongated algae"},
-{name:"Oedogonium",class:"Chlorophyta",habitat:"Freshwater",short:"Filament algae"},
-{name:"Pediastrum",class:"Chlorophyta",habitat:"Freshwater",short:"Star colony"},
-{name:"Scenedesmus",class:"Chlorophyta",habitat:"Freshwater",short:"Linear colony"},
+{
+  name:"Chlorococcum",
+  class:"Chlorophyta",
+  habitat:"Soil",
+  short:"Unicellular green algae",
+
+  classification:{
+    division:"Chlorophyta",
+    class:"Chlorophyceae",
+    order:"Chlorococcales"
+  },
+
+  morphology:[
+    "Unicellular spherical non-motile cells",
+    "Thick cell wall with single chloroplast"
+  ],
+
+  salient_features:[
+    "Occurs in soil and freshwater habitats",
+    "Forms green patches on damp surfaces",
+    "Reproduces by autospores",
+    "Highly resistant to desiccation",
+    "Adapts to terrestrial environments"
+  ],
+
+  economic_importance:[
+    "Contributes to soil formation",
+    "Improves soil fertility",
+    "Used in ecological studies"
+  ],
+
+  distribution:[
+    {place:"Germany",lat:52.3,lon:9.6},
+    {place:"Bavaria (Germany)",lat:48.3,lon:10.1},
+    {place:"Ontario (Canada)",lat:44.3,lon:-78.3}
+  ]
+},
+
+{
+  name:"Coelastrum",
+  class:"Chlorophyta",
+  habitat:"Freshwater",
+  short:"Colonial spherical algae",
+
+  classification:{
+    division:"Chlorophyta",
+    class:"Chlorophyceae",
+    order:"Sphaeropleales"
+  },
+
+  morphology:[
+    "Colonial alga forming hollow spherical colonies",
+    "Cells arranged on colony surface"
+  ],
+
+  salient_features:[
+    "Cells embedded in gelatinous matrix",
+    "Common freshwater plankton",
+    "Symmetrical colony structure",
+    "Efficient photosynthesis in colonies",
+    "Adapts to nutrient-rich water"
+  ],
+
+  economic_importance:[
+    "Primary producer in freshwater",
+    "Used in plankton studies",
+    "Supports aquatic food chains"
+  ],
+
+  distribution:[
+    {place:"Sweden",lat:56.9,lon:14.7},
+    {place:"Berlin (Germany)",lat:52.4,lon:13.3},
+    {place:"South Korea",lat:35.1,lon:129.1}
+  ]
+},
+
+{
+  name:"Cosmarium",
+  class:"Charophyta",
+  habitat:"Freshwater",
+  short:"Desmid algae",
+
+  classification:{
+    division:"Charophyta",
+    class:"Zygnematophyceae",
+    order:"Desmidiales"
+  },
+
+  morphology:[
+    "Unicellular desmid with two semicells",
+    "Deep constriction separating halves"
+  ],
+
+  salient_features:[
+    "Highly symmetrical structure",
+    "Sensitive to pollution",
+    "Occurs in clean freshwater",
+    "Used as bioindicator species",
+    "Distinctive geometric shape"
+  ],
+
+  economic_importance:[
+    "Indicator of water quality",
+    "Used in ecological monitoring",
+    "Helps assess pollution levels"
+  ],
+
+  distribution:[
+    {place:"Germany",lat:52.2,lon:7.7},
+    {place:"Queensland (Australia)",lat:-28.1,lon:149.7},
+    {place:"Sweden",lat:59.8,lon:17.7}
+  ]
+},
+
+{
+  name:"Dunaliella",
+  class:"Chlorophyta",
+  habitat:"Marine",
+  short:"Salt-tolerant algae",
+
+  classification:{
+    division:"Chlorophyta",
+    class:"Chlorophyceae",
+    order:"Chlamydomonadales"
+  },
+
+  morphology:[
+    "Unicellular motile cells with two flagella",
+    "Flexible membrane without rigid wall"
+  ],
+
+  salient_features:[
+    "Thrives in hypersaline environments",
+    "Produces beta-carotene",
+    "Survives extreme salinity",
+    "High adaptability to stress",
+    "Changes color under stress"
+  ],
+
+  economic_importance:[
+    "Source of beta-carotene",
+    "Used in cosmetics",
+    "Used in health supplements"
+  ],
+
+  distribution:[
+    {place:"Ukraine",lat:45.3,lon:30.2},
+    {place:"Reunion Island",lat:-21.1,lon:55.5},
+    {place:"France",lat:43.6,lon:4.2}
+  ]
+},
+
+{
+  name:"Haematococcus",
+  class:"Chlorophyta",
+  habitat:"Freshwater",
+  short:"Astaxanthin algae",
+
+  classification:{
+    division:"Chlorophyta",
+    class:"Chlorophyceae",
+    order:"Chlamydomonadales"
+  },
+
+  morphology:[
+    "Unicellular spherical cells",
+    "Forms thick-walled cysts"
+  ],
+
+  salient_features:[
+    "Produces astaxanthin pigment",
+    "Turns red under stress",
+    "Survives extreme environments",
+    "Switches between motile and resting stages",
+    "High antioxidant production"
+  ],
+
+  economic_importance:[
+    "Source of astaxanthin",
+    "Used in aquaculture",
+    "Used in pharmaceuticals"
+  ],
+
+  distribution:[
+    {place:"Sweden",lat:57.6,lon:11.9},
+    {place:"France",lat:48.8,lon:1.1},
+    {place:"Sweden",lat:56.5,lon:16.4}
+  ]
+}
+{
+  name:"Micractinium",
+  class:"Chlorophyta",
+  habitat:"Freshwater",
+  short:"Spiny green algae",
+
+  classification:{
+    division:"Chlorophyta",
+    class:"Trebouxiophyceae",
+    order:"Chlorellales"
+  },
+
+  morphology:[
+    "Small unicellular or colonial alga",
+    "Cells with spine-like projections"
+  ],
+
+  salient_features:[
+    "Forms colonies with protective spines",
+    "Common in freshwater plankton",
+    "Defense against grazing organisms",
+    "Adapted to predator-rich environments",
+    "Cells embedded in mucilage"
+  ],
+
+  economic_importance:[
+    "Supports aquatic food chains",
+    "Used in ecological interaction studies",
+    "Helps understand predator-prey dynamics"
+  ],
+
+  distribution:[
+    {place:"Sweden",lat:59.0,lon:16.6},
+    {place:"Norway",lat:68.1,lon:13.5},
+    {place:"Estonia",lat:59.4,lon:24.6}
+  ]
+},
+
+{
+  name:"Monoraphidium",
+  class:"Chlorophyta",
+  habitat:"Freshwater",
+  short:"Elongated unicellular algae",
+
+  classification:{
+    division:"Chlorophyta",
+    class:"Chlorophyceae",
+    order:"Sphaeropleales"
+  },
+
+  morphology:[
+    "Unicellular elongated cells",
+    "Tapered at both ends"
+  ],
+
+  salient_features:[
+    "Common freshwater phytoplankton",
+    "Rapid growth rate",
+    "High photosynthetic efficiency",
+    "Thrives in nutrient-rich water",
+    "Important in plankton communities"
+  ],
+
+  economic_importance:[
+    "Used in biofuel research",
+    "Primary producer in ecosystems",
+    "Supports aquatic food webs"
+  ],
+
+  distribution:[
+    {place:"Sweden",lat:59.8,lon:17.7},
+    {place:"Netherlands",lat:53.0,lon:6.1},
+    {place:"Sweden",lat:57.2,lon:14.6}
+  ]
+},
+
+{
+  name:"Oedogonium",
+  class:"Chlorophyta",
+  habitat:"Freshwater",
+  short:"Filamentous cap-cell algae",
+
+  classification:{
+    division:"Chlorophyta",
+    class:"Chlorophyceae",
+    order:"Oedogoniales"
+  },
+
+  morphology:[
+    "Unbranched filamentous structure",
+    "Cells cylindrical with cap cells"
+  ],
+
+  salient_features:[
+    "Distinct cell division forming cap cells",
+    "Attached to substrates",
+    "Reproduces via oogonia and antheridia",
+    "Common in freshwater bodies",
+    "Shows complex reproduction"
+  ],
+
+  economic_importance:[
+    "Used in teaching plant reproduction",
+    "Important ecological component",
+    "Supports aquatic habitats"
+  ],
+
+  distribution:[
+    {place:"Sweden",lat:59.8,lon:17.7},
+    {place:"Germany",lat:48.8,lon:9.4},
+    {place:"Netherlands",lat:52.9,lon:6.1}
+  ]
+},
+
+{
+  name:"Pediastrum",
+  class:"Chlorophyta",
+  habitat:"Freshwater",
+  short:"Star-shaped colony algae",
+
+  classification:{
+    division:"Chlorophyta",
+    class:"Chlorophyceae",
+    order:"Sphaeropleales"
+  },
+
+  morphology:[
+    "Flat plate-like colony",
+    "Cells arranged in star pattern"
+  ],
+
+  salient_features:[
+    "Symmetrical colony structure",
+    "Common in freshwater plankton",
+    "Forms definite colony shapes",
+    "Reproduces via daughter colonies",
+    "Adapted to still water bodies"
+  ],
+
+  economic_importance:[
+    "Indicator of ecological conditions",
+    "Used in paleolimnology",
+    "Helps study freshwater history"
+  ],
+
+  distribution:[
+    {place:"Sweden",lat:58.2,lon:15.6},
+    {place:"Sweden",lat:57.1,lon:14.9},
+    {place:"Norway",lat:59.7,lon:10.7}
+  ]
+},
+
+{
+  name:"Scenedesmus",
+  class:"Chlorophyta",
+  habitat:"Freshwater",
+  short:"Linear colony algae",
+
+  classification:{
+    division:"Chlorophyta",
+    class:"Chlorophyceae",
+    order:"Sphaeropleales"
+  },
+
+  morphology:[
+    "Colonial algae with linear cell arrangement",
+    "Cells may have spines"
+  ],
+
+  salient_features:[
+    "Forms coenobia of 2–8 cells",
+    "Adapted to high light conditions",
+    "Common in nutrient-rich waters",
+    "Shows morphological variation",
+    "Important plankton species"
+  ],
+
+  economic_importance:[
+    "Used in biofuel research",
+    "Indicator of eutrophic conditions",
+    "Supports aquatic food chains"
+  ],
+
+  distribution:[
+    {place:"Norway",lat:68.1,lon:13.5},
+    {place:"Sweden",lat:58.7,lon:17.1},
+    {place:"Netherlands",lat:53.0,lon:5.9}
+  ]
+},
 {name:"Spirogyra",class:"Charophyta",habitat:"Freshwater",short:"Spiral algae"},
 {name:"Stigeoclonium",class:"Chlorophyta",habitat:"Freshwater",short:"Branched algae"},
 {name:"Volvox",class:"Chlorophyta",habitat:"Freshwater",short:"Motile colony"},

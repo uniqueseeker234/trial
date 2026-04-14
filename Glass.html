@@ -52,7 +52,8 @@ body{
 
 /* HOVER EFFECT */
 .polaroid:hover{
-  transform: scale(1.05) rotate(0deg);
+  transform: scale(1.08) rotate(0deg);
+  animation: none;
 }
 
 /* IMAGE */
@@ -69,6 +70,27 @@ body{
   font-size:13px;
   color:black;
   font-family: 'Permanent Marker', cursive;
+}
+  /* FLOAT ANIMATION */
+@keyframes float1 {
+  0% { transform: translateY(0px) rotate(-2deg); }
+  50% { transform: translateY(-8px) rotate(-1deg); }
+  100% { transform: translateY(0px) rotate(-2deg); }
+}
+
+@keyframes float2 {
+  0% { transform: translateY(0px) rotate(2deg); }
+  50% { transform: translateY(6px) rotate(3deg); }
+  100% { transform: translateY(0px) rotate(2deg); }
+}
+
+/* APPLY ANIMATION */
+.polaroid{
+  animation: float1 4s ease-in-out infinite;
+}
+
+.polaroid:nth-child(even){
+  animation: float2 5s ease-in-out infinite;
 }
 </style>
 </head>

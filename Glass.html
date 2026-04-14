@@ -4,162 +4,64 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&family=Inter:wght@300;500&display=swap" rel="stylesheet">
-
-<title>Algae Filter System</title>
+<title>Algae Gallery</title>
 
 <style>
-
-/* ===== BODY ===== */
-body {
-  margin: 0;
-  background: radial-gradient(circle at center, #000814, #000);
-  font-family: 'Inter', sans-serif;
-  color: white;
+body{
+  margin:0;
+  background:#000814;
+  font-family:sans-serif;
+  color:white;
 }
 
-/* TITLE */
-.title {
-  text-align: center;
-  margin: 20px;
-  font-family: 'Orbitron', sans-serif;
-  font-size: 22px;
-  color: cyan;
-  text-shadow: 0 0 15px cyan;
+.title{
+  text-align:center;
+  padding:15px;
+  font-size:22px;
+  color:cyan;
 }
 
-/* PANEL */
-.panel {
-  margin: 15px;
-  padding: 15px;
-  border-radius: 18px;
-  background: rgba(0, 255, 255, 0.03);
-  border: 1px solid rgba(0,255,255,0.3);
-  box-shadow: 0 0 20px rgba(0,255,255,0.1);
+/* GRID */
+.gallery{
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px,1fr));
+  gap:10px;
+  padding:10px;
 }
 
-/* SECTION TITLE */
-.section-title {
-  margin-bottom: 10px;
-  font-size: 14px;
-  color: cyan;
-  letter-spacing: 1px;
+/* IMAGE */
+.gallery img{
+  width:100%;
+  height:120px;
+  object-fit:cover;
+  border-radius:10px;
+  cursor:pointer;
+  border:1px solid cyan;
+  transition:0.3s;
 }
 
-/* BUTTON GROUP */
-.group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+.gallery img:hover{
+  transform:scale(1.05);
+  box-shadow:0 0 10px cyan;
 }
-
-/* FILTER BUTTON */
-.filter-btn {
-  padding: 8px 14px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.2);
-  background: rgba(255,255,255,0.05);
-  font-size: 13px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-/* HOVER */
-.filter-btn:hover {
-  border-color: cyan;
-  box-shadow: 0 0 10px cyan;
-}
-
-/* ACTIVE */
-.filter-btn.active {
-  background: rgba(0,255,255,0.2);
-  border-color: cyan;
-  box-shadow: 0 0 15px cyan;
-}
-
-/* RESULTS PANEL */
-.results {
-  margin: 15px;
-  padding: 20px;
-  border-radius: 18px;
-  border: 1px solid rgba(0,255,255,0.2);
-  min-height: 120px;
-  text-align: center;
-  color: rgba(255,255,255,0.6);
-}
-
 </style>
 </head>
 
 <body>
 
-<div class="title">ALGAE FILTER SYSTEM</div>
+<div class="title">ALGAE GALLERY</div>
 
-<!-- COLOR FILTER -->
-<div class="panel">
-  <div class="section-title">COLOR TYPE</div>
-  <div class="group">
-    <div class="filter-btn">Green</div>
-    <div class="filter-btn">Blue-Green</div>
-    <div class="filter-btn">Brown</div>
-    <div class="filter-btn">Red</div>
-  </div>
+<div class="gallery">
+
+  <!-- SAMPLE IMAGES (replace gradually) -->
+  <img src="images2/Cladophora1.jpg" onerror="this.src='images2/default.jpg'">
+  <img src="images2/Ulva lactuca1.jpg" onerror="this.src='images2/default.jpg'">
+  <img src="images2/Chlorella1.jpg" onerror="this.src='images2/default.jpg'">
+  <img src="images2/Spirogyra1.jpg" onerror="this.src='images2/default.jpg'">
+  <img src="images2/Botryococcus1.jpg" onerror="this.src='images2/default.jpg'">
+  <img src="images2/Polysiphonia1.jpg" onerror="this.src='images2/default.jpg'">
+
 </div>
-
-<!-- HABITAT FILTER -->
-<div class="panel">
-  <div class="section-title">HABITAT</div>
-  <div class="group">
-    <div class="filter-btn">Freshwater</div>
-    <div class="filter-btn">Marine</div>
-    <div class="filter-btn">Moist Soil</div>
-  </div>
-</div>
-
-<!-- STRUCTURE FILTER -->
-<div class="panel">
-  <div class="section-title">STRUCTURE</div>
-  <div class="group">
-    <div class="filter-btn">Unicellular</div>
-    <div class="filter-btn">Colonial</div>
-    <div class="filter-btn">Filamentous</div>
-  </div>
-</div>
-
-<!-- RESULTS -->
-<div class="results" id="results">
-  Select filters to see results
-</div>
-
-<script>
-
-/* TOGGLE BUTTON ACTIVE */
-const buttons = document.querySelectorAll(".filter-btn");
-
-buttons.forEach(btn => {
-  btn.addEventListener("click", () => {
-    btn.classList.toggle("active");
-    updateResults();
-  });
-});
-
-/* SIMPLE RESULT SYSTEM (placeholder) */
-function updateResults() {
-  const active = document.querySelectorAll(".filter-btn.active");
-
-  if (active.length === 0) {
-    document.getElementById("results").innerText = "Select filters to see results";
-    return;
-  }
-
-  let selected = [];
-  active.forEach(b => selected.push(b.innerText));
-
-  document.getElementById("results").innerText =
-    "Filters Applied:\n" + selected.join(", ");
-}
-
-</script>
 
 </body>
 </html>

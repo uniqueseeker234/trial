@@ -22,23 +22,22 @@ html, body{
 }
 
 /* BACKGROUND */
-body::before{
-  content:"";
-  position:fixed;
-  inset:0;
+body{
+  margin:0;
+  font-family:sans-serif;
+  color:white;
+  overflow-x:hidden;
 
-  background: url("images2/bg.jpg") center/cover no-repeat;
+  background:
+    linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.8)),
+    url("images2/bg.jpg");
 
-  z-index:-1;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  background-attachment: scroll; /* 🔥 KEY FIX */
 }
-body::after{
-  content:"";
-  position:fixed;
-  inset:0;
-  background: rgba(0,0,0,0.5); /* smooth dark overlay */
-  z-index:-1;
-}
-
 /* TITLE */
 .title{
   text-align:center;
@@ -49,6 +48,7 @@ body::after{
 
 /* GALLERY */
 .gallery{
+  will-change: transform;
   display:flex;
   flex-direction:column;
   gap:60px;

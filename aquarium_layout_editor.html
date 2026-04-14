@@ -244,7 +244,7 @@ body {
     <div class="filter-btn">Soil</div>
   </div>
 </div>
-
+<div class="filter-btn" onclick="openGallery()">Explore Algae Gallery</div>
 <div class="results" id="results"></div>
 
 <!-- MODAL -->
@@ -2261,6 +2261,27 @@ function closeModal(){
   function openMap(lat, lon){
   const url = `https://www.google.com/maps?q=${lat},${lon}`;
   window.open(url, "_blank");
+  }
+  function openCompare(){
+  const options = algae.map(a => 
+    `<option value="${a.name}">${a.name}</option>`
+  ).join("");
+
+  const html = `
+  <div class="panel">
+    <h2 style="text-align:center; color:cyan;">Compare Algae</h2>
+
+    <select id="a1">${options}</select>
+    <select id="a2">${options}</select>
+
+    <button onclick="runCompare()" style="margin-top:10px;">Compare</button>
+
+    <div id="compareResult" style="margin-top:20px;"></div>
+  </div>
+  `;
+
+  document.getElementById("modal").style.display = "block";
+  document.getElementById("modalContent").innerHTML = html;
   }
 update();
 

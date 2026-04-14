@@ -13,13 +13,12 @@ body{
   margin:0;
   font-family:sans-serif;
   color:white;
-
-  overflow-x:hidden;   /* 🔥 THIS FIXES SIDE SCROLL */
+  overflow-x:hidden;
 }
-  html, body{
+html, body{
   max-width:100%;
   overflow-x:hidden;
-  }
+}
 
 /* BACKGROUND */
 body::before{
@@ -30,7 +29,6 @@ body::before{
   filter: blur(12px) brightness(0.4);
   z-index:-1;
 }
-
 body::after{
   content:"";
   position:fixed;
@@ -53,7 +51,6 @@ body::after{
   flex-direction:column;
   gap:60px;
   padding:25px;
-
   overflow-x:hidden;
 }
 
@@ -89,22 +86,11 @@ body::after{
   box-shadow: 0 10px 20px rgba(0,0,0,0.6);
   text-align:center;
   position: relative;
-
   transform-origin: top center;
-
-  /* 🔥 SIDE SWING ONLY */
   animation: swing 4s ease-in-out infinite;
 }
 
-/* DIFFERENT TIMING */
-.polaroid-wrapper:nth-child(1) .polaroid{
-  animation-delay: 0s;
-}
-.polaroid-wrapper:nth-child(2) .polaroid{
-  animation-delay: 1s;
-}
-
-/* SWING ANIMATION */
+/* SWING */
 @keyframes swing{
   0%{ transform: rotate(-3deg); }
   50%{ transform: rotate(3deg); }
@@ -124,12 +110,45 @@ body::after{
   border-radius:2px;
 }
 
-/* IMAGE */
-.polaroid img{
+/* 🔥 IMAGE BOX (NEW) */
+.img-box{
+  position:relative;
   width:100%;
   height:120px;
-  object-fit:cover;
+  overflow:hidden;
   border-radius:4px;
+}
+
+/* BOTH IMAGES */
+.img-box img{
+  position:absolute;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  top:0;
+  left:0;
+}
+
+/* SECOND IMAGE */
+.img-box img:nth-child(2){
+  opacity:0;
+}
+
+/* ANIMATION */
+.img-box img:nth-child(1){
+  animation: fadeOut 6s infinite;
+}
+.img-box img:nth-child(2){
+  animation: fadeIn 6s infinite;
+}
+
+@keyframes fadeOut{
+  0%,40%{opacity:1;}
+  50%,100%{opacity:0;}
+}
+@keyframes fadeIn{
+  0%,40%{opacity:0;}
+  50%,100%{opacity:1;}
 }
 
 /* NAME */
@@ -144,14 +163,13 @@ body::after{
 .polaroid:hover{
   transform: scale(1.08) rotate(0deg);
   animation-play-state: paused;
-  z-index: 10;
+  z-index:10;
 }
-  .polaroid:active{
+.polaroid:active{
   transform: scale(1.08) rotate(0deg);
   animation-play-state: paused;
-  z-index: 10;
-  }
-
+  z-index:10;
+}
 </style>
 </head>
 
@@ -161,210 +179,280 @@ body::after{
 
 <div class="gallery">
 
-  <!-- EXISTING ROWS (UNCHANGED) -->
-  <div class="row">
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Cladophora1.jpg" onerror="this.src='images2/default.jpg'">
-      <p>Cladophora</p></div></div>
+<!-- ROW 1 -->
+<div class="row">
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Cladophora1.jpg"><img src="images2/Cladophora2.jpg">
+</div><p>Cladophora</p></div></div>
 
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Ulva lactuca1.jpg" onerror="this.src='images2/default.jpg'">
-      <p>Ulva lactuca</p></div></div>
-  </div>
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Ulva lactuca1.jpg"><img src="images2/Ulva lactuca2.jpg">
+</div><p>Ulva lactuca</p></div></div>
+</div>
 
-  <div class="row">
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Chlorella1.jpg"><p>Chlorella</p></div></div>
+<!-- ROW 2 -->
+<div class="row">
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Chlorella1.jpg"><img src="images2/Chlorella2.jpg">
+</div><p>Chlorella</p></div></div>
 
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Spirogyra1.jpg"><p>Spirogyra</p></div></div>
-  </div>
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Spirogyra1.jpg"><img src="images2/Spirogyra2.jpg">
+</div><p>Spirogyra</p></div></div>
+</div>
 
-  <div class="row">
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Botryococcus1.jpg"><p>Botryococcus</p></div></div>
+<!-- ROW 3 -->
+<div class="row">
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Botryococcus1.jpg"><img src="images2/Botryococcus2.jpg">
+</div><p>Botryococcus</p></div></div>
 
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Polysiphonia1.jpg"><p>Polysiphonia</p></div></div>
-  </div>
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Polysiphonia1.jpg"><img src="images2/Polysiphonia2.jpg">
+</div><p>Polysiphonia</p></div></div>
+</div>
 
-  <!-- 🔥 NEW ALGAE ROWS -->
+<!-- ROW 4 -->
+<div class="row">
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Chlorococcum1.jpg"><img src="images2/Chlorococcum2.jpg">
+</div><p>Chlorococcum</p></div></div>
 
-  <div class="row">
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Chlorococcum1.jpg"><p>Chlorococcum</p></div></div>
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Coelastrum1.jpg"><img src="images2/Coelastrum2.jpg">
+</div><p>Coelastrum</p></div></div>
+</div>
 
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Coelastrum1.jpg"><p>Coelastrum</p></div></div>
-  </div>
+<!-- ROW 5 -->
+<div class="row">
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Cosmarium1.jpg"><img src="images2/Cosmarium2.jpg">
+</div><p>Cosmarium</p></div></div>
 
-  <div class="row">
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Cosmarium1.jpg"><p>Cosmarium</p></div></div>
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Dunaliella1.jpg"><img src="images2/Dunaliella2.jpg">
+</div><p>Dunaliella</p></div></div>
+</div>
 
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Dunaliella1.jpg"><p>Dunaliella</p></div></div>
-  </div>
+<!-- ROW 6 -->
+<div class="row">
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Haematococcus1.jpg"><img src="images2/Haematococcus2.jpg">
+</div><p>Haematococcus</p></div></div>
 
-  <div class="row">
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Haematococcus1.jpg"><p>Haematococcus</p></div></div>
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Micractinium1.jpg"><img src="images2/Micractinium2.jpg">
+</div><p>Micractinium</p></div></div>
+</div>
 
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Micractinium1.jpg"><p>Micractinium</p></div></div>
-  </div>
+<!-- ROW 7 -->
+<div class="row">
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Monoraphidium1.jpg"><img src="images2/Monoraphidium2.jpg">
+</div><p>Monoraphidium</p></div></div>
 
-  <div class="row">
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Monoraphidium1.jpg"><p>Monoraphidium</p></div></div>
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Oedogonium1.jpg"><img src="images2/Oedogonium2.jpg">
+</div><p>Oedogonium</p></div></div>
+</div>
 
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Oedogonium1.jpg"><p>Oedogonium</p></div></div>
-  </div>
+<!-- ROW 8 -->
+<div class="row">
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Pediastrum1.jpg"><img src="images2/Pediastrum2.jpg">
+</div><p>Pediastrum</p></div></div>
 
-  <div class="row">
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Pediastrum1.jpg"><p>Pediastrum</p></div></div>
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Scenedesmus1.jpg"><img src="images2/Scenedesmus2.jpg">
+</div><p>Scenedesmus</p></div></div>
+</div>
 
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Scenedesmus1.jpg"><p>Scenedesmus</p></div></div>
-  </div>
+<!-- ROW 9 -->
+<div class="row">
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Stichococcus1.jpg"><img src="images2/Stichococcus2.jpg">
+</div><p>Stichococcus</p></div></div>
 
-  <div class="row">
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Stichococcus1.jpg"><p>Stichococcus</p></div></div>
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Stigeoclonium1.jpg"><img src="images2/Stigeoclonium2.jpg">
+</div><p>Stigeoclonium</p></div></div>
+</div>
 
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Stigeoclonium1.jpg"><p>Stigeoclonium</p></div></div>
-  </div>
+<!-- ROW 10 -->
+<div class="row">
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Tetraselmis1.jpg"><img src="images2/Tetraselmis2.jpg">
+</div><p>Tetraselmis</p></div></div>
 
-  <div class="row">
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Tetraselmis1.jpg"><p>Tetraselmis</p></div></div>
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Trebouxia1.jpg"><img src="images2/Trebouxia2.jpg">
+</div><p>Trebouxia</p></div></div>
+</div>
 
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Trebouxia1.jpg"><p>Trebouxia</p></div></div>
-  </div>
+<!-- ROW 11 -->
+<div class="row">
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Volvox1.jpg"><img src="images2/Volvox2.jpg">
+</div><p>Volvox</p></div></div>
 
-  <div class="row">
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Volvox1.jpg"><p>Volvox</p></div></div>
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Chara1.jpg"><img src="images2/Chara2.jpg">
+</div><p>Chara</p></div></div>
+</div>
 
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Chara1.jpg"><p>Chara</p></div></div>
-  </div>
+<!-- ROW 12 -->
+<div class="row">
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Furcellaria1.jpg"><img src="images2/Furcellaria2.jpg">
+</div><p>Furcellaria</p></div></div>
 
-  <div class="row">
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Furcellaria1.jpg"><p>Furcellaria</p></div></div>
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Hypnea pannosa1.jpg"><img src="images2/Hypnea pannosa2.jpg">
+</div><p>Hypnea pannosa</p></div></div>
+</div>
 
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Hypnea pannosa1.jpg"><p>Hypnea pannosa</p></div></div>
-  </div>
+<!-- ROW 13 -->
+<div class="row">
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Lithothamnion1.jpg"><img src="images2/Lithothamnion2.jpg">
+</div><p>Lithothamnion</p></div></div>
 
-  <div class="row">
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Lithothamnion1.jpg"><p>Lithothamnion</p></div></div>
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Porphyra1.jpg"><img src="images2/Porphyra2.jpg">
+</div><p>Porphyra</p></div></div>
+</div>
 
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Porphyra1.jpg"><p>Porphyra</p></div></div>
-  </div>
+<!-- ROW 14 -->
+<div class="row">
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Titanophora1.jpg"><img src="images2/Titanophora2.jpg">
+</div><p>Titanophora</p></div></div>
 
-  <div class="row">
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Titanophora1.jpg"><p>Titanophora</p></div></div>
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Canistrocarpus1.jpg"><img src="images2/Canistrocarpus2.jpg">
+</div><p>Canistrocarpus</p></div></div>
+</div>
 
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Canistrocarpus1.jpg"><p>Canistrocarpus</p></div></div>
-  </div>
+<!-- ROW 15 -->
+<div class="row">
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Cystoseira1.jpg"><img src="images2/Cystoseira2.jpg">
+</div><p>Cystoseira</p></div></div>
 
-  <div class="row">
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Cystoseira1.jpg"><p>Cystoseira</p></div></div>
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Ectocarpus1.jpg"><img src="images2/Ectocarpus2.jpg">
+</div><p>Ectocarpus</p></div></div>
+</div>
 
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Ectocarpus1.jpg"><p>Ectocarpus</p></div></div>
-  </div>
+<!-- ROW 16 -->
+<div class="row">
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Laminaria1.jpg"><img src="images2/Laminaria2.jpg">
+</div><p>Laminaria</p></div></div>
 
-  <div class="row">
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Laminaria1.jpg"><p>Laminaria</p></div></div>
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Macrocystis1.jpg"><img src="images2/Macrocystis2.jpg">
+</div><p>Macrocystis</p></div></div>
+</div>
 
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Macrocystis1.jpg"><p>Macrocystis</p></div></div>
-  </div>
+<!-- ROW 17 -->
+<div class="row">
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Nereocystis1.jpg"><img src="images2/Nereocystis2.jpg">
+</div><p>Nereocystis</p></div></div>
 
-  <div class="row">
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Nereocystis1.jpg"><p>Nereocystis</p></div></div>
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Padina1.jpg"><img src="images2/Padina2.jpg">
+</div><p>Padina</p></div></div>
+</div>
 
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Padina1.jpg"><p>Padina</p></div></div>
-  </div>
+<!-- ROW 18 -->
+<div class="row">
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Saccharina1.jpg"><img src="images2/Saccharina2.jpg">
+</div><p>Saccharina</p></div></div>
 
-  <div class="row">
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Saccharina1.jpg"><p>Saccharina</p></div></div>
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Sargassum1.jpg"><img src="images2/Sargassum2.jpg">
+</div><p>Sargassum</p></div></div>
+</div>
 
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Sargassum1.jpg"><p>Sargassum</p></div></div>
-  </div>
+<!-- ROW 19 -->
+<div class="row">
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Stypopodium1.jpg"><img src="images2/Stypopodium2.jpg">
+</div><p>Stypopodium</p></div></div>
 
-  <div class="row">
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Stypopodium1.jpg"><p>Stypopodium</p></div></div>
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Turbinaria1.jpg"><img src="images2/Turbinaria2.jpg">
+</div><p>Turbinaria</p></div></div>
+</div>
 
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Turbinaria1.jpg"><p>Turbinaria</p></div></div>
-  </div>
+<!-- ROW 20 -->
+<div class="row">
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Chaetoceros1.jpg"><img src="images2/Chaetoceros2.jpg">
+</div><p>Chaetoceros</p></div></div>
 
-  <div class="row">
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Chaetoceros1.jpg"><p>Chaetoceros</p></div></div>
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Phaeodactylum1.jpg"><img src="images2/Phaeodactylum2.jpg">
+</div><p>Phaeodactylum</p></div></div>
+</div>
 
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Phaeodactylum1.jpg"><p>Phaeodactylum</p></div></div>
-  </div>
+<!-- ROW 21 -->
+<div class="row">
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Pinnularia1.jpg"><img src="images2/Pinnularia2.jpg">
+</div><p>Pinnularia</p></div></div>
 
-  <div class="row">
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Pinnularia1.jpg"><p>Pinnularia</p></div></div>
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Microcystis1.jpg"><img src="images2/Microcystis2.jpg">
+</div><p>Microcystis</p></div></div>
+</div>
 
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Microcystis1.jpg"><p>Microcystis</p></div></div>
-  </div>
+<!-- ROW 22 -->
+<div class="row">
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Nostoc1.jpg"><img src="images2/Nostoc2.jpg">
+</div><p>Nostoc</p></div></div>
 
-  <div class="row">
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Nostoc1.jpg"><p>Nostoc</p></div></div>
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Oscillatoria1.jpg"><img src="images2/Oscillatoria2.jpg">
+</div><p>Oscillatoria</p></div></div>
+</div>
 
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Oscillatoria1.jpg"><p>Oscillatoria</p></div></div>
-  </div>
+<!-- ROW 23 -->
+<div class="row">
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Vaucheria1.jpg"><img src="images2/Vaucheria2.jpg">
+</div><p>Vaucheria</p></div></div>
 
-  <div class="row">
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Vaucheria1.jpg"><p>Vaucheria</p></div></div>
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Schizochytrium1.jpg"><img src="images2/Schizochytrium2.jpg">
+</div><p>Schizochytrium</p></div></div>
+</div>
 
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Schizochytrium1.jpg"><p>Schizochytrium</p></div></div>
-  </div>
+<!-- ROW 24 -->
+<div class="row">
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Ankistrodesmus1.jpg"><img src="images2/Ankistrodesmus2.jpg">
+</div><p>Ankistrodesmus</p></div></div>
 
-  <div class="row">
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Ankistrodesmus1.jpg"><p>Ankistrodesmus</p></div></div>
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Ulothrix1.jpg"><img src="images2/Ulothrix2.jpg">
+</div><p>Ulothrix</p></div></div>
+</div>
 
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Ulothrix1.jpg"><p>Ulothrix</p></div></div>
-  </div>
+<!-- ROW 25 -->
+<div class="row">
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Acetabularia1.jpg"><img src="images2/Acetabularia2.jpg">
+</div><p>Acetabularia</p></div></div>
 
-  <div class="row">
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Acetabularia1.jpg"><p>Acetabularia</p></div></div>
-
-    <div class="polaroid-wrapper"><div class="polaroid">
-      <img src="images2/Botryocladia1.jpg"><p>Botryocladia</p></div></div>
-  </div>
+<div class="polaroid-wrapper"><div class="polaroid"><div class="img-box">
+<img src="images2/Botryocladia1.jpg"><img src="images2/Botryocladia2.jpg">
+</div><p>Botryocladia</p></div></div>
+</div>
 
 </div>
 

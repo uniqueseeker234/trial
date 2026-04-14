@@ -41,19 +41,20 @@ body{
   border-radius:6px;
   box-shadow: 0 10px 20px rgba(0,0,0,0.6);
   text-align:center;
-  transform: rotate(-2deg);
-  transition:0.3s;
+
+  animation: float1 4s ease-in-out infinite;
+  transition: transform 0.3s ease;
 }
 
-/* RANDOM ROTATION */
+/* EVEN */
 .polaroid:nth-child(even){
-  transform: rotate(2deg);
+  animation: float2 5s ease-in-out infinite;
 }
 
-/* HOVER EFFECT */
+/* HOVER FIX */
 .polaroid:hover{
-  transform: scale(1.08) rotate(0deg);
-  animation: none;
+  animation-play-state: paused;
+  transform: scale(1.08) rotate(0deg) !important;
 }
 
 /* IMAGE */

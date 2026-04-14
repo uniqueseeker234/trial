@@ -7,6 +7,7 @@
 <title>Algae Gallery</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet">
+
 <style>
 body{
   margin:0;
@@ -15,7 +16,7 @@ body{
   overflow-x:hidden;
 }
 
-/* BLURRED BACKGROUND IMAGE */
+/* BACKGROUND */
 body::before{
   content:"";
   position:fixed;
@@ -25,7 +26,6 @@ body::before{
   z-index:-1;
 }
 
-/* OPTIONAL DEPTH LAYER */
 body::after{
   content:"";
   position:fixed;
@@ -47,31 +47,27 @@ body::after{
 
 /* GRID */
 .gallery{
-  position:relative;
   display:grid;
   grid-template-columns: repeat(auto-fill, minmax(140px,1fr));
   gap:25px;
   padding:25px;
 }
 
-/* 🔥 HORIZONTAL ROPES */
-.rope{
+/* WRAPPER */
+.polaroid-wrapper{
+  position:relative;
+  animation: float 5s ease-in-out infinite;
+}
+
+/* 🔥 ROPE ATTACHED TO EACH CARD */
+.mini-rope{
   position:absolute;
+  top:-10px;
   left:0;
   width:100%;
   height:3px;
   background: linear-gradient(to right, #ccc, #fff, #ccc);
   z-index:0;
-}
-.rope.r1{ top:80px; }
-.rope.r2{ top:270px; }
-.rope.r3{ top:460px; }
-
-/* WRAPPER */
-.polaroid-wrapper{
-  animation: float 5s ease-in-out infinite;
-  position:relative;
-  z-index:1;
 }
 
 /* POLAROID */
@@ -84,13 +80,14 @@ body::after{
   transform: rotate(var(--rot));
   transition: transform 0.3s ease;
   position: relative;
+  z-index:1;
 }
 
 /* CLIP */
 .polaroid::before{
   content:"";
   position:absolute;
-  top:-6px;
+  top:-8px;
   left:50%;
   transform:translateX(-50%);
   width:12px;
@@ -130,18 +127,18 @@ body::after{
 }
 
 /* ROTATIONS */
-.polaroid-wrapper:nth-child(4){ --rot: -3deg; }
-.polaroid-wrapper:nth-child(5){ --rot: 2deg; }
-.polaroid-wrapper:nth-child(6){ --rot: -2deg; }
-.polaroid-wrapper:nth-child(7){ --rot: 3deg; }
-.polaroid-wrapper:nth-child(8){ --rot: -1deg; }
-.polaroid-wrapper:nth-child(9){ --rot: 2deg; }
+.polaroid-wrapper:nth-child(1){ --rot: -3deg; }
+.polaroid-wrapper:nth-child(2){ --rot: 2deg; }
+.polaroid-wrapper:nth-child(3){ --rot: -2deg; }
+.polaroid-wrapper:nth-child(4){ --rot: 3deg; }
+.polaroid-wrapper:nth-child(5){ --rot: -1deg; }
+.polaroid-wrapper:nth-child(6){ --rot: 2deg; }
 
 /* DELAYS */
-.polaroid-wrapper:nth-child(5){ animation-delay: 1s; }
-.polaroid-wrapper:nth-child(6){ animation-delay: 2s; }
-.polaroid-wrapper:nth-child(7){ animation-delay: 0.5s; }
-.polaroid-wrapper:nth-child(8){ animation-delay: 1.5s; }
+.polaroid-wrapper:nth-child(2){ animation-delay: 1s; }
+.polaroid-wrapper:nth-child(3){ animation-delay: 2s; }
+.polaroid-wrapper:nth-child(4){ animation-delay: 0.5s; }
+.polaroid-wrapper:nth-child(5){ animation-delay: 1.5s; }
 
 </style>
 </head>
@@ -152,12 +149,8 @@ body::after{
 
 <div class="gallery">
 
-  <!-- ✅ ROPES -->
-  <div class="rope r1"></div>
-  <div class="rope r2"></div>
-  <div class="rope r3"></div>
-
   <div class="polaroid-wrapper">
+    <div class="mini-rope"></div>
     <div class="polaroid">
       <img src="images2/Cladophora1.jpg" onerror="this.src='images2/default.jpg'">
       <p>Cladophora</p>
@@ -165,6 +158,7 @@ body::after{
   </div>
 
   <div class="polaroid-wrapper">
+    <div class="mini-rope"></div>
     <div class="polaroid">
       <img src="images2/Ulva lactuca1.jpg" onerror="this.src='images2/default.jpg'">
       <p>Ulva lactuca</p>
@@ -172,6 +166,7 @@ body::after{
   </div>
 
   <div class="polaroid-wrapper">
+    <div class="mini-rope"></div>
     <div class="polaroid">
       <img src="images2/Chlorella1.jpg" onerror="this.src='images2/default.jpg'">
       <p>Chlorella</p>
@@ -179,6 +174,7 @@ body::after{
   </div>
 
   <div class="polaroid-wrapper">
+    <div class="mini-rope"></div>
     <div class="polaroid">
       <img src="images2/Spirogyra1.jpg" onerror="this.src='images2/default.jpg'">
       <p>Spirogyra</p>
@@ -186,6 +182,7 @@ body::after{
   </div>
 
   <div class="polaroid-wrapper">
+    <div class="mini-rope"></div>
     <div class="polaroid">
       <img src="images2/Botryococcus1.jpg" onerror="this.src='images2/default.jpg'">
       <p>Botryococcus</p>
@@ -193,6 +190,7 @@ body::after{
   </div>
 
   <div class="polaroid-wrapper">
+    <div class="mini-rope"></div>
     <div class="polaroid">
       <img src="images2/Polysiphonia1.jpg" onerror="this.src='images2/default.jpg'">
       <p>Polysiphonia</p>

@@ -4,289 +4,200 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&family=Inter:wght@300;500&display=swap" rel="stylesheet">
+<title>Algae Gallery</title>
 
-<title>Algae Filter System</title>
-
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet">
 <style>
+body{
+  margin:0;
+  font-family:sans-serif;
+  color:white;
+  overflow-x:hidden;
+}
 
-/* ===== BODY ===== */
-body {
-  margin: 0;
-  background: radial-gradient(circle at center, #000814, #000);
-  font-family: 'Inter', sans-serif;
-  color: white;
+/* BLURRED BACKGROUND IMAGE */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background: url("images2/bg.jpg") center/cover no-repeat;
+  filter: blur(12px) brightness(0.4);
+  z-index:-1;
+}
+
+/* OPTIONAL DEPTH LAYER */
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  background: radial-gradient(circle at center, rgba(0,0,0,0.3), #000814);
+  z-index:-1;
 }
 
 /* TITLE */
-.title {
-  text-align: center;
-  margin: 20px;
-  font-family: 'Orbitron', sans-serif;
-  font-size: 22px;
-  color: cyan;
-  text-shadow: 0 0 15px cyan;
+.title{
+  text-align:center;
+  padding:20px;
+  font-size:26px;
+  color:white;
+  letter-spacing:2px;
+  font-family: 'Special Elite', monospace;
+  text-shadow: 0 0 10px rgba(255,255,255,0.3);
 }
 
-/* PANEL */
-.panel-ui {
-  margin: 15px;
-  padding: 15px;
-  border-radius: 18px;
-  background: rgba(0, 255, 255, 0.03);
-  border: 1px solid rgba(0,255,255,0.3);
+/* GRID */
+.gallery{
+  position:relative;
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px,1fr));
+  gap:25px;
+  padding:25px;
 }
 
-/* SECTION TITLE */
-.section-title {
-  margin-bottom: 10px;
-  font-size: 14px;
-  color: cyan;
+/* STRING LINES */
+.string{
+  position:absolute;
+  left:0;
+  width:100%;
+  height:2px;
+  background: rgba(255,255,255,0.4);
+  z-index:0;
 }
 
-/* GROUP */
-.group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+/* positions of strings */
+.string.s1{ top:120px; }
+.string.s2{ top:300px; }
+
+/* WRAPPER */
+.polaroid-wrapper{
+  animation: float 5s ease-in-out infinite;
+  position:relative;
+  z-index:1;
 }
 
-/* BUTTON */
-.filter-btn {
-  padding: 8px 14px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.2);
-  background: rgba(255,255,255,0.05);
-  cursor: pointer;
+/* POLAROID */
+.polaroid{
+  background:white;
+  padding:10px 10px 15px;
+  border-radius:6px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.6);
+  text-align:center;
+  transform: rotate(var(--rot));
+  transition: transform 0.3s ease;
+  position: relative;
 }
 
-.filter-btn.active {
-  background: rgba(0,255,255,0.2);
-  border-color: cyan;
+/* CLIP EFFECT */
+.polaroid::before{
+  content:"";
+  position:absolute;
+  top:-8px;
+  left:50%;
+  transform:translateX(-50%);
+  width:12px;
+  height:6px;
+  background:#ccc;
+  border-radius:2px;
 }
 
-/* SEARCH */
-.search-box {
-  width: 100%;
-  padding: 10px;
-  border-radius: 10px;
+/* IMAGE */
+.polaroid img{
+  width:100%;
+  height:120px;
+  object-fit:cover;
+  border-radius:4px;
 }
 
-/* RESULTS */
-.results {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+/* NAME */
+.polaroid p{
+  margin-top:8px;
+  font-size:13px;
+  color:black;
+  font-family: 'Permanent Marker', cursive;
 }
 
-/* CARD */
-.card {
-  width: 200px;
-  margin: 10px;
-  padding: 10px;
-  border-radius: 12px;
-  border: 1px solid cyan;
-  cursor: pointer;
+/* HOVER */
+.polaroid:hover{
+  transform: scale(1.08) rotate(0deg);
+  z-index:10;
 }
 
-.card img {
-  width: 100%;
-  border-radius: 10px;
+/* FLOAT */
+@keyframes float{
+  0%{ transform: translateY(0px); }
+  50%{ transform: translateY(-10px); }
+  100%{ transform: translateY(0px); }
 }
 
-/* MODAL */
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.95);
+/* ROTATIONS */
+.polaroid-wrapper:nth-child(3){ --rot: -3deg; }
+.polaroid-wrapper:nth-child(4){ --rot: 2deg; }
+.polaroid-wrapper:nth-child(5){ --rot: -2deg; }
+.polaroid-wrapper:nth-child(6){ --rot: 3deg; }
+.polaroid-wrapper:nth-child(7){ --rot: -1deg; }
+.polaroid-wrapper:nth-child(8){ --rot: 2deg; }
 
-  display: none;
-
-  overflow-y: auto;
-  padding: 20px;
-
-  justify-content: center;
-  align-items: flex-start; /* IMPORTANT FIX */
-}
-#modalContent {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
-.close {
-  position: fixed;
-  top: 20px;
-  right: 25px;
-  color: red;
-  font-size: 25px;
-  cursor: pointer;
-}
-
-/* ===== FULL PANEL ===== */
-.panel {
-  width: 560px;
-  max-width: 100%;
-  margin: 40px auto;
-}
-.images {
-  display: flex;
-  gap: 10px;
-}
-.images img {
-  width: 50%;
-  border: 1px solid cyan;
-}
-
-.section { margin-top: 10px; }
-.section h4 { color: cyan; }
-
+/* DELAYS */
+.polaroid-wrapper:nth-child(4){ animation-delay: 1s; }
+.polaroid-wrapper:nth-child(5){ animation-delay: 2s; }
+.polaroid-wrapper:nth-child(6){ animation-delay: 0.5s; }
+.polaroid-wrapper:nth-child(7){ animation-delay: 1.5s; }
 </style>
 </head>
 
 <body>
 
-<div class="title">ALGAE FILTER SYSTEM</div>
+<div class="title">ALGAE GALLERY</div>
 
-<!-- SEARCH -->
-<div class="panel-ui">
-  <input type="text" id="search" class="search-box" placeholder="Search algae...">
-</div>
+<div class="gallery">
 
-<!-- CLASS -->
-<div class="panel-ui">
-  <div class="section-title">CLASS</div>
-  <div class="group">
-    <div class="filter-btn">Chlorophyceae</div>
-    <div class="filter-btn">Cyanophyceae</div>
-    <div class="filter-btn">Phaeophyceae</div>
-    <div class="filter-btn">Rhodophyceae</div>
+  <!-- STRINGS -->
+  <div class="string s1"></div>
+  <div class="string s2"></div>
+
+  <div class="polaroid-wrapper">
+    <div class="polaroid">
+      <img src="images2/Cladophora1.jpg" onerror="this.src='images2/default.jpg'">
+      <p>Cladophora</p>
+    </div>
   </div>
-</div>
 
-<!-- HABITAT -->
-<div class="panel-ui">
-  <div class="section-title">HABITAT</div>
-  <div class="group">
-    <div class="filter-btn">Freshwater</div>
-    <div class="filter-btn">Marine</div>
-    <div class="filter-btn">Soil</div>
+  <div class="polaroid-wrapper">
+    <div class="polaroid">
+      <img src="images2/Ulva lactuca1.jpg" onerror="this.src='images2/default.jpg'">
+      <p>Ulva lactuca</p>
+    </div>
   </div>
-</div>
 
-<div class="results" id="results"></div>
-
-<!-- MODAL -->
-<div class="modal" id="modal">
-  <div class="close" onclick="closeModal()">X</div>
-  <div id="modalContent"></div>
-</div>
-
-<script>
-
-/* DATA */
-const algae = [
-{
-  name:"Cladophora",
-  class:"Chlorophyceae",
-  habitat:"Freshwater",
-  short:"Filamentous green algae",
-  full: `
-  <div class="panel">
-
-    <div class="images">
-      <img src="images2/Cladophora1.jpg">
-      <img src="images2/Cladophora2.jpg">
+  <div class="polaroid-wrapper">
+    <div class="polaroid">
+      <img src="images2/Chlorella1.jpg" onerror="this.src='images2/default.jpg'">
+      <p>Chlorella</p>
     </div>
-
-    <h2>Cladophora</h2>
-
-    <div class="section">
-      <h4>Systematic Position</h4>
-      <p>Division: Chlorophyta <br> Class: Ulvophyceae <br> Order: Cladophorales</p>
-    </div>
-
-    <div class="section">
-      <h4>Morphology</h4>
-      <p>Filamentous branched multicellular thallus</p>
-    </div>
-
   </div>
-  `
-},
 
-{
-  name:"Spirogyra",
-  class:"Chlorophyceae",
-  habitat:"Freshwater",
-  short:"Spiral chloroplast algae",
-  full:`<div class="panel"><h2>Spirogyra</h2></div>`
-}
-];
-
-/* FILTER */
-const buttons=document.querySelectorAll(".filter-btn");
-
-buttons.forEach(btn=>{
-  btn.onclick=()=>{
-    btn.classList.toggle("active");
-
-    /* SMART RULE */
-    if(btn.innerText==="Phaeophyceae"){
-      document.querySelectorAll(".filter-btn").forEach(b=>{
-        if(b.innerText==="Freshwater"||b.innerText==="Soil"){
-          b.style.display="none";
-        }
-      });
-    }
-
-    update();
-  }
-});
-
-document.getElementById("search").oninput=update;
-
-function update(){
-  const active=[...document.querySelectorAll(".active")].map(b=>b.innerText);
-  const search=document.getElementById("search").value.toLowerCase();
-
-  const filtered=algae.filter(a=>
-    a.name.toLowerCase().includes(search) &&
-    active.every(f=>a.class===f || a.habitat===f)
-  );
-
-  show(filtered);
-}
-
-function show(list){
-  const r=document.getElementById("results");
-
-  if(list.length===0){
-    r.innerHTML="No algae found";
-    return;
-  }
-
-  r.innerHTML=list.map(a=>`
-    <div class="card" onclick="openCard('${a.name}')">
-      <img src="images2/${a.name}1.jpg">
-      <h4>${a.name}</h4>
-      <p>${a.short}</p>
+  <div class="polaroid-wrapper">
+    <div class="polaroid">
+      <img src="images2/Spirogyra1.jpg" onerror="this.src='images2/default.jpg'">
+      <p>Spirogyra</p>
     </div>
-  `).join("");
-}
+  </div>
 
-function openCard(name){
-  const a=algae.find(x=>x.name===name);
-  document.getElementById("modal").style.display="flex";
-  document.getElementById("modalContent").innerHTML=a.full;
-}
+  <div class="polaroid-wrapper">
+    <div class="polaroid">
+      <img src="images2/Botryococcus1.jpg" onerror="this.src='images2/default.jpg'">
+      <p>Botryococcus</p>
+    </div>
+  </div>
 
-function closeModal(){
-  document.getElementById("modal").style.display="none";
-}
+  <div class="polaroid-wrapper">
+    <div class="polaroid">
+      <img src="images2/Polysiphonia1.jpg" onerror="this.src='images2/default.jpg'">
+      <p>Polysiphonia</p>
+    </div>
+  </div>
 
-update();
-
-</script>
+</div>
 
 </body>
 </html>

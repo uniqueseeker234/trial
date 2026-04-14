@@ -142,8 +142,15 @@ body::after{
 
 /* HOVER */
 .polaroid:hover{
-  transform: scale(1.08);
+  transform: scale(1.08) rotate(0deg);
+  animation-play-state: paused;
+  z-index: 10;
 }
+  .polaroid:active{
+  transform: scale(1.08) rotate(0deg);
+  animation-play-state: paused;
+  z-index: 10;
+  }
 
 </style>
 </head>

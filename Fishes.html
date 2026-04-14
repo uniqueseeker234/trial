@@ -54,18 +54,19 @@ body::after{
   padding:25px;
 }
 
-/* STRING LINES */
-.polaroid-wrapper::before{
-  content:"";
+/* 🔥 HORIZONTAL ROPES */
+.rope{
   position:absolute;
-  top:-18px;
-  left:50%;
-  transform:translateX(-50%);
-  width:2px;
-  height:20px;
-  background: rgba(255,255,255,0.6);
+  left:0;
+  width:100%;
+  height:3px;
+  background: linear-gradient(to right, #ccc, #fff, #ccc);
   z-index:0;
 }
+.rope.r1{ top:80px; }
+.rope.r2{ top:270px; }
+.rope.r3{ top:460px; }
+
 /* WRAPPER */
 .polaroid-wrapper{
   animation: float 5s ease-in-out infinite;
@@ -85,17 +86,18 @@ body::after{
   position: relative;
 }
 
-/* CLIP EFFECT */
+/* CLIP */
 .polaroid::before{
   content:"";
   position:absolute;
-  top:-8px;
+  top:-6px;
   left:50%;
   transform:translateX(-50%);
   width:12px;
   height:6px;
   background:#ccc;
   border-radius:2px;
+  z-index:2;
 }
 
 /* IMAGE */
@@ -128,18 +130,19 @@ body::after{
 }
 
 /* ROTATIONS */
-.polaroid-wrapper:nth-child(3){ --rot: -3deg; }
-.polaroid-wrapper:nth-child(4){ --rot: 2deg; }
-.polaroid-wrapper:nth-child(5){ --rot: -2deg; }
-.polaroid-wrapper:nth-child(6){ --rot: 3deg; }
-.polaroid-wrapper:nth-child(7){ --rot: -1deg; }
-.polaroid-wrapper:nth-child(8){ --rot: 2deg; }
+.polaroid-wrapper:nth-child(4){ --rot: -3deg; }
+.polaroid-wrapper:nth-child(5){ --rot: 2deg; }
+.polaroid-wrapper:nth-child(6){ --rot: -2deg; }
+.polaroid-wrapper:nth-child(7){ --rot: 3deg; }
+.polaroid-wrapper:nth-child(8){ --rot: -1deg; }
+.polaroid-wrapper:nth-child(9){ --rot: 2deg; }
 
 /* DELAYS */
-.polaroid-wrapper:nth-child(4){ animation-delay: 1s; }
-.polaroid-wrapper:nth-child(5){ animation-delay: 2s; }
-.polaroid-wrapper:nth-child(6){ animation-delay: 0.5s; }
-.polaroid-wrapper:nth-child(7){ animation-delay: 1.5s; }
+.polaroid-wrapper:nth-child(5){ animation-delay: 1s; }
+.polaroid-wrapper:nth-child(6){ animation-delay: 2s; }
+.polaroid-wrapper:nth-child(7){ animation-delay: 0.5s; }
+.polaroid-wrapper:nth-child(8){ animation-delay: 1.5s; }
+
 </style>
 </head>
 
@@ -149,9 +152,10 @@ body::after{
 
 <div class="gallery">
 
-  <!-- STRINGS -->
-  <div class="string s1"></div>
-  <div class="string s2"></div>
+  <!-- ✅ ROPES -->
+  <div class="rope r1"></div>
+  <div class="rope r2"></div>
+  <div class="rope r3"></div>
 
   <div class="polaroid-wrapper">
     <div class="polaroid">

@@ -55,19 +55,17 @@ body::after{
 }
 
 /* STRING LINES */
-.string{
+.polaroid-wrapper::before{
+  content:"";
   position:absolute;
-  left:0;
-  width:100%;
-  height:2px;
-  background: rgba(255,255,255,0.4);
+  top:-18px;
+  left:50%;
+  transform:translateX(-50%);
+  width:2px;
+  height:20px;
+  background: rgba(255,255,255,0.6);
   z-index:0;
 }
-
-/* positions of strings */
-.string.s1{ top:120px; }
-.string.s2{ top:300px; }
-
 /* WRAPPER */
 .polaroid-wrapper{
   animation: float 5s ease-in-out infinite;

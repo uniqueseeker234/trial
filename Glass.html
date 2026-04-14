@@ -6,25 +6,46 @@
 
 <title>Algae Gallery</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet">
 <style>
 body{
   margin:0;
-  background:#000814;
   font-family:sans-serif;
   color:white;
+  overflow-x:hidden;
 }
 
+/* BLURRED BACKGROUND IMAGE */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+
+  background: url("images2/bg.jpg") center/cover no-repeat;
+
+  filter: blur(12px) brightness(0.4);
+  z-index:-1;
+}
+
+/* OPTIONAL DEPTH LAYER */
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  background: radial-gradient(circle at center, rgba(0,0,0,0.3), #000814);
+  z-index:-1;
+}
 /* TITLE */
 .title{
   text-align:center;
   padding:20px;
-  font-size:24px;
-  color:cyan;
+  font-size:26px;
+  color:white;
   letter-spacing:2px;
-}
+  font-family: 'Special Elite', monospace;
 
+  text-shadow: 0 0 10px rgba(255,255,255,0.3);
+}
 /* GRID */
 .gallery{
   display:grid;

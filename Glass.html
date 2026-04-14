@@ -6,7 +6,6 @@
 
 <title>Algae Gallery</title>
 
-<!-- Handwritten style font -->
 <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
 
 <style>
@@ -26,12 +25,17 @@ body{
   letter-spacing:2px;
 }
 
-/* GALLERY GRID */
+/* GRID */
 .gallery{
   display:grid;
   grid-template-columns: repeat(auto-fill, minmax(140px,1fr));
-  gap:20px;
-  padding:20px;
+  gap:25px;
+  padding:25px;
+}
+
+/* WRAPPER (handles animation safely) */
+.polaroid-wrapper{
+  animation: float 5s ease-in-out infinite;
 }
 
 /* POLAROID CARD */
@@ -42,19 +46,11 @@ body{
   box-shadow: 0 10px 20px rgba(0,0,0,0.6);
   text-align:center;
 
-  animation: float1 4s ease-in-out infinite;
+  transform: rotate(var(--rot));
   transition: transform 0.3s ease;
-}
 
-/* EVEN */
-.polaroid:nth-child(even){
-  animation: float2 5s ease-in-out infinite;
-}
-
-/* HOVER FIX */
-.polaroid:hover{
-  animation-play-state: paused;
-  transform: scale(1.08) rotate(0deg) !important;
+  position: relative;
+  z-index: 1;
 }
 
 /* IMAGE */
@@ -65,34 +61,40 @@ body{
   border-radius:4px;
 }
 
-/* NAME TEXT */
+/* NAME */
 .polaroid p{
   margin-top:8px;
   font-size:13px;
   color:black;
   font-family: 'Permanent Marker', cursive;
 }
-  /* FLOAT ANIMATION */
-@keyframes float1 {
-  0% { transform: translateY(0px) rotate(-2deg); }
-  50% { transform: translateY(-8px) rotate(-1deg); }
-  100% { transform: translateY(0px) rotate(-2deg); }
+
+/* HOVER */
+.polaroid:hover{
+  transform: scale(1.08) rotate(0deg);
+  z-index: 10;
 }
 
-@keyframes float2 {
-  0% { transform: translateY(0px) rotate(2deg); }
-  50% { transform: translateY(6px) rotate(3deg); }
-  100% { transform: translateY(0px) rotate(2deg); }
+/* FLOAT ANIMATION */
+@keyframes float{
+  0%{ transform: translateY(0px); }
+  50%{ transform: translateY(-10px); }
+  100%{ transform: translateY(0px); }
 }
 
-/* APPLY ANIMATION */
-.polaroid{
-  animation: float1 4s ease-in-out infinite;
-}
+/* RANDOM ROTATIONS */
+.polaroid-wrapper:nth-child(1){ --rot: -3deg; }
+.polaroid-wrapper:nth-child(2){ --rot: 2deg; }
+.polaroid-wrapper:nth-child(3){ --rot: -2deg; }
+.polaroid-wrapper:nth-child(4){ --rot: 3deg; }
+.polaroid-wrapper:nth-child(5){ --rot: -1deg; }
+.polaroid-wrapper:nth-child(6){ --rot: 2deg; }
 
-.polaroid:nth-child(even){
-  animation: float2 5s ease-in-out infinite;
-}
+/* RANDOM ANIMATION DELAY */
+.polaroid-wrapper:nth-child(2){ animation-delay: 1s; }
+.polaroid-wrapper:nth-child(3){ animation-delay: 2s; }
+.polaroid-wrapper:nth-child(4){ animation-delay: 0.5s; }
+.polaroid-wrapper:nth-child(5){ animation-delay: 1.5s; }
 </style>
 </head>
 
@@ -102,34 +104,46 @@ body{
 
 <div class="gallery">
 
-  <div class="polaroid">
-    <img src="images2/Cladophora1.jpg" onerror="this.src='images2/default.jpg'">
-    <p>Cladophora</p>
+  <div class="polaroid-wrapper">
+    <div class="polaroid">
+      <img src="images2/Cladophora1.jpg" onerror="this.src='images2/default.jpg'">
+      <p>Cladophora</p>
+    </div>
   </div>
 
-  <div class="polaroid">
-    <img src="images2/Ulva lactuca1.jpg" onerror="this.src='images2/default.jpg'">
-    <p>Ulva lactuca</p>
+  <div class="polaroid-wrapper">
+    <div class="polaroid">
+      <img src="images2/Ulva lactuca1.jpg" onerror="this.src='images2/default.jpg'">
+      <p>Ulva lactuca</p>
+    </div>
   </div>
 
-  <div class="polaroid">
-    <img src="images2/Chlorella1.jpg" onerror="this.src='images2/default.jpg'">
-    <p>Chlorella</p>
+  <div class="polaroid-wrapper">
+    <div class="polaroid">
+      <img src="images2/Chlorella1.jpg" onerror="this.src='images2/default.jpg'">
+      <p>Chlorella</p>
+    </div>
   </div>
 
-  <div class="polaroid">
-    <img src="images2/Spirogyra1.jpg" onerror="this.src='images2/default.jpg'">
-    <p>Spirogyra</p>
+  <div class="polaroid-wrapper">
+    <div class="polaroid">
+      <img src="images2/Spirogyra1.jpg" onerror="this.src='images2/default.jpg'">
+      <p>Spirogyra</p>
+    </div>
   </div>
 
-  <div class="polaroid">
-    <img src="images2/Botryococcus1.jpg" onerror="this.src='images2/default.jpg'">
-    <p>Botryococcus</p>
+  <div class="polaroid-wrapper">
+    <div class="polaroid">
+      <img src="images2/Botryococcus1.jpg" onerror="this.src='images2/default.jpg'">
+      <p>Botryococcus</p>
+    </div>
   </div>
 
-  <div class="polaroid">
-    <img src="images2/Polysiphonia1.jpg" onerror="this.src='images2/default.jpg'">
-    <p>Polysiphonia</p>
+  <div class="polaroid-wrapper">
+    <div class="polaroid">
+      <img src="images2/Polysiphonia1.jpg" onerror="this.src='images2/default.jpg'">
+      <p>Polysiphonia</p>
+    </div>
   </div>
 
 </div>

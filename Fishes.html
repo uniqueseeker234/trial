@@ -55,10 +55,9 @@ body::after{
   position:relative;
   display:flex;
   justify-content:space-around;
-  animation: ropeMove 6s ease-in-out infinite;
 }
 
-/* 🔥 FULL WIDTH ROPE (extends outside screen) */
+/* ROPE */
 .row::before{
   content:"";
   position:absolute;
@@ -69,16 +68,10 @@ body::after{
   background: linear-gradient(to right, #bbb, #fff, #bbb);
 }
 
-/* ROPE SWING */
-@keyframes ropeMove{
-  0%{ transform: translateY(0px); }
-  50%{ transform: translateY(-5px); }
-  100%{ transform: translateY(0px); }
-}
-
 /* POLAROID WRAPPER */
 .polaroid-wrapper{
-  animation: float 5s ease-in-out infinite;
+  display:flex;
+  justify-content:center;
 }
 
 /* POLAROID */
@@ -88,9 +81,27 @@ body::after{
   border-radius:6px;
   box-shadow: 0 10px 20px rgba(0,0,0,0.6);
   text-align:center;
-  transform: rotate(var(--rot));
-  transition: transform 0.3s ease;
   position: relative;
+
+  transform-origin: top center;
+
+  /* 🔥 SIDE SWING ONLY */
+  animation: swing 4s ease-in-out infinite;
+}
+
+/* DIFFERENT TIMING */
+.polaroid-wrapper:nth-child(1) .polaroid{
+  animation-delay: 0s;
+}
+.polaroid-wrapper:nth-child(2) .polaroid{
+  animation-delay: 1s;
+}
+
+/* SWING ANIMATION */
+@keyframes swing{
+  0%{ transform: rotate(-3deg); }
+  50%{ transform: rotate(3deg); }
+  100%{ transform: rotate(-3deg); }
 }
 
 /* CLIP */
@@ -124,19 +135,8 @@ body::after{
 
 /* HOVER */
 .polaroid:hover{
-  transform: scale(1.08) rotate(0deg);
+  transform: scale(1.08);
 }
-
-/* FLOAT */
-@keyframes float{
-  0%{ transform: translateY(0px); }
-  50%{ transform: translateY(-10px); }
-  100%{ transform: translateY(0px); }
-}
-
-/* ROTATION VARIATION */
-.polaroid-wrapper:nth-child(1){ --rot: -3deg; }
-.polaroid-wrapper:nth-child(2){ --rot: 2deg; }
 
 </style>
 </head>

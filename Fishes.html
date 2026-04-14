@@ -46,26 +46,34 @@ body::after{
 .gallery{
   display:flex;
   flex-direction:column;
-  gap:40px;
+  gap:60px;
   padding:25px;
 }
 
-/* EACH ROW */
+/* ROW */
 .row{
   position:relative;
   display:flex;
   justify-content:space-around;
+  animation: ropeMove 6s ease-in-out infinite;
 }
 
-/* 🔥 FULL ROPE */
+/* 🔥 FULL WIDTH ROPE (extends outside screen) */
 .row::before{
   content:"";
   position:absolute;
   top:-10px;
-  left:0;
-  width:100%;
+  left:-50%;
+  width:200%;
   height:3px;
-  background: linear-gradient(to right, #ccc, #fff, #ccc);
+  background: linear-gradient(to right, #bbb, #fff, #bbb);
+}
+
+/* ROPE SWING */
+@keyframes ropeMove{
+  0%{ transform: translateY(0px); }
+  50%{ transform: translateY(-5px); }
+  100%{ transform: translateY(0px); }
 }
 
 /* POLAROID WRAPPER */
@@ -126,7 +134,7 @@ body::after{
   100%{ transform: translateY(0px); }
 }
 
-/* ROTATIONS */
+/* ROTATION VARIATION */
 .polaroid-wrapper:nth-child(1){ --rot: -3deg; }
 .polaroid-wrapper:nth-child(2){ --rot: 2deg; }
 

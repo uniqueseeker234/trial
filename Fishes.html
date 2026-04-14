@@ -13,8 +13,13 @@ body{
   margin:0;
   font-family:sans-serif;
   color:white;
-  overflow-x:hidden;
+
+  overflow-x:hidden;   /* 🔥 THIS FIXES SIDE SCROLL */
 }
+  html, body{
+  max-width:100%;
+  overflow-x:hidden;
+  }
 
 /* BACKGROUND */
 body::before{
@@ -48,6 +53,8 @@ body::after{
   flex-direction:column;
   gap:60px;
   padding:25px;
+
+  overflow-x:hidden;
 }
 
 /* ROW */

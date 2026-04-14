@@ -25,19 +25,17 @@ html, body{
 body::before{
   content:"";
   position:fixed;
-  top:-10%;          /* 👈 extend beyond screen */
-  left:-10%;
-  width:120%;        /* 👈 bigger than viewport */
-  height:120%;
+  inset:0;
 
   background: url("images2/bg.jpg") center/cover no-repeat;
+
   z-index:-1;
 }
 body::after{
   content:"";
   position:fixed;
   inset:0;
-  background: radial-gradient(circle at center, rgba(0,0,0,0.3), #000814);
+  background: rgba(0,0,0,0.5); /* smooth dark overlay */
   z-index:-1;
 }
 

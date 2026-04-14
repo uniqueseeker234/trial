@@ -39,35 +39,38 @@ body::after{
   text-align:center;
   padding:20px;
   font-size:26px;
-  color:white;
-  letter-spacing:2px;
   font-family: 'Special Elite', monospace;
-  text-shadow: 0 0 10px rgba(255,255,255,0.3);
 }
 
-/* GRID */
+/* GALLERY */
 .gallery{
-  display:grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px,1fr));
-  gap:25px;
+  display:flex;
+  flex-direction:column;
+  gap:40px;
   padding:25px;
 }
 
-/* WRAPPER */
-.polaroid-wrapper{
+/* EACH ROW */
+.row{
   position:relative;
-  animation: float 5s ease-in-out infinite;
+  display:flex;
+  justify-content:space-around;
 }
 
-/* 🔥 ROPE ATTACHED TO EACH CARD */
-.mini-rope{
+/* 🔥 FULL ROPE */
+.row::before{
+  content:"";
   position:absolute;
   top:-10px;
   left:0;
   width:100%;
   height:3px;
   background: linear-gradient(to right, #ccc, #fff, #ccc);
-  z-index:0;
+}
+
+/* POLAROID WRAPPER */
+.polaroid-wrapper{
+  animation: float 5s ease-in-out infinite;
 }
 
 /* POLAROID */
@@ -80,7 +83,6 @@ body::after{
   transform: rotate(var(--rot));
   transition: transform 0.3s ease;
   position: relative;
-  z-index:1;
 }
 
 /* CLIP */
@@ -94,7 +96,6 @@ body::after{
   height:6px;
   background:#ccc;
   border-radius:2px;
-  z-index:2;
 }
 
 /* IMAGE */
@@ -116,7 +117,6 @@ body::after{
 /* HOVER */
 .polaroid:hover{
   transform: scale(1.08) rotate(0deg);
-  z-index:10;
 }
 
 /* FLOAT */
@@ -129,16 +129,6 @@ body::after{
 /* ROTATIONS */
 .polaroid-wrapper:nth-child(1){ --rot: -3deg; }
 .polaroid-wrapper:nth-child(2){ --rot: 2deg; }
-.polaroid-wrapper:nth-child(3){ --rot: -2deg; }
-.polaroid-wrapper:nth-child(4){ --rot: 3deg; }
-.polaroid-wrapper:nth-child(5){ --rot: -1deg; }
-.polaroid-wrapper:nth-child(6){ --rot: 2deg; }
-
-/* DELAYS */
-.polaroid-wrapper:nth-child(2){ animation-delay: 1s; }
-.polaroid-wrapper:nth-child(3){ animation-delay: 2s; }
-.polaroid-wrapper:nth-child(4){ animation-delay: 0.5s; }
-.polaroid-wrapper:nth-child(5){ animation-delay: 1.5s; }
 
 </style>
 </head>
@@ -149,51 +139,54 @@ body::after{
 
 <div class="gallery">
 
-  <div class="polaroid-wrapper">
-    <div class="mini-rope"></div>
-    <div class="polaroid">
-      <img src="images2/Cladophora1.jpg" onerror="this.src='images2/default.jpg'">
-      <p>Cladophora</p>
+  <!-- ROW 1 -->
+  <div class="row">
+    <div class="polaroid-wrapper">
+      <div class="polaroid">
+        <img src="images2/Cladophora1.jpg" onerror="this.src='images2/default.jpg'">
+        <p>Cladophora</p>
+      </div>
+    </div>
+
+    <div class="polaroid-wrapper">
+      <div class="polaroid">
+        <img src="images2/Ulva lactuca1.jpg" onerror="this.src='images2/default.jpg'">
+        <p>Ulva lactuca</p>
+      </div>
     </div>
   </div>
 
-  <div class="polaroid-wrapper">
-    <div class="mini-rope"></div>
-    <div class="polaroid">
-      <img src="images2/Ulva lactuca1.jpg" onerror="this.src='images2/default.jpg'">
-      <p>Ulva lactuca</p>
+  <!-- ROW 2 -->
+  <div class="row">
+    <div class="polaroid-wrapper">
+      <div class="polaroid">
+        <img src="images2/Chlorella1.jpg" onerror="this.src='images2/default.jpg'">
+        <p>Chlorella</p>
+      </div>
+    </div>
+
+    <div class="polaroid-wrapper">
+      <div class="polaroid">
+        <img src="images2/Spirogyra1.jpg" onerror="this.src='images2/default.jpg'">
+        <p>Spirogyra</p>
+      </div>
     </div>
   </div>
 
-  <div class="polaroid-wrapper">
-    <div class="mini-rope"></div>
-    <div class="polaroid">
-      <img src="images2/Chlorella1.jpg" onerror="this.src='images2/default.jpg'">
-      <p>Chlorella</p>
+  <!-- ROW 3 -->
+  <div class="row">
+    <div class="polaroid-wrapper">
+      <div class="polaroid">
+        <img src="images2/Botryococcus1.jpg" onerror="this.src='images2/default.jpg'">
+        <p>Botryococcus</p>
+      </div>
     </div>
-  </div>
 
-  <div class="polaroid-wrapper">
-    <div class="mini-rope"></div>
-    <div class="polaroid">
-      <img src="images2/Spirogyra1.jpg" onerror="this.src='images2/default.jpg'">
-      <p>Spirogyra</p>
-    </div>
-  </div>
-
-  <div class="polaroid-wrapper">
-    <div class="mini-rope"></div>
-    <div class="polaroid">
-      <img src="images2/Botryococcus1.jpg" onerror="this.src='images2/default.jpg'">
-      <p>Botryococcus</p>
-    </div>
-  </div>
-
-  <div class="polaroid-wrapper">
-    <div class="mini-rope"></div>
-    <div class="polaroid">
-      <img src="images2/Polysiphonia1.jpg" onerror="this.src='images2/default.jpg'">
-      <p>Polysiphonia</p>
+    <div class="polaroid-wrapper">
+      <div class="polaroid">
+        <img src="images2/Polysiphonia1.jpg" onerror="this.src='images2/default.jpg'">
+        <p>Polysiphonia</p>
+      </div>
     </div>
   </div>
 

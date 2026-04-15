@@ -166,6 +166,8 @@ body{
   flex:1;
   overflow-y:auto;
   padding:5px 10px 20px;
+
+  -webkit-overflow-scrolling: touch; /* 🔥 IMPORTANT */
 }
 
 /* ITEM */
@@ -222,7 +224,7 @@ body{
 
   <input class="search" placeholder="Search algae..." onkeyup="filterList(this.value)">
 
-  <div id="list">
+  <div id="list" class="list">
 
 <div class="item"><img src="images2/Cladophora1.jpg">Cladophora</div>
 <div class="item"><img src="images2/Ulva lactuca1.jpg">Ulva lactuca</div>

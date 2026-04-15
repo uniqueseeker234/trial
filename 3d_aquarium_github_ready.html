@@ -237,17 +237,22 @@ body{
   align-items:center;
   justify-content:center;
 }
- .cell{
+.cell{
   position:absolute;
   width:50%;
-  padding:12px 16px;
-  font-size:15px;
-  font-family: 'Cinzel', serif;
+  height:60px;              /* 🔥 important */
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+
+  font-size:16px;
+  font-family:'Cinzel', serif;
   color:#f5d76e;
-  box-sizing:border-box;
-  line-height:1.8;
-  letter-spacing:0.5px;
- }
+  letter-spacing:1px;
+
+  text-shadow:0 0 8px rgba(255,215,0,0.4);
+}
 
 /* LEFT */
 /* PERFECT ROW ALIGNMENT */
@@ -261,17 +266,6 @@ body{
 #L_importance, #R_importance { top:610px; }
 #L_classification, #R_classification { top:670px; }
 
-/* RIGHT */
-/* PERFECT ROW ALIGNMENT */
-
-#R_group, #R_group { top:250px; }
-#R_pigment, #R_pigment { top:310px; }
-#R_habitat, #R_habitat { top:370px; }
-#R_structure, #R_structure { top:430px; }
-#R_reproduction, #R_reproduction { top:490px; }
-#R_identification, #R_identification { top:550px; }
-#R_importance, #R_importance { top:610px; }
-#R_classification, #R_classification { top:670px; }
 </style>    </head>    <body>    <div class="title">COMPARE ALGAE</div>    <div class="container">    
   <div class="box">    <div class="line top"></div>    
 <div class="line right"></div>    
@@ -409,9 +403,8 @@ function selectAlgae(name, img){
   const d = algaeData[name] || {};
   const side = currentSide === "left" ? "L" : "R";
 
-  function set(id, label, value){
-    document.getElementById(`${side}_${id}`).innerHTML =
-      `<b>${label}:</b> ${value || "-"}`;
+  function set(id, value){
+  document.getElementById(`${side}_${id}`).innerText = value || "-";
   }
 
   if(side === "L"){
@@ -424,14 +417,14 @@ function selectAlgae(name, img){
       `<img src="${img}" class="algae-img">`;
   }
 
-  set("group","Group",d.group);
-  set("pigment","Pigment",d.pigment);
-  set("habitat","Habitat",d.habitat);
-  set("structure","Structure",d.structure);
-  set("reproduction","Reproduction",d.reproduction);
-  set("identification","Identification",d.identification);
-  set("importance","Importance",d.importance);
-  set("classification","Classification",d.classification);
+  set("group", d.group);
+set("pigment", d.pigment);
+set("habitat", d.habitat);
+set("structure", d.structure);
+set("reproduction", d.reproduction);
+set("identification", d.identification);
+set("importance", d.importance);
+set("classification", d.classification);
 
   closePanel();
 }

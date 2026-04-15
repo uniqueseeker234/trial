@@ -3,135 +3,131 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Elythera Lab Room V5.6 FINAL</title>
+
+<title>Compare Entry Animation</title>
 
 <style>
-html,body{
-margin:0;
-height:100%;
-overflow:hidden;
-background:#edf1f5;
-font-family:Arial,sans-serif;
+body{
+  margin:0;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background: radial-gradient(circle at center, #020617, #000814);
+  overflow:hidden;
 }
-#hud{
-position:fixed;
-top:10px;
-left:10px;
-background:rgba(0,0,0,0.55);
-color:white;
-padding:10px 14px;
-border-radius:10px;
-font-size:13px;
-z-index:20;
+
+/* GOLDEN BOX */
+.compare-box{
+  position:relative;
+  width:80%;
+  max-width:700px;
+  height:300px;
+  border-radius:12px;
+  background: rgba(255,255,255,0.02);
+  backdrop-filter: blur(10px);
+
+  opacity:0;
+  transform: scale(0.8);
+  animation: appear 1s ease forwards;
+  animation-delay: 0.5s;
+}
+
+/* BORDER DRAW EFFECT */
+.compare-box::before,
+.compare-box::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:12px;
+  pointer-events:none;
+}
+
+/* GOLD LINE */
+.compare-box::before{
+  border:2px solid transparent;
+  border-image: linear-gradient(90deg, gold, #fff5cc, gold) 1;
+
+  clip-path: inset(0 100% 100% 0);
+  animation: drawBorder 2s ease forwards;
+  animation-delay: 1s;
+}
+
+/* GLOW */
+.compare-box::after{
+  border:2px solid gold;
+  box-shadow: 0 0 25px gold, 0 0 60px rgba(255,215,0,0.4);
+  opacity:0;
+  animation: glowIn 1.5s ease forwards;
+  animation-delay: 2.5s;
+}
+
+/* CONTENT */
+.content{
+  color:gold;
+  text-align:center;
+  position:absolute;
+  inset:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:24px;
+  letter-spacing:2px;
+
+  opacity:0;
+  animation: fadeIn 1s ease forwards;
+  animation-delay: 3s;
+}
+
+/* ANIMATIONS */
+
+@keyframes appear{
+  to{
+    opacity:1;
+    transform: scale(1);
+  }
+}
+
+@keyframes drawBorder{
+  0%{
+    clip-path: inset(0 100% 100% 0);
+  }
+  25%{
+    clip-path: inset(0 0 100% 0);
+  }
+  50%{
+    clip-path: inset(0 0 0 0);
+  }
+  75%{
+    clip-path: inset(0 0 0 0);
+  }
+  100%{
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes glowIn{
+  to{
+    opacity:1;
+  }
+}
+
+@keyframes fadeIn{
+  to{
+    opacity:1;
+  }
 }
 </style>
 
-<script type="importmap">
-{
-"imports":{
-"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-"three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-}
-}
-</script>
 </head>
 
 <body>
 
-<div id="hud">Mission Elythera Lab V5.6</div>
+<div class="compare-box">
+  <div class="content">
+    COMPARE ALGAE
+  </div>
+</div>
 
-<script type="module">
-
-import * as THREE from 'three'
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
-
-const scene = new THREE.Scene()
-scene.background = new THREE.Color(0xf1f4f7)
-
-const camera = new THREE.PerspectiveCamera(70, innerWidth/innerHeight, 0.01, 2000)
-
-const renderer = new THREE.WebGLRenderer({antialias:true})
-renderer.setSize(innerWidth,innerHeight)
-renderer.setPixelRatio(Math.min(devicePixelRatio,2))
-renderer.outputColorSpace = THREE.SRGBColorSpace
-document.body.appendChild(renderer.domElement)
-
-const loader = new GLTFLoader()
-
-scene.add(new THREE.HemisphereLight(0xffffff,0xdfe6ee,2))
-const dir = new THREE.DirectionalLight(0xffffff,1.8)
-dir.position.set(5,7,5)
-scene.add(dir)
-
-function loadGLB(p){return new Promise(r=>loader.load(p,g=>r(g.scene)))}
-
-function makeAnimatedMonitor(x,y,z,w,h){
-const canvas=document.createElement("canvas")
-canvas.width=700;canvas.height=420
-const ctx=canvas.getContext("2d")
-const tex=new THREE.CanvasTexture(canvas)
-
-const frame=new THREE.Mesh(new THREE.PlaneGeometry(w,h),
-new THREE.MeshBasicMaterial({color:0x101923}))
-frame.position.set(x,y,z)
-scene.add(frame)
-
-const screen=new THREE.Mesh(new THREE.PlaneGeometry(w*0.92,h*0.84),
-new THREE.MeshBasicMaterial({map:tex}))
-screen.position.set(x,y,z+0.001)
-scene.add(screen)
-
-function draw(){
-ctx.fillStyle="#101923"
-ctx.fillRect(0,0,700,420)
-ctx.fillStyle="#90f7ff"
-ctx.font="bold 42px Arial"
-ctx.fillText("GRAVITY FIELD",40,80)
-tex.needsUpdate=true
-}
-draw()
-
-return { update:()=>{}, mesh:frame }
-}
-
-function makeEarthBoard(x,y,z,w,h){
-const frame=new THREE.Mesh(
-new THREE.PlaneGeometry(w,h),
-new THREE.MeshBasicMaterial({color:0xe1dbd0})
-)
-frame.position.set(x,y,z)
-scene.add(frame)
-return frame
-}
-
-(async()=>{
-
-const room=await loadGLB("./room.glb")
-scene.add(room)
-
-// RIGHT WALL
-const monitor=makeAnimatedMonitor(2.15,1.65,-0.9,1.28,0.74)
-monitor.mesh.rotation.y=-Math.PI/2
-
-const board=makeEarthBoard(2.15,0.85,-0.9,1.18,0.74)
-board.rotation.y=-Math.PI/2
-
-const glow=new THREE.Mesh(
-new THREE.PlaneGeometry(0.9,0.04),
-new THREE.MeshBasicMaterial({color:0x96f5ff})
-)
-glow.position.set(2.15,2.15,-0.9)
-glow.rotation.y=-Math.PI/2
-scene.add(glow)
-
-})()
-
-function animate(){
-requestAnimationFrame(animate)
-renderer.render(scene,camera)
-}
-animate()
-
-</script>
 </body>
 </html>

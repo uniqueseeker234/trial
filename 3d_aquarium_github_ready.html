@@ -359,7 +359,18 @@ body{
 <div class="item" onclick="selectAlgae('Ulothrix','images2/Ulothrix1.jpg')"><img src="images2/Ulothrix1.jpg">Ulothrix</div>    <div class="item" onclick="selectAlgae('Acetabularia','images2/Acetabularia1.jpg')"><img src="images2/Acetabularia1.jpg">Acetabularia</div>    
 <div class="item" onclick="selectAlgae('Botryocladia','images2/Botryocladia1.jpg')"><img src="images2/Botryocladia1.jpg">Botryocladia</div>      </div>    
 </div> 
- <div style="position:fixed; bottom:0; left:0; width:100%; background:#000814; padding:10px; z-index:999;">
+ <div style="
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  max-height:180px;
+  overflow-y:auto;
+  background:#000814;
+  padding:10px;
+  z-index:9999;
+  border-top:2px solid gold;
+">
   <div id="sliders"></div>
  </div>
  <script>    

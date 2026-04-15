@@ -269,9 +269,6 @@ body{
 #L_identification, #R_identification { top:648px; }
 #L_importance, #R_importance { top:731px; }
 #L_classification, #R_classification { top:800px; }
- #sliders{
-  display:none;
- }
 </style>    </head>    <body>    <div class="title">COMPARE ALGAE</div>    <div class="container">    
   <div class="box">    <div class="line top"></div>    
 <div class="line right"></div>    
@@ -362,16 +359,6 @@ body{
 <div class="item" onclick="selectAlgae('Ulothrix','images2/Ulothrix1.jpg')"><img src="images2/Ulothrix1.jpg">Ulothrix</div>    <div class="item" onclick="selectAlgae('Acetabularia','images2/Acetabularia1.jpg')"><img src="images2/Acetabularia1.jpg">Acetabularia</div>    
 <div class="item" onclick="selectAlgae('Botryocladia','images2/Botryocladia1.jpg')"><img src="images2/Botryocladia1.jpg">Botryocladia</div>      </div>    
 </div> 
- <div style="
-  position:relative;
-  width:100%;
-  background:#000814;
-  padding:15px;
-  margin-top:20px;
-  border-top:2px solid gold;
-">
-  <div id="sliders"></div>
- </div>
  <script>    
 const algaeData = {
   "Cladophora": {
@@ -446,39 +433,6 @@ set("habitat", d.classification);   // Classification goes above
 
   closePanel();
 }
-window.onload = function(){
-
-const ids = [
-  "group","pigment","habitat","structure",
-  "reproduction","identification","importance","classification"
-];
-
-const sliderBox = document.getElementById("sliders");
-if(!sliderBox) return;
-
-ids.forEach(id=>{
-  const wrap = document.createElement("div");
-  wrap.style.margin = "5px 0";
-  wrap.style.color = "gold";
-  wrap.innerHTML = `
-    ${id.toUpperCase()} : <span id="${id}_val">300</span>
-    <input type="range" min="200" max="900" value="300" id="${id}_slider" style="width:100%">
-  `;
-  sliderBox.appendChild(wrap);
-
-  const slider = document.getElementById(`${id}_slider`);
-  const label = document.getElementById(`${id}_val`);
-
-  slider.oninput = function(){
-    const val = this.value;
-    label.innerText = val;
-
-    document.getElementById("L_"+id).style.top = val + "px";
-    document.getElementById("R_"+id).style.top = val + "px";
-  };
-});
-
-};
 </script> 
 </body>    
 </html>    

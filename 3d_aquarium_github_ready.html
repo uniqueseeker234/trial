@@ -25,15 +25,15 @@ body{
   transform:translate(-50%,-50%);
   font-family:'Cinzel', serif;
   font-size:38px;
-  letter-spacing:6px;
   color:gold;
+  letter-spacing:6px;
 
   animation:moveUp 1.5s ease forwards;
 }
 
 @keyframes moveUp{
   to{
-    top:40px;
+    top:50px;
     transform:translateX(-50%);
     font-size:30px;
   }
@@ -44,7 +44,7 @@ body{
   position:relative;
   width:95%;
   max-width:900px;
-  margin:120px auto 0;
+  margin:150px auto 0; /* 🔥 spacing fixed */
   height:520px;
 }
 
@@ -79,31 +79,40 @@ body{
 /* ROWS */
 .row{left:0;height:3px;width:0;animation:drawW .6s forwards;}
 
-.r1{top:120px;animation-delay:5.5s;} /* BIG IMAGE ROW */
-.r2{top:200px;animation-delay:5.7s;}
-.r3{top:270px;animation-delay:5.9s;}
-.r4{top:340px;animation-delay:6.1s;}
-.r5{top:410px;animation-delay:6.3s;}
+.r1{top:70px;animation-delay:5.5s;}   /* header row normal */
+.r2{top:160px;animation-delay:5.7s;}  /* 🔥 BIG IMAGE ROW */
+.r3{top:240px;animation-delay:5.9s;}
+.r4{top:310px;animation-delay:6.1s;}
+.r5{top:380px;animation-delay:6.3s;}
 
-/* HEADINGS */
+/* HEADINGS (HIDDEN INITIALLY) */
 .head{
   position:absolute;
-  top:60px;
+  top:25px;
   width:50%;
   text-align:center;
   color:gold;
   font-size:20px;
   cursor:pointer;
+
+  opacity:0;
+  animation:fadeIn 1s forwards;
+  animation-delay:6.6s; /* 🔥 AFTER animation */
 }
 
 .leftHead{left:0;}
 .rightHead{right:0;}
 
+@keyframes fadeIn{
+  to{opacity:1;}
+}
+
 /* ANIM */
 @keyframes drawW{to{width:100%;}}
 @keyframes drawH{to{height:100%;}}
 
-/* ================= MODAL PANEL ================= */
+/* ================= PANEL ================= */
+
 .panel{
   position:fixed;
   top:50%;
@@ -116,9 +125,12 @@ body{
   border-radius:15px;
   box-shadow:0 0 30px rgba(0,0,0,0.8);
   padding:15px;
+
   opacity:0;
   pointer-events:none;
   transition:0.3s;
+  display:flex;
+  flex-direction:column;
 }
 
 .panel.active{
@@ -148,10 +160,11 @@ body{
 
 /* LIST */
 .list{
-  overflow-y:auto;
-  height:85%;
+  flex:1;
+  overflow-y:auto; /* 🔥 FIXED SCROLL */
 }
 
+/* ITEM */
 .item{
   display:flex;
   align-items:center;
@@ -195,12 +208,12 @@ body{
   </div>
 </div>
 
-<!-- MODAL -->
+<!-- PANEL -->
 <div class="panel" id="panel">
   <div class="close" onclick="closePanel()">✖</div>
   <input class="search" placeholder="Search algae..." onkeyup="filterList(this.value)">
 
-  <div id="list">
+ <div id="list">
 
 <div class="item"><img src="images2/Cladophora1.jpg">Cladophora</div>
 <div class="item"><img src="images2/Ulva lactuca1.jpg">Ulva lactuca</div>
@@ -261,7 +274,8 @@ body{
 <div class="item"><img src="images2/Acetabularia1.jpg">Acetabularia</div>
 <div class="item"><img src="images2/Botryocladia1.jpg">Botryocladia</div>
 
-  </div>
+ </div>
+</div>
 
 <script>
 function openPanel(){

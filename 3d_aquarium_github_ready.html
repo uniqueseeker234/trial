@@ -41,7 +41,7 @@ body{
 /* BOX */    
 .box{  
   position:relative; /* ✅ VERY IMPORTANT */  
-  height:520px;  
+  height:780px;  
 }  
     
 /* LINES */    
@@ -88,6 +88,20 @@ body{
   top:480px;
   animation-delay:6.3s;
 } 
+ .r6{
+  top:560px;
+  animation-delay:6.5s;
+}
+
+.r7{
+  top:640px;
+  animation-delay:6.7s;
+}
+
+.r8{
+  top:720px;
+  animation-delay:6.9s;
+}
     
 /* HEADINGS */    
 .head{    
@@ -223,6 +237,19 @@ body{
   align-items:center;
   justify-content:center;
 }
+ #dataLeft, #dataRight{
+  position:absolute;
+  width:50%;
+  top:250px;
+  font-size:12px;
+  padding:10px;
+  box-sizing:border-box;
+  color:#d4af37;
+  line-height:1.6;
+}
+
+#dataLeft{ left:0; }
+#dataRight{ right:0; }
 </style>    </head>    <body>    <div class="title">COMPARE ALGAE</div>    <div class="container">    
   <div class="box">    <div class="line top"></div>    
 <div class="line right"></div>    
@@ -236,7 +263,9 @@ body{
 <div class="line row r3"></div>    
 <div class="line row r4"></div>    
 <div class="line row r5"></div>    
-
+<div class="line row r6"></div>
+<div class="line row r7"></div>
+<div class="line row r8"></div>
 <!-- HEADINGS -->    
 <div class="head leftHead" id="algae1" onclick="openPanel('left')">Algae 1</div>    
 <div class="head rightHead" id="algae2" onclick="openPanel('right')">Algae 2</div>    
@@ -244,6 +273,8 @@ body{
 <!-- IMAGE DISPLAY -->    
 <div id="imgLeft"></div>
 <div id="imgRight"></div>
+   <div id="dataLeft"></div>
+<div id="dataRight"></div>
   </div>    
 </div>    <!-- PANEL -->    <div class="panel" id="panel">      <div class="panel-header">    
     <span>Select Algae</span>    
@@ -291,7 +322,30 @@ body{
 <div class="item" onclick="selectAlgae('Ulothrix','images2/Ulothrix1.jpg')"><img src="images2/Ulothrix1.jpg">Ulothrix</div>    <div class="item" onclick="selectAlgae('Acetabularia','images2/Acetabularia1.jpg')"><img src="images2/Acetabularia1.jpg">Acetabularia</div>    
 <div class="item" onclick="selectAlgae('Botryocladia','images2/Botryocladia1.jpg')"><img src="images2/Botryocladia1.jpg">Botryocladia</div>      </div>    
 </div>    <script>    
-let currentSide = "";    
+const algaeData = {
+  "Cladophora": {
+    group: "Green algae",
+    pigment: "Chlorophyll a, b",
+    habitat: "Freshwater",
+    structure: "Branched filamentous",
+    reproduction: "Fragmentation, zoospores",
+    identification: "Green thread-like branched filaments",
+    importance: "Pollution indicator",
+    classification: "Chlorophyta > Ulvophyceae > Cladophorales"
+  },
+
+  "Spirogyra": {
+    group: "Green algae",
+    pigment: "Chlorophyll a, b",
+    habitat: "Freshwater",
+    structure: "Unbranched filament",
+    reproduction: "Conjugation",
+    identification: "Spiral chloroplast",
+    importance: "Oxygen producer",
+    classification: "Charophyta > Zygnematophyceae > Zygnematales"
+  }
+};
+ let currentSide = "";    
     
 function openPanel(side){    
   currentSide = side;    
@@ -311,23 +365,38 @@ function filterList(val){
   });    
 }    
     
-function selectAlgae(name, img){    
-    
-  if(currentSide === "left"){    
-    document.getElementById("algae1").innerText = name;    
-    
-    document.getElementById("imgLeft").innerHTML =    
-      `<img src="${img}" class="algae-img">`;    
-  }    
-    
-  else if(currentSide === "right"){    
-    document.getElementById("algae2").innerText = name;    
-    
-    document.getElementById("imgRight").innerHTML =    
-      `<img src="${img}" class="algae-img">`;    
-  }    
-    
-  closePanel();    
-}    
+function selectAlgae(name, img){
+
+  const d = algaeData[name] || {};
+
+  function val(x){ return x || "-"; }
+
+  const content = `
+  <b>Group:</b> ${val(d.group)}<br><br>
+  <b>Pigment:</b> ${val(d.pigment)}<br><br>
+  <b>Habitat:</b> ${val(d.habitat)}<br><br>
+  <b>Structure:</b> ${val(d.structure)}<br><br>
+  <b>Reproduction:</b> ${val(d.reproduction)}<br><br>
+  <b>Identification:</b> ${val(d.identification)}<br><br>
+  <b>Importance:</b> ${val(d.importance)}<br><br>
+  <b>Classification:</b> ${val(d.classification)}
+  `;
+
+  if(currentSide === "left"){
+    document.getElementById("algae1").innerText = name;
+    document.getElementById("imgLeft").innerHTML =
+      `<img src="${img}" class="algae-img">`;
+    document.getElementById("dataLeft").innerHTML = content;
+  }
+
+  else if(currentSide === "right"){
+    document.getElementById("algae2").innerText = name;
+    document.getElementById("imgRight").innerHTML =
+      `<img src="${img}" class="algae-img">`;
+    document.getElementById("dataRight").innerHTML = content;
+  }
+
+  closePanel();
+}
 </script>    </body>    
 </html>    

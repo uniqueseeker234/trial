@@ -27,13 +27,12 @@ body{
   font-size:38px;
   color:gold;
   letter-spacing:6px;
-
   animation:moveUp 1.5s ease forwards;
 }
 
 @keyframes moveUp{
   to{
-    top:50px;
+    top:70px;
     transform:translateX(-50%);
     font-size:30px;
   }
@@ -41,19 +40,15 @@ body{
 
 /* CONTAINER */
 .container{
-  position:relative;
   width:95%;
   max-width:900px;
-  margin:150px auto 0; /* 🔥 spacing fixed */
-  height:520px;
+  margin:170px auto 0;
 }
 
 /* BOX */
 .box{
   position:relative;
-  width:100%;
   height:460px;
-  transform: perspective(900px) rotateX(6deg);
 }
 
 /* LINES */
@@ -79,13 +74,13 @@ body{
 /* ROWS */
 .row{left:0;height:3px;width:0;animation:drawW .6s forwards;}
 
-.r1{top:70px;animation-delay:5.5s;}   /* header row normal */
-.r2{top:160px;animation-delay:5.7s;}  /* 🔥 BIG IMAGE ROW */
+.r1{top:70px;animation-delay:5.5s;}
+.r2{top:160px;animation-delay:5.7s;}
 .r3{top:240px;animation-delay:5.9s;}
 .r4{top:310px;animation-delay:6.1s;}
 .r5{top:380px;animation-delay:6.3s;}
 
-/* HEADINGS (HIDDEN INITIALLY) */
+/* HEADINGS */
 .head{
   position:absolute;
   top:25px;
@@ -94,10 +89,9 @@ body{
   color:gold;
   font-size:20px;
   cursor:pointer;
-
   opacity:0;
   animation:fadeIn 1s forwards;
-  animation-delay:6.6s; /* 🔥 AFTER animation */
+  animation-delay:6.6s;
 }
 
 .leftHead{left:0;}
@@ -117,20 +111,20 @@ body{
   position:fixed;
   top:50%;
   left:50%;
-  transform:translate(-50%,-50%) scale(0.9);
+  transform:translate(-50%,-50%) scale(0.95);
   width:90%;
   max-width:400px;
-  height:70%;
+  height:75vh; /* 🔥 FIXED HEIGHT */
   background:#020c1a;
   border-radius:15px;
   box-shadow:0 0 30px rgba(0,0,0,0.8);
-  padding:15px;
+
+  display:flex;
+  flex-direction:column;
 
   opacity:0;
   pointer-events:none;
   transition:0.3s;
-  display:flex;
-  flex-direction:column;
 }
 
 .panel.active{
@@ -139,29 +133,35 @@ body{
   transform:translate(-50%,-50%) scale(1);
 }
 
-/* CLOSE */
-.close{
-  position:absolute;
-  top:10px;
-  right:15px;
-  font-size:22px;
+/* HEADER */
+.panel-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 15px;
   color:white;
+  border-bottom:1px solid #222;
+}
+
+/* CLOSE BUTTON */
+.close{
+  font-size:22px;
   cursor:pointer;
 }
 
 /* SEARCH */
 .search{
-  width:100%;
+  margin:10px;
   padding:10px;
   border:none;
   border-radius:8px;
-  margin-bottom:10px;
 }
 
 /* LIST */
 .list{
   flex:1;
-  overflow-y:auto; /* 🔥 FIXED SCROLL */
+  overflow-y:auto; /* 🔥 SCROLL FIXED */
+  padding:5px 10px;
 }
 
 /* ITEM */
@@ -210,71 +210,27 @@ body{
 
 <!-- PANEL -->
 <div class="panel" id="panel">
-  <div class="close" onclick="closePanel()">✖</div>
+
+  <div class="panel-header">
+    <span>Select Algae</span>
+    <span class="close" onclick="closePanel()">✖</span>
+  </div>
+
   <input class="search" placeholder="Search algae..." onkeyup="filterList(this.value)">
 
- <div id="list">
+  <div class="list" id="list">
 
-<div class="item"><img src="images2/Cladophora1.jpg">Cladophora</div>
-<div class="item"><img src="images2/Ulva lactuca1.jpg">Ulva lactuca</div>
-<div class="item"><img src="images2/Chlorella1.jpg">Chlorella</div>
-<div class="item"><img src="images2/Spirogyra1.jpg">Spirogyra</div>
-<div class="item"><img src="images2/Botryococcus1.jpg">Botryococcus</div>
-<div class="item"><img src="images2/Polysiphonia1.jpg">Polysiphonia</div>
+    <!-- SAMPLE ITEMS -->
+    <div class="item"><img src="images2/Cladophora1.jpg">Cladophora</div>
+    <div class="item"><img src="images2/Ulva lactuca1.jpg">Ulva lactuca</div>
+    <div class="item"><img src="images2/Chlorella1.jpg">Chlorella</div>
+    <div class="item"><img src="images2/Spirogyra1.jpg">Spirogyra</div>
+    <div class="item"><img src="images2/Botryococcus1.jpg">Botryococcus</div>
+    <div class="item"><img src="images2/Polysiphonia1.jpg">Polysiphonia</div>
+    <div class="item"><img src="images2/Volvox1.jpg">Volvox</div>
+    <div class="item"><img src="images2/Chara1.jpg">Chara</div>
 
-<div class="item"><img src="images2/Chlorococcum1.jpg">Chlorococcum</div>
-<div class="item"><img src="images2/Coelastrum1.jpg">Coelastrum</div>
-<div class="item"><img src="images2/Cosmarium1.jpg">Cosmarium</div>
-<div class="item"><img src="images2/Dunaliella1.jpg">Dunaliella</div>
-<div class="item"><img src="images2/Haematococcus1.jpg">Haematococcus</div>
-<div class="item"><img src="images2/Micractinium1.jpg">Micractinium</div>
-
-<div class="item"><img src="images2/Monoraphidium1.jpg">Monoraphidium</div>
-<div class="item"><img src="images2/Oedogonium1.jpg">Oedogonium</div>
-<div class="item"><img src="images2/Pediastrum1.jpg">Pediastrum</div>
-<div class="item"><img src="images2/Scenedesmus1.jpg">Scenedesmus</div>
-<div class="item"><img src="images2/Stichococcus1.jpg">Stichococcus</div>
-<div class="item"><img src="images2/Stigeoclonium1.jpg">Stigeoclonium</div>
-
-<div class="item"><img src="images2/Tetraselmis1.jpg">Tetraselmis</div>
-<div class="item"><img src="images2/Trebouxia1.jpg">Trebouxia</div>
-<div class="item"><img src="images2/Volvox1.jpg">Volvox</div>
-<div class="item"><img src="images2/Chara1.jpg">Chara</div>
-<div class="item"><img src="images2/Furcellaria1.jpg">Furcellaria</div>
-<div class="item"><img src="images2/Hypnea pannosa1.jpg">Hypnea pannosa</div>
-
-<div class="item"><img src="images2/Lithothamnion1.jpg">Lithothamnion</div>
-<div class="item"><img src="images2/Porphyra1.jpg">Porphyra</div>
-<div class="item"><img src="images2/Titanophora1.jpg">Titanophora</div>
-<div class="item"><img src="images2/Canistrocarpus1.jpg">Canistrocarpus</div>
-<div class="item"><img src="images2/Cystoseira1.jpg">Cystoseira</div>
-<div class="item"><img src="images2/Ectocarpus1.jpg">Ectocarpus</div>
-
-<div class="item"><img src="images2/Laminaria1.jpg">Laminaria</div>
-<div class="item"><img src="images2/Macrocystis1.jpg">Macrocystis</div>
-<div class="item"><img src="images2/Nereocystis1.jpg">Nereocystis</div>
-<div class="item"><img src="images2/Padina1.jpg">Padina</div>
-<div class="item"><img src="images2/Saccharina1.jpg">Saccharina</div>
-<div class="item"><img src="images2/Sargassum1.jpg">Sargassum</div>
-
-<div class="item"><img src="images2/Stypopodium1.jpg">Stypopodium</div>
-<div class="item"><img src="images2/Turbinaria1.jpg">Turbinaria</div>
-<div class="item"><img src="images2/Chaetoceros1.jpg">Chaetoceros</div>
-<div class="item"><img src="images2/Phaeodactylum1.jpg">Phaeodactylum</div>
-<div class="item"><img src="images2/Pinnularia1.jpg">Pinnularia</div>
-<div class="item"><img src="images2/Microcystis1.jpg">Microcystis</div>
-
-<div class="item"><img src="images2/Nostoc1.jpg">Nostoc</div>
-<div class="item"><img src="images2/Oscillatoria1.jpg">Oscillatoria</div>
-<div class="item"><img src="images2/Vaucheria1.jpg">Vaucheria</div>
-<div class="item"><img src="images2/Schizochytrium1.jpg">Schizochytrium</div>
-<div class="item"><img src="images2/Ankistrodesmus1.jpg">Ankistrodesmus</div>
-<div class="item"><img src="images2/Ulothrix1.jpg">Ulothrix</div>
-
-<div class="item"><img src="images2/Acetabularia1.jpg">Acetabularia</div>
-<div class="item"><img src="images2/Botryocladia1.jpg">Botryocladia</div>
-
- </div>
+  </div>
 </div>
 
 <script>

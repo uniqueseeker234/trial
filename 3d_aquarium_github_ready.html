@@ -11,43 +11,33 @@
 <style>
 body{
   margin:0;
-  height:100vh;
+  min-height:100vh;
   background: radial-gradient(circle at center, #020617, #000814);
-  overflow:hidden;
+  overflow:auto; /* ✅ FIXED SCROLL */
   font-family:sans-serif;
 }
 
 /* TITLE */
 .title{
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
+  text-align:center;
   font-family:'Cinzel', serif;
-  font-size:38px;
+  font-size:32px;
   color:gold;
   letter-spacing:6px;
-  animation:moveUp 1.5s ease forwards;
-}
-
-@keyframes moveUp{
-  to{
-    top:70px;
-    transform:translateX(-50%);
-    font-size:30px;
-  }
+  margin-top:40px;
 }
 
 /* CONTAINER */
 .container{
   width:95%;
   max-width:900px;
-  margin:170px auto 0;
+  margin:40px auto;
 }
 
 /* BOX */
 .box{
-  height:600px; /* 🔥 more breathing space */
+  position:relative; /* ✅ VERY IMPORTANT */
+  height:520px;
 }
 
 /* LINES */
@@ -58,57 +48,57 @@ body{
 }
 
 /* OUTER */
-.top{top:0;left:0;height:3px;width:0;animation:drawW .8s forwards 1.5s;}
-.right{top:0;right:0;width:3px;height:0;animation:drawH .8s forwards 2.3s;}
-.bottom{bottom:0;right:0;height:3px;width:0;animation:drawW .8s forwards 3.1s;}
-.left{bottom:0;left:0;width:3px;height:0;animation:drawH .8s forwards 3.9s;}
+.top{top:0;left:0;height:3px;width:100%;}
+.right{top:0;right:0;width:3px;height:100%;}
+.bottom{bottom:0;right:0;height:3px;width:100%;}
+.left{bottom:0;left:0;width:3px;height:100%;}
 
 /* CENTER */
 .center{
-  top:0;left:50%;width:3px;height:0;
+  top:0;left:50%;width:3px;height:100%;
   transform:translateX(-50%);
-  animation:drawH 1s forwards 4.7s;
 }
 
 /* ROWS */
-.row{left:0;height:3px;width:0;animation:drawW .6s forwards;}
-
-.r1{top:70px;animation-delay:5.5s;}
-.r2{
-  top:240px; /* 🔥 pushed down = bigger image box */
-  animation-delay:5.7s;
-}
-.r3{top:320px;animation-delay:5.9s;}
-.r4{top:400px;animation-delay:6.1s;}
-.r5{top:480px;animation-delay:6.3s;}
+.r1{top:70px;height:3px;width:100%;}
+.r2{top:200px;height:3px;width:100%;} /* ✅ BIG IMAGE BOX */
+.r3{top:300px;height:3px;width:100%;}
+.r4{top:380px;height:3px;width:100%;}
+.r5{top:450px;height:3px;width:100%;}
 
 /* HEADINGS */
 .head{
   position:absolute;
-  top:25px;
+  top:20px;
   width:50%;
   text-align:center;
   color:gold;
   font-size:20px;
   cursor:pointer;
-  opacity:0;
-  animation:fadeIn 1s forwards;
-  animation-delay:6.6s;
 }
 
 .leftHead{left:0;}
 .rightHead{right:0;}
 
-@keyframes fadeIn{
-  to{opacity:1;}
+/* IMAGE */
+.algae-img{
+  width:130px;
+  height:130px;
+  object-fit:cover;
+  border-radius:14px;
+  box-shadow:0 0 15px rgba(255,215,0,0.4);
 }
 
-/* ANIM */
-@keyframes drawW{to{width:100%;}}
-@keyframes drawH{to{height:100%;}}
+/* IMAGE POSITION */
+#imgLeft, #imgRight{
+  position:absolute;
+  top:110px;
+  width:50%;
+  display:flex;
+  justify-content:center;
+}
 
-/* ================= PANEL ================= */
-
+/* PANEL */
 .panel{
   position:fixed;
   top:50%;
@@ -119,7 +109,6 @@ body{
   height:75vh;
   background:#020c1a;
   border-radius:15px;
-  box-shadow:0 0 30px rgba(0,0,0,0.8);
   display:flex;
   flex-direction:column;
   opacity:0;
@@ -133,40 +122,27 @@ body{
   transform:translate(-50%,-50%) scale(1);
 }
 
-/* HEADER */
 .panel-header{
   display:flex;
   justify-content:space-between;
-  align-items:center;
-  padding:10px 15px;
+  padding:10px;
   color:white;
-  border-bottom:1px solid #222;
 }
 
-/* CLOSE BUTTON */
 .close{
-  font-size:22px;
   cursor:pointer;
 }
 
-/* SEARCH */
 .search{
-  padding:10px;
   margin:10px;
-  border:none;
+  padding:10px;
   border-radius:8px;
-  width:calc(100% - 20px);
-  position:sticky;
-  top:0;
-  z-index:2;
+  border:none;
 }
 
-/* LIST */
 .list{
   flex:1;
   overflow-y:auto;
-  padding:5px 10px 20px;
-  -webkit-overflow-scrolling: touch;
 }
 
 /* ITEM */
@@ -175,30 +151,15 @@ body{
   align-items:center;
   gap:10px;
   padding:10px;
-  border-bottom:1px solid #222;
   color:white;
   cursor:pointer;
+  border-bottom:1px solid #222;
 }
 
 .item img{
   width:45px;
   height:45px;
   border-radius:6px;
-}
-  /* IMAGE FIX */
-.algae-img{
-  width:140px;        /* 🔥 bigger */
-  height:140px;
-  object-fit:cover;
-  border-radius:16px;
-  box-shadow:0 0 15px rgba(255,215,0,0.4);
-}
-
-/* CENTER IMAGE INSIDE BOX */
-#imgLeft, #imgRight{
-  display:flex;
-  align-items:center;
-  justify-content:center;
 }
 </style>
 </head>
@@ -217,19 +178,19 @@ body{
 
     <div class="line center"></div>
 
-    <div class="line row r1"></div>
-    <div class="line row r2"></div>
-    <div class="line row r3"></div>
-    <div class="line row r4"></div>
-    <div class="line row r5"></div>
+    <div class="line r1"></div>
+    <div class="line r2"></div>
+    <div class="line r3"></div>
+    <div class="line r4"></div>
+    <div class="line r5"></div>
 
     <!-- HEADINGS -->
     <div class="head leftHead" id="algae1" onclick="openPanel('left')">Algae 1</div>
     <div class="head rightHead" id="algae2" onclick="openPanel('right')">Algae 2</div>
 
-    <!-- IMAGE DISPLAY -->
-    <div id="imgLeft" style="position:absolute;top:130px;left:0;width:50%;text-align:center;"></div>
-    <div id="imgRight" style="position:absolute;top:130px;right:0;width:50%;text-align:center;"></div>
+    <!-- IMAGES -->
+    <div id="imgLeft"></div>
+    <div id="imgRight"></div>
 
   </div>
 </div>
@@ -247,63 +208,8 @@ body{
   <div id="list" class="list">
 
 <div class="item" onclick="selectAlgae('Cladophora','images2/Cladophora1.jpg')"><img src="images2/Cladophora1.jpg">Cladophora</div>
-<div class="item" onclick="selectAlgae('Ulva lactuca','images2/Ulva lactuca1.jpg')"><img src="images2/Ulva lactuca1.jpg">Ulva lactuca</div>
 <div class="item" onclick="selectAlgae('Chlorella','images2/Chlorella1.jpg')"><img src="images2/Chlorella1.jpg">Chlorella</div>
 <div class="item" onclick="selectAlgae('Spirogyra','images2/Spirogyra1.jpg')"><img src="images2/Spirogyra1.jpg">Spirogyra</div>
-<div class="item" onclick="selectAlgae('Botryococcus','images2/Botryococcus1.jpg')"><img src="images2/Botryococcus1.jpg">Botryococcus</div>
-<div class="item" onclick="selectAlgae('Polysiphonia','images2/Polysiphonia1.jpg')"><img src="images2/Polysiphonia1.jpg">Polysiphonia</div>
-
-<div class="item" onclick="selectAlgae('Chlorococcum','images2/Chlorococcum1.jpg')"><img src="images2/Chlorococcum1.jpg">Chlorococcum</div>
-<div class="item" onclick="selectAlgae('Coelastrum','images2/Coelastrum1.jpg')"><img src="images2/Coelastrum1.jpg">Coelastrum</div>
-<div class="item" onclick="selectAlgae('Cosmarium','images2/Cosmarium1.jpg')"><img src="images2/Cosmarium1.jpg">Cosmarium</div>
-<div class="item" onclick="selectAlgae('Dunaliella','images2/Dunaliella1.jpg')"><img src="images2/Dunaliella1.jpg">Dunaliella</div>
-<div class="item" onclick="selectAlgae('Haematococcus','images2/Haematococcus1.jpg')"><img src="images2/Haematococcus1.jpg">Haematococcus</div>
-<div class="item" onclick="selectAlgae('Micractinium','images2/Micractinium1.jpg')"><img src="images2/Micractinium1.jpg">Micractinium</div>
-
-<div class="item" onclick="selectAlgae('Monoraphidium','images2/Monoraphidium1.jpg')"><img src="images2/Monoraphidium1.jpg">Monoraphidium</div>
-<div class="item" onclick="selectAlgae('Oedogonium','images2/Oedogonium1.jpg')"><img src="images2/Oedogonium1.jpg">Oedogonium</div>
-<div class="item" onclick="selectAlgae('Pediastrum','images2/Pediastrum1.jpg')"><img src="images2/Pediastrum1.jpg">Pediastrum</div>
-<div class="item" onclick="selectAlgae('Scenedesmus','images2/Scenedesmus1.jpg')"><img src="images2/Scenedesmus1.jpg">Scenedesmus</div>
-<div class="item" onclick="selectAlgae('Stichococcus','images2/Stichococcus1.jpg')"><img src="images2/Stichococcus1.jpg">Stichococcus</div>
-<div class="item" onclick="selectAlgae('Stigeoclonium','images2/Stigeoclonium1.jpg')"><img src="images2/Stigeoclonium1.jpg">Stigeoclonium</div>
-
-<div class="item" onclick="selectAlgae('Tetraselmis','images2/Tetraselmis1.jpg')"><img src="images2/Tetraselmis1.jpg">Tetraselmis</div>
-<div class="item" onclick="selectAlgae('Trebouxia','images2/Trebouxia1.jpg')"><img src="images2/Trebouxia1.jpg">Trebouxia</div>
-<div class="item" onclick="selectAlgae('Volvox','images2/Volvox1.jpg')"><img src="images2/Volvox1.jpg">Volvox</div>
-<div class="item" onclick="selectAlgae('Chara','images2/Chara1.jpg')"><img src="images2/Chara1.jpg">Chara</div>
-<div class="item" onclick="selectAlgae('Furcellaria','images2/Furcellaria1.jpg')"><img src="images2/Furcellaria1.jpg">Furcellaria</div>
-<div class="item" onclick="selectAlgae('Hypnea pannosa','images2/Hypnea pannosa1.jpg')"><img src="images2/Hypnea pannosa1.jpg">Hypnea pannosa</div>
-
-<div class="item" onclick="selectAlgae('Lithothamnion','images2/Lithothamnion1.jpg')"><img src="images2/Lithothamnion1.jpg">Lithothamnion</div>
-<div class="item" onclick="selectAlgae('Porphyra','images2/Porphyra1.jpg')"><img src="images2/Porphyra1.jpg">Porphyra</div>
-<div class="item" onclick="selectAlgae('Titanophora','images2/Titanophora1.jpg')"><img src="images2/Titanophora1.jpg">Titanophora</div>
-<div class="item" onclick="selectAlgae('Canistrocarpus','images2/Canistrocarpus1.jpg')"><img src="images2/Canistrocarpus1.jpg">Canistrocarpus</div>
-<div class="item" onclick="selectAlgae('Cystoseira','images2/Cystoseira1.jpg')"><img src="images2/Cystoseira1.jpg">Cystoseira</div>
-<div class="item" onclick="selectAlgae('Ectocarpus','images2/Ectocarpus1.jpg')"><img src="images2/Ectocarpus1.jpg">Ectocarpus</div>
-
-<div class="item" onclick="selectAlgae('Laminaria','images2/Laminaria1.jpg')"><img src="images2/Laminaria1.jpg">Laminaria</div>
-<div class="item" onclick="selectAlgae('Macrocystis','images2/Macrocystis1.jpg')"><img src="images2/Macrocystis1.jpg">Macrocystis</div>
-<div class="item" onclick="selectAlgae('Nereocystis','images2/Nereocystis1.jpg')"><img src="images2/Nereocystis1.jpg">Nereocystis</div>
-<div class="item" onclick="selectAlgae('Padina','images2/Padina1.jpg')"><img src="images2/Padina1.jpg">Padina</div>
-<div class="item" onclick="selectAlgae('Saccharina','images2/Saccharina1.jpg')"><img src="images2/Saccharina1.jpg">Saccharina</div>
-<div class="item" onclick="selectAlgae('Sargassum','images2/Sargassum1.jpg')"><img src="images2/Sargassum1.jpg">Sargassum</div>
-
-<div class="item" onclick="selectAlgae('Stypopodium','images2/Stypopodium1.jpg')"><img src="images2/Stypopodium1.jpg">Stypopodium</div>
-<div class="item" onclick="selectAlgae('Turbinaria','images2/Turbinaria1.jpg')"><img src="images2/Turbinaria1.jpg">Turbinaria</div>
-<div class="item" onclick="selectAlgae('Chaetoceros','images2/Chaetoceros1.jpg')"><img src="images2/Chaetoceros1.jpg">Chaetoceros</div>
-<div class="item" onclick="selectAlgae('Phaeodactylum','images2/Phaeodactylum1.jpg')"><img src="images2/Phaeodactylum1.jpg">Phaeodactylum</div>
-<div class="item" onclick="selectAlgae('Pinnularia','images2/Pinnularia1.jpg')"><img src="images2/Pinnularia1.jpg">Pinnularia</div>
-<div class="item" onclick="selectAlgae('Microcystis','images2/Microcystis1.jpg')"><img src="images2/Microcystis1.jpg">Microcystis</div>
-
-<div class="item" onclick="selectAlgae('Nostoc','images2/Nostoc1.jpg')"><img src="images2/Nostoc1.jpg">Nostoc</div>
-<div class="item" onclick="selectAlgae('Oscillatoria','images2/Oscillatoria1.jpg')"><img src="images2/Oscillatoria1.jpg">Oscillatoria</div>
-<div class="item" onclick="selectAlgae('Vaucheria','images2/Vaucheria1.jpg')"><img src="images2/Vaucheria1.jpg">Vaucheria</div>
-<div class="item" onclick="selectAlgae('Schizochytrium','images2/Schizochytrium1.jpg')"><img src="images2/Schizochytrium1.jpg">Schizochytrium</div>
-<div class="item" onclick="selectAlgae('Ankistrodesmus','images2/Ankistrodesmus1.jpg')"><img src="images2/Ankistrodesmus1.jpg">Ankistrodesmus</div>
-<div class="item" onclick="selectAlgae('Ulothrix','images2/Ulothrix1.jpg')"><img src="images2/Ulothrix1.jpg">Ulothrix</div>
-
-<div class="item" onclick="selectAlgae('Acetabularia','images2/Acetabularia1.jpg')"><img src="images2/Acetabularia1.jpg">Acetabularia</div>
-<div class="item" onclick="selectAlgae('Botryocladia','images2/Botryocladia1.jpg')"><img src="images2/Botryocladia1.jpg">Botryocladia</div>
 
   </div>
 </div>
@@ -333,14 +239,12 @@ function selectAlgae(name, img){
 
   if(currentSide === "left"){
     document.getElementById("algae1").innerText = name;
-
     document.getElementById("imgLeft").innerHTML =
       `<img src="${img}" class="algae-img">`;
   }
 
-  else if(currentSide === "right"){
+  if(currentSide === "right"){
     document.getElementById("algae2").innerText = name;
-
     document.getElementById("imgRight").innerHTML =
       `<img src="${img}" class="algae-img">`;
   }

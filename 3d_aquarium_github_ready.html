@@ -250,6 +250,34 @@ body{
 
 #dataLeft{ left:0; }
 #dataRight{ right:0; }
+ .cell{
+  position:absolute;
+  width:50%;
+  padding:10px;
+  font-size:13px;
+  color:#d4af37;
+  box-sizing:border-box;
+}
+
+/* LEFT */
+#L_group{ top:250px; left:0; }
+#L_pigment{ top:300px; left:0; }
+#L_habitat{ top:350px; left:0; }
+#L_structure{ top:400px; left:0; }
+#L_reproduction{ top:450px; left:0; }
+#L_identification{ top:500px; left:0; }
+#L_importance{ top:550px; left:0; }
+#L_classification{ top:600px; left:0; }
+
+/* RIGHT */
+#R_group{ top:250px; right:0; }
+#R_pigment{ top:300px; right:0; }
+#R_habitat{ top:350px; right:0; }
+#R_structure{ top:400px; right:0; }
+#R_reproduction{ top:450px; right:0; }
+#R_identification{ top:500px; right:0; }
+#R_importance{ top:550px; right:0; }
+#R_classification{ top:600px; right:0; }
 </style>    </head>    <body>    <div class="title">COMPARE ALGAE</div>    <div class="container">    
   <div class="box">    <div class="line top"></div>    
 <div class="line right"></div>    
@@ -273,8 +301,25 @@ body{
 <!-- IMAGE DISPLAY -->    
 <div id="imgLeft"></div>
 <div id="imgRight"></div>
-   <div id="dataLeft"></div>
-<div id="dataRight"></div>
+   <!-- ROW DATA LEFT -->
+<div id="L_group" class="cell"></div>
+<div id="L_pigment" class="cell"></div>
+<div id="L_habitat" class="cell"></div>
+<div id="L_structure" class="cell"></div>
+<div id="L_reproduction" class="cell"></div>
+<div id="L_identification" class="cell"></div>
+<div id="L_importance" class="cell"></div>
+<div id="L_classification" class="cell"></div>
+
+<!-- ROW DATA RIGHT -->
+<div id="R_group" class="cell"></div>
+<div id="R_pigment" class="cell"></div>
+<div id="R_habitat" class="cell"></div>
+<div id="R_structure" class="cell"></div>
+<div id="R_reproduction" class="cell"></div>
+<div id="R_identification" class="cell"></div>
+<div id="R_importance" class="cell"></div>
+<div id="R_classification" class="cell"></div>
   </div>    
 </div>    <!-- PANEL -->    <div class="panel" id="panel">      <div class="panel-header">    
     <span>Select Algae</span>    
@@ -368,33 +413,31 @@ function filterList(val){
 function selectAlgae(name, img){
 
   const d = algaeData[name] || {};
+  const side = currentSide === "left" ? "L" : "R";
 
-  function val(x){ return x || "-"; }
+  function set(id, label, value){
+    document.getElementById(`${side}_${id}`).innerHTML =
+      `<b>${label}:</b> ${value || "-"}`;
+  }
 
-  const content = `
-  <b>Group:</b> ${val(d.group)}<br><br>
-  <b>Pigment:</b> ${val(d.pigment)}<br><br>
-  <b>Habitat:</b> ${val(d.habitat)}<br><br>
-  <b>Structure:</b> ${val(d.structure)}<br><br>
-  <b>Reproduction:</b> ${val(d.reproduction)}<br><br>
-  <b>Identification:</b> ${val(d.identification)}<br><br>
-  <b>Importance:</b> ${val(d.importance)}<br><br>
-  <b>Classification:</b> ${val(d.classification)}
-  `;
-
-  if(currentSide === "left"){
+  if(side === "L"){
     document.getElementById("algae1").innerText = name;
     document.getElementById("imgLeft").innerHTML =
       `<img src="${img}" class="algae-img">`;
-    document.getElementById("dataLeft").innerHTML = content;
-  }
-
-  else if(currentSide === "right"){
+  } else {
     document.getElementById("algae2").innerText = name;
     document.getElementById("imgRight").innerHTML =
       `<img src="${img}" class="algae-img">`;
-    document.getElementById("dataRight").innerHTML = content;
   }
+
+  set("group","Group",d.group);
+  set("pigment","Pigment",d.pigment);
+  set("habitat","Habitat",d.habitat);
+  set("structure","Structure",d.structure);
+  set("reproduction","Reproduction",d.reproduction);
+  set("identification","Identification",d.identification);
+  set("importance","Importance",d.importance);
+  set("classification","Classification",d.classification);
 
   closePanel();
 }

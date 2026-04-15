@@ -6,24 +6,37 @@
 
 <title>Compare Algae</title>
 
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&display=swap" rel="stylesheet">
+
 <style>
 body{
   margin:0;
   height:100vh;
   background: radial-gradient(circle at center, #020617, #000814);
-  font-family:sans-serif;
   overflow:hidden;
+  font-family:sans-serif;
 }
 
 /* TITLE */
 .title{
   position:absolute;
-  top:15px;   /* 🔥 FIXED POSITION */
+  top:50%;
   left:50%;
-  transform:translateX(-50%);
-  color:gold;
-  font-size:34px;  /* 🔥 BIGGER */
+  transform:translate(-50%,-50%);
+  font-family:'Cinzel', serif;
+  font-size:38px;
   letter-spacing:6px;
+  color:gold;
+
+  animation:moveUp 1.5s ease forwards;
+}
+
+@keyframes moveUp{
+  to{
+    top:40px;
+    transform:translateX(-50%);
+    font-size:30px;
+  }
 }
 
 /* CONTAINER */
@@ -31,7 +44,7 @@ body{
   position:relative;
   width:95%;
   max-width:900px;
-  margin:80px auto 0;
+  margin:120px auto 0;
   height:520px;
 }
 
@@ -47,34 +60,35 @@ body{
 .line{
   position:absolute;
   background:gold;
-  box-shadow:0 0 15px gold, 0 0 40px rgba(255,215,0,0.5);
+  box-shadow:0 0 15px gold,0 0 40px rgba(255,215,0,0.5);
 }
 
 /* OUTER */
-.top{ top:0; left:0; height:3px; width:0; animation:drawW 0.8s forwards;}
-.right{ top:0; right:0; width:3px; height:0; animation:drawH 0.8s forwards 0.8s;}
-.bottom{ bottom:0; right:0; height:3px; width:0; animation:drawW 0.8s forwards 1.6s;}
-.left{ bottom:0; left:0; width:3px; height:0; animation:drawH 0.8s forwards 2.4s;}
+.top{top:0;left:0;height:3px;width:0;animation:drawW .8s forwards 1.5s;}
+.right{top:0;right:0;width:3px;height:0;animation:drawH .8s forwards 2.3s;}
+.bottom{bottom:0;right:0;height:3px;width:0;animation:drawW .8s forwards 3.1s;}
+.left{bottom:0;left:0;width:3px;height:0;animation:drawH .8s forwards 3.9s;}
 
 /* CENTER */
 .center{
-  top:0; left:50%; width:3px; height:0;
+  top:0;left:50%;width:3px;height:0;
   transform:translateX(-50%);
-  animation:drawH 1s forwards 3.2s;
+  animation:drawH 1s forwards 4.7s;
 }
 
 /* ROWS */
-.row{ left:0; height:3px; width:0; animation:drawW 0.6s forwards;}
-.r1{ top:90px; animation-delay:4s;}   /* 🔥 BIG FIRST ROW */
-.r2{ top:160px; animation-delay:4.2s;}
-.r3{ top:230px; animation-delay:4.4s;}
-.r4{ top:300px; animation-delay:4.6s;}
-.r5{ top:370px; animation-delay:4.8s;}
+.row{left:0;height:3px;width:0;animation:drawW .6s forwards;}
+
+.r1{top:120px;animation-delay:5.5s;} /* BIG IMAGE ROW */
+.r2{top:200px;animation-delay:5.7s;}
+.r3{top:270px;animation-delay:5.9s;}
+.r4{top:340px;animation-delay:6.1s;}
+.r5{top:410px;animation-delay:6.3s;}
 
 /* HEADINGS */
 .head{
   position:absolute;
-  top:30px;
+  top:60px;
   width:50%;
   text-align:center;
   color:gold;
@@ -82,57 +96,35 @@ body{
   cursor:pointer;
 }
 
-.leftHead{ left:0; }
-.rightHead{ right:0; }
+.leftHead{left:0;}
+.rightHead{right:0;}
 
-/* ANIMATIONS */
-@keyframes drawW{ to{ width:100%; } }
-@keyframes drawH{ to{ height:100%; } }
+/* ANIM */
+@keyframes drawW{to{width:100%;}}
+@keyframes drawH{to{height:100%;}}
 
-/* ================= PANEL ================= */
+/* ================= MODAL PANEL ================= */
 .panel{
   position:fixed;
-  top:0;
-  right:-100%;
-  width:80%;
-  height:100%;
-  background:#010c1a;
-  box-shadow:-5px 0 20px rgba(0,0,0,0.8);
-  transition:0.4s;
-  padding:20px;
-  overflow-y:auto;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%) scale(0.9);
+  width:90%;
+  max-width:400px;
+  height:70%;
+  background:#020c1a;
+  border-radius:15px;
+  box-shadow:0 0 30px rgba(0,0,0,0.8);
+  padding:15px;
+  opacity:0;
+  pointer-events:none;
+  transition:0.3s;
 }
 
 .panel.active{
-  right:0;
-}
-
-/* SEARCH */
-.search{
-  width:100%;
-  padding:10px;
-  border:none;
-  outline:none;
-  margin-bottom:15px;
-  border-radius:5px;
-}
-
-/* LIST */
-.item{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:8px;
-  border-bottom:1px solid #222;
-  color:white;
-  cursor:pointer;
-}
-
-.item img{
-  width:40px;
-  height:40px;
-  object-fit:cover;
-  border-radius:4px;
+  opacity:1;
+  pointer-events:auto;
+  transform:translate(-50%,-50%) scale(1);
 }
 
 /* CLOSE */
@@ -140,9 +132,39 @@ body{
   position:absolute;
   top:10px;
   right:15px;
-  font-size:20px;
+  font-size:22px;
   color:white;
   cursor:pointer;
+}
+
+/* SEARCH */
+.search{
+  width:100%;
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  margin-bottom:10px;
+}
+
+/* LIST */
+.list{
+  overflow-y:auto;
+  height:85%;
+}
+
+.item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px;
+  border-bottom:1px solid #222;
+  color:white;
+}
+
+.item img{
+  width:45px;
+  height:45px;
+  border-radius:6px;
 }
 </style>
 </head>
@@ -154,30 +176,26 @@ body{
 <div class="container">
   <div class="box">
 
-    <!-- BOX -->
     <div class="line top"></div>
     <div class="line right"></div>
     <div class="line bottom"></div>
     <div class="line left"></div>
 
-    <!-- CENTER -->
     <div class="line center"></div>
 
-    <!-- ROWS -->
     <div class="line row r1"></div>
     <div class="line row r2"></div>
     <div class="line row r3"></div>
     <div class="line row r4"></div>
     <div class="line row r5"></div>
 
-    <!-- HEADINGS -->
-    <div class="head leftHead" onclick="openPanel('left')">Algae 1</div>
-    <div class="head rightHead" onclick="openPanel('right')">Algae 2</div>
+    <div class="head leftHead" onclick="openPanel()">Algae 1</div>
+    <div class="head rightHead" onclick="openPanel()">Algae 2</div>
 
   </div>
 </div>
 
-<!-- PANEL -->
+<!-- MODAL -->
 <div class="panel" id="panel">
   <div class="close" onclick="closePanel()">✖</div>
   <input class="search" placeholder="Search algae..." onkeyup="filterList(this.value)">
@@ -246,7 +264,7 @@ body{
   </div>
 
 <script>
-function openPanel(side){
+function openPanel(){
   document.getElementById("panel").classList.add("active");
 }
 
@@ -259,7 +277,7 @@ function filterList(val){
   val=val.toLowerCase();
 
   items.forEach(i=>{
-    i.style.display = i.innerText.toLowerCase().includes(val) ? "flex":"none";
+    i.style.display=i.innerText.toLowerCase().includes(val)?"flex":"none";
   });
 }
 </script>

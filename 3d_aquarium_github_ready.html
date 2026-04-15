@@ -202,11 +202,23 @@ body{
 }
     
 /* CENTER IMAGE INSIDE BOX */    
-#imgLeft, #imgRight{
+#imgLeft{
   position:absolute;
-  top:90px;        /* 🔥 PERFECT ALIGNMENT INSIDE r2 */
-  height:140px;     /* matches image zone */
+  top:86px;
+  left:0;
   width:50%;
+  height:140px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+#imgRight{
+  position:absolute;
+  top:86px;
+  right:0;
+  width:50%;
+  height:140px;
   display:flex;
   align-items:center;
   justify-content:center;

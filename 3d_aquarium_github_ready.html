@@ -333,14 +333,20 @@ function selectAlgae(name, img){
 
   if(currentSide === "left"){
     document.getElementById("algae1").innerText = name;
-    `<img src="${img}" class="algae-img">`
+
+    document.getElementById("imgLeft").innerHTML =
+      `<img src="${img}" class="algae-img">`;
   }
 
   else if(currentSide === "right"){
     document.getElementById("algae2").innerText = name;
-    `<img src="${img}" class="algae-img">`
+
+    document.getElementById("imgRight").innerHTML =
+      `<img src="${img}" class="algae-img">`;
   }
 
+  closePanel();
+}
   closePanel();
 }
 </script>

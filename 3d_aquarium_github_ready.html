@@ -261,15 +261,14 @@ body{
 /* LEFT */
 /* PERFECT ROW ALIGNMENT */
 
-#L_group, #R_group { top:250px; }
-#L_pigment, #R_pigment { top:310px; }
-#L_habitat, #R_habitat { top:370px; }
-#L_structure, #R_structure { top:430px; }
-#L_reproduction, #R_reproduction { top:490px; }
-#L_identification, #R_identification { top:550px; }
-#L_importance, #R_importance { top:610px; }
-#L_classification, #R_classification { top:730px; }
-
+#L_group, #R_group { top:280px; }
+#L_pigment, #R_pigment { top:360px; }
+#L_habitat, #R_habitat { top:440px; }
+#L_structure, #R_structure { top:520px; }
+#L_reproduction, #R_reproduction { top:600px; }
+#L_identification, #R_identification { top:680px; }
+#L_importance, #R_importance { top:760px; }
+#L_classification, #R_classification { top:820px; }
 </style>    </head>    <body>    <div class="title">COMPARE ALGAE</div>    <div class="container">    
   <div class="box">    <div class="line top"></div>    
 <div class="line right"></div>    
@@ -424,12 +423,12 @@ function selectAlgae(name, img){
 
   set("group", d.group);
 set("pigment", d.pigment);
-set("habitat", d.habitat);
 set("structure", d.structure);
 set("reproduction", d.reproduction);
 set("identification", d.identification);
 set("importance", d.importance);
-set("classification", d.classification);
+set("classification", d.habitat);   // Freshwater goes last
+set("habitat", d.classification);   // Classification goes above
 
   closePanel();
 }

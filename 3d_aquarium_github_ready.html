@@ -358,7 +358,11 @@ body{
 <div class="item" onclick="selectAlgae('Ankistrodesmus','images2/Ankistrodesmus1.jpg')"><img src="images2/Ankistrodesmus1.jpg">Ankistrodesmus</div>    
 <div class="item" onclick="selectAlgae('Ulothrix','images2/Ulothrix1.jpg')"><img src="images2/Ulothrix1.jpg">Ulothrix</div>    <div class="item" onclick="selectAlgae('Acetabularia','images2/Acetabularia1.jpg')"><img src="images2/Acetabularia1.jpg">Acetabularia</div>    
 <div class="item" onclick="selectAlgae('Botryocladia','images2/Botryocladia1.jpg')"><img src="images2/Botryocladia1.jpg">Botryocladia</div>      </div>    
-</div>    <script>    
+</div> 
+ <div style="position:fixed; bottom:0; left:0; width:100%; background:#000814; padding:10px; z-index:999;">
+  <div id="sliders"></div>
+ </div>
+ <script>    
 const algaeData = {
   "Cladophora": {
     group: "Green algae",
@@ -432,12 +436,15 @@ set("habitat", d.classification);   // Classification goes above
 
   closePanel();
 }
+window.onload = function(){
+
 const ids = [
   "group","pigment","habitat","structure",
   "reproduction","identification","importance","classification"
 ];
 
 const sliderBox = document.getElementById("sliders");
+if(!sliderBox) return;
 
 ids.forEach(id=>{
   const wrap = document.createElement("div");
@@ -460,9 +467,8 @@ ids.forEach(id=>{
     document.getElementById("R_"+id).style.top = val + "px";
   };
 });
+
+};
 </script> 
- <div style="position:fixed; bottom:0; left:0; width:100%; background:#000814; padding:10px; z-index:999;">
-  <div id="sliders"></div>
- </div>
 </body>    
 </html>    

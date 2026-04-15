@@ -17,12 +17,12 @@ body{
   overflow:hidden;
 }
 
-/* MAIN BOX */
+/* CONTAINER */
 .container{
   position:relative;
-  width:80%;
-  max-width:800px;
-  height:400px;
+  width:85%;
+  max-width:850px;
+  height:420px;
 }
 
 /* TITLE */
@@ -32,123 +32,137 @@ body{
   left:50%;
   transform:translate(-50%, -50%);
   color:gold;
-  font-size:28px;
-  letter-spacing:3px;
+  font-size:30px;
+  letter-spacing:4px;
 
   animation: moveUp 1.5s ease forwards;
-  animation-delay:0.5s;
+  animation-delay:0.3s;
 }
 
-/* MOVE TITLE UP */
 @keyframes moveUp{
   to{
-    top:20px;
+    top:10px;
     transform:translateX(-50%);
     font-size:22px;
   }
 }
 
-/* TABLE */
-.table{
+/* BOX */
+.box{
   position:absolute;
   top:60px;
   left:0;
   width:100%;
-  height:300px;
+  height:330px;
 }
 
-/* VERTICAL LINE */
-.vertical{
+/* BORDER LINES */
+.line{
   position:absolute;
-  top:0;
-  left:50%;
-  width:4px;
-  height:0;
   background:gold;
-  box-shadow:0 0 15px gold;
-  transform:translateX(-50%);
-  animation: drawVertical 1s ease forwards;
+  box-shadow:0 0 15px gold, 0 0 40px rgba(255,215,0,0.5);
+}
+
+/* TOP */
+.top{
+  top:0;
+  left:0;
+  height:3px;
+  width:0;
+  animation: drawWidth 0.8s forwards;
+  animation-delay:1s;
+}
+
+/* RIGHT */
+.right{
+  top:0;
+  right:0;
+  width:3px;
+  height:0;
+  animation: drawHeight 0.8s forwards;
   animation-delay:1.8s;
 }
 
-/* HORIZONTAL LINES */
-.row-line{
-  position:absolute;
-  left:0;
-  width:0%;
+/* BOTTOM */
+.bottom{
+  bottom:0;
+  right:0;
   height:3px;
-  background:gold;
-  box-shadow:0 0 10px gold;
-  animation: drawHorizontal 1s ease forwards;
+  width:0;
+  animation: drawWidth 0.8s forwards;
+  animation-delay:2.6s;
 }
 
-/* ROW POSITIONS */
-.row1{ top:40px; animation-delay:2.2s;}
-.row2{ top:90px; animation-delay:2.4s;}
-.row3{ top:140px; animation-delay:2.6s;}
-.row4{ top:190px; animation-delay:2.8s;}
-.row5{ top:240px; animation-delay:3s;}
-
-/* DRAW ANIMATIONS */
-@keyframes drawVertical{
-  to{ height:100%; }
+/* LEFT */
+.left{
+  bottom:0;
+  left:0;
+  width:3px;
+  height:0;
+  animation: drawHeight 0.8s forwards;
+  animation-delay:3.4s;
 }
 
-@keyframes drawHorizontal{
-  to{ width:100%; }
+/* CENTER LINE */
+.center{
+  top:0;
+  left:50%;
+  width:3px;
+  height:0;
+  transform:translateX(-50%);
+  animation: drawHeight 1s forwards;
+  animation-delay:4.2s;
 }
+
+/* ROW LINES */
+.row{
+  left:0;
+  height:3px;
+  width:0;
+  animation: drawWidth 0.8s forwards;
+}
+
+.r1{ top:60px; animation-delay:4.8s;}
+.r2{ top:120px; animation-delay:5s;}
+.r3{ top:180px; animation-delay:5.2s;}
+.r4{ top:240px; animation-delay:5.4s;}
+.r5{ top:300px; animation-delay:5.6s;}
 
 /* HEADINGS */
 .head{
   position:absolute;
-  top:10px;
+  top:15px;
   width:50%;
   text-align:center;
   color:gold;
   font-size:18px;
   opacity:0;
-  animation: fadeIn 1s ease forwards;
-  animation-delay:3.2s;
+  animation: fadeIn 1s forwards;
+  animation-delay:6.2s;
 }
 
-.head.left{ left:0; }
-.head.right{ right:0; }
+.leftHead{ left:0; }
+.rightHead{ right:0; }
 
-/* ROW TEXT */
-.cell{
-  position:absolute;
-  width:50%;
-  text-align:center;
-  color:white;
-  font-size:14px;
-  opacity:0;
-  animation: fadeIn 0.8s ease forwards;
+/* ANIMATIONS */
+@keyframes drawWidth{
+  to{ width:100%; }
 }
 
-/* LEFT CELLS */
-.l1{ top:50px; left:0; animation-delay:3.5s;}
-.l2{ top:100px; left:0; animation-delay:3.7s;}
-.l3{ top:150px; left:0; animation-delay:3.9s;}
-.l4{ top:200px; left:0; animation-delay:4.1s;}
-.l5{ top:250px; left:0; animation-delay:4.3s;}
+@keyframes drawHeight{
+  to{ height:100%; }
+}
 
-/* RIGHT CELLS */
-.r1{ top:50px; right:0; animation-delay:3.5s;}
-.r2{ top:100px; right:0; animation-delay:3.7s;}
-.r3{ top:150px; right:0; animation-delay:3.9s;}
-.r4{ top:200px; right:0; animation-delay:4.1s;}
-.r5{ top:250px; right:0; animation-delay:4.3s;}
-
-/* FADE */
 @keyframes fadeIn{
   to{ opacity:1; }
 }
 
 /* 3D EFFECT */
-.table{
-  transform: perspective(800px) rotateX(5deg);
+.box{
+  transform: perspective(900px) rotateX(6deg);
 }
 </style>
+
 </head>
 
 <body>
@@ -157,34 +171,27 @@ body{
 
   <div class="title">COMPARE ALGAE</div>
 
-  <div class="table">
+  <div class="box">
+
+    <!-- OUTER BOX -->
+    <div class="line top"></div>
+    <div class="line right"></div>
+    <div class="line bottom"></div>
+    <div class="line left"></div>
+
+    <!-- CENTER -->
+    <div class="line center"></div>
+
+    <!-- ROWS -->
+    <div class="line row r1"></div>
+    <div class="line row r2"></div>
+    <div class="line row r3"></div>
+    <div class="line row r4"></div>
+    <div class="line row r5"></div>
 
     <!-- HEADINGS -->
-    <div class="head left">Algae 1</div>
-    <div class="head right">Algae 2</div>
-
-    <!-- LINES -->
-    <div class="vertical"></div>
-
-    <div class="row-line row1"></div>
-    <div class="row-line row2"></div>
-    <div class="row-line row3"></div>
-    <div class="row-line row4"></div>
-    <div class="row-line row5"></div>
-
-    <!-- LEFT -->
-    <div class="cell l1">Colour</div>
-    <div class="cell l2">Habitat</div>
-    <div class="cell l3">Morphology</div>
-    <div class="cell l4">Salient Features</div>
-    <div class="cell l5">Economic Importance</div>
-
-    <!-- RIGHT -->
-    <div class="cell r1">---</div>
-    <div class="cell r2">---</div>
-    <div class="cell r3">---</div>
-    <div class="cell r4">---</div>
-    <div class="cell r5">---</div>
+    <div class="head leftHead">Algae 1</div>
+    <div class="head rightHead">Algae 2</div>
 
   </div>
 

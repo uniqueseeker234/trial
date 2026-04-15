@@ -186,6 +186,20 @@ body{
   height:45px;
   border-radius:6px;
 }
+  /* IMAGE FIX */
+.algae-img{
+  width:90px;
+  height:90px;
+  object-fit:cover;
+  border-radius:12px;
+}
+
+/* CENTER IMAGE INSIDE BOX */
+#imgLeft, #imgRight{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
 </style>
 </head>
 
@@ -319,14 +333,12 @@ function selectAlgae(name, img){
 
   if(currentSide === "left"){
     document.getElementById("algae1").innerText = name;
-    document.getElementById("imgLeft").innerHTML =
-      `<img src="${img}" style="width:110px;height:110px;border-radius:8px;">`;
+    `<img src="${img}" class="algae-img">`
   }
 
   else if(currentSide === "right"){
     document.getElementById("algae2").innerText = name;
-    document.getElementById("imgRight").innerHTML =
-      `<img src="${img}" style="width:110px;height:110px;border-radius:8px;">`;
+    `<img src="${img}" class="algae-img">`
   }
 
   closePanel();

@@ -172,7 +172,9 @@ body{
   pointer-events:none;    
   transition:0.3s;    
 }    
-    
+    .panel{
+  z-index: 9999;  /* 🔥 force it above everything */
+    }
 .panel.active{    
   opacity:1;    
   pointer-events:auto;    

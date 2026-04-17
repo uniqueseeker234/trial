@@ -311,6 +311,7 @@ body{
   opacity:0;
   transform:scale(0.5);
   pointer-events:none;
+  animation:none; /* 🔥 important */
 }
 
 /* value hidden initially */
@@ -321,14 +322,23 @@ body{
 
 /* when revealed */
 .cell.revealed .label{
-  opacity:0;
-  transform:scale(0.3);
+  opacity:0 !important;
+  transform:scale(0.2);
 }
 
 .cell.revealed .value{
   opacity:1;
   transform:scale(1);
 }
+ .value{
+  z-index:2;
+}
+.label{
+  z-index:1;
+}
+ .cell{
+  cursor:pointer;
+ }
 </style>    </head>    <body>    <div class="title">COMPARE ALGAE</div>    <div class="container">    
   <div class="box">    <div class="line top"></div>    
 <div class="line right"></div>    
@@ -1106,6 +1116,7 @@ set("habitat", d.classification);   // Classification goes above
 if(selectedLeft && selectedRight){
   document.querySelectorAll(".label").forEach((el, i)=>{
     el.style.pointerEvents = "auto";
+    el.style.opacity = "1";   // 🔥 THIS WAS MISSING
     el.style.animation = `pop3d 0.5s ease forwards ${i * 0.1}s`;
   });
 }

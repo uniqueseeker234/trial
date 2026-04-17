@@ -284,6 +284,25 @@ body{
 #R_reproduction, #R_identification, #R_importance, #R_classification {
   left:50%;
 }
+ .label{
+  position:absolute;
+  opacity:1;
+  transition:0.4s;
+}
+
+.value{
+  position:absolute;
+  opacity:0;
+  transition:0.4s;
+}
+
+.cell.revealed .label{
+  opacity:0;
+}
+
+.cell.revealed .value{
+  opacity:1;
+}
 </style>    </head>    <body>    <div class="title">COMPARE ALGAE</div>    <div class="container">    
   <div class="box">    <div class="line top"></div>    
 <div class="line right"></div>    
@@ -309,24 +328,22 @@ body{
 <div id="imgLeft"></div>
 <div id="imgRight"></div>
    <!-- ROW DATA LEFT -->
-<div id="L_group" class="cell"></div>
-<div id="L_pigment" class="cell"></div>
-<div id="L_habitat" class="cell"></div>
-<div id="L_structure" class="cell"></div>
-<div id="L_reproduction" class="cell"></div>
-<div id="L_identification" class="cell"></div>
-<div id="L_importance" class="cell"></div>
-<div id="L_classification" class="cell"></div>
-
-<!-- ROW DATA RIGHT -->
-<div id="R_group" class="cell"></div>
-<div id="R_pigment" class="cell"></div>
-<div id="R_habitat" class="cell"></div>
-<div id="R_structure" class="cell"></div>
-<div id="R_reproduction" class="cell"></div>
-<div id="R_identification" class="cell"></div>
-<div id="R_importance" class="cell"></div>
-<div id="R_classification" class="cell"></div>
+<div id="L_group" class="cell reveal" data-key="group">GROUP</div>
+<div id="L_pigment" class="cell reveal" data-key="pigment">PIGMENT</div>
+<div id="L_habitat" class="cell reveal" data-key="habitat">HABITAT</div>
+<div id="L_structure" class="cell reveal" data-key="structure">STRUCTURE</div>
+<div id="L_reproduction" class="cell reveal" data-key="reproduction">REPRODUCTION</div>
+<div id="L_identification" class="cell reveal" data-key="identification">IDENTIFICATION</div>
+<div id="L_importance" class="cell reveal" data-key="importance">IMPORTANCE</div>
+<div id="L_classification" class="cell reveal" data-key="classification">CLASSIFICATION</div>
+   <div id="R_group" class="cell reveal" data-key="group">GROUP</div>
+<div id="R_pigment" class="cell reveal" data-key="pigment">PIGMENT</div>
+<div id="R_habitat" class="cell reveal" data-key="habitat">HABITAT</div>
+<div id="R_structure" class="cell reveal" data-key="structure">STRUCTURE</div>
+<div id="R_reproduction" class="cell reveal" data-key="reproduction">REPRODUCTION</div>
+<div id="R_identification" class="cell reveal" data-key="identification">IDENTIFICATION</div>
+<div id="R_importance" class="cell reveal" data-key="importance">IMPORTANCE</div>
+<div id="R_classification" class="cell reveal" data-key="classification">CLASSIFICATION</div>
   </div>    
 </div>    <!-- PANEL -->    <div class="panel" id="panel">      <div class="panel-header">    
     <span>Select Algae</span>    
@@ -947,9 +964,11 @@ function selectAlgae(name, img){
   const d = algaeData[name] || {};
   const side = currentSide === "left" ? "L" : "R";
 
-  function set(id, value){
-  document.getElementById(`${side}_${id}`).innerText = value || "-";
-  }
+ function set(id, value){
+  const cell = document.getElementById(${side}_${id});
+  cell.querySelector(".value").innerText = value || "-";
+  cell.classList.remove("revealed"); // reset
+}
 
   if(side === "L"){
     document.getElementById("algae1").innerText = name;

@@ -286,9 +286,9 @@ body{
 }
  .label{
   position:absolute;
-  opacity:1;
+  opacity:0;   /* 👈 hidden initially */
   transition:0.4s;
-}
+ }
 
 .value{
   position:absolute;
@@ -1022,6 +1022,8 @@ const algaeData = {
   classification: "Rhodophyta > Florideophyceae > Gelidiales"
 },
 };
+  let selectedLeft = false;
+let selectedRight = false;
  let currentSide = "";    
     
 function openPanel(side){    
@@ -1046,7 +1048,11 @@ function selectAlgae(name, img){
 
   const d = algaeData[name] || {};
   const side = currentSide === "left" ? "L" : "R";
-
+if(side === "L"){
+  selectedLeft = true;
+} else {
+  selectedRight = true;
+}
  function set(id, value){
   const cell = document.getElementById(`${side}_${id}`);
   cell.querySelector(".value").innerText = value || "-";
@@ -1071,7 +1077,12 @@ set("identification", d.identification);
 set("importance", d.importance);
 set("classification", d.habitat);   // Freshwater goes last
 set("habitat", d.classification);   // Classification goes above
-
+if(selectedLeft && selectedRight){
+  document.querySelectorAll(".label").forEach(el=>{
+    el.style.opacity = "1";
+    el.style.transform = "scale(1)";
+  });
+}
   closePanel();
 }
   function reveal(cell){

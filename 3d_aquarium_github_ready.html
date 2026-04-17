@@ -328,22 +328,95 @@ body{
 <div id="imgLeft"></div>
 <div id="imgRight"></div>
    <!-- ROW DATA LEFT -->
-<div id="L_group" class="cell reveal" data-key="group">GROUP</div>
-<div id="L_pigment" class="cell reveal" data-key="pigment">PIGMENT</div>
-<div id="L_habitat" class="cell reveal" data-key="classification">CLASSIFICATION</div>
-<div id="L_structure" class="cell reveal" data-key="structure">STRUCTURE</div>
-<div id="L_reproduction" class="cell reveal" data-key="reproduction">REPRODUCTION</div>
-<div id="L_identification" class="cell reveal" data-key="identification">IDENTIFICATION</div>
-<div id="L_importance" class="cell reveal" data-key="importance">IMPORTANCE</div>
-<div id="L_classification" class="cell reveal" data-key="habitat">HABITAT</div>
-   <div id="R_group" class="cell reveal" data-key="group">GROUP</div>
-<div id="R_pigment" class="cell reveal" data-key="pigment">PIGMENT</div>
-<div id="R_habitat" class="cell reveal" data-key="classification">CLASSIFICATION</div>
-<div id="R_structure" class="cell reveal" data-key="structure">STRUCTURE</div>
-<div id="R_reproduction" class="cell reveal" data-key="reproduction">REPRODUCTION</div>
-<div id="R_identification" class="cell reveal" data-key="identification">IDENTIFICATION</div>
-<div id="R_importance" class="cell reveal" data-key="importance">IMPORTANCE</div>
-<div id="R_classification" class="cell reveal" data-key="habitat">HABITAT</div>
+<!-- LEFT SIDE -->
+
+<div id="L_group" class="cell" onclick="reveal(this)">
+  <span class="label">GROUP</span>
+  <span class="value"></span>
+</div>
+
+<div id="L_pigment" class="cell" onclick="reveal(this)">
+  <span class="label">PIGMENT</span>
+  <span class="value"></span>
+</div>
+
+<!-- ⚠️ REVERSED (your preference) -->
+<div id="L_habitat" class="cell" onclick="reveal(this)">
+  <span class="label">CLASSIFICATION</span>
+  <span class="value"></span>
+</div>
+
+<div id="L_structure" class="cell" onclick="reveal(this)">
+  <span class="label">STRUCTURE</span>
+  <span class="value"></span>
+</div>
+
+<div id="L_reproduction" class="cell" onclick="reveal(this)">
+  <span class="label">REPRODUCTION</span>
+  <span class="value"></span>
+</div>
+
+<div id="L_identification" class="cell" onclick="reveal(this)">
+  <span class="label">IDENTIFICATION</span>
+  <span class="value"></span>
+</div>
+
+<div id="L_importance" class="cell" onclick="reveal(this)">
+  <span class="label">IMPORTANCE</span>
+  <span class="value"></span>
+</div>
+
+<!-- ⚠️ REVERSED (your preference) -->
+<div id="L_classification" class="cell" onclick="reveal(this)">
+  <span class="label">HABITAT</span>
+  <span class="value"></span>
+</div>
+
+
+
+<!-- RIGHT SIDE -->
+
+<div id="R_group" class="cell" onclick="reveal(this)">
+  <span class="label">GROUP</span>
+  <span class="value"></span>
+</div>
+
+<div id="R_pigment" class="cell" onclick="reveal(this)">
+  <span class="label">PIGMENT</span>
+  <span class="value"></span>
+</div>
+
+<!-- ⚠️ REVERSED -->
+<div id="R_habitat" class="cell" onclick="reveal(this)">
+  <span class="label">CLASSIFICATION</span>
+  <span class="value"></span>
+</div>
+
+<div id="R_structure" class="cell" onclick="reveal(this)">
+  <span class="label">STRUCTURE</span>
+  <span class="value"></span>
+</div>
+
+<div id="R_reproduction" class="cell" onclick="reveal(this)">
+  <span class="label">REPRODUCTION</span>
+  <span class="value"></span>
+</div>
+
+<div id="R_identification" class="cell" onclick="reveal(this)">
+  <span class="label">IDENTIFICATION</span>
+  <span class="value"></span>
+</div>
+
+<div id="R_importance" class="cell" onclick="reveal(this)">
+  <span class="label">IMPORTANCE</span>
+  <span class="value"></span>
+</div>
+
+<!-- ⚠️ REVERSED -->
+<div id="R_classification" class="cell" onclick="reveal(this)">
+  <span class="label">HABITAT</span>
+  <span class="value"></span>
+</div>
   </div>    
 </div>    <!-- PANEL -->    <div class="panel" id="panel">      <div class="panel-header">    
     <span>Select Algae</span>    
@@ -393,6 +466,16 @@ body{
 </div> 
  <script>    
 const algaeData = {
+ "Cladophora": {
+  group: "Green algae",
+  pigment: "Chlorophyll a, b",
+  habitat: "Freshwater",
+  structure: "Branched filamentous",
+  reproduction: "Fragmentation, zoospores",
+  identification: "Green thread-like branched filaments",
+  importance: "Pollution indicator",
+  classification: "Chlorophyta > Ulvophyceae > Cladophorales"
+},
 "Ulva lactuca": {
   group: "Green algae",
   pigment: "Chlorophyll a, b",
@@ -965,7 +1048,7 @@ function selectAlgae(name, img){
   const side = currentSide === "left" ? "L" : "R";
 
  function set(id, value){
-  const cell = document.getElementById(${side}_${id});
+  const cell = document.getElementById(`${side}_${id}`);
   cell.querySelector(".value").innerText = value || "-";
   cell.classList.remove("revealed"); // reset
 }
@@ -991,6 +1074,12 @@ set("habitat", d.classification);   // Classification goes above
 
   closePanel();
 }
+  function reveal(cell){
+  const id = cell.id.split("_")[1];
+
+  document.getElementById("L_"+id).classList.add("revealed");
+  document.getElementById("R_"+id).classList.add("revealed");
+  }
 </script> 
 </body>    
 </html>    

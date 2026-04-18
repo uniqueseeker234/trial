@@ -211,7 +211,9 @@ const hasToken = t => state.tokens.includes(t);
 const setMessage = (h,s="") => { msg.innerHTML = h; hint.innerHTML = s; };
 
 function safeImage(path){
-  return `<img class="preview" src="${path}" onerror="console.error('Missing image:', path); this.style.display='none'; this.parentElement.innerHTML='MISSING IMAGE';" alt="">`;
+  return `<img class="preview" src="${path}" 
+    onerror="console.error('Missing image:', this.src); this.style.display='none'; this.parentElement.innerHTML='MISSING IMAGE';" 
+  alt="">`;
 }
 function showScan(){ scan.classList.remove("on"); void scan.offsetWidth; scan.classList.add("on"); }
 function addTrailTag(qid,label){ trail.classList.remove("hidden"); const t=document.createElement("div"); t.className="tag"; t.innerHTML=`<b>${qid}</b>: ${label}`; trail.appendChild(t);}
@@ -413,13 +415,6 @@ const QUESTIONS = [
     {label:"Fine hair-like red tuft", token:"diag:red_hairlike", img:PATHS.diagnosticMacro+"diag_red_hairlike.jpg"}
   ]}
 ];
-
-function openColorHelp(){
-  const mode = selectedObservation()==="micro" ? "micro" : "macro";
-  const items = COLOR_HELP[mode];
-  const base = mode==="micro" ? PATHS.helpMicro : PATHS.helpMacro;
-  return `<div class="helpPanel"><div class="helpHd"><div><b>Unsure about the color?</b></div><div class="small">${mode==="micro"?"Microscopic examples":"Macroscopic examples"}</div></div><div class="helpBd"><div class="helpGrid">${items.map(item=>`<div class="opt"><div class="img">${safeImage(base+item.img)}</div><div class="lb">${item.name}</div></div>`).join("")}</div></div></div>`;
-}
 
 function nextQuestionIndex(fromIdx){
   let idx = fromIdx + 1;
@@ -625,7 +620,58 @@ resetBtn.onclick=resetAll;
   test.onerror=()=>{};
   test.src=PATHS.ui+"vixen.png";
 })();
+function validateAllImages(){
+  const allPaths = [];
 
+  // QUESTIONS
+  QUESTIONS.forEach(q=>{
+    try{
+      const answers = q.getAnswers();
+      answers.forEach(a=>{
+        if(a.img) allPaths.push(a.img);
+      });
+    }catch(e){}
+  });
+
+  // COLOR HELP
+  Object.entries(COLOR_HELP).forEach(([mode, items])=>{
+    const base = mode === "micro" ? PATHS.helpMicro : PATHS.helpMacro;
+    items.forEach(item=>{
+      allPaths.push(base + item.img);
+    });
+  });
+
+  // SPECIES
+  SPECIES.forEach(s=>{
+    allPaths.push(PATHS.species + s.image);
+  });
+
+  // UI
+  allPaths.push(PATHS.ui + "vixen.png");
+
+  const unique = [...new Set(allPaths)];
+
+  console.log("🔍 Checking", unique.length, "images...");
+
+  let missingCount = 0;
+
+  unique.forEach(path=>{
+    const img = new Image();
+    img.onerror = ()=>{
+      console.error("❌ Missing:", path);
+      missingCount++;
+    };
+    img.onload = ()=>{
+      console.log("✅ OK:", path);
+    };
+    img.src = path;
+  });
+
+  setTimeout(()=>{
+    console.log(`\n📊 Scan complete → Missing: ${missingCount} / ${unique.length}`);
+  }, 2000);
+}
+  validateAllImages();
 resetAll();
 </script>
 </body>

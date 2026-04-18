@@ -39,6 +39,11 @@
   .colorGrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}@media (max-width:900px){.colorGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media (max-width:520px){.colorGrid{grid-template-columns:1fr}}
   .colorCard{position:relative;min-height:140px;border-radius:18px;border:1px solid rgba(255,255,255,.12);overflow:hidden;display:flex;align-items:flex-end;padding:14px;cursor:pointer;transition:transform .12s ease, border-color .18s ease, box-shadow .18s ease;background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02))}.colorCard:hover{transform:translateY(-2px)}.colorCard::before{content:"";position:absolute;inset:-30% -10%;background:radial-gradient(circle at 50% 45%, var(--glowColor) 0%, rgba(255,255,255,.05) 24%, transparent 64%);opacity:.95;filter:blur(8px)}.colorCard::after{content:"";position:absolute;inset:0;background:linear-gradient(120deg, transparent 18%, rgba(255,255,255,.14) 48%, transparent 78%);transform:translateX(-120%);opacity:0}.colorCard:hover::after{opacity:.8;animation:sweep 1.1s linear}.colorCard .label{position:relative;z-index:2;font-size:14px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;text-shadow:0 0 14px rgba(255,255,255,.18)}
   .colorCard.green{--glowColor:rgba(50,255,140,.72);box-shadow:0 0 22px rgba(50,255,140,.18), inset 0 0 22px rgba(50,255,140,.08)} .colorCard.bluegreen{--glowColor:rgba(70,235,255,.74);box-shadow:0 0 22px rgba(70,235,255,.18), inset 0 0 22px rgba(70,235,255,.08)} .colorCard.brown{--glowColor:rgba(255,182,72,.72);box-shadow:0 0 22px rgba(255,182,72,.18), inset 0 0 22px rgba(255,182,72,.08)} .colorCard.red{--glowColor:rgba(255,80,110,.72);box-shadow:0 0 22px rgba(255,80,110,.18), inset 0 0 22px rgba(255,80,110,.08)} .colorCard.yellowgreen{--glowColor:rgba(206,255,88,.74);box-shadow:0 0 22px rgba(206,255,88,.18), inset 0 0 22px rgba(206,255,88,.08)}
+  .colorCard.transparent{
+  --glowColor:rgba(200,255,255,.65);
+  box-shadow:0 0 22px rgba(200,255,255,.18),
+             inset 0 0 22px rgba(200,255,255,.08);
+  }
   .helpPanel,.confidenceBox,.morphBox{margin-top:12px;border:1px solid rgba(255,255,255,.12);border-radius:18px;background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));box-shadow:inset 0 0 20px rgba(102,247,255,.06);overflow:hidden}.helpHd{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.10);display:flex;justify-content:space-between;align-items:center;gap:8px}.helpBd{padding:14px}.helpGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}@media (max-width:520px){.helpGrid{grid-template-columns:1fr}}
   .scanOverlay{position:absolute;inset:0;border-radius:16px;pointer-events:none;opacity:0}.scanOverlay.on{opacity:1;animation:scanFade 720ms ease-out forwards}@keyframes scanFade{0%{opacity:0}15%{opacity:1}100%{opacity:0}} .scanOverlay .beam{position:absolute;left:-20%;top:0;bottom:0;width:45%;background:linear-gradient(90deg, transparent, rgba(102,247,255,.28), rgba(102,247,255,.10), transparent);filter:blur(.2px);animation:beam 720ms ease-out forwards}@keyframes beam{0%{transform:translateX(0)}100%{transform:translateX(320%)}} .scanOverlay .gridGlow{position:absolute;inset:0;background-image:linear-gradient(rgba(102,247,255,.08) 1px, transparent 1px),linear-gradient(90deg, rgba(102,247,255,.08) 1px, transparent 1px);background-size:34px 34px;opacity:.22;mask:radial-gradient(520px 220px at 50% 30%, #000 40%, transparent 74%)}
   .morphBox{padding:18px}.morphStep{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08)} .morphStep:last-child{border-bottom:none}.morphStep b{font-size:13px}.morphState{font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:.08em}
@@ -159,8 +164,12 @@ const SPECIES = [
   {name:"Synedra", image:"synedra.jpg", about:"Rod-like diatom.", habitats:["river"], obs:"micro", color:"brown", structure:"micro_single", keys:["diag:diatom_rod"]},
   {name:"Gyrosigma", image:"gyrosigma.jpg", about:"Broad sigmoid diatom.", habitats:["river","brackish"], obs:"micro", color:"brown", structure:"micro_single", keys:["diag:diatom_sigmoid_broad"]},
   {name:"Pleurosigma", image:"pleurosigma.jpg", about:"Slender sigmoid diatom.", habitats:["brackish","marine"], obs:"micro", color:"brown", structure:"micro_single", keys:["diag:diatom_sigmoid_slender"]},
-  {name:"Noctiluca", image:"noctiluca.jpg", about:"Large bioluminescent marine plankton sphere.", habitats:["marine"], obs:"micro", color:"brown", structure:"micro_single", keys:["diag:noctiluca_glow"]},
-
+  {name:"Noctiluca", image:"noctiluca.jpg",
+ about:"Large bioluminescent marine plankton sphere.",
+ habitats:["marine"], obs:"micro",
+ color:"transparent",
+ structure:"micro_single",
+ keys:["diag:noctiluca_glow"]},
   {name:"Fragilaria", image:"fragilaria.jpg", about:"Chain-forming diatom.", habitats:["river","pond"], obs:"micro", color:"brown", structure:"micro_colony", keys:["diag:diatom_chain"]},
   {name:"Tabellaria", image:"tabellaria.jpg", about:"Zig-zag chain diatom.", habitats:["river","pond"], obs:"micro", color:"brown", structure:"micro_colony", keys:["diag:diatom_zigzag"]},
   {name:"Asterionella", image:"asterionella.jpg", about:"Star colony diatom.", habitats:["pond"], obs:"micro", color:"brown", structure:"micro_colony", keys:["diag:diatom_star_colony"]},
@@ -234,6 +243,7 @@ const QUESTIONS = [
     {label:"Brown / Golden", token:"color:brown", colorClass:"brown"},
     {label:"Red", token:"color:red", colorClass:"red"},
     {label:"Yellow-Green", token:"color:yellowgreen", colorClass:"yellowgreen"}
+    {label:"Colourless / Transparent", token:"color:transparent", colorClass:"transparent"}
   ]},
   {id:"structureMicro", kind:"image", showIf:()=>selectedObservation()==="micro", title:"Microscopic — what is the cell arrangement?", getAnswers:()=>[
     {label:"Single cell", token:"structure:micro_single", img:PATHS.structure+"structure_singlecell.jpg"},
@@ -311,7 +321,6 @@ const QUESTIONS = [
     {label:"Long rod-like frustule", token:"diag:diatom_rod", img:PATHS.diagnosticMicro+"diag_diatom_frustule.jpg"},
     {label:"Broad sigmoid frustule", token:"diag:diatom_sigmoid_broad", img:PATHS.diagnosticMicro+"diag_diatom_frustule.jpg"},
     {label:"Slender sigmoid frustule", token:"diag:diatom_sigmoid_slender", img:PATHS.diagnosticMicro+"diag_diatom_frustule.jpg"},
-    {label:"Large round bioluminescent plankton cell", token:"diag:noctiluca_glow", img:PATHS.diagnosticMicro+"diag_noctiluca_glow.jpg"}
   ]},
   {id:"diagDiatomColony", kind:"image", showIf:()=>hasToken("observe:micro")&&hasToken("color:brown")&&hasToken("structure:micro_colony"), title:"Brown / golden colony — which form matches best?", getAnswers:()=>[
     {label:"Chain colony", token:"diag:diatom_chain", img:PATHS.diagnosticMicro+"diag_diatom_chain.jpg"},
@@ -337,6 +346,19 @@ const QUESTIONS = [
     );
     return arr;
   }},
+  {
+  id:"diagTransparent",
+  kind:"image",
+  showIf:()=>hasToken("observe:micro") && hasToken("color:transparent"),
+  title:"Colourless plankton — which feature matches?",
+  getAnswers:()=>[
+    {
+      label:"Large round bioluminescent plankton cell",
+      token:"diag:noctiluca_glow",
+      img:PATHS.diagnosticMicro+"diag_noctiluca_glow.jpg"
+    }
+  ]
+},
 
   // MACRO diagnostic keys
   {id:"diagMacroGreenSheet", kind:"image", showIf:()=>hasToken("observe:macro")&&hasToken("color:green")&&hasToken("structure:macro_sheet"), title:"Green macro sheet — which body form matches best?", getAnswers:()=>[
@@ -451,11 +473,14 @@ function speciesPassesHardFilters(sp){
   const obs = selectedObservation();
   if(obs && sp.obs !== obs) return false;
 
-  const color = hasToken("color:green") ? "green" :
-                hasToken("color:cyanobacteria") ? "cyanobacteria" :
-                hasToken("color:brown") ? "brown" :
-                hasToken("color:red") ? "red" :
-                hasToken("color:yellowgreen") ? "yellowgreen" : null;
+  const color =
+  hasToken("color:green") ? "green" :
+  hasToken("color:cyanobacteria") ? "cyanobacteria" :
+  hasToken("color:brown") ? "brown" :
+  hasToken("color:red") ? "red" :
+  hasToken("color:yellowgreen") ? "yellowgreen" :
+  hasToken("color:transparent") ? "transparent" :
+  null;
   if(color && sp.color !== color) return false;
 
   const structure =

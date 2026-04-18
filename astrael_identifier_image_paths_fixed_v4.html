@@ -310,18 +310,24 @@ const QUESTIONS = [
     {label:"Gelatinous jelly balls / lumps", token:"diag:cyano_jelly", img:PATHS.diagnosticMacro+"diag_cyano_jelly.jpg"},
     {label:"Diffuse surface bloom / scum", token:"diag:cyano_bloom", img:PATHS.diagnosticMacro+"diag_cyano_bloom.jpg"}
   ]},
-  {id:"diagDiatomSingle", kind:"image", showIf:()=>hasToken("observe:micro")&&hasToken("color:brown")&&hasToken("structure:micro_single"), title:"Brown / golden microscopic single cell — which shape matches best?", getAnswers:()=>[
-    {label:"Boat-shaped frustule", token:"diag:diatom_boat", img:PATHS.diagnosticMicro+"diag_diatom_frustule.jpg"},
-    {label:"Broad oval frustule", token:"diag:diatom_oval", img:PATHS.diagnosticMicro+"diag_diatom_frustule.jpg"},
-    {label:"Needle-like frustule", token:"diag:diatom_needle", img:PATHS.diagnosticMicro+"diag_diatom_frustule.jpg"},
-    {label:"Curved asymmetric frustule", token:"diag:diatom_curved", img:PATHS.diagnosticMicro+"diag_diatom_frustule.jpg"},
-    {label:"Circular disc frustule", token:"diag:diatom_circular", img:PATHS.diagnosticMicro+"diag_diatom_frustule.jpg"},
-    {label:"Ornate broad frustule", token:"diag:diatom_ornate", img:PATHS.diagnosticMicro+"diag_diatom_frustule.jpg"},
-    {label:"Wedge / club-shaped frustule", token:"diag:diatom_wedge", img:PATHS.diagnosticMicro+"diag_diatom_frustule.jpg"},
-    {label:"Long rod-like frustule", token:"diag:diatom_rod", img:PATHS.diagnosticMicro+"diag_diatom_frustule.jpg"},
-    {label:"Broad sigmoid frustule", token:"diag:diatom_sigmoid_broad", img:PATHS.diagnosticMicro+"diag_diatom_frustule.jpg"},
-    {label:"Slender sigmoid frustule", token:"diag:diatom_sigmoid_slender", img:PATHS.diagnosticMicro+"diag_diatom_frustule.jpg"},
-  ]},
+{
+  id:"diagDiatomSingle",
+  kind:"image",
+  showIf:()=>hasToken("observe:micro")&&hasToken("color:brown")&&hasToken("structure:micro_single"),
+  title:"Brown / golden microscopic single cell — which shape matches best?",
+  getAnswers:()=>[
+    {label:"Boat-shaped frustule", token:"diag:diatom_boat", img:PATHS.diagnosticMicro+"diag_diatom_boat_shaped.jpg"},
+    {label:"Broad oval frustule", token:"diag:diatom_oval", img:PATHS.diagnosticMicro+"diag_diatom_broad_oval.jpg"},
+    {label:"Needle-like frustule", token:"diag:diatom_needle", img:PATHS.diagnosticMicro+"diag_diatom_needle_like.jpg"},
+    {label:"Curved asymmetric frustule", token:"diag:diatom_curved", img:PATHS.diagnosticMicro+"diag_diatom_curved_asymmetric.jpg"},
+    {label:"Circular disc frustule", token:"diag:diatom_circular", img:PATHS.diagnosticMicro+"diag_diatom_circular.jpg"},
+    {label:"Ornate broad frustule", token:"diag:diatom_ornate", img:PATHS.diagnosticMicro+"diag_diatom_ornate.jpg"},
+    {label:"Wedge / club-shaped frustule", token:"diag:diatom_wedge", img:PATHS.diagnosticMicro+"diag_diatom_wedge_club.jpg"},
+    {label:"Long rod-like frustule", token:"diag:diatom_rod", img:PATHS.diagnosticMicro+"diag_diatom_long_rod.jpg"},
+    {label:"Broad sigmoid frustule", token:"diag:diatom_sigmoid_broad", img:PATHS.diagnosticMicro+"diag_diatom_broad_sigmoid.jpg"},
+    {label:"Slender sigmoid frustule", token:"diag:diatom_sigmoid_slender", img:PATHS.diagnosticMicro+"diag_diatom_slender_sigmoid.jpg"}
+  ]
+},
   {id:"diagDiatomColony", kind:"image", showIf:()=>hasToken("observe:micro")&&hasToken("color:brown")&&hasToken("structure:micro_colony"), title:"Brown / golden colony — which form matches best?", getAnswers:()=>[
     {label:"Chain colony", token:"diag:diatom_chain", img:PATHS.diagnosticMicro+"diag_diatom_chain.jpg"},
     {label:"Zig-zag colony", token:"diag:diatom_zigzag", img:PATHS.diagnosticMicro+"diag_diatom_zigzag.jpg"},

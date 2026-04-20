@@ -673,6 +673,61 @@ function validateAllImages(){
 }
   validateAllImages();
   function validateAllSpecies(){
+    // ===== 🧪 DUPLICATE + DATA INTEGRITY DEBUG =====
+
+console.log("🔎 Running duplicate + integrity check...");
+
+const nameMap = {};
+let duplicateCount = 0;
+
+SPECIES.forEach((sp, i) => {
+
+  // 1. Check empty entries
+  if(!sp || !sp.name){
+    console.error(`❌ Empty or invalid species at index ${i}`);
+    return;
+  }
+
+  // 2. Normalize name (removes hidden duplicates)
+  const clean = sp.name.trim().toLowerCase();
+
+  // 3. Detect duplicates
+  if(nameMap[clean]){
+    console.error(`❌ Duplicate species found → "${sp.name}" at index ${i}`);
+    duplicateCount++;
+  } else {
+    nameMap[clean] = i;
+  }
+
+  // 4. Detect missing keys
+  if(!sp.keys || sp.keys.length === 0){
+    console.warn(`⚠️ No diagnostic keys → ${sp.name}`);
+  }
+
+  // 5. Detect missing habitats
+  if(!sp.habitats || sp.habitats.length === 0){
+    console.warn(`⚠️ No habitat defined → ${sp.name}`);
+  }
+
+  // 6. Detect missing structure/color/obs
+  if(!sp.structure || !sp.color || !sp.obs){
+    console.warn(`⚠️ Incomplete data → ${sp.name}`);
+  }
+
+});
+
+// 7. Summary
+console.log("📊 Duplicate check complete");
+console.log("❌ Duplicates found:", duplicateCount);
+console.log("🧬 Unique species:", Object.keys(nameMap).length);
+console.log("📦 Total entries:", SPECIES.length);
+
+console.log("📋 Species list:");
+SPECIES.forEach((sp, i) => {
+  console.log(`${i+1}. ${sp?.name}`);
+});
+
+// ===== END DEBUG =====
   console.log("🧬 Starting species validation...");
 
   let issues = [];

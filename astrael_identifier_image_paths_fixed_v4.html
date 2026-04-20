@@ -672,6 +672,56 @@ function validateAllImages(){
   }, 2000);
 }
   validateAllImages();
+  function validateAllSpecies(){
+  console.log("🧬 Starting species validation...");
+
+  let issues = [];
+  let passed = 0;
+
+  SPECIES.forEach(sp => {
+    sp.keys.forEach(key => {
+
+      // Build correct answer path
+      state.tokens = [
+        `habitat:${sp.habitats[0]}`, // take first valid habitat
+        `observe:${sp.obs}`,
+        `color:${sp.color}`,
+        `structure:${sp.structure}`,
+        key
+      ];
+
+      const result = computeTop3();
+
+      // ❌ No result
+      if(result.length === 0){
+        issues.push(`❌ No result → ${sp.name}`);
+        return;
+      }
+
+      // ❌ Wrong top match
+      if(result[0].name !== sp.name){
+        issues.push(`⚠ Wrong match → ${sp.name} → got ${result[0].name}`);
+        return;
+      }
+
+      // ⚠ Ambiguous
+      if(result[1] && result[0].conf === result[1].conf){
+        issues.push(`⚠ Ambiguous → ${sp.name}`);
+        return;
+      }
+
+      passed++;
+    });
+  });
+
+  console.log("✅ Passed:", passed);
+  console.log("❌ Issues:", issues.length);
+
+  issues.forEach(i => console.warn(i));
+
+  console.log("🧬 Validation complete");
+  }
+  validateAllSpecies(); // ← ADD THIS
 resetAll();
 </script>
 </body>

@@ -757,7 +757,7 @@ let startY = 0;
   // ===== DRAG LOGIC =====
 const drag = document.getElementById("dragShield");
 
-drag.addEventListener("pointerdown", (e) => {
+dragShield.addEventListener("pointerdown", (e) => {
   isDragging = true;
   startX = e.clientX;
   startY = e.clientY;
@@ -769,13 +769,14 @@ window.addEventListener("pointermove", (e) => {
   const dx = e.clientX - startX;
   const dy = e.clientY - startY;
 
-  offsetX += dx;
-  offsetY += dy;
-
   startX = e.clientX;
   startY = e.clientY;
 
-  drawImage(); // 🔥 IMPORTANT
+  // 🔥 IMPORTANT: convert pixels → normalized pan
+  panX += dx / 300;
+  panY += dy / 300;
+
+  renderAll();
 });
 
 window.addEventListener("pointerup", () => {

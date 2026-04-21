@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>PhotoHouse • Darkroom</title>
+<title>PhotoHouse</title>
 
 <style>
   :root{
@@ -543,10 +543,11 @@
 
   <div class="topbar">
     <div class="brand">
-      <div class="badge" aria-hidden="true">📷</div>
+      <div class="badge">
+  <img src="assets/logo.jpg" style="width:100%; height:100%; object-fit:cover; border-radius:12px;">
+      </div>
       <div>
-        <h1>PhotoHouse • Darkroom Workroom</h1>
-        <p id="subtitle">Developing algae photos for Uniqueseeker’s Pond</p>
+        <h1>PhotoHouse</h1>
       </div>
     </div>
 
@@ -556,7 +557,6 @@
       <button class="btn" id="btnAddPhoto" type="button">Add Photo (temporary)</button>
       <button class="btn" id="btnSkip" type="button">Show all controls</button>
       <button class="btn" id="btnReset" type="button">Reset</button>
-      <button class="btn primary" id="btnAuto" type="button">Auto Improve</button>
       <button class="btn primary" id="btnDevelop" type="button">Develop → Analyze</button>
     </div>
   </div>
@@ -651,7 +651,9 @@
 
         <div class="stepBody">
           <div class="stepLine">
-            <div class="stepBadge" id="stepIcon">🧑‍🔧</div>
+            <div class="avatar">
+  <img src="assets/lyra.jpg" style="width:100%; height:100%; object-fit:cover; border-radius:12px;">
+            </div>
             <div class="stepText" id="stepText"></div>
           </div>
 
@@ -692,9 +694,11 @@
 <div class="intro" id="intro">
   <div class="introCard">
     <div class="introTop">
-      <div class="avatar">🧑‍🔧</div>
+      <div class="avatar">
+  <img src="assets/lyra.jpg" style="width:100%; height:100%; object-fit:cover; border-radius:12px;">
+      </div>
       <div>
-        <h3 id="introTitle">Hi! I’m X.</h3>
+        <h3 id="introTitle">Hi! I’m Lyra solene.</h3>
         <p id="introSub">I run this PhotoHouse workroom and I’ll help you enhance the algae photo.</p>
       </div>
     </div>
@@ -728,8 +732,8 @@
 /* =========================
    SETTINGS YOU CAN CHANGE LATER
 ========================= */
-const HELPER_NAME = "X";                  // ✅ change later anytime
-const WORKROOM_NAME = "Uniqueseeker’s Project Mate"; // change later anytime
+const HELPER_NAME = "Lyra Solene";                  // ✅ change later anytime
+const WORKROOM_NAME = "Lyra solene's workroom"; // change later anytime
 const PAGE5_URL = "page4.html";           // testing loop (change later)
 const KEY_INPUT = "pond2_upload_image";   // set in Page 3
 const KEY_OUTPUT = "pond2_enhanced_224";  // read in Page 5
@@ -792,7 +796,7 @@ let rotation = 0;
 let guideEnabled = true;
 let step = 0;
 const steps = [
-  { id:0, icon:"🧑‍🔧", title:`${HELPER_NAME} says:`, text:`Welcome to my darkroom. First, add a photo. (If Pond 2 upload isn’t ready, use <b>Add Photo (temporary)</b>.)`, enable:[] },
+  { id:0, icon:"🧑‍🔧", title:`${HELPER_NAME} says:`, text:`Welcome to my photohouse. First, add a photo. (If Pond 2 upload isn’t ready, use <b>Add Photo (temporary)</b>.)`, enable:[] },
   { id:1, icon:"🔎", title:"Step 1 — Crop & zoom", text:"Drag the photo so algae sits inside the square. Zoom until algae fills <b>60–80%</b> of the box.", enable:["zoom"] },
   { id:2, icon:"🔆", title:"Step 2 — Brightness", text:"If the image is dark, increase brightness a little. Stop before whites look washed out.", enable:["bright"] },
   { id:3, icon:"🎚️", title:"Step 3 — Contrast", text:"Add contrast so structures pop. Keep details natural.", enable:["contrast"] },

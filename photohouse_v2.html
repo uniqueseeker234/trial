@@ -1105,15 +1105,6 @@ document.getElementById("btnNext").addEventListener("click", ()=>{
   if (step === 1 || step === 2) playDipAnimation();
 });
 
-document.getElementById("btnAuto").addEventListener("click", ()=>{
-  sliders.bright.value = Math.max(-40, Math.min(40, Number(sliders.bright.value) + 10));
-  sliders.contrast.value = Math.max(0.60, Math.min(1.80, Number(sliders.contrast.value) + 0.10));
-  sliders.denoise.value = Math.max(0, Math.min(6, Number(sliders.denoise.value) + 2));
-  sliders.sharpen.value = Math.max(0, Math.min(6, Number(sliders.sharpen.value) + 1));
-  renderAll();
-  playDipAnimation();
-});
-
 document.getElementById("btnDevelop").addEventListener("click", ()=>{
   if (!imgReady){
     alert("No image loaded yet. Use Add Photo (temporary) or upload from Pond 2 later.");

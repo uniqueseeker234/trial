@@ -738,9 +738,11 @@ const PAGE5_URL = "page4.html";           // testing loop (change later)
 const KEY_INPUT = "pond2_upload_image";   // set in Page 3
 const KEY_OUTPUT = "pond2_enhanced_224";  // read in Page 5
 
-document.getElementById("subtitle").textContent =
-  `${WORKROOM_NAME} • developing algae photos collected from Earth`;
-
+const subtitleEl = document.getElementById("subtitle");
+if (subtitleEl) {
+  subtitleEl.textContent =
+    `${WORKROOM_NAME} • developing algae photos collected from Earth`;
+}
 document.getElementById("introTitle").textContent = `Hi! I’m ${HELPER_NAME}.`;
 document.getElementById("introSub").textContent = `${HELPER_NAME} will help you enhance your algae photo step-by-step.`;
 

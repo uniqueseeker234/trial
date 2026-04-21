@@ -750,40 +750,6 @@ document.getElementById("introSub").textContent = `${HELPER_NAME} will help you 
    STATE
 ========================= */
 const bigCanvas = document.getElementById("bigView");
-  // ===== DRAG VARIABLES =====
-let offsetX = 0;
-let offsetY = 0;
-let isDragging = false;
-let startX = 0;
-let startY = 0;
-  // ===== DRAG LOGIC =====
-const drag = document.getElementById("dragShield");
-
-dragShield.addEventListener("pointerdown", (e) => {
-  isDragging = true;
-  startX = e.clientX;
-  startY = e.clientY;
-});
-
-window.addEventListener("pointermove", (e) => {
-  if (!isDragging) return;
-
-  const dx = e.clientX - startX;
-  const dy = e.clientY - startY;
-
-  startX = e.clientX;
-  startY = e.clientY;
-
-  // 🔥 IMPORTANT: convert pixels → normalized pan
-  panX += dx / 300;
-  panY += dy / 300;
-
-  renderAll();
-});
-
-window.addEventListener("pointerup", () => {
-  isDragging = false;
-});
 const bigCtx = bigCanvas.getContext("2d", { willReadFrequently: false });
 
 const sampleCanvas = document.getElementById("sample224");
@@ -821,6 +787,7 @@ let imgReady = false;
 // crop controls
 let panX = 0;
 let panY = 0;
+  let isDragging = false;
 let lastX = 0;
 let lastY = 0;
 

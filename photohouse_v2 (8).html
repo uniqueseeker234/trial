@@ -544,7 +544,7 @@
   <div class="topbar">
     <div class="brand">
       <div class="badge">
-  <img src="assets/logo.jpg" style="width:100%; height:100%; object-fit:cover; border-radius:12px;">
+  <img src="assets/elythera/logo_camera_black.png" style="width:100%; height:100%; object-fit:cover; border-radius:12px;">
       </div>
       <div>
         <h1>PhotoHouse</h1>
@@ -611,7 +611,7 @@
         <div class="stepBody">
           <div class="stepLine">
             <div class="avatar">
-  <img src="assets/lyra.jpg" style="width:100%; height:100%; object-fit:cover; border-radius:12px;">
+  <img src="assets/elythera/lyra_solene.png" style="width:100%; height:100%; object-fit:cover; border-radius:12px;">
             </div>
             <div class="stepText" id="stepText"></div>
           </div>
@@ -718,7 +718,7 @@
   <div class="introCard">
     <div class="introTop">
       <div class="avatar">
-  <img src="assets/lyra.jpg" style="width:100%; height:100%; object-fit:cover; border-radius:12px;">
+  <img src="assets/elythera/lyra_solene.png" style="width:100%; height:100%; object-fit:cover; border-radius:12px;">
       </div>
       <div>
         <h3 id="introTitle">Hi! I’m Lyra solene.</h3>
@@ -768,7 +768,7 @@ if (subtitleEl) {
     `${WORKROOM_NAME} • developing algae photos collected from Earth`;
 }
 document.getElementById("introTitle").textContent = `Hi! I’m ${HELPER_NAME}.`;
-document.getElementById("introSub").textContent = `${HELPER_NAME} will help you enhance your algae photo step-by-step.`;
+document.getElementById("introSub").textContent = `I will help you enhance your algae photo step-by-step.`;
 
 /* =========================
    STATE
@@ -822,7 +822,7 @@ let guideEnabled = true;
 let step = 0;
 const steps = [
   { id:0, icon:"🧑‍🔧", title:`${HELPER_NAME} says:`, text:`Welcome to my photohouse. First, add a photo. (If Pond 2 upload isn’t ready, use <b>Add Photo (temporary)</b>.)`, enable:[] },
-  { id:1, icon:"🔎", title:"Step 1 — Crop & zoom", text:"Drag the photo so algae sits inside the square. Zoom until algae fills <b>60–80%</b> of the box.", enable:["zoom"] },
+  { id:1, icon:"🔎", title:"Step 1 — Crop & zoom", text:"Use the arrow buttons to perfectly fit the algae in the center. Zoom until algae fills <b>60–80%</b> of the box.", enable:["zoom"] },
   { id:2, icon:"🔆", title:"Step 2 — Brightness", text:"If the image is dark, increase brightness a little. Stop before whites look washed out.", enable:["bright"] },
   { id:3, icon:"🎚️", title:"Step 3 — Contrast", text:"Add contrast so structures pop. Keep details natural.", enable:["contrast"] },
   { id:4, icon:"🧼", title:"Step 4 — Clean noise", text:"Use mild denoise if the background is noisy. Too much can blur cell edges.", enable:["denoise"] },

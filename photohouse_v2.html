@@ -1058,7 +1058,7 @@ function renderSample224(){
 
 /* Slider events */
     /* Arrow movement */
-const MOVE_STEP = 0.12;
+const MOVE_STEP = 0.01;
 
 function moveImage(dx, dy){
   panX += dx;
@@ -1086,7 +1086,7 @@ document.getElementById("moveRight").addEventListener("click", () => {
 
   const start = () => {
     moveImage(dx, dy);
-    interval = setInterval(() => moveImage(dx, dy), 40);
+    interval = setInterval(() => moveImage(dx, dy), 100);
   };
 
   const stop = () => clearInterval(interval);

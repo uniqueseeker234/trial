@@ -500,18 +500,18 @@
   }
 
   /* Buttons grid */
-  .actions{
-    width:100%;
-    display:flex;
-    flex-wrap:nowrap;
-    gap: 8px;
-    justify-content:flex-end;
-  }
+ .actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;              /* ✅ allow wrap */
+  justify-content:flex-end;
+}
 
-  .btn{
-    font-size:11px;
-    padding:8px;
-  }
+.actions .btn{
+  flex:1 1 auto;              /* ✅ equal flexible buttons */
+  min-width:110px;            /* prevents tiny crushed buttons */
+  text-align:center;
+}
 
   /* Topbar not sticky on mobile */
   .topbar{

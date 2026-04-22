@@ -40,9 +40,11 @@
   }
 
   /* Sticky topbar so user always can reach buttons */
- .topbar{
-  position:sticky;
+.topbar{
+  position:fixed;
   top:0;
+  left:0;
+  right:0;
   z-index:9999;
 
   display:flex;
@@ -52,10 +54,11 @@
   padding:14px 18px;
   gap:12px;
 
-  background:#07131d; /* ✅ SOLID (fix overlay issue) */
-  backdrop-filter:none; /* optional: removes blur glitch */
-
+  background:#07131d;
   border-bottom:1px solid rgba(255,255,255,0.10);
+}
+  .main{
+  margin-top:90px; /* push content below fixed header */
 }
   .brand{
     display:flex; gap:12px; align-items:center;
@@ -501,16 +504,14 @@
 
   /* Buttons grid */
  .actions{
-  display:flex;
+  display:grid;
+  grid-template-columns: repeat(2, 1fr);
   gap:8px;
-  flex-wrap:wrap;              /* ✅ allow wrap */
-  justify-content:flex-end;
+  width:100%;
 }
 
 .actions .btn{
-  flex:1 1 auto;              /* ✅ equal flexible buttons */
-  min-width:110px;            /* prevents tiny crushed buttons */
-  text-align:center;
+  width:100%;
 }
 
   /* Topbar not sticky on mobile */
@@ -520,7 +521,7 @@
     z-index: 9999;
     
     flex-direction:row;
-    allign-items:center;
+    align-items:center;
    justify-content:space-between;
   }
 

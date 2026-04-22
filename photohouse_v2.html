@@ -510,7 +510,13 @@
 
   /* Topbar not sticky on mobile */
   .topbar{
-    position:static;
+    position:sticky;
+    top:0;
+    z-index: 9999;
+    
+    flex-direction: column;
+    allign-items: stretch;
+    gap: 10px;
   }
 
   /* FIX grey space under image */

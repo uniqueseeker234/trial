@@ -594,6 +594,38 @@
         <div class="pill"><span class="dot"></span> <span><b>Tip:</b> keep algae filling ~60–80% of the square.</span></div>
         <div class="pill">Model sample: <b>224×224</b></div>
       </div>
+ <div class="side">
+      <div class="card" id="guideCard">
+        <div class="cardHead">
+  <div>
+    <h2>Helper Steps</h2>
+    <p id="helperSub">Follow the steps so you don’t miss anything.</p>
+  </div>
+
+  <div style="display:flex; gap:8px; align-items:center;">
+    <div id="stepIcon">🧑‍🔧</div>
+    <div class="stepBadge" id="stepBadge">0</div>
+  </div>
+        </div>
+
+        <div class="stepBody">
+          <div class="stepLine">
+            <div class="avatar">
+  <img src="assets/lyra.jpg" style="width:100%; height:100%; object-fit:cover; border-radius:12px;">
+            </div>
+            <div class="stepText" id="stepText"></div>
+          </div>
+
+          <div class="stepFooter">
+            <button class="btn" id="btnPrev" type="button">Back</button>
+            <button class="btn primary" id="btnNext" type="button">Next</button>
+          </div>
+
+          <div style="margin-top:10px;color:var(--muted);font-size:12px;line-height:1.45" id="lockedHint">
+            Some controls are locked until their step — press <b>Next</b>. (Or click <b>Show all controls</b>.)
+          </div>
+        </div>
+      </div>
 
       <div class="tableArea">
         <div class="desk">
@@ -658,39 +690,7 @@
     </div>
 
     <!-- RIGHT -->
-    <div class="side">
-      <div class="card" id="guideCard">
-        <div class="cardHead">
-  <div>
-    <h2>Helper Steps</h2>
-    <p id="helperSub">Follow the steps so you don’t miss anything.</p>
-  </div>
-
-  <div style="display:flex; gap:8px; align-items:center;">
-    <div id="stepIcon">🧑‍🔧</div>
-    <div class="stepBadge" id="stepBadge">0</div>
-  </div>
-        </div>
-
-        <div class="stepBody">
-          <div class="stepLine">
-            <div class="avatar">
-  <img src="assets/lyra.jpg" style="width:100%; height:100%; object-fit:cover; border-radius:12px;">
-            </div>
-            <div class="stepText" id="stepText"></div>
-          </div>
-
-          <div class="stepFooter">
-            <button class="btn" id="btnPrev" type="button">Back</button>
-            <button class="btn primary" id="btnNext" type="button">Next</button>
-          </div>
-
-          <div style="margin-top:10px;color:var(--muted);font-size:12px;line-height:1.45" id="lockedHint">
-            Some controls are locked until their step — press <b>Next</b>. (Or click <b>Show all controls</b>.)
-          </div>
-        </div>
-      </div>
-
+   
       <div class="card">
         <div class="cardHead">
           <div>

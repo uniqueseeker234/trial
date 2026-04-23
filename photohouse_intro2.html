@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>PhotoHouse Intro • Simple</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#05070d;
+    --ink:#dff3ff;
+    --muted:rgba(215,243,255,.72);
+    --line:rgba(255,255,255,.10);
+    --cyan:#3fc8ff;
+    --green:#4affc5;
+  }
+
+  html,body{height:100%; margin:0; background:var(--bg); color:var(--ink); overflow:hidden;}
+  body{font-family:'Share Tech Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono";}
+  *{box-sizing:border-box;}
+
+  .scene{
+    position:relative;
+    width:100%;
+    height:100svh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding: env(safe-area-inset-top) 10px env(safe-area-inset-bottom);
+  }
+
+  .room{
+    width:min(1100px, 96vw);
+    height:min(650px, 92vh);
+    position:relative;
+    border:1px solid var(--line);
+    border-radius:18px;
+    background:
+      radial-gradient(900px 520px at 25% 20%, rgba(63,200,255,.10), transparent 60%),
+      radial-gradient(800px 520px at 85% 40%, rgba(74,255,197,.08), transparent 55%),
+      linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+    box-shadow: 0 30px 90px rgba(0,0,0,.65);
+    overflow:hidden;
+  }
+
+  .welcome{
+    position:absolute;
+    top:18px; left:22px; right:22px;
+    display:flex; justify-content:space-between; align-items:center; gap:14px;
+    z-index:3;
+  }
+  .welcome h1{
+    margin:0;
+    font-family:'Orbitron', system-ui;
+    font-size:18px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:rgba(180,240,255,.95);
+    text-shadow: 0 0 18px rgba(63,200,255,.20);
+  }
+  .welcome .sub{
+    font-size:12px;
+    color:rgba(215,243,255,.62);
+    letter-spacing:1px;
+    text-transform:uppercase;
+  }
+
+  /* Lyra block */
+  .lyraWrap{
+    position:absolute;
+    left:34px;
+    bottom:88px;
+    width:min(310px, 32vw);
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    z-index:2;
+  }
+  .lyra{
+    width:100%;
+    border-radius:18px;
+    border:1px solid rgba(255,255,255,.10);
+    background: rgba(0,0,0,.25);
+    box-shadow: 0 20px 60px rgba(0,0,0,.55);
+    overflow:hidden;
+  }
+  .lyra img{width:100%; display:block;}
+  .speech{
+    padding:10px 12px;
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:14px;
+    background: rgba(0,0,0,.25);
+    color:rgba(225,248,255,.86);
+    font-size:12px;
+    line-height:1.55;
+  }
+  .speech b{color:rgba(240,255,255,.95);}
+
+  /* Desk */
+  .desk{
+    position:absolute;
+    right:34px;
+    bottom:70px;
+    width:min(620px, 58vw);
+    height:300px;
+    border-radius:18px;
+    background: linear-gradient(180deg, rgba(10,18,34,.95), rgba(5,8,14,.92));
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow:0 25px 70px rgba(0,0,0,0.60);
+    overflow:hidden;
+    z-index:1;
+  }
+
+  /* Cable */
+  .cable{
+    position:absolute;
+    left:255px;
+    top:145px;
+    width:180px;
+    height:8px;
+    border-radius:99px;
+    background: rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.08);
+    overflow:hidden;
+  }
+  .cable::after{
+    content:"";
+    position:absolute; inset:-8px auto -8px -40px;
+    width:80px;
+    background: linear-gradient(90deg, transparent, rgba(63,200,255,.55), transparent);
+    filter: blur(2px);
+    opacity:.0;
+  }
+  .cable.active::after{
+    opacity:1;
+    animation: cable 0.9s ease-in-out infinite;
+  }
+  @keyframes cable{
+    from{ transform: translateX(0); }
+    to{ transform: translateX(240px); }
+  }
+
+  /* Machine */
+  .machine{
+    position:absolute;
+    left:40px;
+    top:92px;
+    width:190px;
+    height:150px;
+    border-radius:16px;
+    background: linear-gradient(180deg, rgba(18,30,56,.95), rgba(10,16,28,.95));
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow: 0 20px 55px rgba(0,0,0,.55);
+  }
+  .machine .label{
+    position:absolute;
+    left:14px; top:12px;
+    font-size:11px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    color:rgba(215,243,255,.65);
+  }
+  
+  .inlet{
+    position:absolute;
+    left:50%;
+    top:55%;
+    transform:translate(-50%,-50%);
+    width:80px;
+    height:80px;
+    border-radius:50%;
+    border:2px solid rgba(74,255,197,.85);
+    box-shadow:0 0 18px rgba(74,255,197,.35);
+    background: radial-gradient(circle at 30% 30%, rgba(74,255,197,.25), rgba(0,0,0,.45));
+  }
+  .inlet.active{
+    box-shadow:0 0 28px rgba(74,255,197,.55);
+    border-color: rgba(74,255,197,1);
+  }
+
+  /* Monitor */
+  .monitor{
+    position:absolute;
+    right:40px;
+    top:70px;
+    width:260px;
+    height:170px;
+    border-radius:14px;
+    background: rgba(0,0,0,.85);
+    border:1px solid rgba(255,255,255,.12);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.05);
+    overflow:hidden;
+  }
+  .monitor::before{
+    content:"";
+    position:absolute; inset:0;
+    background: radial-gradient(500px 220px at 40% 20%, rgba(63,200,255,.18), transparent 60%);
+    opacity:0;
+    transition: opacity .25s ease;
+  }
+  .monitor .boot{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column;
+    justify-content:center; align-items:center;
+    gap:10px;
+    opacity:0;
+    transform: translateY(6px);
+    transition: opacity .25s ease, transform .25s ease;
+  }
+  .monitor .boot .t{
+    font-family:'Orbitron', system-ui;
+    letter-spacing:1.6px;
+    font-size:12px;
+    text-transform:uppercase;
+    color:rgba(220,248,255,.92);
+    text-align:center;
+    padding:0 10px;
+  }
+  .bar{
+    width:70%;
+    height:10px;
+    border-radius:99px;
+    border:1px solid rgba(255,255,255,.10);
+    overflow:hidden;
+    background: rgba(255,255,255,.04);
+  }
+  .bar i{
+    display:block; height:100%;
+    width:0%;
+    background: linear-gradient(90deg, transparent, rgba(63,200,255,.95), transparent);
+    filter: drop-shadow(0 0 10px rgba(63,200,255,.35));
+  }
+
+  .monitor.on{
+    box-shadow: 0 0 30px rgba(63,200,255,.35), inset 0 0 0 1px rgba(255,255,255,.07);
+  }
+  .monitor.on::before{ opacity:1; }
+  .monitor.on .boot{ opacity:1; transform: translateY(0); }
+  .monitor.on .bar i{ animation: load 1.2s ease forwards; }
+  @keyframes load{ to{ width:100%; } }
+
+  /* Upload */
+  .upload{
+    position:absolute;
+    bottom:22px;
+    left:50%;
+    transform:translateX(-50%);
+    display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    padding:10px 12px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,.10);
+    background: rgba(0,0,0,.22);
+    z-index:4;
+  }
+  .upload label{
+    font-size:12px;
+    color:rgba(215,243,255,.72);
+    letter-spacing:1px;
+    text-transform:uppercase;
+  }
+  input[type="file"]{
+    color:rgba(215,243,255,.80);
+    font-family:'Share Tech Mono', monospace;
+    font-size:12px;
+    max-width: min(420px, 70vw);
+  }
+
+  /* Canvas FX */
+  canvas{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    z-index:5;
+  }
+.btn{
+  cursor:pointer;
+  font-family:'Orbitron', system-ui;
+  font-size:11px;
+  letter-spacing:1.4px;
+  text-transform:uppercase;
+  padding:10px 14px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.05);
+  color:rgba(220,248,255,.90);
+}
+  /* =========================
+     MOBILE FIX (ONLY)
+     Desktop/laptop untouched
+     ========================= */
+  @media (max-width: 720px){
+    html,body{ overflow:hidden; }
+    .scene{ align-items:stretch; }
+    .room{
+      width: 94vw;
+      height: 92svh;
+      border-radius: 16px;
+    }
+
+    .welcome{
+      top:14px; left:16px; right:16px;
+    }
+    .welcome h1{ font-size:16px; letter-spacing:1.5px; }
+    .welcome .sub{ font-size:11px; }
+
+    /* Turn layout into vertical stack to avoid overlap */
+    .lyraWrap{
+      left:16px;
+      right:16px;
+      bottom:auto;
+      top:64px;
+      width:auto;
+      flex-direction:row;
+      align-items:flex-start;
+      gap:10px;
+    }
+    .lyra{
+      width:128px;
+      flex:0 0 auto;
+      border-radius:14px;
+    }
+    .speech{
+      flex:1 1 auto;
+      font-size:11px;
+      border-radius:14px;
+      padding:10px 10px;
+      max-height: 150px;
+      overflow:auto;
+    }
+
+    .desk{
+      left:16px;
+      right:16px;
+      bottom:94px; /* leave space for upload bar */
+      width:auto;
+      height: 300px;
+      border-radius:16px;
+    }
+
+    /* Scale desk contents */
+    .machine{
+      left:18px;
+      top:110px;
+      width:150px;
+      height:120px;
+      border-radius:14px;
+    }
+    .machine .label{ font-size:10px; }
+    .inlet{
+      width:44px;
+      height:44px;
+    }
+
+    .monitor{
+      right:18px;
+      top:74px;
+      width:190px;
+      height:150px;
+      border-radius:14px;
+    }
+
+    .cable{
+      left:175px;
+      top:168px;
+      width:120px;
+      height:7px;
+    }
+
+    .upload{
+      bottom:14px;
+      left:16px;
+      right:16px;
+      transform:none;
+      justify-content:space-between;
+      border-radius:16px;
+    }
+    input[type="file"]{
+      max-width: 56vw;
+      font-size:11px;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="scene">
+    <div class="room" id="room">
+
+      <div class="welcome">
+        <h1>PhotoHouse Intake</h1>
+        <div class="sub" id="sub">status: awaiting image</div>
+      </div>
+
+      <div class="lyraWrap">
+        <div class="lyra">
+          <img src="assets/images/lyra_solene.png" alt="Lyra Solene" />
+        </div>
+        <div class="speech">
+          <b>Lyra:</b> Welcome to PhotoHouse. Upload your image and I’ll route it to our own enchantment software.You can edit and enchance your images there to your liking.
+        </div>
+      </div>
+
+      <div class="desk">
+        <div class="machine">
+          <div class="label">INLET UNIT</div>
+          <div class="inlet" id="inlet"></div>
+        </div>
+<button class="btn" id="goBtn" style="display:none; position:absolute; left:50%; bottom:20px; transform:translateX(-50%);">
+  Go to PhotoHouse
+</button>
+        <div class="cable" id="cable"></div>
+
+      <div class="upload">
+        <label for="fileInput">Upload image</label>
+        <input type="file" id="fileInput" accept="image/*" />
+      </div>
+
+      <canvas id="fx"></canvas>
+    </div>
+  </div>
+
+<script>
+  const canvas = document.getElementById("fx");
+  const ctx = canvas.getContext("2d");
+  const inlet = document.getElementById("inlet");
+  const monitor = document.getElementById("monitor");
+  const cable = document.getElementById("cable");
+  const sub = document.getElementById("sub");
+  const fileInput = document.getElementById("fileInput");
+  const roomEl = document.getElementById("room");
+  const goBtn = document.getElementById("goBtn");
+
+  function resize(){
+    const r = roomEl.getBoundingClientRect();
+    canvas.width = r.width * devicePixelRatio;
+    canvas.height = r.height * devicePixelRatio;
+    canvas.style.width = r.width + "px";
+    canvas.style.height = r.height + "px";
+    ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  }
+  window.addEventListener("resize", resize);
+  resize();
+
+  function roomOffset(){
+    return roomEl.getBoundingClientRect();
+  }
+
+  fileInput.addEventListener("change", (e)=>{
+    const file = e.target.files && e.target.files[0];
+    if(!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      localStorage.setItem("pond2_upload_image", reader.result);
+      const img = new Image();
+      img.onload = () => startPixelTransfer(img);
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  function startPixelTransfer(img){
+    sub.textContent = "status: converting to pixels...";
+    cable.classList.add("active");
+    inlet.classList.add("active");
+
+    const inletRect = inlet.getBoundingClientRect();
+    const roomRect = roomOffset();
+    const targetX = inletRect.left - roomRect.left + inletRect.width/2;
+    const targetY = inletRect.top - roomRect.top + inletRect.height/2;
+
+    // Start region: near upload bar center
+    const startX = roomRect.width * 0.50;
+    const startY = roomRect.height * 0.86;
+
+    // Sample pixels from uploaded image
+    const off = document.createElement("canvas");
+    const ow = 90, oh = 90;
+    off.width = ow; off.height = oh;
+    const octx = off.getContext("2d");
+
+    const ar = img.naturalWidth / img.naturalHeight;
+    const tar = ow / oh;
+    let sx=0, sy=0, sw=img.naturalWidth, sh=img.naturalHeight;
+    if (ar > tar){
+      sw = img.naturalHeight * tar;
+      sx = (img.naturalWidth - sw)/2;
+    } else {
+      sh = img.naturalWidth / tar;
+      sy = (img.naturalHeight - sh)/2;
+    }
+    octx.drawImage(img, sx, sy, sw, sh, 0, 0, ow, oh);
+    const data = octx.getImageData(0,0,ow,oh).data;
+
+    const particles = [];
+    const count = 1500;
+
+    for(let i=0;i<count;i++){
+      const px = Math.floor(Math.random()*ow);
+      const py = Math.floor(Math.random()*oh);
+      const idx = (py*ow + px)*4;
+      const r = data[idx], g = data[idx+1], b = data[idx+2], a = data[idx+3];
+      if (a < 40) { i--; continue; }
+      const lum = 0.2126*r + 0.7152*g + 0.0722*b;
+      if (lum < 25) { i--; continue; }
+
+      const spread = 90;
+      particles.push({
+        tx: targetX + (Math.random()-0.5)*18,
+        ty: targetY + (Math.random()-0.5)*18,
+        r,g,b,
+        size: 1 + Math.random()*1.8,
+        delay: Math.random()*220,
+        curve: (Math.random()-0.5)*120,
+        // starting position
+        sx: startX + (px/ow - 0.5)*spread,
+        sy: startY + (py/oh - 0.5)*spread
+      });
+    }
+
+    sub.textContent = "status: transferring...";
+    const t0 = performance.now();
+    const dur = 1200;
+
+    function draw(now){
+      const t = now - t0;
+      ctx.clearRect(0,0,canvas.clientWidth,canvas.clientHeight);
+
+      // beam line
+      const beamA = Math.min(0.22, t/500*0.22);
+      ctx.beginPath();
+      ctx.moveTo(startX, startY);
+      ctx.quadraticCurveTo((startX+targetX)/2 + 30, (startY+targetY)/2 - 25, targetX, targetY);
+      ctx.strokeStyle = `rgba(74,255,197,${beamA})`;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      for(const p of particles){
+        if (t < p.delay) continue;
+        const tt = Math.min(1, (t - p.delay)/dur);
+        const s = tt*tt*(3-2*tt);
+
+        const mx = (p.sx + p.tx)/2;
+        const my = (p.sy + p.ty)/2;
+        const cx = mx + p.curve;
+        const cy = my - p.curve*0.35;
+
+        const x = (1-s)*(1-s)*p.sx + 2*(1-s)*s*cx + s*s*p.tx;
+        const y = (1-s)*(1-s)*p.sy + 2*(1-s)*s*cy + s*s*p.ty;
+
+        const alpha = tt < 0.85 ? 1 : Math.max(0, 1 - (tt-0.85)/0.15);
+        ctx.fillStyle = `rgba(${Math.min(255,p.r+30)},${Math.min(255,p.g+60)},${Math.min(255,p.b+40)},${0.75*alpha})`;
+        ctx.fillRect(x, y, p.size, p.size);
+      }
+
+    if (t < dur){
+  requestAnimationFrame(draw);
+} else {
+  ctx.clearRect(0,0,canvas.clientWidth,canvas.clientHeight);
+
+  sub.textContent = "status: received • ready";
+
+  cable.classList.remove("active");   // stops beam
+  inlet.classList.remove("active");   // stops glow
+
+  showNextButton();  // 👈 IMPORTANT (for step 3)
+}
+   }
+    requestAnimationFrame(draw);
+  }
+  function showNextButton(){
+  goBtn.style.display = "block";
+}
+
+goBtn.addEventListener("click", () => {
+  window.location.href = "photohouse_v2 (8) (3).html"; // change if needed
+});
+</script>
+</body>
+</html>

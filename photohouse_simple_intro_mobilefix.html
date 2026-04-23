@@ -425,7 +425,6 @@
   const canvas = document.getElementById("fx");
   const ctx = canvas.getContext("2d");
   const inlet = document.getElementById("inlet");
-  const monitor = document.getElementById("monitor");
   const cable = document.getElementById("cable");
   const sub = document.getElementById("sub");
   const fileInput = document.getElementById("fileInput");
@@ -533,7 +532,7 @@
   ctx.beginPath();
   ctx.moveTo(startX, startY);
   ctx.quadraticCurveTo((startX+targetX)/2 + 30, (startY+targetY)/2 - 25, targetX, targetY);
-  ctx.strokeStyle = rgba(74,255,197,${beamA});
+  ctx.strokeStyle = `rgba(74,255,197,${beamA})`;
   ctx.lineWidth = 2;
   ctx.stroke();
 
@@ -553,7 +552,7 @@
 
     const alpha = tt < 0.85 ? 1 : Math.max(0, 1 - (tt-0.85)/0.15);
 
-    ctx.fillStyle = rgba(${Math.min(255,p.r+30)},${Math.min(255,p.g+60)},${Math.min(255,p.b+40)},${0.75*alpha});
+    ctx.fillStyle = `rgba(${Math.min(255,p.r+30)},${Math.min(255,p.g+60)},${Math.min(255,p.b+40)},${0.75*alpha})`;
     ctx.fillRect(x, y, p.size, p.size);
   }
 

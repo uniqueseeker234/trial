@@ -504,12 +504,6 @@
     .hanger{ height:340px; }
     .photoCard{ height:300px; }
   }
-  /* =========================
-   MOBILE OPTIMIZATION ONLY
-========================= */
-@media (max-width: 980px){
-
-  /* Smaller main heading */
   .brand h1{
     font-size: 14px;
   }
@@ -553,15 +547,10 @@
     height: 240px;
   }
 /* Mobile-only: topbar should scroll (no masking the clip) */
-@media (max-width: 980px){
   .topbar{
     position: static;     /* remove sticky */
     top: auto;
   }
-}
-}
-  /* FIX: Developed Sample not overflowing */
-/* RIGHT SIDE CONTAINER FIX */
 .main{
   max-width: 1200px;     /* contains whole layout */
   margin: 0 auto;        /* centers everything */
@@ -594,8 +583,9 @@
     --cyan:#3fc8ff;
     --violet:#a786ff;
     --green:#4affc5;
-  }
-  html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);}
+  background: var(--bg);
+  color: var(--ink);
+}
   body{font-family:'Share Tech Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono";}
   *{box-sizing:border-box;}
 
@@ -1714,8 +1704,8 @@ function playFlyToAnalysis(done){
 
   flyCard.animate([
     { transform:"translate(-50%,-50%) scale(0.90) rotate(-4deg)", filter:"blur(0px)", opacity:1 },
-    { transform:"translate(-50%,-50%) scale(1.08) (2deg)",  filter:"blur(0px)", opacity:1, offset:0.7 },
-    { transform:"translate(-50%,-50%) scale(1.35) (0deg)",  filter:"blur(1.5px)", opacity:0.0 }
+    { transform:"translate(-50%,-50%) scale(1.08) rotate(2deg)",  filter:"blur(0px)", opacity:1, offset:0.7 },
+    { transform:"translate(-50%,-50%) scale(1.35) rotate(0deg)",  filter:"blur(1.5px)", opacity:0.0 }
   ], { duration: 920, easing:"cubic-bezier(.2,.8,.2,1)", fill:"forwards" });
 
   flyCard.animate([
@@ -1814,7 +1804,7 @@ intro.classList.add("show");
 setStep(0);
 });    
 </script>
- <div id="outroScene" class="room" style="display:none;">
+ <div id="outroScene" style="display:none;">
   <div class="scene">
     <div class="outro-room">
     <div class="outro-topbar">
@@ -1834,7 +1824,7 @@ setStep(0);
 
     <div class="outro-desk">
       <div class="outro-machine">
-        <div class="outro-label">OUTPUT PORT</div>
+        <div class="label">OUTPUT PORT</div>
         <div class="outro-outlet" id="outlet"></div>
         <div class="outro-tray" id="outro-tray"></div>
       </div>
@@ -1868,7 +1858,7 @@ setStep(0);
           <img id="outro-thumbImg" alt="enhanced" />
           <div class="outro-ph" id="thumbPh">No image found</div>
         </div>
-        <div class="meta">
+        <div class="outro-meta">
           <b>Enhanced Output</b><br/>
           Loaded from editor memory.<br/>
           <div class="outro-actions">

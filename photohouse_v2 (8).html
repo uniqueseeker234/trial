@@ -564,7 +564,9 @@
 .main > .card{
   max-width: 360px;
   width: 100%;
-  justify-self: center;   /* ⭐ THIS is what you're missing */
+
+  justify-self: center;   /* ⭐ THIS stops grid stretching */
+  align-self: start;      /* keeps it from stretching vertically */
 }
   .polaroid .cap{
   color: #111;        /* dark text */

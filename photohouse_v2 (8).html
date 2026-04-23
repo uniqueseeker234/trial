@@ -204,25 +204,24 @@
   .photoCard{
   width:min(300px, 70%);
   height:260px;
-
   border-radius:12px;
-  background:#f5f5f5; /* polaroid white */
-
+  background:#f5f5f5;
   border:1px solid rgba(0,0,0,0.15);
   box-shadow:0 20px 40px rgba(0,0,0,0.6);
-
   position:relative;
   overflow:hidden;
 
-  /* ⭐ THIS IS KEY (connect to clip) */
   margin-top:-28px;
 
   transform-origin:50% -40px;
+  animation: gentleSwing 4.8s ease-in-out infinite;
+
+  z-index:1;
+  }
   @keyframes gentleSwing{
   0%   { transform: rotate(-2deg); }
   50%  { transform: rotate(2deg); }
   100% { transform: rotate(-2deg); }
-z-index: 1;
   }
 .photoFrame{
   position:absolute;
@@ -361,15 +360,17 @@ z-index: 1;
     gap:14px;
   }
   .card{
-    #guideCard{
-      max-width: 420px;
-      margin: 0 auto;
-    border:1px solid var(--border);
-    border-radius:22px;
-    background:rgba(255,255,255,0.07);
-    box-shadow:var(--shadow);
-    overflow:hidden;
-  }
+  border:1px solid var(--border);
+  border-radius:22px;
+  background:rgba(255,255,255,0.07);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+
+#guideCard{
+  max-width:420px;
+  margin:0 auto;
+}
   .cardHead{
     padding:14px 14px 10px;
     display:flex;
@@ -1211,7 +1212,7 @@ function playDipAnimation(){
   ripple.style.transform = "translateY(40px)";
 
   photoCard.style.transition = "transform .55s ease";
-  photoCard.style.transform = null;
+  photoCard.style.transform = "translateY(42px) rotate(-1deg)";
 
   requestAnimationFrame(()=>{
     ripple.style.transition = "transform .9s ease, opacity .9s ease";

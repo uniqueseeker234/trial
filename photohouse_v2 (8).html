@@ -1639,15 +1639,18 @@ document.getElementById("btnSkip").addEventListener("click", ()=>{
     setStep(step);
   }
 });
-document.getElementById("btnFinished").addEventListener("click", () => {
+   document.getElementById("btnFinished").addEventListener("click", () => {
 
-  // Hide entire page smoothly
-  document.querySelector(".room").style.transition = "opacity 0.4s ease";
-  document.querySelector(".room").style.opacity = "0";
+  const room = document.querySelector(".room");
+  const outro = document.getElementById("outroScene");
 
-  // (Temporary placeholder)
+  // fade out main page
+  room.style.transition = "opacity 0.4s ease";
+  room.style.opacity = "0";
+
   setTimeout(() => {
-    alert("Outro animation will go here");
+    room.style.display = "none";      // hide main UI
+    outro.style.display = "block";    // show animation
   }, 400);
 
 });
@@ -1812,6 +1815,72 @@ setStep(0);
 });    
 </script>
   <div id="outroScene" style="display:none;"></div>
+  <div class="scene">
+  <div class="room" id="room">
+    <div class="topbar">
+      <h1>Output Channel</h1>
+      <div class="sub" id="sub">status: waiting for enhanced image</div>
+    </div>
+
+    <div class="lyraWrap">
+      <div class="lyra">
+        <img src="assets/images/lyra_black.png" alt="Lyra Solene" />
+      </div>
+      <div class="speech">
+        <b>Lyra:</b> Ready to publish your enhanced image to the <b>Kerala Algal Archive</b>.
+        When you press <b>Send</b>, the output port will release it as pixels and sync to the Algal Archive.
+      </div>
+    </div>
+
+    <div class="desk">
+      <div class="machine">
+        <div class="label">OUTPUT PORT</div>
+        <div class="outlet" id="outlet"></div>
+        <div class="tray" id="tray"></div>
+      </div>
+
+      <div class="cable" id="cable"></div>
+
+      <div class="db" id="db">
+        <div class="dbHeader">
+          <div class="t">Algal Archive</div>
+          <div class="badge" id="badge">idle</div>
+        </div>
+        <div class="dbBody">
+          <div class="rack">
+            <div class="slot"></div>
+            <div class="slot"></div>
+            <div class="slot"></div>
+            <div class="slot"></div>
+          </div>
+          <div class="dbText" id="dbText">
+            <div class="logLine dim">• Awaiting output stream...</div>
+            <div class="logLine dim">• Destination: Page 5 Archive Scan</div>
+            <div class="logLine dim">• Gate: Similarity + Threshold</div>
+            <div class="logLine dim">• Status: idle</div>
+          </div>
+          <div class="dbInlet" id="dbInlet" title="archive inlet"></div>
+        </div>
+      </div>
+
+      <div class="preview">
+        <div class="thumb">
+          <img id="thumbImg" alt="enhanced" />
+          <div class="ph" id="thumbPh">No image found</div>
+        </div>
+        <div class="meta">
+          <b>Enhanced Output</b><br/>
+          Loaded from editor memory.<br/>
+          <div class="actions">
+            <button class="btn" id="sendBtn" type="button">Send to Archive</button>
+                      </div>
+        </div>
+      </div>
+    </div>
+
+    <canvas id="fx"></canvas>
+  </div>
+</div>
   
 </body>
 </html>

@@ -343,12 +343,6 @@
 </button>
         <div class="cable" id="cable"></div>
 
-          <div class="boot">
-            <div class="t">Enhancement Console Online</div>
-            <div class="bar"><i></i></div>
-          </div>
-        </div>
-      </div>
 
       <div class="upload">
         <label for="fileInput">Upload image</label>
@@ -363,6 +357,7 @@
   const canvas = document.getElementById("fx");
   const ctx = canvas.getContext("2d");
   const inlet = document.getElementById("inlet");
+  //*const monitor = document.getElementById("monitor");
   const cable = document.getElementById("cable");
   const sub = document.getElementById("sub");
   const fileInput = document.getElementById("fileInput");
@@ -399,7 +394,7 @@ const goBtn = document.getElementById("goBtn");
 
   function startPixelTransfer(img){
     sub.textContent = "status: converting to pixels...";
-    //*monitor.classList.add("on");
+    //monitor.classList.add("on");
     cable.classList.add("active");
     inlet.classList.add("active");
 

@@ -162,13 +162,14 @@
     text-transform:uppercase;
     color:rgba(215,243,255,.65);
   }
+  
   .inlet{
     position:absolute;
     left:50%;
     top:55%;
     transform:translate(-50%,-50%);
-    width:50px;
-    height:50px;
+    width:80px;
+    height:80px;
     border-radius:50%;
     border:2px solid rgba(74,255,197,.85);
     box-shadow:0 0 18px rgba(74,255,197,.35);
@@ -273,7 +274,18 @@
     pointer-events:none;
     z-index:5;
   }
-
+.btn{
+  cursor:pointer;
+  font-family:'Orbitron', system-ui;
+  font-size:11px;
+  letter-spacing:1.4px;
+  text-transform:uppercase;
+  padding:10px 14px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.05);
+  color:rgba(220,248,255,.90);
+}
   /* =========================
      MOBILE FIX (ONLY)
      Desktop/laptop untouched
@@ -382,11 +394,10 @@
 
       <div class="lyraWrap">
         <div class="lyra">
-          <img src="assets/images/lyra_black.png" alt="Lyra Solene" />
+          <img src="assets/images/lyra_solene.png" alt="Lyra Solene" />
         </div>
         <div class="speech">
-          <b>Lyra:</b> Welcome. Upload your image and I’ll route it through the enhancement inlet.
-          Your photo will convert into pixels and enter the machine.
+          <b>Lyra:</b> Welcome to PhotoHouse. Upload your image and I’ll route it to our own enchantment software.You can edit and enchance your images there to your liking.
         </div>
       </div>
 
@@ -395,16 +406,10 @@
           <div class="label">INLET UNIT</div>
           <div class="inlet" id="inlet"></div>
         </div>
-
+<button class="btn" id="goBtn" style="display:none; position:absolute; left:50%; bottom:20px; transform:translateX(-50%);">
+  Go to PhotoHouse
+</button>
         <div class="cable" id="cable"></div>
-
-        <div class="monitor" id="monitor">
-          <div class="boot">
-            <div class="t">Enhancement Console Online</div>
-            <div class="bar"><i></i></div>
-          </div>
-        </div>
-      </div>
 
       <div class="upload">
         <label for="fileInput">Upload image</label>
@@ -424,6 +429,7 @@
   const sub = document.getElementById("sub");
   const fileInput = document.getElementById("fileInput");
   const roomEl = document.getElementById("room");
+  const goBtn = document.getElementById("goBtn");
 
   function resize(){
     const r = roomEl.getBoundingClientRect();
@@ -446,6 +452,7 @@
 
     const reader = new FileReader();
     reader.onload = () => {
+      localStorage.setItem("pond2_upload_image", reader.result);
       const img = new Image();
       img.onload = () => startPixelTransfer(img);
       img.src = reader.result;
@@ -455,7 +462,6 @@
 
   function startPixelTransfer(img){
     sub.textContent = "status: converting to pixels...";
-    monitor.classList.add("on");
     cable.classList.add("active");
     inlet.classList.add("active");
 
@@ -548,16 +554,28 @@
         ctx.fillRect(x, y, p.size, p.size);
       }
 
-      if (t < dur + 600){
-        requestAnimationFrame(draw);
-      } else {
-        sub.textContent = "status: received • ready";
-        cable.classList.remove("active");
-        setTimeout(()=> inlet.classList.remove("active"), 450);
-      }
-    }
+    if (t < dur){
+  requestAnimationFrame(draw);
+} else {
+  ctx.clearRect(0,0,canvas.clientWidth,canvas.clientHeight);
+
+  sub.textContent = "status: received • ready";
+
+  cable.classList.remove("active");   // stops beam
+  inlet.classList.remove("active");   // stops glow
+
+  showNextButton();  // 👈 IMPORTANT (for step 3)
+}
+   }
     requestAnimationFrame(draw);
   }
+  function showNextButton(){
+  goBtn.style.display = "block";
+}
+
+goBtn.addEventListener("click", () => {
+  window.location.href = "photohouse_v2 (8) (3).html"; // change if needed
+});
 </script>
 </body>
 </html>

@@ -554,17 +554,15 @@
         ctx.fillRect(x, y, p.size, p.size);
       }
 
-    if (t < dur){
+    if (t < dur + 600){
   requestAnimationFrame(draw);
 } else {
-  ctx.clearRect(0,0,canvas.clientWidth,canvas.clientHeight);
-
   sub.textContent = "status: received • ready";
 
-  cable.classList.remove("active");   // stops beam
-  inlet.classList.remove("active");   // stops glow
+  cable.classList.remove("active");   // stops cable AFTER animation
+  setTimeout(()=> inlet.classList.remove("active"), 450);
 
-  showNextButton();  // 👈 IMPORTANT (for step 3)
+  showNextButton(); // 👈 button appears AFTER full animation
 }
    }
     requestAnimationFrame(draw);

@@ -474,11 +474,11 @@
 
     <div class="lyraWrap">
       <div class="lyra">
-        <img src="assets/images/lyra_black.png" alt="Lyra Solene" />
+        <img src="assets/elythera/images/lyra_solene.png" alt="Lyra Solene" />
       </div>
       <div class="speech">
-        <b>Lyra:</b> Ready to publish your enhanced image to the <b>Kerala Algal Archive</b>.
-        When you press <b>Send</b>, the output port will release it as pixels and sync to the Algal Archive.
+        <b>Lyra:</b>Your developed image is ready to sent to <b>Algal Identifier</b>.
+        When you press <b>Send</b>, the output port will automatically transfer the image to  Algal Identifier.
       </div>
     </div>
 
@@ -493,7 +493,7 @@
 
       <div class="db" id="db">
         <div class="dbHeader">
-          <div class="t">Algal Archive</div>
+          <div class="t">Algal Identifier Reciever End/div>
           <div class="badge" id="badge">idle</div>
         </div>
         <div class="dbBody">
@@ -505,8 +505,8 @@
           </div>
           <div class="dbText" id="dbText">
             <div class="logLine dim">• Awaiting output stream...</div>
-            <div class="logLine dim">• Destination: Page 5 Archive Scan</div>
-            <div class="logLine dim">• Gate: Similarity + Threshold</div>
+            <div class="logLine dim">• Destination: Algal Identifier</div>
+            <div class="logLine dim">• Gateway: pixel transfer</div>
             <div class="logLine dim">• Status: idle</div>
           </div>
           <div class="dbInlet" id="dbInlet" title="archive inlet"></div>
@@ -741,10 +741,10 @@ goNextBtn.addEventListener("click", () => {
     log([
       "• Output stream: CLOSED",
       "• Archive: UPDATED",
-      "• Next: Page 5 Scan Ready",
-      "• Status: ready"
+      "• success: Algae identifier has recieved the image",
+      "• Status: ready for identification"
     ]);
-    badge.textContent = "ready";
+    badge.textContent = "Active";
 goNextBtn.style.display = "inline-block";
     setTimeout(()=>{
       db.classList.remove("sync");

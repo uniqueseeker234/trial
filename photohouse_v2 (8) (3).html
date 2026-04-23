@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>PhotoHouse</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg0:#07131d;
@@ -24,7 +25,7 @@
   body{
   margin:0;
   color:var(--ink);
-  font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  font-family:'Share Tech Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas;
 
   min-height:100vh;
 
@@ -79,10 +80,10 @@
     transform: rotate(12deg);
   }
   .brand h1{
-  font-size:20px;               /* bigger */
+  font-size:20px;
   margin:0;
   letter-spacing:0.8px;
-  font-family: 'Playfair Display', serif; /* premium font */
+  font-family:'Share Tech Mono', monospace;
   }
   .brand p{ margin:0; font-size:12px; color:var(--muted); }
 
@@ -1188,13 +1189,18 @@ document.getElementById("btnSkip").addEventListener("click", ()=>{
 });
 document.getElementById("btnFinished").addEventListener("click", () => {
 
-  // Hide entire page smoothly
+  const dataUrl = sampleCanvas.toDataURL("image/png");
+
+  // Save final image for next page
+  localStorage.setItem("pond2_enhanced_224", dataUrl);
+
+  // Smooth fade
   document.querySelector(".room").style.transition = "opacity 0.4s ease";
   document.querySelector(".room").style.opacity = "0";
 
-  // (Temporary placeholder)
+  // Redirect to outro page
   setTimeout(() => {
-    alert("Outro animation will go here");
+    window.location.href = "photohouse_output_to_archive_v5.html"; // 🔁 change if your page name is different
   }, 400);
 
 });

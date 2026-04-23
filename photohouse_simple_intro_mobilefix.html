@@ -147,8 +147,8 @@
     position:absolute;
     left:40px;
     top:92px;
-    width:190px;
-    height:150px;
+    width:220px;
+    height:180px;
     border-radius:16px;
     background: linear-gradient(180deg, rgba(18,30,56,.95), rgba(10,16,28,.95));
     border:1px solid rgba(255,255,255,.10);
@@ -168,8 +168,8 @@
     left:50%;
     top:55%;
     transform:translate(-50%,-50%);
-    width:80px;
-    height:80px;
+    width:100px;
+    height:100px;
     border-radius:50%;
     border:2px solid rgba(74,255,197,.85);
     box-shadow:0 0 18px rgba(74,255,197,.35);
@@ -406,7 +406,8 @@
           <div class="label">INLET UNIT</div>
           <div class="inlet" id="inlet"></div>
         </div>
-<button class="btn" id="goBtn" style="display:none; position:absolute; left:50%; bottom:20px; transform:translateX(-50%);">
+<button class="btn" id="goBtn"
+  style="display:none; position:absolute; left:50%; top:65%; transform:translateX(-50%);">
   Go to PhotoHouse
 </button>
         <div class="cable" id="cable"></div>
@@ -559,14 +560,22 @@
 } else {
   sub.textContent = "status: received • ready";
 
-  cable.classList.remove("active");   // stops cable AFTER animation
+  cable.classList.remove("active");
   setTimeout(()=> inlet.classList.remove("active"), 450);
 
-  showNextButton(); // 👈 button appears AFTER full animation
+  // ✅ HIDE UPLOAD BAR
+  const uploadBar = document.querySelector(".upload");
+  uploadBar.style.transition = "opacity 0.3s ease";
+  uploadBar.style.opacity = "0";
+
+  setTimeout(()=>{
+    uploadBar.style.display = "none";
+  }, 300);
+
+  // ✅ SHOW BUTTON
+  showNextButton();
 }
-   }
-    requestAnimationFrame(draw);
-  }
+
   function showNextButton(){
   goBtn.style.display = "block";
 }

@@ -26,19 +26,22 @@
   color:var(--ink);
   font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial;
 
+  min-height:100vh;
+
   background:
     radial-gradient(1200px 800px at 15% 10%, rgba(255,219,179,0.08), transparent 55%),
     radial-gradient(900px 600px at 85% 18%, rgba(95,194,167,0.10), transparent 52%),
     linear-gradient(180deg, var(--bg0), var(--bg1));
 
-  background-attachment: fixed;   /* ⭐ THIS FIXES YOUR ISSUE */
-  overflow:auto;
+  background-repeat: no-repeat;
+  background-size: cover;   /* ⭐ KEY FIX */
   }
 
   .room{
     min-height:100vh;
     display:flex;
     flex-direction:column;
+    background: inherit;   /* ⭐ forces background to continue */
   }
 
   /* Sticky topbar so user always can reach buttons */

@@ -561,12 +561,23 @@
 }
 }
   /* FIX: Developed Sample not overflowing */
-.main > .card{
+/* RIGHT SIDE CONTAINER FIX */
+.main{
+  max-width: 1200px;     /* contains whole layout */
+  margin: 0 auto;        /* centers everything */
+  width: 100%;
+}
+
+/* Ensure right column doesn't stretch */
+.main > div:last-child{
+  display: flex;
+  justify-content: center;
+}
+
+/* Developed Sample card */
+.main > div:last-child .card{
   max-width: 360px;
   width: 100%;
-
-  justify-self: center;   /* ⭐ THIS stops grid stretching */
-  align-self: start;      /* keeps it from stretching vertically */
 }
   .polaroid .cap{
   color: #111;        /* dark text */

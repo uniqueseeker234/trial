@@ -522,8 +522,12 @@
           <b>Enhanced Output</b><br/>
           Loaded from editor memory.<br/>
           <div class="actions">
-            <button class="btn" id="sendBtn" type="button">Send to Archive</button>
-                      </div>
+  <button class="btn" id="sendBtn" type="button">Send to Archive</button>
+  
+  <button class="btn secondary" id="goNextBtn" style="display:none;" type="button">
+    Go to Algae Identifier
+  </button>
+          </div>
         </div>
       </div>
     </div>
@@ -551,10 +555,9 @@
   const thumbPh = document.getElementById("thumbPh");
 
   const sendBtn = document.getElementById("sendBtn");
-
+const goNextBtn = document.getElementById("goNextBtn");
   // Which key to read from editor:
   // Put your enhanced image dataURL here from the editor page.
-  const INPUT_KEYS = ["photohouse_out", "enhanced_out", "photohouse_enhanced", "photohouse_in"];
 
   let imgDataURL = null;
 
@@ -583,24 +586,20 @@
 
   // Load image from localStorage
   function loadImage(){
-    for(const k of INPUT_KEYS){
-      const v = localStorage.getItem(k);
-      if(v && v.startsWith("data:image")){
-        imgDataURL = v;
-        break;
-      }
-    }
-    if(imgDataURL){
-      thumbImg.src = imgDataURL;
-      thumbImg.style.display = "block";
-      thumbPh.style.display = "none";
-      sub.textContent = "status: enhanced image loaded";
-    } else {
-      sub.textContent = "status: no enhanced image in memory";
-    }
-  }
-  loadImage();
+  const v = localStorage.getItem("pond2_enhanced_224"); // ✅ EXACT key from PhotoHouse
 
+  if(v && v.startsWith("data:image")){
+    imgDataURL = v;
+
+    thumbImg.src = imgDataURL;
+    thumbImg.style.display = "block";
+    thumbPh.style.display = "none";
+
+    sub.textContent = "status: enhanced image loaded";
+  } else {
+    sub.textContent = "status: no enhanced image in memory";
+  }
+  }
   sendBtn.addEventListener("click", async ()=>{
     if(!imgDataURL){
       alert("No enhanced image found. Save it from the editor first.");
@@ -613,7 +612,9 @@
     sub.textContent = "status: delivered • ready";
     sendBtn.disabled = false;
   });
-
+goNextBtn.addEventListener("click", () => {
+  window.location.href = "page5.html"; // change later if needed
+});
   function samplePixels(img, ow=90, oh=90){
     const off = document.createElement("canvas");
     off.width = ow; off.height = oh;
@@ -744,7 +745,7 @@
       "• Status: ready"
     ]);
     badge.textContent = "ready";
-
+goNextBtn.style.display = "inline-block";
     setTimeout(()=>{
       db.classList.remove("sync");
       dbInlet.classList.remove("active");

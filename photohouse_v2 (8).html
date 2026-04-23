@@ -737,7 +737,10 @@
         <div class="cardHead">
           <div>
             <h2>Developed Sample</h2>
-            <p>This is <b>exactly</b> what the model will analyze (224×224).</p>
+            <p>Here is<b>your</b> developed image.</p>
+            <button class="btn primary" id="btnFinished" style="margin-top:10px; width:100%;">
+  Finish
+</button>
           </div>
         </div>
         <div class="polaroid">
@@ -1183,7 +1186,18 @@ document.getElementById("btnSkip").addEventListener("click", ()=>{
     setStep(step);
   }
 });
+document.getElementById("btnFinished").addEventListener("click", () => {
 
+  // Hide entire page smoothly
+  document.querySelector(".room").style.transition = "opacity 0.4s ease";
+  document.querySelector(".room").style.opacity = "0";
+
+  // (Temporary placeholder)
+  setTimeout(() => {
+    alert("Outro animation will go here");
+  }, 400);
+
+});
 document.getElementById("btnPrev").addEventListener("click", ()=> setStep(step - 1));
 document.getElementById("btnNext").addEventListener("click", ()=>{
   setStep(step + 1);

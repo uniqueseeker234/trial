@@ -1,1876 +1,584 @@
-<!doctype html>  
-<html lang="en">  
-<head>  
-<meta charset="utf-8" />  
-<meta name="viewport" content="width=device-width,initial-scale=1" />  
-<title>PhotoHouse</title>  
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">  
-<style>  
-  :root{  
-    --bg0:#07131d;  
-    --bg1:#0a1a24;  
-    --warm:#ffdbb3;  
-    --ink:rgba(255,255,255,0.92);  
-    --muted:rgba(255,255,255,0.70);  
-    --border:rgba(255,255,255,0.18);  
-    --shadow:0 18px 55px rgba(0,0,0,0.55);  
-    --accent:#5FC2A7; /* pond teal */  
-    --accent2:#3CC19E;  
-    --danger:#ff7a7a;  
-  }  
-  
-  *{box-sizing:border-box}  
-  html,body{height:100%}  
-  body{  
-  margin:0;  
-  color:var(--ink);  
-  font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial;  
-  
-  min-height:100vh;  
-  
-  background:  
-    radial-gradient(1200px 800px at 15% 10%, rgba(255,219,179,0.08), transparent 55%),  
-    radial-gradient(900px 600px at 85% 18%, rgba(95,194,167,0.10), transparent 52%),  
-    linear-gradient(180deg, var(--bg0), var(--bg1));  
-  
-  background-repeat: no-repeat;  
-  background-size: cover;   /* ⭐ KEY FIX */  
-  }  
-  
-  .room{  
-    min-height:100vh;  
-    display:flex;  
-    flex-direction:column;  
-    background: inherit;   /* ⭐ forces background to continue */  
-  }  
-  
-  /* Sticky topbar so user always can reach buttons */  
-  .topbar{  
-    position:sticky;  
-    top:0;  
-    z-index:9999;  
-    display:flex;  
-    align-items:center;  
-    justify-content:space-between;  
-    padding:14px 18px;  
-    gap:12px;  
-    background:linear-gradient(180deg, rgba(7,19,29,0.92), rgba(7,19,29,0.65));  
-    backdrop-filter: blur(10px);  
-    border-bottom:1px solid rgba(255,255,255,0.10);  
-  }  
-  .brand{  
-    display:flex; gap:12px; align-items:center;  
-    min-width:260px;  
-  }  
-  .badge{  
-    width:52px; height:52px; border-radius:16px;  
-    background:linear-gradient(135deg, rgba(255,219,179,0.18), rgba(95,194,167,0.16));  
-    border:1px solid var(--border);  
-    box-shadow:var(--shadow);  
-    display:grid; place-items:center;  
-    position:relative;  
-    overflow:hidden;  
-    flex:0 0 auto;  
-  }  
-  .badge:before{  
-    content:"";  
-    position:absolute; inset:-30%;  
-    background:radial-gradient(circle at 40% 40%, rgba(255,255,255,0.18), transparent 55%);  
-    transform: rotate(12deg);  
-  }  
-  .brand h1{  
-  font-size:20px;               /* bigger */  
-  margin:0;  
-  letter-spacing:0.8px;  
-  font-family: 'Playfair Display', serif; /* premium font */  
-  }  
-  .brand p{ margin:0; font-size:12px; color:var(--muted); }  
-  
-  .actions{  
-    display:flex; gap:10px; align-items:center;  
-    flex-wrap:wrap;  
-    justify-content:flex-end;  
-  }  
-.btn{  
-  appearance:none;  
-  border:1px solid var(--border);  
-  background:linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));  
-  color:var(--ink);  
-  padding:10px 12px;  
-  border-radius:14px;  
-  cursor:pointer;  
-  
-  /* 3D effect */  
-  box-shadow:  
-    0 6px 0 rgba(0,0,0,0.4),        /* bottom depth */  
-    0 12px 25px rgba(0,0,0,0.35);   /* soft shadow */  
-  
-  transition: all .15s ease;  
-  font-weight:600;  
-  font-size:12px;  
-}  
-  
-.btn:hover{  
-  transform:translateY(-2px);  
-}  
-  
-.btn:active{  
-  transform:translateY(3px);        /* press effect */  
-  box-shadow:  
-    0 2px 0 rgba(0,0,0,0.4),  
-    0 6px 15px rgba(0,0,0,0.25);  
-}  
-  
-  .main{  
-    flex:1;  
-    display:grid;  
-    grid-template-columns: 1.4fr 0.8fr;  
-    gap:16px;  
-    padding:16px 18px 18px;  
-    align-items:start;  
-  }  
-  
-  .wall{  
-    position:relative;  
-    border:1px solid var(--border);  
-    border-radius:22px;  
-    background:  
-      radial-gradient(900px 600px at 20% 0%, rgba(255,219,179,0.08), transparent 55%),  
-      linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));  
-    box-shadow:var(--shadow);  
-    overflow:hidden;  
-    display:flex;  
-    flex-direction:column;  
-  }  
-  
-  .ropeArea{ position:relative; padding:16px 16px 10px; }  
-  .lampGlow{  
-    position:absolute; top:-120px; right:-120px;  
-    width:320px; height:320px;  
-    background:radial-gradient(circle at 35% 35%, rgba(255,219,179,0.16), transparent 58%);  
-    filter:blur(2px);  
-    pointer-events:none;  
-  }  
-  .rope{ position:relative; height:58px; }  
-  .rope:before{  
-    content:"";  
-    position:absolute; left:10px; right:10px; top:26px;  
-    height:3px;  
-    background:linear-gradient(90deg, rgba(255,219,179,0.45), rgba(255,219,179,0.18));  
-    border-radius:999px;  
-    box-shadow:0 8px 16px rgba(0,0,0,0.35);  
-  }  
-  .rope:after{  
-    content:"";  
-    position:absolute; left:14px; right:14px; top:26px;  
-    height:1px;  
-    background:rgba(255,255,255,0.10);  
-    border-radius:999px;  
-  }  
-  .clip{  
-    position:absolute;  
-    top:7px; left:50%;  
-    transform:translateX(-50%) rotate(-3deg);  
-    width:46px; height:34px;  
-    background:linear-gradient(180deg, rgba(240,240,240,0.75), rgba(180,180,180,0.35));  
-    border:1px solid rgba(255,255,255,0.26);  
-    border-radius:10px;  
-    box-shadow:0 14px 22px rgba(0,0,0,0.35);  
-    display:flex; align-items:flex-end; justify-content:center;  
-    padding-bottom:6px;  
-    z-index:20;  
-  }  
-  .clip i{ display:block; width:26px; height:8px; background:rgba(0,0,0,0.25); border-radius:99px; }  
-.clip::after{  
-  content:"";  
-  position:absolute;  
-  bottom:-6px;  
-  left:50%;  
-  transform:translateX(-50%);  
-  width:30px;  
-  height:6px;  
-  background:rgba(0,0,0,0.25);  
-  border-radius:4px;  
-}  
-  .hanger{  
-    position:relative;  
-    height:320px;  
-    display:flex;  
-    align-items:flex-start;  
-    justify-content:center;  
-    padding-top:8px;  
-    flex:0 0 auto;  
-  }  
-  .photoCard{  
-  width:min(300px, 70%);  
-  height:260px;  
-  border-radius:12px;  
-  background:#f5f5f5;  
-  border:1px solid rgba(0,0,0,0.15);  
-  box-shadow:0 20px 40px rgba(0,0,0,0.6);  
-  position:relative;  
-  overflow:hidden;  
-  
-  margin-top:-44px;  
-  
-  transform-origin:50% -60px;  
-  animation: gentleSwing 4.8s ease-in-out infinite;  
-  
-  z-index:1;  
-  }  
-  @keyframes gentleSwing{  
-  0%   { transform: rotate(-2deg); }  
-  50%  { transform: rotate(2deg); }  
-  100% { transform: rotate(-2deg); }  
-  }  
-.photoFrame{  
-  position:absolute;  
-  top:12px;  
-  left:12px;  
-  right:12px;  
-  bottom:50px; /* bottom white space */  
-  
-  border-radius:8px;  
-  background:#000;  
-  overflow:hidden;  
-}  
-  .photoCard::after{  
-  content:"";  
-  position:absolute;  
-  bottom:0;  
-  left:0;  
-  right:0;  
-  height:40px;  
-  background:#f5f5f5;  
-  }  
-  #bigView{ width:100%; height:100%; display:block; }  
-  
-  
-  .dragShield{  
-    position:absolute; inset:14px;  
-    border-radius:14px;  
-    cursor:grab;  
-    z-index:10;  
-  }  
-  .dragShield:active{cursor:grabbing}  
-  
-  .hintBar{  
-    display:flex; align-items:center; justify-content:space-between;  
-    gap:10px;  
-    padding:10px 16px 14px;  
-    color:var(--muted);  
-    font-size:12px;  
-  }  
-  .hintBar b{color:var(--ink)}  
-  .pill{  
-    display:inline-flex; gap:8px; align-items:center;  
-    padding:8px 10px;  
-    border-radius:999px;  
-    background:rgba(255,255,255,0.08);  
-    border:1px solid var(--border);  
-  }  
-  .dot{  
-    width:8px; height:8px; border-radius:50%;  
-    background:var(--accent);  
-    box-shadow:0 0 0 6px rgba(95,194,167,0.12);  
-  }  
-  
-  .tableArea{  
-    background:linear-gradient(180deg, rgba(0,0,0,0.10), rgba(0,0,0,0.24));  
-    border-top:1px solid rgba(255,255,255,0.10);  
-    padding:14px 14px 16px;  
-  }  
-  .desk{  
-    border-radius:18px;  
-    border:1px solid rgba(255,255,255,0.12);  
-    background:  
-      radial-gradient(900px 520px at 20% -40%, rgba(255,219,179,0.10), transparent 55%),  
-      linear-gradient(180deg, rgba(42,27,18,0.84), rgba(32,19,13,0.86));  
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 14px 38px rgba(0,0,0,0.40);  
-    padding:14px;  
-  }  
-  .controls{  
-    display:grid;  
-    grid-template-columns: repeat(2, minmax(0,1fr));  
-    gap:12px;  
-  }  
-  .control{  
-    border-radius:16px;  
-    border:1px solid rgba(255,255,255,0.12);  
-    background:rgba(255,255,255,0.06);  
-    padding:12px;  
-  }  
-  .control small{  
-    display:block;  
-    color:var(--muted);  
-    margin-bottom:6px;  
-    font-size:11px;  
-    letter-spacing:0.3px;  
-  }  
-  .control label{  
-    display:flex;  
-    align-items:center;  
-    justify-content:space-between;  
-    gap:10px;  
-    font-weight:700;  
-    font-size:13px;  
-    margin-bottom:8px;  
-  }  
-  .control label span.val{  
-    font-size:12px;  
-    color:rgba(255,255,255,0.82);  
-    font-weight:700;  
-  }  
-  input[type="range"]{ width:100%; accent-color: var(--accent); }  
-  
-  .side{  
-    display:flex;  
-    flex-direction:column;  
-    gap:14px;  
-    align-items:center;  
-  }  
-  .card{  
-  border:1px solid var(--border);  
-  border-radius:22px;  
-  background:rgba(255,255,255,0.07);  
-  box-shadow:var(--shadow);  
-  overflow:hidden;  
-}  
-  
-#guideCard{  
-  width:100%;  
-  max-width:360px;  
-  margin:0 auto;  
-}  
-  .cardHead{  
-    padding:14px 14px 10px;  
-    display:flex;  
-    align-items:flex-start;  
-    justify-content:space-between;  
-    gap:10px;  
-    border-bottom:1px solid rgba(255,255,255,0.10);  
-  }  
-  .cardHead h2{ margin:0; font-size:13px; letter-spacing:0.3px; }  
-  .cardHead p{ margin:4px 0 0; color:var(--muted); font-size:12px; line-height:1.35; }  
-  
-  .stepBody{ padding:10px 12px 12px; }  
-  .stepLine{ display:flex; align-items:flex-start; gap:10px; margin-bottom:10px; }  
-  .stepBadge{  
-    width:34px; height:34px; border-radius:12px;  
-    display:grid; place-items:center;  
-    background:linear-gradient(135deg, rgba(95,194,167,0.24), rgba(255,219,179,0.14));  
-    border:1px solid rgba(255,255,255,0.14);  
-    font-weight:900;  
-    flex:0 0 auto;  
-  }  
-  .stepText{ color:rgba(255,255,255,0.86); font-size:13px; line-height:1.45; }  
-  .stepText b{color:var(--ink)}  
-  .stepFooter{ display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }  
-  
- .polaroid{  
-  margin:12px auto;  
-  width:260px;  
-  
-  border-radius:14px;  
-  background:#f5f5f5;  
-  
-  border:1px solid rgba(0,0,0,0.15);  
-  box-shadow:0 20px 40px rgba(0,0,0,0.6);  
-  
-  padding:12px 12px 20px;  
-  display:flex;  
-  flex-direction:column;  
-  align-items:center;  
-}  
-  .polaroid .frame{  
-  width:224px;  
-  height:224px;  
-  border-radius:8px;  
-  overflow:hidden;  
-  background:#000;  
-}  
-  #sample224{ width:224px; height:224px; display:block; }  
-  .polaroid .cap{  
-    padding:0 14px 14px;  
-    color:var(--muted);  
-    font-size:12px;  
-    line-height:1.35;  
-    text-align:center;  
-  }  
-  .polaroid .cap b{color:var(--ink)}  
-  
-  /* Wash tray (dip animation) */  
-  .tray{  
-    position:absolute;  
-    left:50%; bottom:12px;  
-    transform:translateX(-50%);  
-    width:min(620px, 94%);  
-    height:54px;  
-    border-radius:18px;  
-    background:linear-gradient(180deg, rgba(95,194,167,0.14), rgba(0,0,0,0.18));  
-    border:1px solid rgba(255,255,255,0.14);  
-    box-shadow:0 18px 55px rgba(0,0,0,0.55);  
-    overflow:hidden;  
-    opacity:0.0;  
-    pointer-events:none;  
-  }  
-  .tray .ripple{  
-    position:absolute; inset:-60% -10%;  
-    background:  
-      radial-gradient(circle at 40% 60%, rgba(255,255,255,0.18), transparent 55%),  
-      radial-gradient(circle at 70% 35%, rgba(95,194,167,0.18), transparent 60%);  
-    transform:translateY(40px);  
-    opacity:0.0;  
-  }  
-  
-  /* fly overlay */  
-  .flyOverlay{ position:fixed; inset:0; pointer-events:none; display:none; z-index:99999; }  
-  .flyOverlay.show{display:block}  
-  .flyCard{  
-    position:absolute;  
-    width:260px; height:320px;  
-    border-radius:22px;  
-    background:rgba(255,255,255,0.10);  
-    border:1px solid rgba(255,255,255,0.18);  
-    box-shadow:0 24px 90px rgba(0,0,0,0.75);  
-    backdrop-filter: blur(10px);  
-    overflow:hidden;  
-    transform:translate(-50%,-50%) scale(0.9) rotate(-4deg);  
-  }  
-  .flyCard .inner{  
-    margin:14px;  
-    border-radius:16px;  
-    overflow:hidden;  
-    border:1px solid rgba(255,255,255,0.14);  
-    background:rgba(0,0,0,0.28);  
-    height:232px;  
-    display:grid;  
-    place-items:center;  
-  }  
-  #flyCanvas{width:224px;height:224px}  
-  .flyCard .label{ padding:0 14px 14px; text-align:center; color:var(--muted); font-size:12px; }  
-  
-  /* Character intro modal */  
-  .intro{  
-    position:fixed; inset:0;  
-    display:none;  
-    z-index:100000;  
-    background:rgba(0,0,0,0.55);  
-    backdrop-filter: blur(8px);  
-    align-items:center;  
-    justify-content:center;  
-    padding:18px;  
-  }  
-  .intro.show{display:flex}  
-  .introCard{  
-    width:min(560px, 100%);  
-    border-radius:26px;  
-    border:1px solid rgba(255,255,255,0.18);  
-    background:linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.06));  
-    box-shadow:0 30px 120px rgba(0,0,0,0.75);  
-    overflow:hidden;  
-  }  
-  .introTop{  
-    display:flex;  
-    gap:14px;  
-    padding:16px;  
-    align-items:center;  
-    border-bottom:1px solid rgba(255,255,255,0.10);  
-  }  
-  .avatar{  
-    width:56px; height:56px;  
-    border-radius:18px;  
-    display:grid; place-items:center;  
-    background:linear-gradient(135deg, rgba(255,219,179,0.18), rgba(95,194,167,0.16));  
-    border:1px solid rgba(255,255,255,0.18);  
-    box-shadow:0 16px 40px rgba(0,0,0,0.40);  
-    flex:0 0 auto;  
-    font-size:26px;  
-  }  
-  .introTop h3{ margin:0; font-size:16px; letter-spacing:0.3px; }  
-  .introTop p{ margin:4px 0 0; color:var(--muted); font-size:12px; line-height:1.35; }  
-  .introBody{ padding:14px 16px 16px; color:rgba(255,255,255,0.86); font-size:13px; line-height:1.55; }  
-  .introBody b{color:var(--ink)}  
-  .introFoot{  
-    padding:0 16px 16px;  
-    display:flex;  
-    gap:10px;  
-    justify-content:flex-end;  
-    flex-wrap:wrap;  
-  }  
-  
-  @media (max-width: 980px){  
-    .main{ grid-template-columns:1fr; }  
-    .hanger{ height:340px; }  
-    .photoCard{ height:300px; }  
-  }  
-  .brand h1{  
-    font-size: 14px;  
-  }  
-  
-  .brand p{  
-    font-size: 11px;  
-  }  
-  
-  /* Make topbar vertical and clean */  
-  .topbar{  
-    flex-direction: column;  
-    align-items: flex-start;  
-    gap: 10px;  
-  }  
-  
-  .actions{  
-    width: 100%;  
-    display: grid;  
-    grid-template-columns: 1fr 1fr;  
-    gap: 8px;  
-  }  
-  
-  /* Make buttons smaller */  
-  .btn{  
-    font-size: 11px;  
-    padding: 8px 10px;  
-    border-radius: 12px;  
-  }  
-  
-  /* Make primary buttons not oversized */  
-  .btn.primary{  
-    padding: 8px 10px;  
-  }  
-  
-  /* Slightly reduce photo area height */  
-  .hanger{  
-    height: 280px;  
-  }  
-  
-  .photoCard{  
-    height: 240px;  
-  }  
-/* Mobile-only: topbar should scroll (no masking the clip) */  
-  .topbar{  
-    position: static;     /* remove sticky */  
-    top: auto;  
-  }  
-.main{  
-  max-width: 1200px;     /* contains whole layout */  
-  margin: 0 auto;        /* centers everything */  
-  width: 100%;  
-}  
-  
-/* Ensure right column doesn't stretch */  
-.main > div:last-child{  
-  display: flex;  
-  justify-content: center;  
-}  
-  
-/* Developed Sample card */  
-.main > div:last-child .card{  
-  max-width: 360px;  
-  width: 100%;  
-}  
-  .polaroid .cap{  
-  color: #111;        /* dark text */  
-}  
-  
-.polaroid .cap b{  
-  color: #000;        /* strong black for title */  
-}  
-#outroScene{  
-    --bg:#05070d;  
-    --ink:#dff3ff;  
-    --muted:rgba(215,243,255,.72);  
-    --line:rgba(255,255,255,.10);  
-    --cyan:#3fc8ff;  
-    --violet:#a786ff;  
-    --green:#4affc5;  
-  background: var(--bg);  
-  color: var(--ink);  
-}  
-  body{font-family:'Share Tech Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono";}  
-  *{box-sizing:border-box;}  
-  
-  .scene{  
-    position:relative;  
-    width:100%;  
-    height:100svh;  
-    display:flex;  
-    justify-content:center;  
-    align-items:center;  
-    padding: env(safe-area-inset-top) 10px env(safe-area-inset-bottom);  
-  }  
-  .outro-room{  
-    width:min(1100px, 96vw);  
-    height:min(650px, 92vh);  
-    position:relative;  
-    border:1px solid var(--line);  
-    border-radius:18px;  
-    background:  
-      radial-gradient(900px 520px at 25% 20%, rgba(63,200,255,.10), transparent 60%),  
-      radial-gradient(800px 520px at 85% 40%, rgba(167,134,255,.10), transparent 55%),  
-      linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));  
-    box-shadow: 0 30px 90px rgba(0,0,0,.65);  
-    overflow:hidden;  
-  }  
-  
-  .outro-topbar{  
-    position:absolute;  
-    top:18px; left:22px; right:22px;  
-    display:flex; justify-content:space-between; align-items:center; gap:14px;  
-    z-index:3;  
-  }  
-  .outro-topbar h1{  
-    margin:0;  
-    font-family:'Orbitron', system-ui;  
-    font-size:18px;  
-    letter-spacing:2px;  
-    text-transform:uppercase;  
-    color:rgba(180,240,255,.95);  
-    text-shadow: 0 0 18px rgba(63,200,255,.20);  
-  }  
-  .outro-topbar .sub{  
-    font-size:12px;  
-    color:rgba(215,243,255,.62);  
-    letter-spacing:1px;  
-    text-transform:uppercase;  
-  }  
-  
-  /* Lyra */  
-  .outro-lyraWrap{  
-    position:absolute;  
-    left:34px;  
-    bottom:88px;  
-    width:min(320px, 30vw);  
-    display:flex;  
-    flex-direction:column;  
-    gap:10px;  
-    z-index:2;  
-  }  
-  .outro-lyra{  
-    width:100%;  
-    border-radius:18px;  
-    border:1px solid rgba(255,255,255,.10);  
-    background: rgba(0,0,0,.25);  
-    box-shadow: 0 20px 60px rgba(0,0,0,.55);  
-    overflow:hidden;  
-  }  
-  .outro-lyra img{width:100%; display:block;}  
-  .outro-speech{  
-    padding:10px 12px;  
-    border:1px solid rgba(255,255,255,.10);  
-    border-radius:14px;  
-    background: rgba(0,0,0,.25);  
-    color:rgba(225,248,255,.86);  
-    font-size:12px;  
-    line-height:1.55;  
-  }  
-  .outro-speech b{color:rgba(240,255,255,.95);}  
-  
-  /* Desk */  
-  .outro-desk{  
-    position:absolute;  
-    right:34px;  
-    bottom:70px;  
-    width:min(700px, 62vw);  
-    height:320px;  
-    border-radius:18px;  
-    background: linear-gradient(180deg, rgba(10,18,34,.95), rgba(5,8,14,.92));  
-    border:1px solid rgba(255,255,255,.10);  
-    box-shadow:0 25px 70px rgba(0,0,0,0.60);  
-    overflow:hidden;  
-    z-index:1;  
-  }  
-  
-  /* Output machine */  
-  .outro-machine{  
-    position:absolute;  
-    left:40px;  
-    top:92px;  
-    width:220px;  
-    height:190px;  
-    border-radius:16px;  
-    background: linear-gradient(180deg, rgba(18,30,56,.95), rgba(10,16,28,.95));  
-    border:1px solid rgba(255,255,255,.10);  
-    box-shadow: 0 20px 55px rgba(0,0,0,.55);  
-  }  
-  .outro-machine .label{  
-    position:absolute;  
-    left:14px; top:12px;  
-    font-size:11px;  
-    letter-spacing:1px;  
-    text-transform:uppercase;  
-    color:rgba(215,243,255,.65);  
-  }  
-  .outro-outlet{  
-    position:absolute;  
-    left:50%;  
-    top:56%;  
-    transform:translate(-50%,-50%);  
-    width:54px;  
-    height:54px;  
-    border-radius:50%;  
-    border:2px solid rgba(63,200,255,.85);  
-    box-shadow:0 0 18px rgba(63,200,255,.35);  
-    background: radial-gradient(circle at 30% 30%, rgba(63,200,255,.25), rgba(0,0,0,.45));  
-  }  
-  .outro-outlet.active{  
-    box-shadow:0 0 30px rgba(63,200,255,.62);  
-    border-color: rgba(63,200,255,1);  
-  }  
-  .outro-tray{  
-    position:absolute;  
-    left:50%;  
-    bottom:14px;  
-    transform:translateX(-50%);  
-    width:160px;  
-    height:26px;  
-    border-radius:12px;  
-    border:1px solid rgba(255,255,255,.10);  
-    background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,.25));  
-    overflow:hidden;  
-  }  
-  .outro-tray::after{  
-    content:"";  
-    position:absolute; inset:0;  
-    background: radial-gradient(160px 26px at 50% 50%, rgba(63,200,255,.22), transparent 70%);  
-    opacity:0;  
-    transition: opacity .25s ease;  
-  }  
-  .outro-tray.active::after{ opacity:1; }  
-  
-  /* Cable to archive */  
-  .outro-cable{  
-    position:absolute;  
-    left:270px;  
-    top:172px;  
-    width:210px;  
-    height:8px;  
-    border-radius:99px;  
-    background: rgba(255,255,255,.06);  
-    border:1px solid rgba(255,255,255,.08);  
-    overflow:hidden;  
-  }  
-  .outro-cable::after{  
-    content:"";  
-    position:absolute; inset:-8px auto -8px -60px;  
-    width:110px;  
-    background: linear-gradient(90deg, transparent, rgba(167,134,255,.55), transparent);  
-    filter: blur(2px);  
-    opacity:0;  
-  }  
-  .outro-cable.active::after{  
-    opacity:1;  
-    animation: cable 0.85s ease-in-out infinite;  
-  }  
-  @keyframes cable{  
-    from{ transform: translateX(0); }  
-    to{ transform: translateX(320px); }  
-  }  
-  
-  /* Archive DB panel */  
-  .outro-db{  
-    position:absolute;  
-    right:40px;  
-    top:58px;  
-    width:360px;  
-    height:210px;  
-    border-radius:16px;  
-    border:1px solid rgba(255,255,255,.12);  
-    background: rgba(0,0,0,.40);  
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,.05);  
-    overflow:hidden;  
-  }  
-  .outro-dbHeader{  
-    display:flex;  
-    justify-content:space-between;  
-    align-items:center;  
-    padding:12px 14px;  
-    border-bottom:1px solid rgba(255,255,255,.08);  
-    background: linear-gradient(180deg, rgba(255,255,255,.05), transparent);  
-  }  
-  .outro-dbHeader .t{  
-    font-family:'Orbitron', system-ui;  
-    font-size:12px;  
-    letter-spacing:1.6px;  
-    text-transform:uppercase;  
-    color:rgba(220,248,255,.92);  
-  }  
-  .outro-badge{  
-    font-size:11px;  
-    letter-spacing:1px;  
-    text-transform:uppercase;  
-    color:rgba(215,243,255,.70);  
-    padding:5px 8px;  
-    border-radius:999px;  
-    border:1px solid rgba(255,255,255,.10);  
-    background: rgba(255,255,255,.04);  
-  }  
-  .outro-dbBody{  
-    position:relative;  
-    padding:12px 14px;  
-    height:calc(100% - 48px);  
-  }  
-  .outro-rack{  
-    position:absolute;  
-    left:14px;  
-    top:14px;  
-    bottom:14px;  
-    width:120px;  
-    border-radius:14px;  
-    border:1px solid rgba(255,255,255,.10);  
-    background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.22));  
-    overflow:hidden;  
-  }  
-  .outro-slot{  
-    height:18%;  
-    margin:10px 12px;  
-    border-radius:10px;  
-    border:1px solid rgba(255,255,255,.10);  
-    background: rgba(0,0,0,.25);  
-    position:relative;  
-    overflow:hidden;  
-  }  
-  .outro-slot::after{  
-    content:"";  
-    position:absolute; inset:-8px auto -8px -40px;  
-    width:70px;  
-    background: linear-gradient(90deg, transparent, rgba(167,134,255,.55), transparent);  
-    filter: blur(2px);  
-    opacity:0;  
-  }  
-  .outro-db.outro-sync .outro-slot::after{  
-    opacity:1;  
-    animation: slot 1.05s ease-in-out infinite;  
-  }  
-  @keyframes slot{  
-    from{ transform: translateX(0); }  
-    to{ transform: translateX(220px); }  
-  }  
-  
-  .outro-dbText{  
-    position:absolute;  
-    left:150px;  
-    right:14px;  
-    top:14px;  
-    bottom:14px;  
-    border-radius:14px;  
-    border:1px solid rgba(255,255,255,.10);  
-    background: rgba(0,0,0,.22);  
-    padding:10px 10px;  
-    font-size:12px;  
-    color:rgba(225,248,255,.82);  
-    overflow:hidden;  
-  }  
-  .outro-logLine{ opacity:.85; }  
-  .outro-logLine.dim{ opacity:.60; }  
-  
-  .outro-dbInlet{  
-    position:absolute;  
-    right:18px;  
-    bottom:18px;  
-    width:22px;  
-    height:22px;  
-    border-radius:50%;  
-    border:2px solid rgba(167,134,255,.85);  
-    box-shadow:0 0 16px rgba(167,134,255,.35);  
-    background: radial-gradient(circle at 30% 30%, rgba(167,134,255,.25), rgba(0,0,0,.45));  
-  }  
-  .outro-dbInlet.outro-active{  
-    box-shadow:0 0 24px rgba(167,134,255,.55);  
-    border-color: rgba(167,134,255,1);  
-  }  
-  
-  /* Preview of outgoing image */  
-  .outro-preview{  
-    position:absolute;  
-    right:40px;  
-    bottom:22px;  
-    width:260px;  
-    height:92px;  
-    border-radius:14px;  
-    border:1px solid rgba(255,255,255,.10);  
-    background: rgba(0,0,0,.22);  
-    display:flex;  
-    align-items:center;  
-    gap:10px;  
-    padding:10px;  
-    z-index:2;  
-  }  
-  .outro-thumb{  
-    width:72px; height:72px;  
-    border-radius:12px;  
-    border:1px solid rgba(255,255,255,.10);  
-    background: rgba(255,255,255,.04);  
-    overflow:hidden;  
-    display:flex; align-items:center; justify-content:center;  
-  }  
-  .outro-thumb img{width:100%;height:100%;object-fit:cover;display:none;}  
-  .outro-thumb .outro-ph{  
-    font-size:10px;  
-    color:rgba(215,243,255,.55);  
-    text-transform:uppercase;  
-    letter-spacing:1px;  
-    text-align:center;  
-    padding:0 6px;  
-  }  
-  .outro-meta{  
-    flex:1;  
-    font-size:11px;  
-    color:rgba(215,243,255,.75);  
-    line-height:1.45;  
-  }  
-  .outro-meta b{color:rgba(240,255,255,.92);}  
-  
-  .outro-actions{  
-    display:flex;  
-    gap:10px;  
-    flex-wrap:wrap;  
-    margin-top:8px;  
-  }  
-  .outro-btn{  
-    cursor:pointer;  
-    user-select:none;  
-    font-family:'Orbitron', system-ui;  
-    font-size:11px;  
-    letter-spacing:1.4px;  
-    text-transform:uppercase;  
-    padding:10px 12px;  
-    border-radius:12px;  
-    border:1px solid rgba(255,255,255,.10);  
-    background: rgba(255,255,255,.04);  
-    color:rgba(220,248,255,.90);  
-    transition: transform .08s ease, border-color .2s ease, background .2s ease;  
-  }  
-  .outro-btn:hover{ border-color: rgba(167,134,255,.28); background: rgba(167,134,255,.07); }  
-  .outro-btn:active{ transform: translateY(1px); }  
-  .outro-btn.secondary:hover{ border-color: rgba(63,200,255,.28); background: rgba(63,200,255,.06); }  
-  
-  canvas{ position:absolute; inset:0; pointer-events:none; z-index:6; }  
-  
-    /* ===== MOBILE FIX ONLY ===== */  
-  @media (max-width: 720px){  
-    body{ overflow:hidden; }  
-    .scene{ align-items:stretch; padding: env(safe-area-inset-top) 8px env(safe-area-inset-bottom); }  
-  
-    .outro-room{  
-      width:94vw;  
-      height:92svh;  
-      border-radius:16px;  
-    }  
-  
-    .outro-topbar{ top:14px; left:16px; right:16px; }  
-    .outro-topbar h1{ font-size:16px; letter-spacing:1.5px; }  
-    .topbar .sub{ font-size:11px; }  
-  
-    .outro-lyraWrap{  
-      left:16px; right:16px;  
-      top:62px; bottom:auto;  
-      width:auto;  
-      flex-direction:row;  
-      align-items:flex-start;  
-      gap:10px;  
-      z-index:4;  
-    }  
-    .outro-lyra{ width:120px; border-radius:14px; }  
-    .outro-speech{  
-      flex:1;  
-      font-size:11px;  
-      padding:10px;  
-      max-height:142px;  
-      overflow:auto;  
-    }  
-  
-    .outro-desk{  
-      left:16px; right:16px;  
-      bottom:18px;  
-      width:auto;  
-      height: 520px;  
-      border-radius:16px;  
-      z-index:2;  
-    }  
-  
-    /* Move both devices higher */  
-    .outro-machine{  
-      left:50%;  
-      top:40px;  
-      width:220px;  
-      height:170px;  
-      transform:translateX(-50%);  
-    }  
-  
-    .outro-db{  
-      left:50%;  
-      right:auto;  
-      top:210px;  
-      width:320px;  
-      height:190px;  
-      transform:translateX(-50%);  
-      border-radius:14px;  
-    }  
-  
-    /* Vertical cable adjusted */  
-    .outro-cable{  
-      left:50%;  
-      top:175px;  
-      width:8px;  
-      height:36px;  
-      transform:translateX(-50%);  
-      border-radius:99px;  
-    }  
-  
-    .outro-preview{  
-      left:16px;  
-      right:16px;  
-      bottom:10px;  
-      width:auto;  
-      height:auto;  
-      padding:10px;  
-      border-radius:14px;  
-      background: rgba(0,0,0,.26);  
-      z-index:3;  
-    }  
-}  
-</style>  
-</head>  
-  
-<body>  
-<div class="room">  
-  
-  <div class="topbar">  
-    <div class="brand">  
-      <div class="badge">  
-  <img src="assets/elythera/logo_camera_black.png" style="width:100%; height:100%; object-fit:cover; border-radius:12px;">  
-      </div>  
-      <div>  
-        <h1>PhotoHouse</h1>  
-      </div>  
-    </div>  
-  
-    <div class="actions">  
-      <input id="tmpPhotoInput" type="file" accept="image/*" hidden>  
-  
-      <button class="btn" id="btnAddPhoto" type="button">Add Photo (temporary)</button>  
-      <button class="btn" id="btnSkip" type="button">Show all controls</button>  
-      <button class="btn" id="btnReset" type="button">Reset</button>  
-      <button class="btn primary" id="btnDevelop" type="button">Develop → Analyze</button>  
-    </div>  
-  </div>  
-  
-  <div class="main">  
-  
-    <!-- LEFT -->  
-    <div class="wall">  
-      <div class="ropeArea">  
-        <div class="lampGlow"></div>  
-        <div class="rope">  
-          <div class="clip"><i></i></div>  
-        </div>  
-      </div>  
-  
-      <div class="hanger">  
-        <div class="photoCard" id="photoCard">  
-          <div class="photoFrame">  
-            <canvas id="bigView"></canvas>  
-            </div>  
-            <div class="dragShield" id="dragShield" title="Drag to position algae inside the square crop"></div>  
-          </div>  
-        </div>  
-  
-        <div class="tray" id="tray">  
-          <div class="ripple" id="ripple"></div>  
-        </div>  
-      </div>  
-  
-      <div class="hintBar">  
-        <div class="pill"><span class="dot"></span> <span><b>Tip:</b> keep algae filling ~60–80% of the square.</span></div>  
-        <div class="pill">Model sample: <b>224×224</b></div>  
-      </div>  
- <div class="side">  
-      <div class="card" id="guideCard">  
-        <div class="cardHead">  
-  <div>  
-    <h2>Helper Steps</h2>  
-    <p id="helperSub">Follow the steps so you don’t miss anything.</p>  
-  </div>  
-  
-  <div style="display:flex; gap:8px; align-items:center;">  
-    <div id="stepIcon">🧑‍🔧</div>  
-    <div class="stepBadge" id="stepBadge">0</div>  
-  </div>  
-        </div>  
-  
-        <div class="stepBody">  
-          <div class="stepLine">  
-            <div class="avatar">  
-  <img src="assets/elythera/lyra_solene.png" style="width:100%; height:100%; object-fit:cover; border-radius:12px;">  
-            </div>  
-            <div class="stepText" id="stepText"></div>  
-          </div>  
-  
-          <div class="stepFooter">  
-            <button class="btn" id="btnPrev" type="button">Back</button>  
-            <button class="btn primary" id="btnNext" type="button">Next</button>  
-          </div>  
-  
-          <div style="margin-top:10px;color:var(--muted);font-size:12px;line-height:1.45" id="lockedHint">  
-            Some controls are locked until their step — press <b>Next</b>. (Or click <b>Show all controls</b>.)  
-          </div>  
-        </div>  
-      </div>  
-  
-      <div class="tableArea">  
-        <div class="desk">  
-          <div class="controls">  
-            <div class="control">  
-              <small>Lens (Step 1)</small>  
-              <label>Zoom <span class="val" id="vZoom">1.00×</span></label>  
-              <input type="range" id="zoom" min="1" max="4" value="1" step="0.01">  
-            </div>  
-            <div class="control">  
-              <small>Exposure Dial (Step 2)</small>  
-              <label>Brightness <span class="val" id="vBright">0</span></label>  
-              <input type="range" id="bright" min="-40" max="40" value="0" step="1">  
-            </div>  
-  
-            <div class="control">  
-              <small>Contrast Lever (Step 3)</small>  
-              <label>Contrast <span class="val" id="vContrast">1.00×</span></label>  
-              <input type="range" id="contrast" min="0.60" max="1.80" value="1.00" step="0.01">  
-            </div>  
-  
-            <div class="control">  
-              <small>Grain Cleaner (Step 4)</small>  
-              <label>Denoise <span class="val" id="vDenoise">0</span></label>  
-              <input type="range" id="denoise" min="0" max="6" value="0" step="1">  
-            </div>  
-  
-            <div class="control">  
-              <small>Focus Tuner (Step 5)</small>  
-              <label>Sharpen <span class="val" id="vSharpen">0</span></label>  
-              <input type="range" id="sharpen" min="0" max="6" value="0" step="1">  
-            </div>  
-  
-           <div class="control">  
-  <small>Rotate</small>  
-  <label>Rotate 90°</label>  
-  <button class="btn" id="btnRotate" type="button" style="width:100%">Rotate</button>  
-</div>  
-  
-<div class="control">  
-  <small>Position Control</small>  
-  
-  <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:6px; text-align:center;">  
-    <div></div>  
-    <button class="btn" id="moveUp">↑</button>  
-    <div></div>  
-  
-    <button class="btn" id="moveLeft">←</button>  
-    <div></div>  
-    <button class="btn" id="moveRight">→</button>  
-  
-    <div></div>  
-    <button class="btn" id="moveDown">↓</button>  
-    <div></div>  
-  </div>  
-</div>  
-            </div>  
-          </div>  
-        </div>  
-      </div>  
-    <div class="card">  
-        <div class="cardHead">  
-          <div>  
-            <h2>Developed Sample</h2>  
-            <p>Here is<b>your</b> developed image.</p>  
-            <button class="btn primary" id="btnFinished" style="margin-top:10px; width:100%;">  
-  Finish  
-</button>  
-          </div>  
-        </div>  
-        <div class="polaroid">  
-          <div class="frame">  
-            <canvas id="sample224" width="224" height="224"></canvas>  
-          </div>  
-          <div class="cap">  
-            <b>Model Input (224×224)</b><br/>  
-            Keep algae centered and clear.  
-          </div>  
-        </div>  
-      </div>  
-    </div>  
-  
-  </div>  
-</div>  
-      
-  
-    <!-- RIGHT -->  
-     
-        
-  
-<!-- Intro overlay -->  
-<div class="intro" id="intro">  
-  <div class="introCard">  
-    <div class="introTop">  
-      <div class="avatar">  
-  <img src="assets/elythera/lyra_solene.png" style="width:100%; height:100%; object-fit:cover; border-radius:12px;">  
-      </div>  
-      <div>  
-        <h3 id="introTitle">Hi! I’m Lyra solene.</h3>  
-        <p id="introSub">I run this PhotoHouse workroom and I’ll help you enhance the algae photo.</p>  
-      </div>  
-    </div>  
-    <div class="introBody" id="introBody">  
-      We’ll do this in <b>small steps</b> so you don’t miss anything:  
-      <br>• Step 1: Crop & zoom (no squashing)  
-      <br>• Step 2: Brightness  
-      <br>• Step 3: Contrast  
-      <br>• Step 4: Clean noise  
-      <br>• Step 5: Mild sharpen  
-      <br><br>On the right, you’ll see a <b>224×224 preview</b> — that is what the model will see.  
-    </div>  
-    <div class="introFoot">  
-      <button class="btn" id="introSkip" type="button">Skip guide</button>  
-      <button class="btn primary" id="introStart" type="button">Start</button>  
-    </div>  
-  </div>  
-</div>  
-  
-<!-- Fly overlay -->  
-<div class="flyOverlay" id="flyOverlay">  
-  <div class="flyCard" id="flyCard">  
-    <div class="inner">  
-      <canvas id="flyCanvas" width="224" height="224"></canvas>  
-    </div>  
-    <div class="label">Sending developed sample to analysis…</div>  
-  </div>  
-</div>  
-  
-<script>  
-  document.addEventListener("DOMContentLoaded", () => {  
-/* =========================  
-   SETTINGS YOU CAN CHANGE LATER  
-========================= */  
-const HELPER_NAME = "Lyra Solene";                  // ✅ change later anytime  
-const WORKROOM_NAME = "Lyra solene's workroom"; // change later anytime  
-const PAGE5_URL = "page4.html";           // testing loop (change later)  
-const KEY_INPUT = "pond2_upload_image";   // set in Page 3  
-const KEY_OUTPUT = "pond2_enhanced_224";  // read in Page 5  
-  
-const subtitleEl = document.getElementById("subtitle");  
-if (subtitleEl) {  
-  subtitleEl.textContent =  
-    `${WORKROOM_NAME} • developing algae photos collected from Earth`;  
-}  
-document.getElementById("introTitle").textContent = `Hi! I’m ${HELPER_NAME}.`;  
-document.getElementById("introSub").textContent = `I will help you enhance your algae photo step-by-step.`;  
-  
-/* =========================  
-   STATE  
-========================= */  
-const bigCanvas = document.getElementById("bigView");  
-const bigCtx = bigCanvas.getContext("2d", { willReadFrequently: false });  
-  
-const sampleCanvas = document.getElementById("sample224");  
-const sampleCtx = sampleCanvas.getContext("2d", { willReadFrequently: true });  
-  
-const flyCanvas = document.getElementById("flyCanvas");  
-const flyCtx = flyCanvas.getContext("2d", { willReadFrequently: true });  
-  
-const photoCard = document.getElementById("photoCard");  
-  
-const tray = document.getElementById("tray");  
-const ripple = document.getElementById("ripple");  
-  
-const sliders = {  
-  zoom: document.getElementById("zoom"),  
-  bright: document.getElementById("bright"),  
-  contrast: document.getElementById("contrast"),  
-  denoise: document.getElementById("denoise"),  
-  sharpen: document.getElementById("sharpen"),  
-};  
-  
-const vals = {  
-  zoom: document.getElementById("vZoom"),  
-  bright: document.getElementById("vBright"),  
-  contrast: document.getElementById("vContrast"),  
-  denoise: document.getElementById("vDenoise"),  
-  sharpen: document.getElementById("vSharpen"),  
-};  
-  
-let img = new Image();  
-img.crossOrigin = "anonymous";  
-let imgReady = false;  
-  
-// crop controls  
-let panX = 0;  
-let panY = 0;  
-  let isDragging = false;  
-let lastX = 0;  
-let lastY = 0;  
-  
-// rotation  
-let rotation = 0;  
-  
-// guide steps  
-let guideEnabled = true;  
-let step = 0;  
-const steps = [  
-  { id:0, icon:"🧑‍🔧", title:`${HELPER_NAME} says:`, text:`Welcome to my photohouse. First, add a photo. (If Pond 2 upload isn’t ready, use <b>Add Photo (temporary)</b>.)`, enable:[] },  
-  { id:1, icon:"🔎", title:"Step 1 — Crop & zoom", text:"Use the arrow buttons to perfectly fit the algae in the center. Zoom until algae fills <b>60–80%</b> of the box.", enable:["zoom"] },  
-  { id:2, icon:"🔆", title:"Step 2 — Brightness", text:"If the image is dark, increase brightness a little. Stop before whites look washed out.", enable:["bright"] },  
-  { id:3, icon:"🎚️", title:"Step 3 — Contrast", text:"Add contrast so structures pop. Keep details natural.", enable:["contrast"] },  
-  { id:4, icon:"🧼", title:"Step 4 — Clean noise", text:"Use mild denoise if the background is noisy. Too much can blur cell edges.", enable:["denoise"] },  
-  { id:5, icon:"✨", title:"Step 5 — Focus", text:"Tiny sharpen can help. Too much creates fake edges—keep it mild.", enable:["sharpen"] },  
-  { id:6, icon:"🚀", title:"Final — Send to model", text:"Looks good. Press <b>Develop → Analyze</b> to send the 224×224 sample to the model page.", enable:[] },  
-];  
-  
-function setStep(newStep){  
-  step = Math.max(0, Math.min(steps.length-1, newStep));  
-  const s = steps[step];  
-  document.getElementById("stepBadge").textContent = s.id;  
-  document.getElementById("stepIcon").textContent = s.icon;  
-  document.getElementById("stepText").innerHTML = `<b>${s.title}</b><br>${s.text}`;  
-  
-  const enabled = new Set(s.enable);  
-  for (const [k, el] of Object.entries(sliders)){  
-    if (!guideEnabled){  
-      el.disabled = false;  
-      el.closest(".control").style.opacity = 1;  
-      continue;  
-    }  
-    const canUse = enabled.has(k) || step === 6 || step === 0;  
-    el.disabled = !canUse;  
-    el.closest(".control").style.opacity = canUse ? 1 : 0.45;  
-  }  
-}  
-  
-function enableAllControls(){  
-  for (const el of Object.values(sliders)){  
-    el.disabled = false;  
-    el.closest(".control").style.opacity = 1;  
-  }  
-}  
-  
-function updateValueLabels(){  
-  vals.zoom.textContent = `${Number(sliders.zoom.value).toFixed(2)}×`;  
-  vals.bright.textContent = `${Number(sliders.bright.value)}`;  
-  vals.contrast.textContent = `${Number(sliders.contrast.value).toFixed(2)}×`;  
-  vals.denoise.textContent = `${Number(sliders.denoise.value)}`;  
-  vals.sharpen.textContent = `${Number(sliders.sharpen.value)}`;  
-}  
-  
-/* Canvas sizing */  
-function sizeBigCanvas(){  
-  const frame = bigCanvas.parentElement.getBoundingClientRect();  
-  const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));  
-  bigCanvas.width = Math.floor(frame.width * dpr);  
-  bigCanvas.height = Math.floor(frame.height * dpr);  
-  bigCanvas.style.width = frame.width + "px";  
-  bigCanvas.style.height = frame.height + "px";  
-  bigCtx.setTransform(dpr,0,0,dpr,0,0);  
-  renderAll();  
-}  
-window.addEventListener("resize", sizeBigCanvas);  
-  
-/* Image helpers */  
-function getRotatedCanvas(){  
-  const c = document.createElement("canvas");  
-  const ctx = c.getContext("2d");  
-  const w = img.naturalWidth;  
-  const h = img.naturalHeight;  
-  const rot = ((rotation % 360) + 360) % 360;  
-  if (rot === 0 || rot === 180){ c.width = w; c.height = h; }  
-  else { c.width = h; c.height = w; }  
-  
-  ctx.save();  
-  ctx.translate(c.width/2, c.height/2);  
-  ctx.rotate(rot * Math.PI/180);  
-  ctx.drawImage(img, -w/2, -h/2);  
-  ctx.restore();  
-  return c;  
-}  
-  
-function applyBC(imageData, brightness, contrast){  
-  const data = imageData.data;  
-  const b = brightness * 2.55;  
-  const c = contrast;  
-  for (let i=0; i<data.length; i+=4){  
-    let r = data[i], g = data[i+1], bl = data[i+2];  
-    r = (r - 128) * c + 128 + b;  
-    g = (g - 128) * c + 128 + b;  
-    bl = (bl - 128) * c + 128 + b;  
-    data[i]   = Math.max(0, Math.min(255, r));  
-    data[i+1] = Math.max(0, Math.min(255, g));  
-    data[i+2] = Math.max(0, Math.min(255, bl));  
-  }  
-  return imageData;  
-}  
-  
-function denoiseBoxBlur(srcCtx, w, h, strength){  
-  if (strength <= 0) return;  
-  const passes = Math.min(2, Math.ceil(strength / 3));  
-  const radius = strength <= 2 ? 1 : strength <= 4 ? 2 : 3;  
-  
-  for (let p=0; p<passes; p++){  
-    const id = srcCtx.getImageData(0,0,w,h);  
-    const out = srcCtx.createImageData(w,h);  
-    const d = id.data, o = out.data;  
-  
-    const rs = radius;  
-    const area = (2*rs+1)*(2*rs+1);  
-  
-    for (let y=0; y<h; y++){  
-      for (let x=0; x<w; x++){  
-        let r=0,g=0,b=0,a=0;  
-        for (let yy=y-rs; yy<=y+rs; yy++){  
-          const cy = Math.max(0, Math.min(h-1, yy));  
-          for (let xx=x-rs; xx<=x+rs; xx++){  
-            const cx = Math.max(0, Math.min(w-1, xx));  
-            const idx = (cy*w + cx)*4;  
-            r += d[idx]; g += d[idx+1]; b += d[idx+2]; a += d[idx+3];  
-          }  
-        }  
-        const oi = (y*w + x)*4;  
-        o[oi]   = r/area;  
-        o[oi+1] = g/area;  
-        o[oi+2] = b/area;  
-        o[oi+3] = a/area;  
-      }  
-    }  
-    srcCtx.putImageData(out,0,0);  
-  }  
-}  
-  
-function sharpenUnsharp(srcCtx, w, h, strength){  
-  if (strength <= 0) return;  
-  const s = Math.min(6, strength);  
-  const amount = 0.10 + s*0.07;  
-  
-  const temp = document.createElement("canvas");  
-  temp.width=w; temp.height=h;  
-  const tctx = temp.getContext("2d");  
-  tctx.drawImage(srcCtx.canvas,0,0);  
-  denoiseBoxBlur(tctx, w, h, 2);  
-  
-  const orig = srcCtx.getImageData(0,0,w,h);  
-  const blur = tctx.getImageData(0,0,w,h);  
-  const o = orig.data, b = blur.data;  
-  
-  for (let i=0; i<o.length; i+=4){  
-    o[i]   = Math.max(0, Math.min(255, o[i]   + amount*(o[i]   - b[i])));  
-    o[i+1] = Math.max(0, Math.min(255, o[i+1] + amount*(o[i+1] - b[i+1])));  
-    o[i+2] = Math.max(0, Math.min(255, o[i+2] + amount*(o[i+2] - b[i+2])));  
-  }  
-  srcCtx.putImageData(orig,0,0);  
-}  
-  
-/* Rendering */  
-function renderAll(){  
-  if (!imgReady) return;  
-  updateValueLabels();  
-  
-  const frame = bigCanvas.getBoundingClientRect();  
-  const fw = frame.width, fh = frame.height;  
-  bigCtx.clearRect(0,0,fw,fh);  
-  
-  const grd = bigCtx.createRadialGradient(fw*0.5, fh*0.45, 10, fw*0.5, fh*0.5, Math.max(fw,fh)*0.7);  
-  grd.addColorStop(0, "rgba(255,255,255,0.06)");  
-  grd.addColorStop(1, "rgba(0,0,0,0.35)");  
-  bigCtx.fillStyle = grd;  
-  bigCtx.fillRect(0,0,fw,fh);  
-  
-  const rotC = getRotatedCanvas();  
-  const iw = rotC.width, ih = rotC.height;  
-  
-  const scaleFit = Math.max(fw/iw, fh/ih);  
-  const drawW = iw * scaleFit;  
-  const drawH = ih * scaleFit;  
-  const x0 = (fw - drawW)/2;  
-  const y0 = (fh - drawH)/2;  
-panX = Math.max(-0.5, Math.min(0.5, panX));  
-panY = Math.max(-0.5, Math.min(0.5, panY));  
-  renderAll._map = { x0, y0, drawW, drawH, iw, ih };  
-  bigCtx.drawImage(rotC, x0, y0, drawW, drawH);  
-  
-  bigCtx.fillStyle = "rgba(255,255,255,0.04)";  
-  bigCtx.fillRect(0,0,fw,fh);  
-  
-  renderSample224();  
-}  
-  
-function renderSample224(){  
-  if (!imgReady || !renderAll._map) return;  
-  
-  const { x0, y0, drawW, drawH, iw, ih } = renderAll._map;  
-  const zoom = Number(sliders.zoom.value);  
-  
-  const frame = bigCanvas.getBoundingClientRect();  
-  const fw = frame.width, fh = frame.height;  
-  
-  const cropSize = Math.min(fw*0.70, 320);  
-  const panPxX = panX * drawW;  
-  const panPxY = panY * drawH;  
-  
-  const sampleW = cropSize / zoom;  
-  const sampleH = cropSize / zoom;  
-  
-  const centerOnFitX = x0 + drawW/2 + panPxX;  
-  const centerOnFitY = y0 + drawH/2 + panPxY;  
-  
-  const fitSampleX = centerOnFitX - sampleW/2;  
-  const fitSampleY = centerOnFitY - sampleH/2;  
-  
-  const sx = (fitSampleX - x0) / drawW * iw;  
-  const sy = (fitSampleY - y0) / drawH * ih;  
-  const sw = (sampleW / drawW) * iw;  
-  const sh = (sampleH / drawH) * ih;  
-  
-  const csx = sx;  
-  const csy = sy;  
-  
-  const off = document.createElement("canvas");  
-  off.width = 224; off.height = 224;  
-  const octx = off.getContext("2d", { willReadFrequently:true });  
-  
-  const rotC = getRotatedCanvas();  
-  octx.drawImage(rotC, csx, csy, sw, sh, 0, 0, 224, 224);  
-  
-  let id = octx.getImageData(0,0,224,224);  
-  id = applyBC(id, Number(sliders.bright.value), Number(sliders.contrast.value));  
-  octx.putImageData(id,0,0);  
-  
-  denoiseBoxBlur(octx, 224, 224, Number(sliders.denoise.value));  
-  sharpenUnsharp(octx, 224, 224, Number(sliders.sharpen.value));  
-  
-  sampleCtx.clearRect(0,0,224,224);  
-  sampleCtx.drawImage(off,0,0);  
-  
-  flyCtx.clearRect(0,0,224,224);  
-  flyCtx.drawImage(off,0,0);  
-}  
-  
-/* Drag */  
-  
-/* Slider events */  
-    /* Arrow movement */  
-const MOVE_STEP = 0.01;  
-  
-function moveImage(dx, dy){  
-  panX += dx;  
-  panY += dy;  
-  renderAll();  
-}  
-  
-document.getElementById("moveUp").addEventListener("click", () => {  
-  moveImage(0, -MOVE_STEP);  
-});  
-  
-document.getElementById("moveDown").addEventListener("click", () => {  
-  moveImage(0, MOVE_STEP);  
-});  
-  
-document.getElementById("moveLeft").addEventListener("click", () => {  
-  moveImage(-MOVE_STEP, 0);  
-});  
-  
-document.getElementById("moveRight").addEventListener("click", () => {  
-  moveImage(MOVE_STEP, 0);  
-});  
-    function holdMove(buttonId, dx, dy){  
-  let interval;  
-  
-  const start = () => {  
-    moveImage(dx, dy);  
-    interval = setInterval(() => moveImage(dx, dy), 100);  
-  };  
-  
-  const stop = () => clearInterval(interval);  
-  
-  const btn = document.getElementById(buttonId);  
-  
-  btn.addEventListener("pointerdown", start);  
-  btn.addEventListener("pointerup", stop);  
-  btn.addEventListener("pointerleave", stop);  
-}  
-  
-holdMove("moveUp", 0, -MOVE_STEP);  
-holdMove("moveDown", 0, MOVE_STEP);  
-holdMove("moveLeft", -MOVE_STEP, 0);  
-holdMove("moveRight", MOVE_STEP, 0);  
-for (const el of Object.values(sliders)){  
-  el.addEventListener("input", renderAll);  
-}  
-  
-/* Buttons */  
-document.getElementById("btnRotate").addEventListener("click", ()=>{  
-  rotation = (rotation + 90) % 360;  
-  renderAll();  
-});  
-  
-document.getElementById("btnReset").addEventListener("click", ()=>{  
-  sliders.zoom.value = 1;  
-  sliders.bright.value = 0;  
-  sliders.contrast.value = 1.0;  
-  sliders.denoise.value = 0;  
-  sliders.sharpen.value = 0;  
-  panX = 0; panY = 0;  
-  rotation = 0;  
-  renderAll();  
-});  
-  
-document.getElementById("btnSkip").addEventListener("click", ()=>{  
-  guideEnabled = !guideEnabled;  
-  if (!guideEnabled){  
-    document.getElementById("btnSkip").textContent = "Guide mode";  
-    document.getElementById("lockedHint").innerHTML = "All controls unlocked. You can edit freely.";  
-    enableAllControls();  
-  } else {  
-    document.getElementById("btnSkip").textContent = "Show all controls";  
-    document.getElementById("lockedHint").innerHTML = "Some controls are locked until their step — press <b>Next</b>. (Or click <b>Show all controls</b>.)";  
-    setStep(step);  
-  }  
-});  
-   document.getElementById("btnFinished").addEventListener("click", () => {  
-  
-  const room = document.querySelector(".room");  
-  const outro = document.getElementById("outroScene");  
-  
-  // fade out main page  
-  room.style.transition = "opacity 0.4s ease";  
-  room.style.opacity = "0";  
-  
-  setTimeout(() => {  
-    room.style.display = "none";      // hide main UI  
-    outro.style.display = "block";    // show animation  
-  }, 400);  
-  
-});  
-document.getElementById("btnPrev").addEventListener("click", ()=> setStep(step - 1));  
-document.getElementById("btnNext").addEventListener("click", ()=>{  
-  setStep(step + 1);  
-  if (step === 1 || step === 2) playDipAnimation();  
-});  
-  
-document.getElementById("btnDevelop").addEventListener("click", ()=>{  
-  if (!imgReady){  
-    alert("No image loaded yet. Use Add Photo (temporary) or upload from Pond 2 later.");  
-    return;  
-  }  
-  const dataUrl = sampleCanvas.toDataURL("image/png");  
-  localStorage.setItem(KEY_OUTPUT, dataUrl);  
-  playFlyToAnalysis(() => window.location.href = PAGE5_URL);  
-});  
-  
-/* Animations */  
-function playDipAnimation(){  
-  tray.style.opacity = "1";  
-  ripple.style.opacity = "1";  
-  ripple.style.transition = "none";  
-  ripple.style.transform = "translateY(40px)";  
-  
-  photoCard.style.transition = "transform .55s ease";  
-  photoCard.style.transform = "translateY(42px) rotate(-1deg)";  
-  
-  requestAnimationFrame(()=>{  
-    ripple.style.transition = "transform .9s ease, opacity .9s ease";  
-    ripple.style.transform = "translateY(0px)";  
-    ripple.style.opacity = "0.9";  
-  });  
-  
-  setTimeout(()=>{  
-    photoCard.style.transform = "translateY(0px) rotate(0.5deg)";  
-    setTimeout(()=>{  
-      photoCard.style.transition = "";  
-      photoCard.style.transform = "";  
-      tray.style.opacity = "0";  
-      ripple.style.opacity = "0";  
-    }, 520);  
-  }, 520);  
-}  
-  
-function playFlyToAnalysis(done){  
-  const overlay = document.getElementById("flyOverlay");  
-  const flyCard = document.getElementById("flyCard");  
-  
-  const sampleRect = sampleCanvas.getBoundingClientRect();  
-  const startX = sampleRect.left + sampleRect.width/2;  
-  const startY = sampleRect.top + sampleRect.height/2;  
-  
-  overlay.classList.add("show");  
-  flyCard.style.left = startX + "px";  
-  flyCard.style.top  = startY + "px";  
-  
-  const endX = window.innerWidth/2;  
-  const endY = window.innerHeight/2;  
-  
-  flyCard.animate([  
-    { transform:"translate(-50%,-50%) scale(0.90) rotate(-4deg)", filter:"blur(0px)", opacity:1 },  
-    { transform:"translate(-50%,-50%) scale(1.08) rotate(2deg)",  filter:"blur(0px)", opacity:1, offset:0.7 },  
-    { transform:"translate(-50%,-50%) scale(1.35) rotate(0deg)",  filter:"blur(1.5px)", opacity:0.0 }  
-  ], { duration: 920, easing:"cubic-bezier(.2,.8,.2,1)", fill:"forwards" });  
-  
-  flyCard.animate([  
-    { left: startX+"px", top: startY+"px" },  
-    { left: endX+"px",   top: endY+"px" }  
-  ], { duration: 920, easing:"cubic-bezier(.2,.8,.2,1)", fill:"forwards" });  
-  
-  const flash = document.createElement("div");  
-  flash.style.position="fixed";  
-  flash.style.inset="0";  
-  flash.style.background="radial-gradient(circle at 50% 45%, rgba(95,194,167,0.30), rgba(255,255,255,0.10), transparent 60%)";  
-  flash.style.opacity="0";  
-  flash.style.pointerEvents="none";  
-  flash.style.zIndex="999999";  
-  document.body.appendChild(flash);  
-  
-  flash.animate([{opacity:0},{opacity:1,offset:0.35},{opacity:0}], { duration: 920, easing:"ease-out", fill:"forwards" });  
-  
-  setTimeout(()=>{  
-    overlay.classList.remove("show");  
-    flash.remove();  
-    done && done();  
-  }, 930);  
-}  
-  
-/* Storage loader */  
-function loadFromStorage(){  
-  const dataUrl = localStorage.getItem(KEY_INPUT);  
-  if (!dataUrl){  
-    imgReady = false;  
-    return;  
-  }  
-  img.onload = () => {  
-    imgReady = true;  
-    sizeBigCanvas();  
-    renderAll();  
-  };  
-  img.src = dataUrl;  
-}  
-  
-/* TEMP uploader */  
-const tmpPhotoInput = document.getElementById("tmpPhotoInput");  
-document.getElementById("btnAddPhoto").addEventListener("click", () => {  
-  tmpPhotoInput.value = "";  
-  tmpPhotoInput.click();  
-});  
-tmpPhotoInput.addEventListener("change", (e) => {  
-  const file = e.target.files?.[0];  
-  if (!file) return;  
-  if (file.size > 10 * 1024 * 1024){  
-    alert("Image too large. Please choose under 10MB.");  
-    return;  
-  }  
-  const r = new FileReader();  
-  r.onload = () => {  
-    localStorage.setItem(KEY_INPUT, r.result);  
-    imgReady = false;  
-    img.onload = () => {  
-      imgReady = true;  
-      sliders.zoom.value = 1;  
-      sliders.bright.value = 0;  
-      sliders.contrast.value = 1.0;  
-      sliders.denoise.value = 0;  
-      sliders.sharpen.value = 0;  
-      panX = 0; panY = 0;  
-      rotation = 0;  
-      sizeBigCanvas();  
-      renderAll();  
-      setStep(1);  
-    };  
-    img.src = r.result;  
-  };  
-  r.readAsDataURL(file);  
-});  
-  
-/* Intro modal */  
-const intro = document.getElementById("intro");  
-document.getElementById("introStart").addEventListener("click", () => {  
-  intro.classList.remove("show");  
-  guideEnabled = true;  
-  document.getElementById("btnSkip").textContent = "Show all controls";  
-  setStep(1);  
-});  
-document.getElementById("introSkip").addEventListener("click", () => {  
-  intro.classList.remove("show");  
-  guideEnabled = false;  
-  document.getElementById("btnSkip").textContent = "Guide mode";  
-  enableAllControls();  
-  setStep(1);  
-});  
-  
-/* init */  
-loadFromStorage();  
-sizeBigCanvas();  
-intro.classList.add("show");  
-setStep(0);  
-});      
-</script>  
- <div id="outroScene" style="display:none;">  
-  <div class="scene">  
-    <div class="outro-room">  
-    <div class="outro-topbar">  
-      <h1>Output Channel</h1>  
-      <div class="sub" id="sub">status: waiting for enhanced image</div>  
-    </div>  
-  
-    <div class="outro-lyraWrap">  
-      <div class="outro-lyra">  
-        <img src="assets/images/lyra_black.png" alt="Lyra Solene" />  
-      </div>  
-      <div class="outro-speech">  
-        <b>Lyra:</b> Ready to publish your enhanced image to the <b>Kerala Algal Archive</b>.  
-        When you press <b>Send</b>, the output port will release it as pixels and sync to the Algal Archive.  
-      </div>  
-    </div>  
-  
-    <div class="outro-desk">  
-      <div class="outro-machine">  
-        <div class="label">OUTPUT PORT</div>  
-        <div class="outro-outlet" id="outlet"></div>  
-        <div class="outro-tray" id="outro-tray"></div>  
-      </div>  
-  
-      <div class="outro-cable" id="cable"></div>  
-  
-      <div class="outro-db" id="db">  
-        <div class="outro-dbHeader">  
-          <div class="t">Algal Archive</div>  
-          <div class="outro-badge" id="badge">idle</div>  
-        </div>  
-        <div class="outro-dbBody">  
-          <div class="outro-rack">  
-            <div class="outro-slot"></div>  
-            <div class="outro-slot"></div>  
-            <div class="outro-slot"></div>  
-            <div class="outro-slot"></div>  
-          </div>  
-          <div class="outro-dbText" id="dbText">  
-            <div class="outro-logLine dim">• Awaiting output stream...</div>  
-            <div class="outro-logLine dim">• Destination: Page 5 Archive Scan</div>  
-            <div class="outro-logLine dim">• Gate: Similarity + Threshold</div>  
-            <div class="outro-logLine dim">• Status: idle</div>  
-          </div>  
-          <div class="outro-dbInlet" id="dbInlet" title="archive inlet"></div>  
-        </div>  
-      </div>  
-  
-      <div class="outro-preview">  
-        <div class="outro-thumb">  
-          <img id="outro-thumbImg" alt="enhanced" />  
-          <div class="outro-ph" id="thumbPh">No image found</div>  
-        </div>  
-        <div class="outro-meta">  
-          <b>Enhanced Output</b><br/>  
-          Loaded from editor memory.<br/>  
-          <div class="outro-actions">  
-            <button class="outro-btn" id="outro-sendBtn" type="button">Send to Archive</button>  
-                      </div>  
-        </div>  
-      </div>  
-    </div>  
-  
-    <canvas id="fx"></canvas>  
-  </div>  
-</div>  
-  </div>  
-</body>  
-</html>  
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>PhotoHouse Intro • Simple</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#05070d;
+    --ink:#dff3ff;
+    --muted:rgba(215,243,255,.72);
+    --line:rgba(255,255,255,.10);
+    --cyan:#3fc8ff;
+    --green:#4affc5;
+  }
+
+  html,body{height:100%; margin:0; background:var(--bg); color:var(--ink); overflow:hidden;}
+  body{font-family:'Share Tech Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono";}
+  *{box-sizing:border-box;}
+
+  .scene{
+    position:relative;
+    width:100%;
+    height:100svh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding: env(safe-area-inset-top) 10px env(safe-area-inset-bottom);
+  }
+
+  .room{
+    width:min(1100px, 96vw);
+    height:min(650px, 92vh);
+    position:relative;
+    border:1px solid var(--line);
+    border-radius:18px;
+    background:
+      radial-gradient(900px 520px at 25% 20%, rgba(63,200,255,.10), transparent 60%),
+      radial-gradient(800px 520px at 85% 40%, rgba(74,255,197,.08), transparent 55%),
+      linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+    box-shadow: 0 30px 90px rgba(0,0,0,.65);
+    overflow:hidden;
+  }
+
+  .welcome{
+    position:absolute;
+    top:18px; left:22px; right:22px;
+    display:flex; justify-content:space-between; align-items:center; gap:14px;
+    z-index:3;
+  }
+  .welcome h1{
+    margin:0;
+    font-family:'Orbitron', system-ui;
+    font-size:18px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:rgba(180,240,255,.95);
+    text-shadow: 0 0 18px rgba(63,200,255,.20);
+  }
+  .welcome .sub{
+    font-size:12px;
+    color:rgba(215,243,255,.62);
+    letter-spacing:1px;
+    text-transform:uppercase;
+  }
+
+  /* Lyra block */
+  .lyraWrap{
+    position:absolute;
+    left:34px;
+    bottom:88px;
+    width:min(310px, 32vw);
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    z-index:2;
+  }
+  .lyra{
+    width:100%;
+    border-radius:18px;
+    border:1px solid rgba(255,255,255,.10);
+    background: rgba(0,0,0,.25);
+    box-shadow: 0 20px 60px rgba(0,0,0,.55);
+    overflow:hidden;
+  }
+  .lyra img{width:100%; display:block;}
+  .speech{
+    padding:10px 12px;
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:14px;
+    background: rgba(0,0,0,.25);
+    color:rgba(225,248,255,.86);
+    font-size:12px;
+    line-height:1.55;
+  }
+  .speech b{color:rgba(240,255,255,.95);}
+
+  /* Desk */
+  .desk{
+    position:absolute;
+    right:34px;
+    bottom:70px;
+    width:min(620px, 58vw);
+    height:300px;
+    border-radius:18px;
+    background: linear-gradient(180deg, rgba(10,18,34,.95), rgba(5,8,14,.92));
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow:0 25px 70px rgba(0,0,0,0.60);
+    overflow:hidden;
+    z-index:1;
+  }
+
+  /* Cable */
+  .cable{
+    position:absolute;
+    left:255px;
+    top:145px;
+    width:180px;
+    height:8px;
+    border-radius:99px;
+    background: rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.08);
+    overflow:hidden;
+  }
+  .cable::after{
+    content:"";
+    position:absolute; inset:-8px auto -8px -40px;
+    width:80px;
+    background: linear-gradient(90deg, transparent, rgba(63,200,255,.55), transparent);
+    filter: blur(2px);
+    opacity:.0;
+  }
+  .cable.active::after{
+    opacity:1;
+    animation: cable 0.9s ease-in-out infinite;
+  }
+  @keyframes cable{
+    from{ transform: translateX(0); }
+    to{ transform: translateX(240px); }
+  }
+
+  /* Machine */
+  .machine{
+    position:absolute;
+    left:40px;
+    top:92px;
+    width:190px;
+    height:150px;
+    border-radius:16px;
+    background: linear-gradient(180deg, rgba(18,30,56,.95), rgba(10,16,28,.95));
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow: 0 20px 55px rgba(0,0,0,.55);
+  }
+  .machine .label{
+    position:absolute;
+    left:14px; top:12px;
+    font-size:11px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    color:rgba(215,243,255,.65);
+  }
+  .inlet{
+    position:absolute;
+    left:50%;
+    top:55%;
+    transform:translate(-50%,-50%);
+    width:50px;
+    height:50px;
+    border-radius:50%;
+    border:2px solid rgba(74,255,197,.85);
+    box-shadow:0 0 18px rgba(74,255,197,.35);
+    background: radial-gradient(circle at 30% 30%, rgba(74,255,197,.25), rgba(0,0,0,.45));
+  }
+  .inlet.active{
+    box-shadow:0 0 28px rgba(74,255,197,.55);
+    border-color: rgba(74,255,197,1);
+  }
+
+  /* Monitor */
+  .monitor{
+    position:absolute;
+    right:40px;
+    top:70px;
+    width:260px;
+    height:170px;
+    border-radius:14px;
+    background: rgba(0,0,0,.85);
+    border:1px solid rgba(255,255,255,.12);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.05);
+    overflow:hidden;
+  }
+  .monitor::before{
+    content:"";
+    position:absolute; inset:0;
+    background: radial-gradient(500px 220px at 40% 20%, rgba(63,200,255,.18), transparent 60%);
+    opacity:0;
+    transition: opacity .25s ease;
+  }
+  .monitor .boot{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column;
+    justify-content:center; align-items:center;
+    gap:10px;
+    opacity:0;
+    transform: translateY(6px);
+    transition: opacity .25s ease, transform .25s ease;
+  }
+  .monitor .boot .t{
+    font-family:'Orbitron', system-ui;
+    letter-spacing:1.6px;
+    font-size:12px;
+    text-transform:uppercase;
+    color:rgba(220,248,255,.92);
+    text-align:center;
+    padding:0 10px;
+  }
+  .bar{
+    width:70%;
+    height:10px;
+    border-radius:99px;
+    border:1px solid rgba(255,255,255,.10);
+    overflow:hidden;
+    background: rgba(255,255,255,.04);
+  }
+  .bar i{
+    display:block; height:100%;
+    width:0%;
+    background: linear-gradient(90deg, transparent, rgba(63,200,255,.95), transparent);
+    filter: drop-shadow(0 0 10px rgba(63,200,255,.35));
+  }
+
+  .monitor.on{
+    box-shadow: 0 0 30px rgba(63,200,255,.35), inset 0 0 0 1px rgba(255,255,255,.07);
+  }
+  .monitor.on::before{ opacity:1; }
+  .monitor.on .boot{ opacity:1; transform: translateY(0); }
+  .monitor.on .bar i{ animation: load 1.2s ease forwards; }
+  @keyframes load{ to{ width:100%; } }
+
+  /* Upload */
+  .upload{
+    position:absolute;
+    bottom:22px;
+    left:50%;
+    transform:translateX(-50%);
+    display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    padding:10px 12px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,.10);
+    background: rgba(0,0,0,.22);
+    z-index:4;
+  }
+  .upload label{
+    font-size:12px;
+    color:rgba(215,243,255,.72);
+    letter-spacing:1px;
+    text-transform:uppercase;
+  }
+  input[type="file"]{
+    color:rgba(215,243,255,.80);
+    font-family:'Share Tech Mono', monospace;
+    font-size:12px;
+    max-width: min(420px, 70vw);
+  }
+
+  /* Canvas FX */
+  canvas{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    z-index:5;
+  }
+
+  /* =========================
+     MOBILE FIX (ONLY)
+     Desktop/laptop untouched
+     ========================= */
+  @media (max-width: 720px){
+    html,body{ overflow:hidden; }
+    .scene{ align-items:stretch; }
+    .room{
+      width: 94vw;
+      height: 92svh;
+      border-radius: 16px;
+    }
+
+    .welcome{
+      top:14px; left:16px; right:16px;
+    }
+    .welcome h1{ font-size:16px; letter-spacing:1.5px; }
+    .welcome .sub{ font-size:11px; }
+
+    /* Turn layout into vertical stack to avoid overlap */
+    .lyraWrap{
+      left:16px;
+      right:16px;
+      bottom:auto;
+      top:64px;
+      width:auto;
+      flex-direction:row;
+      align-items:flex-start;
+      gap:10px;
+    }
+    .lyra{
+      width:128px;
+      flex:0 0 auto;
+      border-radius:14px;
+    }
+    .speech{
+      flex:1 1 auto;
+      font-size:11px;
+      border-radius:14px;
+      padding:10px 10px;
+      max-height: 150px;
+      overflow:auto;
+    }
+
+    .desk{
+      left:16px;
+      right:16px;
+      bottom:94px; /* leave space for upload bar */
+      width:auto;
+      height: 300px;
+      border-radius:16px;
+    }
+
+    /* Scale desk contents */
+    .machine{
+      left:18px;
+      top:110px;
+      width:150px;
+      height:120px;
+      border-radius:14px;
+    }
+    .machine .label{ font-size:10px; }
+    .inlet{
+      width:44px;
+      height:44px;
+    }
+
+    .monitor{
+      right:18px;
+      top:74px;
+      width:190px;
+      height:150px;
+      border-radius:14px;
+    }
+
+    .cable{
+      left:175px;
+      top:168px;
+      width:120px;
+      height:7px;
+    }
+
+    .upload{
+      bottom:14px;
+      left:16px;
+      right:16px;
+      transform:none;
+      justify-content:space-between;
+      border-radius:16px;
+    }
+    input[type="file"]{
+      max-width: 56vw;
+      font-size:11px;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="scene">
+    <div class="room" id="room">
+
+      <div class="welcome">
+        <h1>PhotoHouse Intake</h1>
+        <div class="sub" id="sub">status: awaiting image</div>
+      </div>
+
+      <div class="lyraWrap">
+        <div class="lyra">
+          <img src="assets/images/lyra_black.png" alt="Lyra Solene" />
+        </div>
+        <div class="speech">
+          <b>Lyra:</b> Welcome. Upload your image and I’ll route it through the enhancement inlet.
+          Your photo will convert into pixels and enter the machine.
+        </div>
+      </div>
+
+      <div class="desk">
+        <div class="machine">
+          <div class="label">INLET UNIT</div>
+          <div class="inlet" id="inlet"></div>
+        </div>
+<button class="btn" id="goBtn"
+  style="display:none; position:absolute; left:50%; bottom:20px; transform:translateX(-50%);">
+  Go to PhotoHouse
+</button>
+        <div class="cable" id="cable"></div>
+
+        <div class="monitor" id="monitor">
+          <div class="boot">
+            <div class="t">Enhancement Console Online</div>
+            <div class="bar"><i></i></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="upload">
+        <label for="fileInput">Upload image</label>
+        <input type="file" id="fileInput" accept="image/*" />
+      </div>
+
+      <canvas id="fx"></canvas>
+    </div>
+  </div>
+
+<script>
+  const canvas = document.getElementById("fx");
+  const ctx = canvas.getContext("2d");
+  const inlet = document.getElementById("inlet");
+  const monitor = document.getElementById("monitor");
+  const cable = document.getElementById("cable");
+  const sub = document.getElementById("sub");
+  const fileInput = document.getElementById("fileInput");
+  const roomEl = document.getElementById("room");
+
+  function resize(){
+    const r = roomEl.getBoundingClientRect();
+    canvas.width = r.width * devicePixelRatio;
+    canvas.height = r.height * devicePixelRatio;
+    canvas.style.width = r.width + "px";
+    canvas.style.height = r.height + "px";
+    ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  }
+  window.addEventListener("resize", resize);
+  resize();
+
+  function roomOffset(){
+    return roomEl.getBoundingClientRect();
+  }
+
+  fileInput.addEventListener("change", (e)=>{
+    const file = e.target.files && e.target.files[0];
+    if(!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      localStorage.setItem("pond2_upload_image", reader.result);
+      const img = new Image();
+      img.onload = () => startPixelTransfer(img);
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  function startPixelTransfer(img){
+    sub.textContent = "status: converting to pixels...";
+    monitor.classList.add("on");
+    cable.classList.add("active");
+    inlet.classList.add("active");
+
+    const inletRect = inlet.getBoundingClientRect();
+    const roomRect = roomOffset();
+    const targetX = inletRect.left - roomRect.left + inletRect.width/2;
+    const targetY = inletRect.top - roomRect.top + inletRect.height/2;
+
+    // Start region: near upload bar center
+    const startX = roomRect.width * 0.50;
+    const startY = roomRect.height * 0.86;
+
+    // Sample pixels from uploaded image
+    const off = document.createElement("canvas");
+    const ow = 90, oh = 90;
+    off.width = ow; off.height = oh;
+    const octx = off.getContext("2d");
+
+    const ar = img.naturalWidth / img.naturalHeight;
+    const tar = ow / oh;
+    let sx=0, sy=0, sw=img.naturalWidth, sh=img.naturalHeight;
+    if (ar > tar){
+      sw = img.naturalHeight * tar;
+      sx = (img.naturalWidth - sw)/2;
+    } else {
+      sh = img.naturalWidth / tar;
+      sy = (img.naturalHeight - sh)/2;
+    }
+    octx.drawImage(img, sx, sy, sw, sh, 0, 0, ow, oh);
+    const data = octx.getImageData(0,0,ow,oh).data;
+
+    const particles = [];
+    const count = 1500;
+
+    for(let i=0;i<count;i++){
+      const px = Math.floor(Math.random()*ow);
+      const py = Math.floor(Math.random()*oh);
+      const idx = (py*ow + px)*4;
+      const r = data[idx], g = data[idx+1], b = data[idx+2], a = data[idx+3];
+      if (a < 40) { i--; continue; }
+      const lum = 0.2126*r + 0.7152*g + 0.0722*b;
+      if (lum < 25) { i--; continue; }
+
+      const spread = 90;
+      particles.push({
+        tx: targetX + (Math.random()-0.5)*18,
+        ty: targetY + (Math.random()-0.5)*18,
+        r,g,b,
+        size: 1 + Math.random()*1.8,
+        delay: Math.random()*220,
+        curve: (Math.random()-0.5)*120,
+        // starting position
+        sx: startX + (px/ow - 0.5)*spread,
+        sy: startY + (py/oh - 0.5)*spread
+      });
+    }
+
+    sub.textContent = "status: transferring...";
+    const t0 = performance.now();
+    const dur = 1200;
+
+    function draw(now){
+      const t = now - t0;
+      ctx.clearRect(0,0,canvas.clientWidth,canvas.clientHeight);
+
+      // beam line
+      const beamA = Math.min(0.22, t/500*0.22);
+      ctx.beginPath();
+      ctx.moveTo(startX, startY);
+      ctx.quadraticCurveTo((startX+targetX)/2 + 30, (startY+targetY)/2 - 25, targetX, targetY);
+      ctx.strokeStyle = `rgba(74,255,197,${beamA})`;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      for(const p of particles){
+        if (t < p.delay) continue;
+        const tt = Math.min(1, (t - p.delay)/dur);
+        const s = tt*tt*(3-2*tt);
+
+        const mx = (p.sx + p.tx)/2;
+        const my = (p.sy + p.ty)/2;
+        const cx = mx + p.curve;
+        const cy = my - p.curve*0.35;
+
+        const x = (1-s)*(1-s)*p.sx + 2*(1-s)*s*cx + s*s*p.tx;
+        const y = (1-s)*(1-s)*p.sy + 2*(1-s)*s*cy + s*s*p.ty;
+
+        const alpha = tt < 0.85 ? 1 : Math.max(0, 1 - (tt-0.85)/0.15);
+        ctx.fillStyle = `rgba(${Math.min(255,p.r+30)},${Math.min(255,p.g+60)},${Math.min(255,p.b+40)},${0.75*alpha})`;
+        ctx.fillRect(x, y, p.size, p.size);
+      }
+
+      if (t < dur + 600){
+        requestAnimationFrame(draw);
+      } else {
+  sub.textContent = "status: received • ready";
+
+  cable.classList.remove("active");
+  setTimeout(()=> inlet.classList.remove("active"), 450);
+
+  // hide upload
+  const uploadBar = document.querySelector(".upload");
+  uploadBar.style.transition = "opacity 0.3s ease";
+  uploadBar.style.opacity = "0";
+
+  setTimeout(()=>{
+    uploadBar.style.display = "none";
+  }, 300);
+
+  // show button
+  goBtn.style.display = "block";
+      }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  goBtn.addEventListener("click", () => {
+  window.location.href = "photohouse_v2 (8) (3).html";
+});
+</script>
+</body>
+</html>

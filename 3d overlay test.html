@@ -427,7 +427,7 @@
   const sub = document.getElementById("sub");
   const fileInput = document.getElementById("fileInput");
   const roomEl = document.getElementById("room");
-
+const goBtn = document.getElementById("goBtn");
   function resize(){
     const r = roomEl.getBoundingClientRect();
     canvas.width = r.width * devicePixelRatio;
@@ -573,7 +573,6 @@
   goBtn.style.display = "block";
       }
       }
-    }
     requestAnimationFrame(draw);
   }
   goBtn.addEventListener("click", () => {

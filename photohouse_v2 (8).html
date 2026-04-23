@@ -595,7 +595,7 @@
     --violet:#a786ff;
     --green:#4affc5;
   }
- / html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);}
+  html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);}
   body{font-family:'Share Tech Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono";}
   *{box-sizing:border-box;}
 
@@ -1814,7 +1814,7 @@ intro.classList.add("show");
 setStep(0);
 });    
 </script>
- <div id="outroScene" style="display:none;">
+ <div id="outroScene" class="room" style="display:none;">
   <div class="scene">
     <div class="outro-room">
     <div class="outro-topbar">
@@ -1836,7 +1836,7 @@ setStep(0);
       <div class="outro-machine">
         <div class="outro-label">OUTPUT PORT</div>
         <div class="outro-outlet" id="outlet"></div>
-        <div class="outro-tray" id="tray"></div>
+        <div class="outro-tray" id="outro-tray"></div>
       </div>
 
       <div class="outro-cable" id="cable"></div>
@@ -1848,18 +1848,18 @@ setStep(0);
         </div>
         <div class="outro-dbBody">
           <div class="outro-rack">
-            <div class="slot"></div>
-            <div class="slot"></div>
-            <div class="slot"></div>
-            <div class="slot"></div>
+            <div class="outro-slot"></div>
+            <div class="outro-slot"></div>
+            <div class="outro-slot"></div>
+            <div class="outro-slot"></div>
           </div>
           <div class="outro-dbText" id="dbText">
-            <div class="logLine dim">• Awaiting output stream...</div>
-            <div class="logLine dim">• Destination: Page 5 Archive Scan</div>
-            <div class="logLine dim">• Gate: Similarity + Threshold</div>
-            <div class="logLine dim">• Status: idle</div>
+            <div class="outro-logLine dim">• Awaiting output stream...</div>
+            <div class="outro-logLine dim">• Destination: Page 5 Archive Scan</div>
+            <div class="outro-logLine dim">• Gate: Similarity + Threshold</div>
+            <div class="outro-logLine dim">• Status: idle</div>
           </div>
-          <div class="dbInlet" id="dbInlet" title="archive inlet"></div>
+          <div class="outro-dbInlet" id="dbInlet" title="archive inlet"></div>
         </div>
       </div>
 

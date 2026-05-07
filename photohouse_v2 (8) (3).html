@@ -965,8 +965,17 @@ function applyBC(imageData, brightness, contrast){
 
 function denoiseBoxBlur(srcCtx, w, h, strength){
   if (strength <= 0) return;
-  const passes = Math.min(2, Math.ceil(strength / 3));
-  const radius = strength <= 2 ? 1 : strength <= 4 ? 2 : 3;
+
+  // softer denoise
+  const passes = 1;
+
+  // gentler radius
+  const radius =
+    strength <= 2 ? 0 :
+    strength <= 4 ? 1 : 2;
+
+  // if radius becomes 0 → almost no blur
+  if (radius === 0) return;
 
   for (let p=0; p<passes; p++){
     const id = srcCtx.getImageData(0,0,w,h);
@@ -979,35 +988,44 @@ function denoiseBoxBlur(srcCtx, w, h, strength){
     for (let y=0; y<h; y++){
       for (let x=0; x<w; x++){
         let r=0,g=0,b=0,a=0;
+
         for (let yy=y-rs; yy<=y+rs; yy++){
           const cy = Math.max(0, Math.min(h-1, yy));
+
           for (let xx=x-rs; xx<=x+rs; xx++){
             const cx = Math.max(0, Math.min(w-1, xx));
+
             const idx = (cy*w + cx)*4;
-            r += d[idx]; g += d[idx+1]; b += d[idx+2]; a += d[idx+3];
+
+            r += d[idx];
+            g += d[idx+1];
+            b += d[idx+2];
+            a += d[idx+3];
           }
         }
+
         const oi = (y*w + x)*4;
+
         o[oi]   = r/area;
         o[oi+1] = g/area;
         o[oi+2] = b/area;
         o[oi+3] = a/area;
       }
     }
+
     srcCtx.putImageData(out,0,0);
   }
 }
-
 function sharpenUnsharp(srcCtx, w, h, strength){
   if (strength <= 0) return;
   const s = Math.min(6, strength);
-  const amount = 0.10 + s*0.07;
+  const amount = 0.25 + s*0.12;
 
   const temp = document.createElement("canvas");
   temp.width=w; temp.height=h;
   const tctx = temp.getContext("2d");
   tctx.drawImage(srcCtx.canvas,0,0);
-  denoiseBoxBlur(tctx, w, h, 2);
+ denoiseBoxBlur(tctx, w, h, 4);
 
   const orig = srcCtx.getImageData(0,0,w,h);
   const blur = tctx.getImageData(0,0,w,h);

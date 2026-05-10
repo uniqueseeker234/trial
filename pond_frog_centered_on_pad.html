@@ -2,19 +2,29 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Microscope Viewer • Smooth Seated POV</title>
+<meta name="viewport"
+content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+
+<title>Microscope Viewer • Smooth POV Test</title>
 
 <style>
+
 html,body{
   margin:0;
+  width:100%;
   height:100%;
   overflow:hidden;
+  overscroll-behavior:none;
+  touch-action:none;
+
   background:#05070c;
 }
 
 canvas{
   display:block;
+  width:100%;
+  height:100%;
+  touch-action:none;
 }
 
 #hint{
@@ -37,20 +47,110 @@ canvas{
 
   border:1px solid rgba(255,255,255,0.10);
 }
+
+#loading{
+  position:fixed;
+  inset:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:#05070c;
+
+  z-index:100;
+
+  color:white;
+
+  font-family:Arial;
+}
+
+#loadingCard{
+
+  width:min(340px,90vw);
+
+  padding:18px;
+
+  border-radius:18px;
+
+  background:rgba(255,255,255,0.05);
+
+  border:1px solid rgba(255,255,255,0.08);
+}
+
+#bar{
+  height:10px;
+  border-radius:999px;
+  overflow:hidden;
+
+  background:rgba(255,255,255,0.08);
+
+  margin-top:14px;
+}
+
+#fill{
+  width:0%;
+  height:100%;
+
+  background:#5FC2A7;
+}
+
+.small{
+  margin-top:10px;
+  font-size:12px;
+  opacity:.7;
+}
+
 </style>
 </head>
 
 <body>
 
 <div id="hint">
-Drag screen to look around microscope
+Drag screen smoothly to look around
+</div>
+
+<div id="loading">
+
+<div id="loadingCard">
+
+<div style="font-size:16px;font-weight:700">
+Loading Microscope Lab...
+</div>
+
+<div class="small" id="status">
+Preparing scene...
+</div>
+
+<div id="bar">
+<div id="fill"></div>
+</div>
+
+</div>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 
 <script>
+
 (() => {
+
+/* =========================
+   LOADING UI
+========================= */
+
+const fill = document.getElementById("fill");
+const statusText = document.getElementById("status");
+const loading = document.getElementById("loading");
+
+function setProgress(p,text){
+
+  fill.style.width = p + "%";
+
+  if(text) statusText.textContent = text;
+}
 
 /* =========================
    SCENE
@@ -65,7 +165,8 @@ scene.background = new THREE.Color(0x05070c);
 ========================= */
 
 const renderer = new THREE.WebGLRenderer({
-  antialias:true
+  antialias:true,
+  powerPreference:"high-performance"
 });
 
 renderer.setSize(
@@ -73,13 +174,19 @@ renderer.setSize(
   window.innerHeight
 );
 
+/* smoother on mobile */
+
 renderer.setPixelRatio(
-  Math.min(window.devicePixelRatio,2)
+  Math.min(window.devicePixelRatio,1.5)
 );
 
-renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.outputEncoding =
+THREE.sRGBEncoding;
 
 renderer.shadowMap.enabled = true;
+
+renderer.shadowMap.type =
+THREE.PCFSoftShadowMap;
 
 document.body.appendChild(renderer.domElement);
 
@@ -115,6 +222,8 @@ dir.position.set(5,8,5);
 
 dir.castShadow = true;
 
+dir.shadow.mapSize.set(1024,1024);
+
 scene.add(dir);
 
 /* =========================
@@ -131,8 +240,6 @@ const CAMERA_POS = new THREE.Vector3(
    VIEW LIMITS
 ========================= */
 
-const CENTER_YAW = -1.86;
-
 const MIN_YAW = -2.05;
 const MAX_YAW = -1.08;
 
@@ -140,11 +247,11 @@ const MIN_PITCH = -0.15;
 const MAX_PITCH = 0.18;
 
 /* =========================
-   SMOOTH CAMERA SYSTEM
+   SMOOTH CAMERA
 ========================= */
 
-let targetYaw = CENTER_YAW;
-let currentYaw = CENTER_YAW;
+let targetYaw = -1.86;
+let currentYaw = -1.86;
 
 let targetPitch = 0.02;
 let currentPitch = 0.02;
@@ -158,6 +265,16 @@ let dragging = false;
 let lastX = 0;
 let lastY = 0;
 
+/* PREVENT PAGE STRETCH */
+
+document.body.addEventListener(
+  "touchmove",
+  e => e.preventDefault(),
+  { passive:false }
+);
+
+/* POINTER DOWN */
+
 renderer.domElement.addEventListener(
   "pointerdown",
   e => {
@@ -169,10 +286,14 @@ renderer.domElement.addEventListener(
   }
 );
 
+/* POINTER UP */
+
 window.addEventListener(
   "pointerup",
   () => dragging = false
 );
+
+/* POINTER MOVE */
 
 window.addEventListener(
   "pointermove",
@@ -186,13 +307,11 @@ window.addEventListener(
     lastX = e.clientX;
     lastY = e.clientY;
 
-    /* smoother faster movement */
+    /* MUCH FASTER + RESPONSIVE */
 
-    targetYaw -= dx * 0.0045;
+    targetYaw -= dx * 0.0085;
 
-    targetPitch -= dy * 0.0025;
-
-    /* limits */
+    targetPitch -= dy * 0.0045;
 
     targetYaw = THREE.MathUtils.clamp(
       targetYaw,
@@ -210,7 +329,7 @@ window.addEventListener(
 );
 
 /* =========================
-   LOAD GLB
+   GLTF LOADER
 ========================= */
 
 const loader = new THREE.GLTFLoader();
@@ -221,8 +340,11 @@ function load(path){
 
     loader.load(
       path,
-      g => resolve(g.scene),
+
+      gltf => resolve(gltf.scene),
+
       undefined,
+
       reject
     );
 
@@ -230,9 +352,17 @@ function load(path){
 
 }
 
+/* =========================
+   LOAD MODELS
+========================= */
+
 (async()=>{
 
+try{
+
 /* ROOM */
+
+setProgress(10,"Loading room...");
 
 const room = await load("./room.glb");
 
@@ -245,9 +375,10 @@ room.traverse(o=>{
   o.castShadow = true;
   o.receiveShadow = true;
 
-  const mats = Array.isArray(o.material)
-    ? o.material
-    : [o.material];
+  const mats =
+  Array.isArray(o.material)
+  ? o.material
+  : [o.material];
 
   mats.forEach(m=>{
 
@@ -256,7 +387,8 @@ room.traverse(o=>{
     m.side = THREE.DoubleSide;
 
     if(m.map){
-      m.map.encoding = THREE.sRGBEncoding;
+      m.map.encoding =
+      THREE.sRGBEncoding;
     }
 
   });
@@ -265,99 +397,154 @@ room.traverse(o=>{
 
 /* TABLE */
 
+setProgress(30,"Loading table...");
+
 const table = await load(
-  "./models/lumen_hologram_table.glb"
+"./models/lumen_hologram_table.glb"
 );
 
 room.add(table);
 
 table.position.set(
-  1.60,
-  0.10,
-  -0.80
+1.60,
+0.10,
+-0.80
 );
 
 table.scale.set(
-  0.75,
-  0.75,
-  0.75
+0.75,
+0.75,
+0.75
 );
 
 table.rotation.y = -3.14;
 
 /* MICROSCOPE */
 
+setProgress(45,"Loading microscope...");
+
 const microscope = await load(
-  "./models/microscope.glb"
+"./models/microscope.glb"
 );
 
 room.add(microscope);
 
 microscope.position.set(
-  1.54,
-  0.45,
-  -0.28
+1.54,
+0.45,
+-0.28
 );
 
 microscope.scale.set(
-  0.14,
-  0.14,
-  0.14
+0.14,
+0.14,
+0.14
 );
 
 microscope.rotation.set(
-  -0.02,
-  1.7,
-  0
+-0.02,
+1.7,
+0
 );
 
 /* CHAIR */
 
+setProgress(60,"Loading chair...");
+
 const chair = await load(
-  "./round_chair.glb"
+"./round_chair.glb"
 );
 
 room.add(chair);
 
 chair.position.set(
-  -0.35,
-  -0.15,
-  1.50
+-0.35,
+-0.15,
+1.50
 );
 
 chair.scale.set(
-  0.40,
-  0.40,
-  0.40
+0.40,
+0.40,
+0.40
 );
 
 chair.rotation.y = 0.05;
 
 /* JOURNAL */
 
+setProgress(72,"Loading journal...");
+
 const journal = await load(
-  "./models/journal.glb"
+"./models/journal.glb"
 );
 
 room.add(journal);
 
 journal.position.set(
-  1.58,
-  0.37,
-  -0.62
+1.58,
+0.37,
+-0.62
 );
 
 journal.scale.set(
-  0.05,
-  0.05,
-  0.05
+0.05,
+0.05,
+0.05
 );
 
 journal.rotation.set(
-  -1.66,
-  0.68,
-  1.69
+-1.66,
+0.68,
+1.69
 );
+
+/* NEW 13MB GLB */
+
+setProgress(82,"Loading specimen slides case...");
+
+const slidesCase = await load(
+"./models/microscope_slides__case.glb"
+);
+
+room.add(slidesCase);
+
+/* TEMP SAME SCALE FEEL AS JOURNAL */
+
+slidesCase.position.set(
+1.75,
+0.37,
+-0.75
+);
+
+slidesCase.scale.set(
+0.05,
+0.05,
+0.05
+);
+
+slidesCase.rotation.set(
+0,
+-1.5,
+0
+);
+
+setProgress(100,"Scene loaded");
+
+setTimeout(()=>{
+
+loading.style.display = "none";
+
+},500);
+
+}catch(err){
+
+console.error(err);
+
+statusText.textContent =
+"Failed to load scene.";
+
+}
 
 })();
 
@@ -367,13 +554,13 @@ journal.rotation.set(
 
 function updateCamera(){
 
-  /* smooth interpolation */
+  /* MUCH SMOOTHER */
 
   currentYaw +=
-    (targetYaw - currentYaw) * 0.08;
+  (targetYaw - currentYaw) * 0.22;
 
   currentPitch +=
-    (targetPitch - currentPitch) * 0.08;
+  (targetPitch - currentPitch) * 0.22;
 
   camera.position.copy(CAMERA_POS);
 
@@ -390,7 +577,7 @@ function updateCamera(){
 }
 
 /* =========================
-   ANIMATION LOOP
+   RENDER LOOP
 ========================= */
 
 function animate(){
@@ -410,23 +597,24 @@ animate();
 ========================= */
 
 window.addEventListener(
-  "resize",
-  ()=>{
+"resize",
+()=>{
 
-    camera.aspect =
-      window.innerWidth/window.innerHeight;
+camera.aspect =
+window.innerWidth/window.innerHeight;
 
-    camera.updateProjectionMatrix();
+camera.updateProjectionMatrix();
 
-    renderer.setSize(
-      window.innerWidth,
-      window.innerHeight
-    );
+renderer.setSize(
+window.innerWidth,
+window.innerHeight
+);
 
-  }
+}
 );
 
 })();
+
 </script>
 
 </body>

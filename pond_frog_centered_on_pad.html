@@ -23,28 +23,50 @@ canvas{
   position:fixed;
   top:14px;
   left:14px;
-  z-index:10;
+  z-index:20;
 
-  padding:12px 14px;
+  padding:14px;
   border-radius:16px;
 
-  background:rgba(0,0,0,0.45);
+  background:rgba(0,0,0,0.55);
   backdrop-filter:blur(10px);
 
   color:white;
+
   border:1px solid rgba(255,255,255,0.08);
+
+  min-width:280px;
 }
 
 #hud h1{
-  margin:0;
-  font-size:14px;
+  margin:0 0 12px;
+  font-size:15px;
 }
 
-#hud p{
-  margin:6px 0 0;
+.row{
+  margin-bottom:12px;
+}
+
+.label{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:6px;
+  font-size:12px;
+}
+
+.value{
+  color:#7fe7d2;
+}
+
+input[type=range]{
+  width:100%;
+}
+
+#info{
+  margin-top:10px;
   font-size:12px;
   opacity:.8;
-  line-height:1.4;
+  line-height:1.5;
 }
 </style>
 </head>
@@ -52,11 +74,53 @@ canvas{
 <body>
 
 <div id="hud">
-  <h1>Microscope Lab Viewer</h1>
-  <p>
-    Slight mouse movement = head movement<br>
-    Future: microscope interaction system
-  </p>
+
+  <h1>Camera POV Controls</h1>
+
+  <div class="row">
+    <div class="label">
+      <span>Left / Right (X)</span>
+      <span class="value" id="vx">0.95</span>
+    </div>
+    <input id="sx" type="range" min="-10" max="10" step="0.01" value="0.95">
+  </div>
+
+  <div class="row">
+    <div class="label">
+      <span>Up / Down (Y)</span>
+      <span class="value" id="vy">1.15</span>
+    </div>
+    <input id="sy" type="range" min="-10" max="10" step="0.01" value="1.15">
+  </div>
+
+  <div class="row">
+    <div class="label">
+      <span>Forward / Backward (Z)</span>
+      <span class="value" id="vz">1.45</span>
+    </div>
+    <input id="sz" type="range" min="-15" max="15" step="0.01" value="1.45">
+  </div>
+
+  <div class="row">
+    <div class="label">
+      <span>Look Left / Right</span>
+      <span class="value" id="vyaw">0</span>
+    </div>
+    <input id="syaw" type="range" min="-3.14" max="3.14" step="0.01" value="0">
+  </div>
+
+  <div class="row">
+    <div class="label">
+      <span>Look Up / Down</span>
+      <span class="value" id="vpitch">-0.08</span>
+    </div>
+    <input id="spitch" type="range" min="-1.5" max="1.5" step="0.01" value="-0.08">
+  </div>
+
+  <div id="info">
+    Adjust camera until it feels like sitting naturally on the chair looking into microscope.
+  </div>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
@@ -96,12 +160,8 @@ const camera = new THREE.PerspectiveCamera(
   100
 );
 
-
-
-
-
 /* =========================
-   HUMAN SEATED POV
+   CAMERA VALUES
 ========================= */
 
 const eye = new THREE.Vector3(
@@ -113,7 +173,39 @@ const eye = new THREE.Vector3(
 let yaw = 0;
 let pitch = -0.08;
 
-function updateLook(){
+/* =========================
+   SLIDERS
+========================= */
+
+const sx = document.getElementById("sx");
+const sy = document.getElementById("sy");
+const sz = document.getElementById("sz");
+
+const syaw = document.getElementById("syaw");
+const spitch = document.getElementById("spitch");
+
+const vx = document.getElementById("vx");
+const vy = document.getElementById("vy");
+const vz = document.getElementById("vz");
+
+const vyaw = document.getElementById("vyaw");
+const vpitch = document.getElementById("vpitch");
+
+function updateCamera(){
+
+  eye.x = parseFloat(sx.value);
+  eye.y = parseFloat(sy.value);
+  eye.z = parseFloat(sz.value);
+
+  yaw = parseFloat(syaw.value);
+  pitch = parseFloat(spitch.value);
+
+  vx.textContent = eye.x.toFixed(2);
+  vy.textContent = eye.y.toFixed(2);
+  vz.textContent = eye.z.toFixed(2);
+
+  vyaw.textContent = yaw.toFixed(2);
+  vpitch.textContent = pitch.toFixed(2);
 
   const dir = new THREE.Vector3(
     Math.cos(pitch) * Math.sin(yaw),
@@ -128,43 +220,11 @@ function updateLook(){
   );
 }
 
-updateLook();
-
-
-
-
-
-/* =========================
-   MOUSE HEAD MOVEMENT
-========================= */
-
-window.addEventListener("mousemove", e => {
-
-  const nx = (e.clientX / window.innerWidth) - 0.5;
-  const ny = (e.clientY / window.innerHeight) - 0.5;
-
-  yaw = -nx * 0.55;
-
-  pitch = -0.08 - ny * 0.18;
-
-  /* LIMITS */
-
-  yaw = Math.max(
-    -0.5,
-    Math.min(0.5, yaw)
-  );
-
-  pitch = Math.max(
-    -0.28,
-    Math.min(0.15, pitch)
-  );
-
-  updateLook();
+[sx,sy,sz,syaw,spitch].forEach(el=>{
+  el.addEventListener("input", updateCamera);
 });
 
-
-
-
+updateCamera();
 
 /* =========================
    LIGHTING
@@ -207,10 +267,6 @@ const ambient = new THREE.AmbientLight(
 
 scene.add(ambient);
 
-
-
-
-
 /* =========================
    LOADER
 ========================= */
@@ -232,12 +288,8 @@ function loadModel(path){
 
 }
 
-
-
-
-
 /* =========================
-   HELPERS
+   MATERIAL FIX
 ========================= */
 
 function fixMaterials(root){
@@ -282,27 +334,17 @@ function fixMaterials(root){
 
 }
 
-
-
-
-
 /* =========================
    LOAD SCENE
 ========================= */
 
 (async()=>{
 
-/* ROOM */
-
 const room = await loadModel("./room.glb");
 
 fixMaterials(room);
 
 scene.add(room);
-
-
-
-
 
 /* TABLE */
 
@@ -327,10 +369,6 @@ table.scale.set(
 );
 
 table.rotation.y = -3.14;
-
-
-
-
 
 /* MICROSCOPE */
 
@@ -360,10 +398,6 @@ microscope.rotation.set(
   0
 );
 
-
-
-
-
 /* JOURNAL */
 
 const journal = await loadModel(
@@ -391,10 +425,6 @@ journal.rotation.set(
   0.68,
   1.69
 );
-
-
-
-
 
 /* CHAIR */
 
@@ -431,29 +461,18 @@ chair.rotation.y = 0.05;
 
 })();
 
-
-
-
-
 /* =========================
-   RENDER LOOP
+   LOOP
 ========================= */
 
 function animate(){
 
   requestAnimationFrame(animate);
 
-  renderer.render(
-    scene,
-    camera
-  );
+  renderer.render(scene,camera);
 }
 
 animate();
-
-
-
-
 
 /* =========================
    RESIZE

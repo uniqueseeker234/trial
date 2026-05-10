@@ -3,42 +3,41 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Microscope Lab Viewer</title>
+<title>Microscope Viewer • Seated POV</title>
 
 <style>
 html,body{
   margin:0;
-  width:100%;
   height:100%;
   overflow:hidden;
   background:#05070c;
-  font-family:system-ui;
+  font-family:Arial,Helvetica,sans-serif;
 }
 
 canvas{
   display:block;
 }
 
-#hud{
+#ui{
   position:fixed;
-  top:14px;
-  left:14px;
+  top:12px;
+  left:12px;
   z-index:20;
 
-  padding:14px;
-  border-radius:16px;
+  width:320px;
 
   background:rgba(0,0,0,0.55);
-  backdrop-filter:blur(10px);
+  backdrop-filter:blur(12px);
+
+  border-radius:18px;
+  padding:14px;
 
   color:white;
 
-  border:1px solid rgba(255,255,255,0.08);
-
-  min-width:280px;
+  border:1px solid rgba(255,255,255,0.12);
 }
 
-#hud h1{
+#ui h2{
   margin:0 0 12px;
   font-size:15px;
 }
@@ -47,79 +46,59 @@ canvas{
   margin-bottom:12px;
 }
 
-.label{
+.row label{
   display:flex;
   justify-content:space-between;
-  margin-bottom:6px;
   font-size:12px;
-}
-
-.value{
-  color:#7fe7d2;
+  margin-bottom:4px;
 }
 
 input[type=range]{
   width:100%;
 }
 
-#info{
-  margin-top:10px;
-  font-size:12px;
-  opacity:.8;
-  line-height:1.5;
+.small{
+  font-size:11px;
+  opacity:.7;
+  line-height:1.4;
 }
 </style>
 </head>
 
 <body>
 
-<div id="hud">
+<div id="ui">
 
-  <h1>Camera POV Controls</h1>
+<h2>Microscope POV Controls</h2>
 
-  <div class="row">
-    <div class="label">
-      <span>Left / Right (X)</span>
-      <span class="value" id="vx">0.95</span>
-    </div>
-    <input id="sx" type="range" min="-10" max="10" step="0.01" value="0.95">
-  </div>
+<div class="row">
+<label>X Position <span id="vx"></span></label>
+<input id="x" type="range" min="-10" max="10" step="0.01" value="2.53">
+</div>
 
-  <div class="row">
-    <div class="label">
-      <span>Up / Down (Y)</span>
-      <span class="value" id="vy">1.15</span>
-    </div>
-    <input id="sy" type="range" min="-10" max="10" step="0.01" value="1.15">
-  </div>
+<div class="row">
+<label>Y Position <span id="vy"></span></label>
+<input id="y" type="range" min="-5" max="5" step="0.01" value="0.48">
+</div>
 
-  <div class="row">
-    <div class="label">
-      <span>Forward / Backward (Z)</span>
-      <span class="value" id="vz">1.45</span>
-    </div>
-    <input id="sz" type="range" min="-15" max="15" step="0.01" value="1.45">
-  </div>
+<div class="row">
+<label>Z Position <span id="vz"></span></label>
+<input id="z" type="range" min="-10" max="10" step="0.01" value="-0.70">
+</div>
 
-  <div class="row">
-    <div class="label">
-      <span>Look Left / Right</span>
-      <span class="value" id="vyaw">0</span>
-    </div>
-    <input id="syaw" type="range" min="-3.14" max="3.14" step="0.01" value="0">
-  </div>
+<div class="row">
+<label>Center Look Yaw <span id="vyaw"></span></label>
+<input id="yaw" type="range" min="-3.14" max="3.14" step="0.01" value="-1.86">
+</div>
 
-  <div class="row">
-    <div class="label">
-      <span>Look Up / Down</span>
-      <span class="value" id="vpitch">-0.08</span>
-    </div>
-    <input id="spitch" type="range" min="-1.5" max="1.5" step="0.01" value="-0.08">
-  </div>
+<div class="row">
+<label>Look Up / Down <span id="vpitch"></span></label>
+<input id="pitch" type="range" min="-1" max="1" step="0.01" value="0.02">
+</div>
 
-  <div id="info">
-    Adjust camera until it feels like sitting naturally on the chair looking into microscope.
-  </div>
+<div class="small">
+Mouse / finger drag = limited seated head movement.
+</div>
 
 </div>
 
@@ -129,29 +108,23 @@ input[type=range]{
 <script>
 (() => {
 
-const renderer = new THREE.WebGLRenderer({
-  antialias:true
-});
-
-renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
-renderer.setSize(window.innerWidth, window.innerHeight);
-
-renderer.outputEncoding = THREE.sRGBEncoding;
-
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-document.body.appendChild(renderer.domElement);
-
 const scene = new THREE.Scene();
 
 scene.background = new THREE.Color(0x05070c);
 
-scene.fog = new THREE.Fog(
-  0x070a12,
-  5,
-  18
-);
+const renderer = new THREE.WebGLRenderer({
+  antialias:true
+});
+
+renderer.setSize(window.innerWidth, window.innerHeight);
+
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+
+renderer.outputEncoding = THREE.sRGBEncoding;
+
+renderer.shadowMap.enabled = true;
+
+document.body.appendChild(renderer.domElement);
 
 const camera = new THREE.PerspectiveCamera(
   45,
@@ -161,125 +134,164 @@ const camera = new THREE.PerspectiveCamera(
 );
 
 /* =========================
-   CAMERA VALUES
-========================= */
-
-const eye = new THREE.Vector3(
-  0.95,
-  1.15,
-  1.45
-);
-
-let yaw = 0;
-let pitch = -0.08;
-
-/* =========================
-   SLIDERS
-========================= */
-
-const sx = document.getElementById("sx");
-const sy = document.getElementById("sy");
-const sz = document.getElementById("sz");
-
-const syaw = document.getElementById("syaw");
-const spitch = document.getElementById("spitch");
-
-const vx = document.getElementById("vx");
-const vy = document.getElementById("vy");
-const vz = document.getElementById("vz");
-
-const vyaw = document.getElementById("vyaw");
-const vpitch = document.getElementById("vpitch");
-
-function updateCamera(){
-
-  eye.x = parseFloat(sx.value);
-  eye.y = parseFloat(sy.value);
-  eye.z = parseFloat(sz.value);
-
-  yaw = parseFloat(syaw.value);
-  pitch = parseFloat(spitch.value);
-
-  vx.textContent = eye.x.toFixed(2);
-  vy.textContent = eye.y.toFixed(2);
-  vz.textContent = eye.z.toFixed(2);
-
-  vyaw.textContent = yaw.toFixed(2);
-  vpitch.textContent = pitch.toFixed(2);
-
-  const dir = new THREE.Vector3(
-    Math.cos(pitch) * Math.sin(yaw),
-    Math.sin(pitch),
-    -Math.cos(pitch) * Math.cos(yaw)
-  );
-
-  camera.position.copy(eye);
-
-  camera.lookAt(
-    eye.clone().add(dir)
-  );
-}
-
-[sx,sy,sz,syaw,spitch].forEach(el=>{
-  el.addEventListener("input", updateCamera);
-});
-
-updateCamera();
-
-/* =========================
-   LIGHTING
+   LIGHTS
 ========================= */
 
 const hemi = new THREE.HemisphereLight(
-  0x9fdcff,
-  0x07101f,
-  0.65
+  0xffffff,
+  0x222233,
+  1.2
 );
 
 scene.add(hemi);
 
-const key = new THREE.DirectionalLight(
+const dir = new THREE.DirectionalLight(
   0xffffff,
-  0.85
+  1.1
 );
 
-key.position.set(6,8,4);
+dir.position.set(5,8,5);
 
-key.castShadow = true;
+dir.castShadow = true;
 
-key.shadow.mapSize.set(2048,2048);
-
-scene.add(key);
-
-const rim = new THREE.DirectionalLight(
-  0x7fe7d2,
-  0.45
-);
-
-rim.position.set(-5,3,-2);
-
-scene.add(rim);
-
-const ambient = new THREE.AmbientLight(
-  0xffffff,
-  0.30
-);
-
-scene.add(ambient);
+scene.add(dir);
 
 /* =========================
-   LOADER
+   CAMERA VALUES
+========================= */
+
+const CENTER_YAW = -1.86;
+
+const MIN_YAW = -2.05;
+const MAX_YAW = -1.08;
+
+let currentYaw = CENTER_YAW;
+let currentPitch = 0.02;
+
+/* =========================
+   CAMERA POSITION
+========================= */
+
+const sliders = {
+  x: document.getElementById("x"),
+  y: document.getElementById("y"),
+  z: document.getElementById("z"),
+  yaw: document.getElementById("yaw"),
+  pitch: document.getElementById("pitch")
+};
+
+const vals = {
+  x: document.getElementById("vx"),
+  y: document.getElementById("vy"),
+  z: document.getElementById("vz"),
+  yaw: document.getElementById("vyaw"),
+  pitch: document.getElementById("vpitch")
+};
+
+function updateLabels(){
+
+  vals.x.textContent = sliders.x.value;
+  vals.y.textContent = sliders.y.value;
+  vals.z.textContent = sliders.z.value;
+  vals.yaw.textContent = sliders.yaw.value;
+  vals.pitch.textContent = sliders.pitch.value;
+}
+
+function updateCamera(){
+
+  camera.position.set(
+    parseFloat(sliders.x.value),
+    parseFloat(sliders.y.value),
+    parseFloat(sliders.z.value)
+  );
+
+  const dir = new THREE.Vector3(
+    Math.sin(currentYaw),
+    currentPitch,
+    -Math.cos(currentYaw)
+  );
+
+  camera.lookAt(
+    camera.position.clone().add(dir)
+  );
+
+  updateLabels();
+}
+
+Object.values(sliders).forEach(s => {
+
+  s.addEventListener("input", () => {
+
+    currentYaw = parseFloat(sliders.yaw.value);
+    currentPitch = parseFloat(sliders.pitch.value);
+
+    updateCamera();
+  });
+
+});
+
+/* =========================
+   LIMITED HEAD MOVEMENT
+========================= */
+
+let dragging = false;
+let lastX = 0;
+let lastY = 0;
+
+renderer.domElement.addEventListener("pointerdown", e => {
+
+  dragging = true;
+
+  lastX = e.clientX;
+  lastY = e.clientY;
+});
+
+window.addEventListener("pointerup", () => {
+  dragging = false;
+});
+
+window.addEventListener("pointermove", e => {
+
+  if(!dragging) return;
+
+  const dx = e.clientX - lastX;
+  const dy = e.clientY - lastY;
+
+  lastX = e.clientX;
+  lastY = e.clientY;
+
+  currentYaw -= dx * 0.003;
+
+  currentPitch -= dy * 0.002;
+
+  currentYaw = THREE.MathUtils.clamp(
+    currentYaw,
+    MIN_YAW,
+    MAX_YAW
+  );
+
+  currentPitch = THREE.MathUtils.clamp(
+    currentPitch,
+    -0.15,
+    0.18
+  );
+
+  updateCamera();
+});
+
+/* =========================
+   LOAD MODELS
 ========================= */
 
 const loader = new THREE.GLTFLoader();
 
-function loadModel(path){
+function load(path){
 
   return new Promise((resolve,reject)=>{
 
     loader.load(
       path,
-      gltf => resolve(gltf.scene),
+      g => resolve(g.scene),
       undefined,
       reject
     );
@@ -288,181 +300,95 @@ function loadModel(path){
 
 }
 
-/* =========================
-   MATERIAL FIX
-========================= */
-
-function fixMaterials(root){
-
-  root.traverse(o => {
-
-    if(!o.isMesh) return;
-
-    o.castShadow = true;
-    o.receiveShadow = true;
-
-    const mats = Array.isArray(o.material)
-      ? o.material
-      : [o.material];
-
-    mats.forEach(m => {
-
-      if(!m) return;
-
-      m.side = THREE.DoubleSide;
-
-      if(m.map){
-        m.map.encoding = THREE.sRGBEncoding;
-      }
-
-      if("metalness" in m){
-        m.metalness *= 0.55;
-      }
-
-      if("roughness" in m){
-        m.roughness = Math.min(
-          1,
-          m.roughness + 0.05
-        );
-      }
-
-      m.needsUpdate = true;
-
-    });
-
-  });
-
-}
-
-/* =========================
-   LOAD SCENE
-========================= */
-
 (async()=>{
 
-const room = await loadModel("./room.glb");
+/* ROOM */
 
-fixMaterials(room);
+const room = await load("./room.glb");
 
 scene.add(room);
 
+room.traverse(o=>{
+
+  if(!o.isMesh) return;
+
+  o.castShadow = true;
+  o.receiveShadow = true;
+
+  const mats = Array.isArray(o.material)
+    ? o.material
+    : [o.material];
+
+  mats.forEach(m=>{
+
+    if(!m) return;
+
+    m.side = THREE.DoubleSide;
+
+    if(m.map){
+      m.map.encoding = THREE.sRGBEncoding;
+    }
+
+  });
+
+});
+
 /* TABLE */
 
-const table = await loadModel(
-  "./models/lumen_hologram_table.glb"
-);
-
-fixMaterials(table);
+const table = await load("./models/lumen_hologram_table.glb");
 
 room.add(table);
 
-table.position.set(
-  1.60,
-  0.10,
-  -0.80
-);
+table.position.set(1.60, 0.10, -0.80);
 
-table.scale.set(
-  0.75,
-  0.75,
-  0.75
-);
+table.scale.set(0.75,0.75,0.75);
 
 table.rotation.y = -3.14;
 
 /* MICROSCOPE */
 
-const microscope = await loadModel(
-  "./models/microscope.glb"
-);
-
-fixMaterials(microscope);
+const microscope = await load("./models/microscope.glb");
 
 room.add(microscope);
 
-microscope.position.set(
-  1.54,
-  0.45,
-  -0.28
-);
+microscope.position.set(1.54, 0.45, -0.28);
 
-microscope.scale.set(
-  0.14,
-  0.14,
-  0.14
-);
+microscope.scale.set(0.14,0.14,0.14);
 
-microscope.rotation.set(
-  -0.02,
-  1.7,
-  0
-);
-
-/* JOURNAL */
-
-const journal = await loadModel(
-  "./models/journal.glb"
-);
-
-fixMaterials(journal);
-
-room.add(journal);
-
-journal.position.set(
-  1.58,
-  0.37,
-  -0.62
-);
-
-journal.scale.set(
-  0.05,
-  0.05,
-  0.05
-);
-
-journal.rotation.set(
-  -1.66,
-  0.68,
-  1.69
-);
+microscope.rotation.set(-0.02,1.7,0);
 
 /* CHAIR */
 
-const chair = await loadModel(
-  "./round_chair.glb"
-);
-
-fixMaterials(chair);
-
-const chairBox = new THREE.Box3()
-.setFromObject(chair);
-
-const chairCenter = new THREE.Vector3();
-
-chairBox.getCenter(chairCenter);
-
-chair.position.sub(chairCenter);
+const chair = await load("./round_chair.glb");
 
 room.add(chair);
 
-chair.position.set(
-  -0.35,
-  -0.15,
-  1.50
-);
+chair.position.set(-0.35, -0.15, 1.50);
 
-chair.scale.set(
-  0.40,
-  0.40,
-  0.40
-);
+chair.scale.set(0.40,0.40,0.40);
 
 chair.rotation.y = 0.05;
+
+/* JOURNAL */
+
+const journal = await load("./models/journal.glb");
+
+room.add(journal);
+
+journal.position.set(1.58, 0.37, -0.62);
+
+journal.scale.set(0.05,0.05,0.05);
+
+journal.rotation.set(-1.66,0.68,1.69);
+
+/* INITIAL CAMERA */
+
+updateCamera();
 
 })();
 
 /* =========================
-   LOOP
+   RENDER LOOP
 ========================= */
 
 function animate(){
@@ -481,8 +407,7 @@ animate();
 window.addEventListener("resize", ()=>{
 
   camera.aspect =
-    window.innerWidth /
-    window.innerHeight;
+    window.innerWidth/window.innerHeight;
 
   camera.updateProjectionMatrix();
 

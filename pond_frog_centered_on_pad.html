@@ -343,10 +343,156 @@ Preparing scene...
 </div>
 
 </div>
+<div class="popupOverlay" id="microscopePopup">
 
+  <div class="popup">
+
+    <div class="popupTitle">
+      MICROSCOPE READY
+    </div>
+
+    <div class="popupText">
+      Insert a specimen slide to begin
+      microscopic observation.
+    </div>
+
+    <div class="popupButtons">
+
+      <button
+      class="popupBtn"
+      id="openSlidesBtn">
+
+      Select Specimen
+
+      </button>
+
+      <button
+      class="popupBtn closeBtn popupClose">
+
+      Close
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- =========================
+     SPECIMEN POPUP
+========================= -->
+
+<div class="popupOverlay" id="slidesPopup">
+
+  <div class="popup">
+
+    <div class="popupTitle">
+      SPECIMEN LIBRARY
+    </div>
+
+    <div class="popupText">
+      Select an algae specimen slide.
+    </div>
+
+    <div class="specimenGrid">
+
+      <div class="specimenCard">
+        <div class="specimenImage">10x / 40x Preview</div>
+        <div class="specimenName">Spirogyra</div>
+      </div>
+
+      <div class="specimenCard">
+        <div class="specimenImage">10x / 40x Preview</div>
+        <div class="specimenName">Volvox</div>
+      </div>
+
+      <div class="specimenCard">
+        <div class="specimenImage">10x / 40x Preview</div>
+        <div class="specimenName">Ulothrix</div>
+      </div>
+
+      <div class="specimenCard">
+        <div class="specimenImage">10x / 40x Preview</div>
+        <div class="specimenName">Oedogonium</div>
+      </div>
+
+      <div class="specimenCard">
+        <div class="specimenImage">10x / 40x Preview</div>
+        <div class="specimenName">Oscillatoria</div>
+      </div>
+
+      <div class="specimenCard">
+        <div class="specimenImage">10x / 40x Preview</div>
+        <div class="specimenName">Diatoms</div>
+      </div>
+
+    </div>
+
+    <div
+    class="popupButtons"
+    style="margin-top:22px;">
+
+      <button
+      class="popupBtn closeBtn popupClose">
+
+      Close
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- =========================
+     JOURNAL POPUP
+========================= -->
+
+<div class="popupOverlay" id="journalPopup">
+
+  <div class="popup">
+
+    <div class="popupTitle">
+      LAB JOURNAL
+    </div>
+
+    <div class="popupText">
+
+      AI biology journal system
+      coming soon...
+
+      <br><br>
+
+      Future features:
+      <br>
+      • specimen notes
+      <br>
+      • algae theory
+      <br>
+      • AI assistant
+      <br>
+      • practical records
+
+    </div>
+
+    <div class="popupButtons">
+
+      <button
+      class="popupBtn closeBtn popupClose">
+
+      Close
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-
 <script>
 
 (() => {
@@ -516,7 +662,8 @@ window.addEventListener(
     if(!dragging) return;
 
     const dx = e.clientX - lastX;
-    const dy = e.clientY - lastY;
+    const dy = e.clientY - lastY;up
+    
 
     lastX = e.clientX;
     lastY = e.clientY;
@@ -957,157 +1104,5 @@ window.innerHeight
 })();
 
 </script>
-<!-- =========================
-     MICROSCOPE POPUP
-========================= -->
-
-<div class="popupOverlay" id="microscopePopup">
-
-  <div class="popup">
-
-    <div class="popupTitle">
-      MICROSCOPE READY
-    </div>
-
-    <div class="popupText">
-      Insert a specimen slide to begin
-      microscopic observation.
-    </div>
-
-    <div class="popupButtons">
-
-      <button
-      class="popupBtn"
-      id="openSlidesBtn">
-
-      Select Specimen
-
-      </button>
-
-      <button
-      class="popupBtn closeBtn popupClose">
-
-      Close
-
-      </button>
-
-    </div>
-
-  </div>
-
-</div>
-
-<!-- =========================
-     SPECIMEN POPUP
-========================= -->
-
-<div class="popupOverlay" id="slidesPopup">
-
-  <div class="popup">
-
-    <div class="popupTitle">
-      SPECIMEN LIBRARY
-    </div>
-
-    <div class="popupText">
-      Select an algae specimen slide.
-    </div>
-
-    <div class="specimenGrid">
-
-      <div class="specimenCard">
-        <div class="specimenImage">10x / 40x Preview</div>
-        <div class="specimenName">Spirogyra</div>
-      </div>
-
-      <div class="specimenCard">
-        <div class="specimenImage">10x / 40x Preview</div>
-        <div class="specimenName">Volvox</div>
-      </div>
-
-      <div class="specimenCard">
-        <div class="specimenImage">10x / 40x Preview</div>
-        <div class="specimenName">Ulothrix</div>
-      </div>
-
-      <div class="specimenCard">
-        <div class="specimenImage">10x / 40x Preview</div>
-        <div class="specimenName">Oedogonium</div>
-      </div>
-
-      <div class="specimenCard">
-        <div class="specimenImage">10x / 40x Preview</div>
-        <div class="specimenName">Oscillatoria</div>
-      </div>
-
-      <div class="specimenCard">
-        <div class="specimenImage">10x / 40x Preview</div>
-        <div class="specimenName">Diatoms</div>
-      </div>
-
-    </div>
-
-    <div
-    class="popupButtons"
-    style="margin-top:22px;">
-
-      <button
-      class="popupBtn closeBtn popupClose">
-
-      Close
-
-      </button>
-
-    </div>
-
-  </div>
-
-</div>
-
-<!-- =========================
-     JOURNAL POPUP
-========================= -->
-
-<div class="popupOverlay" id="journalPopup">
-
-  <div class="popup">
-
-    <div class="popupTitle">
-      LAB JOURNAL
-    </div>
-
-    <div class="popupText">
-
-      AI biology journal system
-      coming soon...
-
-      <br><br>
-
-      Future features:
-      <br>
-      • specimen notes
-      <br>
-      • algae theory
-      <br>
-      • AI assistant
-      <br>
-      • practical records
-
-    </div>
-
-    <div class="popupButtons">
-
-      <button
-      class="popupBtn closeBtn popupClose">
-
-      Close
-
-      </button>
-
-    </div>
-
-  </div>
-
-</div>
 </body>
 </html>

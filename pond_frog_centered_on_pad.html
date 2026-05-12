@@ -888,26 +888,7 @@ Preparing scene...
     </button>
 
   </div>
-
-  <!-- MICROSCOPE EYE -->
-
-  <div id="scopeEye">
-
-    <!-- replace later with real algae images -->
-
-    <img
-    id="scopeImage"
-    src="https://images.unsplash.com/photo-1532187643603-ba119ca4109e?q=80&w=1200&auto=format&fit=crop"/>
-
-  </div>
-
-  <!-- CONTROLS -->
-
-  <div class="scopeControls">
-
-    <!-- LIGHT -->
-
-    <div class="controlPanel">
+  <div class="controlPanel">
 
       <div class="controlTitle">
         LIGHT INTENSITY
@@ -921,7 +902,26 @@ Preparing scene...
       id="lightSlider"
       class="scopeSlider">
 
-    </div>
+  </div>
+
+  <!-- MICROSCOPE EYE -->
+
+  <div id="scopeEye">
+
+    <!-- replace later with real algae images -->
+
+    <img
+    <img
+id="scopeImage"
+src="./spirogyra10x.jpg"/>
+  </div>
+
+  <!-- CONTROLS -->
+
+  <div class="scopeControls">
+
+    <!-- LIGHT -->
+
 
     <!-- KNOBS -->
 
@@ -1767,6 +1767,9 @@ zoom10Btn.onclick = ()=>{
   zoom10Btn.classList.add("active");
   zoom40Btn.classList.remove("active");
 
+  scopeImage.src =
+  "./spirogyra10x.jpg";
+
   scopeImage.style.transform =
   "scale(1)";
 
@@ -1782,10 +1785,11 @@ zoom40Btn.onclick = ()=>{
   zoom40Btn.classList.add("active");
   zoom10Btn.classList.remove("active");
 
+  scopeImage.src =
+  "./spirogyra40x.jpg";
+
   scopeImage.style.transform =
   "scale(1.85)";
-
-  /* slight blur again */
 
   mainFocus.value = 62;
   fineFocus.value = 40;

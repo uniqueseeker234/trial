@@ -327,9 +327,6 @@ canvas{
 
   display:none;
 
-  align-items:center;
-  justify-content:center;
-
   background:
   radial-gradient(
     circle at center,
@@ -344,13 +341,17 @@ canvas{
 
 #scopeEye{
 
-  position:relative;
+  position:absolute;
 
-  width:min(70vw,680px);
-  height:min(70vw,680px);
+  left:50%;
+  top:50%;
+
+  transform:translate(-50%,-50%);
+
+  width:min(82vw,760px);
+  height:min(82vw,760px);
 
   border-radius:50%;
-
   overflow:hidden;
 
   background:black;
@@ -423,31 +424,30 @@ canvas{
 
   position:absolute;
 
-  top:90px;
+  top:95px;
 
   left:50%;
 
   transform:translateX(-50%);
 
-  z-index:20;
+  z-index:25;
 
   width:min(420px,88vw);
 
-  padding:14px 18px;
+  padding:16px 20px;
 
-  border-radius:20px;
+  border-radius:22px;
 
   background:
-  rgba(10,14,22,0.72);
+  rgba(10,14,22,0.78);
 
-  backdrop-filter:blur(10px);
+  backdrop-filter:blur(14px);
 
   border:
   1px solid rgba(255,255,255,0.08);
 
   color:white;
   }
-
 .zoomBtn{
 
   padding:12px 22px;
@@ -504,28 +504,27 @@ box-sizing:border-box;
 
   position:absolute;
 
-  bottom:10px;
+  left:50%;
+  bottom:18px;
 
-  width:100%;
+  transform:translateX(-50%);
+
+  width:min(1000px,95vw);
 
   display:grid;
 
   grid-template-columns:
-  repeat(auto-fit,minmax(220px,1fr));
+  repeat(2,minmax(240px,1fr));
 
-  gap:14px;
+  gap:16px;
 
   align-items:end;
-
-  padding:0 12px;
-
-  box-sizing:border-box;
 
   color:white;
 
   font-family:Arial;
 
-  max-width:1200px;
+  z-index:20;
 }
 .controlTitle{
 
@@ -647,10 +646,12 @@ input{
 
   #scopeEye{
 
-    width:min(82vw,520px);
-    height:min(82vw,520px);
+  width:min(92vw,620px);
+  height:min(92vw,620px);
 
-    border-width:18px;
+  top:44%;
+
+  border-width:18px;
   }
 
   .scopeControls{
@@ -916,19 +917,19 @@ Preparing scene...
     </button>
 
   </div>
-  <div class="controlPanel">
+  <div id="lightPanel">
 
-      <div class="controlTitle">
-        LIGHT INTENSITY
-      </div>
+  <div class="controlTitle">
+    LIGHT INTENSITY
+  </div>
 
-      <input
-      type="range"
-      min="0"
-      max="100"
-      value="0"
-      id="lightSlider"
-      class="scopeSlider">
+  <input
+  type="range"
+  min="0"
+  max="100"
+  value="0"
+  id="lightSlider"
+  class="scopeSlider">
 
   </div>
 

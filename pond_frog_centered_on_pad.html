@@ -456,23 +456,28 @@ canvas{
 
   position:absolute;
 
-  bottom:20px;
+  bottom:14px;
 
-  width:min(92vw,1000px);
+  width:min(96vw,1200px);
 
   display:flex;
 
-  justify-content:space-between;
+  justify-content:center;
 
   align-items:flex-end;
 
-  gap:20px;
+  gap:14px;
 
   color:white;
 
   font-family:Arial;
-}
 
+  flex-wrap:wrap;
+
+  padding:0 10px;
+
+  box-sizing:border-box;
+}
 /* control box */
 
 .controlPanel{
@@ -503,7 +508,15 @@ canvas{
 
 .scopeSlider{
 
-  width:180px;
+  width:min(160px,34vw);
+
+  touch-action:auto;
+}
+  .scopeSlider,
+button,
+input{
+
+  touch-action:auto;
 }
 
 /* knobs */

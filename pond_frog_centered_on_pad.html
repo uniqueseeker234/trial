@@ -1846,6 +1846,45 @@ Math.max(0,Math.min(18,blur));
 /* first render */
 
 updateMicroscopeView();
+  let lightTouched = false;
+let coarseTouched = false;
+let fineTouched = false;
+
+lightSlider.addEventListener("input",()=>{
+
+  if(lightTouched) return;
+
+  lightTouched = true;
+
+  typeGuide(
+  "Good. Now use coarse adjustment to bring the specimen into view."
+  );
+
+});
+
+mainFocus.addEventListener("input",()=>{
+
+  if(coarseTouched) return;
+
+  coarseTouched = true;
+
+  typeGuide(
+  "Excellent. Now fine tune the cells using fine adjustment."
+  );
+
+});
+
+fineFocus.addEventListener("input",()=>{
+
+  if(fineTouched) return;
+
+  fineTouched = true;
+
+  typeGuide(
+  "Specimen focused successfully."
+  );
+
+});
 
 /* =========================
    MOVE SLIDE

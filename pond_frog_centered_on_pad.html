@@ -452,6 +452,46 @@ canvas{
 
   color:white;
   }
+  #scopeGuide{
+
+  position:absolute;
+
+  left:50%;
+  top:190px;
+
+  transform:translateX(-50%);
+
+  width:min(320px,82vw);
+
+  text-align:center;
+
+  color:#8FFFE1;
+
+  font-family:Arial;
+
+  font-size:14px;
+
+  line-height:1.5;
+
+  z-index:40;
+
+  padding:12px 16px;
+
+  border-radius:18px;
+
+  background:
+  rgba(0,0,0,0.45);
+
+  backdrop-filter:blur(10px);
+
+  border:
+  1px solid rgba(95,194,167,0.18);
+
+  min-height:24px;
+
+  box-shadow:
+  0 0 24px rgba(95,194,167,0.12);
+  }
 .zoomBtn{
 
   padding:12px 22px;
@@ -655,12 +695,12 @@ input{
 
 #scopeEye{
 
-  width:min(76vw,520px);
-  height:min(76vw,520px);
+  width:min(64vw,430px);
+  height:min(64vw,430px);
 
-  top:48%;
+  top:41%;
 
-  border-width:18px;
+  border-width:16px;
 }
 
   .scopeControls{
@@ -949,7 +989,7 @@ Preparing scene...
   class="scopeSlider">
 
   </div>
-
+<div id="scopeGuide"></div>
   <!-- MICROSCOPE EYE -->
 
   <div id="scopeEye">
@@ -1634,6 +1674,37 @@ document.getElementById("zoom10Btn");
 
 const zoom40Btn =
 document.getElementById("zoom40Btn");
+  const scopeGuide =
+document.getElementById("scopeGuide");
+
+let currentGuideTimeout;
+
+/* typewriter effect */
+
+function typeGuide(text){
+
+  clearTimeout(currentGuideTimeout);
+
+  scopeGuide.textContent = "";
+
+  let i = 0;
+
+  function type(){
+
+    if(i < text.length){
+
+      scopeGuide.textContent += text.charAt(i);
+
+      i++;
+
+      currentGuideTimeout =
+      setTimeout(type,28);
+    }
+
+  }
+
+  type();
+}
 
 /* OPEN SCOPE */
 
@@ -1646,6 +1717,9 @@ document
     closeAllPopups();
 
     scopeUI.style.display = "flex";
+    typeGuide(
+"Increase the light intensity to illuminate the specimen."
+);
 
   };
 
@@ -1697,15 +1771,42 @@ function updateMicroscopeView(){
 
   /* realistic blur */
 
-  let blur =
-  (coarseError * 0.18)
-  + (fineError * 0.12);
+  /* =========================
+   REALISTIC MICROSCOPE FOCUS
+========================= */
 
-  /* clamp */
+/*
+Coarse:
+large blur reduction
+brings specimen roughly visible
 
-  blur =
-  Math.max(0,Math.min(18,blur));
+Fine:
+small precision sharpening
+*/
 
+let coarseBlur =
+coarseError * 0.22;
+
+coarseBlur =
+Math.max(0,Math.min(14,coarseBlur));
+
+/* fine only works when coarse near correct */
+
+let fineBlur =
+fineError * 0.10;
+
+if(coarseError > 18){
+
+  fineBlur += 4;
+}
+
+/* final blur */
+
+let blur =
+coarseBlur + fineBlur;
+
+blur =
+Math.max(0,Math.min(18,blur));
   /* brightness */
 
   const brightness =
@@ -1842,6 +1943,7 @@ zoom40Btn.onclick = ()=>{
   updateMicroscopeView();
 
 };
+  
 /* =========================
    OBJECT CLICK DETECTION
 ========================= */

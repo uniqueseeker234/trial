@@ -491,6 +491,7 @@ canvas{
 
   box-shadow:
   0 0 24px rgba(95,194,167,0.12);
+    transition:opacity .3s;
   }
 .zoomBtn{
 
@@ -1873,16 +1874,19 @@ mainFocus.addEventListener("input",()=>{
   );
 
 });
-
 fineFocus.addEventListener("input",()=>{
 
   if(fineTouched) return;
 
   fineTouched = true;
 
-  typeGuide(
-  "Specimen focused successfully."
-  );
+  scopeGuide.style.opacity = "0";
+
+  setTimeout(()=>{
+
+    scopeGuide.style.display = "none";
+
+  },300);
 
 });
 

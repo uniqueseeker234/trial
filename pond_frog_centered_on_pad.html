@@ -315,6 +315,289 @@ canvas{
 
   font-weight:700;
 }
+  /* =========================
+   MICROSCOPE OBSERVATION UI
+========================= */
+
+#scopeUI{
+
+  position:fixed;
+  inset:0;
+
+  z-index:900;
+
+  display:none;
+
+  align-items:center;
+  justify-content:center;
+
+  background:
+  radial-gradient(
+    circle at center,
+    rgba(0,0,0,0.25),
+    rgba(0,0,0,0.92)
+  );
+
+  overflow:hidden;
+}
+
+/* microscope eye */
+
+#scopeEye{
+
+  position:relative;
+
+  width:min(70vw,680px);
+  height:min(70vw,680px);
+
+  border-radius:50%;
+
+  overflow:hidden;
+
+  background:black;
+
+  border:26px solid #0d0d0d;
+
+  box-shadow:
+  0 0 0 10px #1e1e1e,
+  0 0 60px rgba(0,0,0,0.95),
+  inset 0 0 90px rgba(0,0,0,0.95);
+}
+
+/* specimen image */
+
+#scopeImage{
+
+  position:absolute;
+
+  width:130%;
+  height:130%;
+
+  left:-15%;
+  top:-15%;
+
+  object-fit:cover;
+
+  transition:
+  filter .35s,
+  transform .55s,
+  opacity .35s;
+
+  filter:
+  brightness(0.12)
+  blur(12px)
+  saturate(1.1);
+}
+
+/* dark edge */
+
+#scopeEye::after{
+
+  content:"";
+
+  position:absolute;
+  inset:0;
+
+  border-radius:50%;
+
+  box-shadow:
+  inset 0 0 120px rgba(0,0,0,0.95);
+
+  pointer-events:none;
+}
+
+/* top buttons */
+
+.scopeTop{
+
+  position:absolute;
+
+  top:28px;
+
+  display:flex;
+
+  gap:12px;
+
+  z-index:20;
+}
+
+.zoomBtn{
+
+  padding:12px 22px;
+
+  border:none;
+
+  border-radius:14px;
+
+  background:#121826;
+
+  color:white;
+
+  font-weight:700;
+
+  cursor:pointer;
+
+  border:1px solid rgba(255,255,255,0.12);
+
+  transition:.25s;
+}
+
+.zoomBtn.active{
+
+  background:#5FC2A7;
+
+  box-shadow:
+  0 0 24px rgba(95,194,167,0.7);
+}
+
+/* controls */
+
+.scopeControls{
+
+  position:absolute;
+
+  bottom:20px;
+
+  width:min(92vw,1000px);
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:flex-end;
+
+  gap:20px;
+
+  color:white;
+
+  font-family:Arial;
+}
+
+/* control box */
+
+.controlPanel{
+
+  background:
+  rgba(10,14,22,0.72);
+
+  backdrop-filter:blur(10px);
+
+  border-radius:22px;
+
+  padding:18px;
+
+  border:
+  1px solid rgba(255,255,255,0.08);
+}
+
+.controlTitle{
+
+  font-size:13px;
+
+  opacity:.7;
+
+  margin-bottom:10px;
+}
+
+/* sliders */
+
+.scopeSlider{
+
+  width:180px;
+}
+
+/* knobs */
+
+.knobWrap{
+
+  display:flex;
+  gap:22px;
+}
+
+.knobBox{
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+.knob{
+
+  width:82px;
+  height:82px;
+
+  border-radius:50%;
+
+  background:
+  radial-gradient(
+    circle at 30% 30%,
+    #434343,
+    #111
+  );
+
+  border:5px solid #222;
+
+  box-shadow:
+  inset 0 0 30px rgba(255,255,255,0.08),
+  0 0 20px rgba(0,0,0,0.8);
+
+  transition:transform .15s linear;
+}
+
+/* movement buttons */
+
+.moveGrid{
+
+  display:grid;
+
+  grid-template-columns:
+  repeat(3,52px);
+
+  gap:10px;
+}
+
+.moveBtn{
+
+  width:52px;
+  height:52px;
+
+  border:none;
+
+  border-radius:14px;
+
+  background:#151c28;
+
+  color:white;
+
+  font-size:18px;
+
+  cursor:pointer;
+}
+
+#closeScope{
+
+  position:absolute;
+
+  right:24px;
+  top:24px;
+
+  z-index:30;
+
+  border:none;
+
+  width:52px;
+  height:52px;
+
+  border-radius:50%;
+
+  background:#ff5c74;
+
+  color:white;
+
+  font-size:22px;
+
+  cursor:pointer;
+}
 </style>
 </head>
 
@@ -485,6 +768,153 @@ Preparing scene...
       Close
 
       </button>
+
+    </div>
+
+  </div>
+
+</div>
+  <!-- =========================
+     MICROSCOPE OBSERVATION UI
+========================= -->
+
+<div id="scopeUI">
+
+  <button id="closeScope">×</button>
+
+  <!-- TOP BUTTONS -->
+
+  <div class="scopeTop">
+
+    <button
+    class="zoomBtn active"
+    id="zoom10Btn">
+
+    10x
+
+    </button>
+
+    <button
+    class="zoomBtn"
+    id="zoom40Btn">
+
+    40x
+
+    </button>
+
+  </div>
+
+  <!-- MICROSCOPE EYE -->
+
+  <div id="scopeEye">
+
+    <!-- replace later with real algae images -->
+
+    <img
+    id="scopeImage"
+    src="https://images.unsplash.com/photo-1532187643603-ba119ca4109e?q=80&w=1200&auto=format&fit=crop"/>
+
+  </div>
+
+  <!-- CONTROLS -->
+
+  <div class="scopeControls">
+
+    <!-- LIGHT -->
+
+    <div class="controlPanel">
+
+      <div class="controlTitle">
+        LIGHT INTENSITY
+      </div>
+
+      <input
+      type="range"
+      min="0"
+      max="100"
+      value="15"
+      id="lightSlider"
+      class="scopeSlider">
+
+    </div>
+
+    <!-- KNOBS -->
+
+    <div class="controlPanel">
+
+      <div class="controlTitle">
+        FOCUS SYSTEM
+      </div>
+
+      <div class="knobWrap">
+
+        <div class="knobBox">
+
+          <div
+          class="knob"
+          id="mainKnob"></div>
+
+          <input
+          type="range"
+          min="0"
+          max="100"
+          value="20"
+          id="mainFocus"
+          class="scopeSlider">
+
+        </div>
+
+        <div class="knobBox">
+
+          <div
+          class="knob"
+          id="fineKnob"></div>
+
+          <input
+          type="range"
+          min="0"
+          max="100"
+          value="30"
+          id="fineFocus"
+          class="scopeSlider">
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- MOVE -->
+
+    <div class="controlPanel">
+
+      <div class="controlTitle">
+        MOVE SLIDE
+      </div>
+
+      <div class="moveGrid">
+
+        <div></div>
+
+        <button class="moveBtn" id="moveUp">
+          ↑
+        </button>
+
+        <div></div>
+
+        <button class="moveBtn" id="moveLeft">
+          ←
+        </button>
+
+        <button class="moveBtn" id="moveDown">
+          ↓
+        </button>
+
+        <button class="moveBtn" id="moveRight">
+          →
+        </button>
+
+      </div>
 
     </div>
 
@@ -1016,7 +1446,215 @@ document
   openPopup("slidesPopup");
 
 };
+/* =========================
+   MICROSCOPE UI SYSTEM
+========================= */
 
+const scopeUI =
+document.getElementById("scopeUI");
+
+const scopeImage =
+document.getElementById("scopeImage");
+
+const lightSlider =
+document.getElementById("lightSlider");
+
+const mainFocus =
+document.getElementById("mainFocus");
+
+const fineFocus =
+document.getElementById("fineFocus");
+
+const mainKnob =
+document.getElementById("mainKnob");
+
+const fineKnob =
+document.getElementById("fineKnob");
+
+const zoom10Btn =
+document.getElementById("zoom10Btn");
+
+const zoom40Btn =
+document.getElementById("zoom40Btn");
+
+/* OPEN SCOPE */
+
+document
+.querySelectorAll(".specimenCard")
+.forEach(card=>{
+
+  card.onclick = ()=>{
+
+    closeAllPopups();
+
+    scopeUI.style.display = "flex";
+
+  };
+
+});
+
+/* CLOSE */
+
+document
+.getElementById("closeScope")
+.onclick = ()=>{
+
+  scopeUI.style.display = "none";
+
+};
+
+/* =========================
+   LIGHT + FOCUS SYSTEM
+========================= */
+
+function updateMicroscopeView(){
+
+  const light =
+  lightSlider.value / 100;
+
+  const main =
+  mainFocus.value / 100;
+
+  const fine =
+  fineFocus.value / 100;
+
+  /* blur system */
+
+  const blur =
+  14
+  - (main * 10)
+  - (fine * 3);
+
+  /* brightness */
+
+  const brightness =
+  0.1 + (light * 1.3);
+
+  /* sharpen feel */
+
+  const contrast =
+  1 + fine * 0.6;
+
+  scopeImage.style.filter = `
+  brightness(${brightness})
+  blur(${blur}px)
+  contrast(${contrast})
+  saturate(1.15)
+  `;
+
+  /* knob rotation */
+
+  mainKnob.style.transform =
+  `rotate(${mainFocus.value * 3.6}deg)`;
+
+  fineKnob.style.transform =
+  `rotate(${fineFocus.value * 3.6}deg)`;
+
+}
+
+lightSlider.oninput =
+updateMicroscopeView;
+
+mainFocus.oninput =
+updateMicroscopeView;
+
+fineFocus.oninput =
+updateMicroscopeView;
+
+updateMicroscopeView();
+
+/* =========================
+   MOVE SLIDE
+========================= */
+
+let slideX = -15;
+let slideY = -15;
+
+function updateSlideMove(){
+
+  scopeImage.style.left =
+  slideX + "%";
+
+  scopeImage.style.top =
+  slideY + "%";
+
+}
+
+document
+.getElementById("moveLeft")
+.onclick = ()=>{
+
+  slideX += 2;
+
+  updateSlideMove();
+
+};
+
+document
+.getElementById("moveRight")
+.onclick = ()=>{
+
+  slideX -= 2;
+
+  updateSlideMove();
+
+};
+
+document
+.getElementById("moveUp")
+.onclick = ()=>{
+
+  slideY += 2;
+
+  updateSlideMove();
+
+};
+
+document
+.getElementById("moveDown")
+.onclick = ()=>{
+
+  slideY -= 2;
+
+  updateSlideMove();
+
+};
+
+/* =========================
+   10x / 40x
+========================= */
+
+zoom10Btn.onclick = ()=>{
+
+  zoom10Btn.classList.add("active");
+  zoom40Btn.classList.remove("active");
+
+  scopeImage.style.transform =
+  "scale(1)";
+
+  mainFocus.value = 45;
+  fineFocus.value = 35;
+
+  updateMicroscopeView();
+
+};
+
+zoom40Btn.onclick = ()=>{
+
+  zoom40Btn.classList.add("active");
+  zoom10Btn.classList.remove("active");
+
+  scopeImage.style.transform =
+  "scale(1.85)";
+
+  /* slight blur again */
+
+  mainFocus.value = 62;
+  fineFocus.value = 40;
+
+  updateMicroscopeView();
+
+};
 /* =========================
    OBJECT CLICK DETECTION
 ========================= */

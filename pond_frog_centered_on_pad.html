@@ -1158,7 +1158,21 @@ let lastY = 0;
 
 document.body.addEventListener(
   "touchmove",
-  e => e.preventDefault(),
+  e => {
+
+    if(
+      e.target.closest(".scopeSlider")
+      ||
+      e.target.closest(".moveBtn")
+      ||
+      e.target.closest(".zoomBtn")
+    ){
+      return;
+    }
+
+    e.preventDefault();
+
+  },
   { passive:false }
 );
 
@@ -1671,20 +1685,21 @@ function updateMicroscopeView(){
 
   fineKnob.style.transform =
   `rotate(${fine * 3.6}deg)`;
-  
-lightSlider.oninput =
-updateMicroscopeView;
-
-mainFocus.oninput =
-updateMicroscopeView;
-
-fineFocus.oninput =
-updateMicroscopeView;
-
-updateMicroscopeView();
 }
   
+[lightSlider,mainFocus,fineFocus]
+.forEach(slider=>{
 
+  slider.addEventListener(
+    "input",
+    updateMicroscopeView
+  );
+
+});
+
+/* first render */
+
+updateMicroscopeView();
 
 /* =========================
    MOVE SLIDE

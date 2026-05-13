@@ -436,11 +436,11 @@ canvas{
 
   z-index:25;
 
-  width:min(420px,88vw);
+  width:min(340px,82vw);
 
-  padding:16px 20px;
+padding:12px 16px;
 
-  border-radius:22px;
+border-radius:18px;
 
   background:
   rgba(10,14,22,0.78);
@@ -586,7 +586,7 @@ box-sizing:border-box;
 
   border-radius:22px;
 
-  padding:18px;
+  padding:12px;
 
   border:
   1px solid rgba(255,255,255,0.08);
@@ -633,7 +633,7 @@ align-items:center;
 
 .scopeSlider{
 
-  width:min(160px,34vw);
+  width:min(130px,30vw);
 
   touch-action:auto;
 }
@@ -661,8 +661,8 @@ input{
 
 .knob{
 
-  width:82px;
-  height:82px;
+  width:64px;
+height:64px;
 
   border-radius:50%;
 
@@ -1137,17 +1137,14 @@ src="./spirogyra10x.jpg"/>
       <div class="controlTitle">
         MOVE SLIDE
       </div>
-<div style="
-font-size:11px;
-opacity:.65;
-margin-bottom:14px;
-text-align:center;
-line-height:1.5;
-max-width:220px;
+
+      <div style="
+display:flex;
+align-items:center;
+gap:16px;
 ">
-Move the coarse and fine adjustment knobs to get a clear view of the specimen.
-</div>
-      <div class="moveGrid">
+
+<div class="moveGrid">
 
         <div></div>
 
@@ -1172,6 +1169,17 @@ Move the coarse and fine adjustment knobs to get a clear view of the specimen.
       </div>
 
     </div>
+
+  </div>
+    <div style="
+font-size:11px;
+opacity:.65;
+line-height:1.5;
+max-width:120px;
+text-align:left;
+">
+Move the coarse and fine adjustment knobs to get a clear view of the specimen.
+</div>
 
   </div>
 
@@ -1786,13 +1794,13 @@ guideNextBtn.onclick = ()=>{
 
   if(guideStep === 1){
 
-    guideStep = 1;
+    typeGuide(
+    "Increase the light intensity to illuminate the specimen."
+    );
 
-typeGuide(
-"Increase the light intensity to illuminate the specimen."
-);
+  }
 
-  if(guideStep === 2){
+  else if(guideStep === 2){
 
     typeGuide(
     "As the light is now focused, let's start coarse adjustment. Use it till you start to see your specimen slightly (not clear)."
@@ -1800,13 +1808,17 @@ typeGuide(
 
   }
 
-  if(guideStep === 3){
+  else if(guideStep === 3){
 
     typeGuide(
     "Excellent. Now fine tune the cells using fine adjustment."
     );
 
+    guideNextBtn.style.display = "none";
+
   }
+
+};
 
 };
 /* OPEN SCOPE */

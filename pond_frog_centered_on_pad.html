@@ -1786,11 +1786,11 @@ guideNextBtn.onclick = ()=>{
 
   if(guideStep === 1){
 
-    typeGuide(
-    "Increase the light intensity to illuminate the specimen."
-    );
+    guideStep = 1;
 
-  }
+typeGuide(
+"Increase the light intensity to illuminate the specimen."
+);
 
   if(guideStep === 2){
 
@@ -1960,44 +1960,7 @@ updateMicroscopeView();
 let coarseTouched = false;
 let fineTouched = false;
 
-lightSlider.addEventListener("input",()=>{
 
-  if(lightTouched) return;
-
-  lightTouched = true;
-
-  typeGuide(
-"As the light is now focused, let's start coarse adjustment knob. Use it till you start to see your specimen slightly (not fully clear)."
-);
-
-});
-
-mainFocus.addEventListener("input",()=>{
-
-  if(coarseTouched) return;
-
-  coarseTouched = true;
-
-  typeGuide(
-  "Excellent. Now fine tune the cells using fine adjustment."
-  );
-
-});
-fineFocus.addEventListener("input",()=>{
-
-  if(fineTouched) return;
-
-  fineTouched = true;
-
-  scopeGuide.style.opacity = "0";
-
-  setTimeout(()=>{
-
-    scopeGuide.style.display = "none";
-
-  },300);
-
-});
 
 /* =========================
    MOVE SLIDE

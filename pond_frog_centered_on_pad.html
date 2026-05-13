@@ -1767,6 +1767,58 @@ document.getElementById("zoom10Btn");
 
 const zoom40Btn =
 document.getElementById("zoom40Btn");
+  const specimens = {
+
+  spirogyra:{
+    name:"Spirogyra",
+    img10:"./spirogyra10x.jpg",
+    img40:"./spirogyra40x.jpg"
+  },
+
+  nostoc:{
+    name:"Nostoc",
+    img10:"./nostoc10x.jpg",
+    img40:"./nostoc40x.jpg"
+  },
+
+  cosmarium:{
+    name:"Cosmarium",
+    img10:"./cosmarium10x.jpg",
+    img40:"./cosmarium40x.jpg"
+  },
+
+  chlorella:{
+    name:"Chlorella",
+    img10:"./chlorella10x.jpg",
+    img40:"./chlorella40x.jpg"
+  },
+
+  volvox:{
+    name:"Volvox",
+    img10:"./volvox10x.jpg",
+    img40:"./volvox40x.jpg"
+  },
+
+  nodularia:{
+    name:"Nodularia",
+    img10:"./nodularia10x.jpg",
+    img40:"./nodularia40x.jpg"
+  },
+
+  scenedesmus:{
+    name:"Scendesmus",
+    img10:"./scendesmus10x.jpg",
+    img40:"./scendesmus40x.jpg"
+  }
+    oscillatoria:{
+  name:"Oscillatoria",
+  img10:"./oscillatoria10x.jpg",
+  img40:"./oscillatoria40x.jpg"
+},
+
+};
+
+let currentSpecimen = specimens.spirogyra;
   const scopeGuide =
 document.getElementById("scopeGuide");
 
@@ -1835,25 +1887,50 @@ guideNextBtn.onclick = ()=>{
 };
 
 /* OPEN SCOPE */
-
 document
 .querySelectorAll(".specimenCard")
 .forEach(card=>{
 
   card.onclick = ()=>{
 
+    const specimenKey =
+    card.dataset.specimen;
+
+    currentSpecimen =
+    specimens[specimenKey];
+
+    /* default 10x */
+
+    zoom10Btn.classList.add("active");
+    zoom40Btn.classList.remove("active");
+
+    scopeImage.src =
+    currentSpecimen.img10;
+
+    scopeImage.style.transform =
+    "scale(1)";
+
     closeAllPopups();
 
     scopeUI.style.display = "flex";
+
     guideStep = 1;
 
-guideNextBtn.style.display = "block";
+    guideNextBtn.style.display = "block";
+
+    scopeGuide.style.display = "block";
+    scopeGuide.style.opacity = "1";
+
     typeGuide(
-"Increase the light intensity to illuminate the specimen."
-);
+    "Increase the light intensity to illuminate the specimen."
+    );
+
+    updateMicroscopeView();
 
   };
+
 });
+
 
 /* CLOSE */
 
@@ -2077,7 +2154,7 @@ zoom10Btn.onclick = ()=>{
   zoom40Btn.classList.remove("active");
 
   scopeImage.src =
-  "./spirogyra10x.jpg";
+currentSpecimen.img10;
 
   scopeImage.style.transform =
   "scale(1)";
@@ -2095,7 +2172,7 @@ zoom40Btn.onclick = ()=>{
   zoom10Btn.classList.remove("active");
 
   scopeImage.src =
-  "./spirogyra40x.jpg";
+currentSpecimen.img40;
 
   scopeImage.style.transform =
   "scale(1.85)";

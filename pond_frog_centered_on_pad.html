@@ -428,7 +428,7 @@ canvas{
 
   position:absolute;
 
-  top:95px;
+  top:88px;
 
   left:50%;
 
@@ -436,11 +436,11 @@ canvas{
 
   z-index:25;
 
-  width:min(340px,82vw);
+  width:min(260px,72vw);
 
-padding:12px 16px;
+  padding:10px 14px;
 
-border-radius:18px;
+  border-radius:16px;
 
   background:
   rgba(10,14,22,0.78);
@@ -493,12 +493,13 @@ border-radius:18px;
   0 0 24px rgba(95,194,167,0.12);
     transition:opacity .3s;
   }
-  #scopeGuideBox{
+
+#scopeGuideBox{
 
   position:absolute;
 
   left:50%;
-  top:190px;
+  top:320px;
 
   transform:translateX(-50%);
 
@@ -512,7 +513,6 @@ border-radius:18px;
 
   gap:10px;
 }
-
 #guideNextBtn{
 
   border:none;
@@ -1957,11 +1957,32 @@ const brightness =
 
   slider.addEventListener(
     "input",
-    updateMicroscopeView
+    () => {
+
+      updateMicroscopeView();
+
+      /* remove final guide after fine tuning */
+
+      if(
+        guideStep === 3 &&
+        Math.abs(fineFocus.value - 52) < 8
+      ){
+
+        scopeGuide.style.opacity = "0";
+
+        setTimeout(()=>{
+
+          scopeGuide.style.display = "none";
+          guideNextBtn.style.display = "none";
+
+        },300);
+
+      }
+
+    }
   );
 
 });
-
 /* first render */
 
 updateMicroscopeView();

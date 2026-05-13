@@ -244,6 +244,10 @@ canvas{
   background:#ff5c74;
 }
 
+.popup{
+
+  touch-action:auto;
+}
 .specimenGrid{
 
   display:grid;
@@ -287,12 +291,8 @@ canvas{
 
   height:110px;
 
-  background:
-  linear-gradient(
-    135deg,
-    #284d46,
-    #17313d
-  );
+  background-size:cover;
+  background-position:center;
 
   display:flex;
 
@@ -301,9 +301,11 @@ canvas{
 
   font-size:12px;
 
-  color:rgba(255,255,255,0.7);
-}
+  color:white;
 
+  text-shadow:
+  0 2px 10px rgba(0,0,0,0.9);
+}
 .specimenName{
 
   padding:12px;
@@ -917,57 +919,76 @@ border:1px solid rgba(255,180,80,0.18);
     <div class="specimenGrid">
 
   <div class="specimenCard" data-specimen="spirogyra">
-    <div class="specimenImage">10x / 40x Preview</div>
+    <div class="specimenImage"
+    style="background-image:url('./spirogyra10x.jpg')">
+    </div>
     <div class="specimenName">Spirogyra</div>
   </div>
 
   <div class="specimenCard" data-specimen="nostoc">
-    <div class="specimenImage">10x / 40x Preview</div>
+    <div class="specimenImage"
+    style="background-image:url('./nostoc10x.jpg')">
+    </div>
     <div class="specimenName">Nostoc</div>
   </div>
 
   <div class="specimenCard" data-specimen="scenedesmus">
-    <div class="specimenImage">10x / 40x Preview</div>
+    <div class="specimenImage"
+    style="background-image:url('./scenedesmus10x.jpg')">
+    </div>
     <div class="specimenName">Scenedesmus</div>
   </div>
 
   <div class="specimenCard" data-specimen="oscillatoria">
-    <div class="specimenImage">10x / 40x Preview</div>
+    <div class="specimenImage"
+    style="background-image:url('./oscillatoria10x.jpg')">
+    </div>
     <div class="specimenName">Oscillatoria</div>
   </div>
 
   <div class="specimenCard" data-specimen="cosmarium">
-    <div class="specimenImage">10x / 40x Preview</div>
+    <div class="specimenImage"
+    style="background-image:url('./cosmarium10x.jpg')">
+    </div>
     <div class="specimenName">Cosmarium</div>
   </div>
 
   <div class="specimenCard" data-specimen="chlorella">
-    <div class="specimenImage">10x / 40x Preview</div>
+    <div class="specimenImage"
+    style="background-image:url('./chlorella10x.jpg')">
+    </div>
     <div class="specimenName">Chlorella</div>
   </div>
 
   <div class="specimenCard" data-specimen="nodularia">
-    <div class="specimenImage">10x / 40x Preview</div>
+    <div class="specimenImage"
+    style="background-image:url('./nodularia10x.jpg')">
+    </div>
     <div class="specimenName">Nodularia</div>
   </div>
 
   <div class="specimenCard" data-specimen="volvox">
-    <div class="specimenImage">10x / 40x Preview</div>
+    <div class="specimenImage"
+    style="background-image:url('./volvox10x.jpg')">
+    </div>
     <div class="specimenName">Volvox</div>
   </div>
 
-    </div>
-    class="popupButtons"
-    style="margin-top:22px;">
+</div>
 
-      <button
-      class="popupBtn closeBtn popupClose">
+<div
+class="popupButtons"
+style="margin-top:22px;">
 
-      Close
+  <button
+  class="popupBtn closeBtn popupClose">
 
-      </button>
+  Close
 
-    </div>
+  </button>
+
+</div>
+
 
   </div>
 
@@ -1347,15 +1368,16 @@ document.body.addEventListener(
   e => {
 
     if(
-      e.target.closest(".scopeSlider")
-      ||
-      e.target.closest(".moveBtn")
-      ||
-      e.target.closest(".zoomBtn")
-    ){
-      return;
+  e.target.closest(".scopeSlider")
+  ||
+  e.target.closest(".moveBtn")
+  ||
+  e.target.closest(".zoomBtn")
+  ||
+  e.target.closest(".popup")
+){
+  return;
     }
-
     e.preventDefault();
 
   },

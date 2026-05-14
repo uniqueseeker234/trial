@@ -4,6 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
 <title>Elythera Portal Hub</title>
 
 <style>
@@ -40,9 +41,41 @@ background:#000;
 display:none;
 align-items:center;
 justify-content:center;
-font-size:28px;
-letter-spacing:4px;
+flex-direction:column;
 z-index:999;
+overflow:hidden;
+}
+
+#welcomeText{
+font-size:48px;
+font-weight:700;
+letter-spacing:10px;
+font-family:'Orbitron',sans-serif;
+text-transform:uppercase;
+text-align:center;
+line-height:1.5;
+
+background:linear-gradient(90deg,#5edbff,#4cff79,#b96bff);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+
+text-shadow:
+0 0 12px rgba(94,219,255,.35),
+0 0 24px rgba(76,255,121,.25);
+
+animation:welcomeGlow 3s ease-in-out infinite;
+}
+
+@keyframes welcomeGlow{
+0%,100%{
+transform:scale(1);
+opacity:1;
+}
+
+50%{
+transform:scale(1.04);
+opacity:.92;
+}
 }
 
 #welcomeText::after{
@@ -248,6 +281,7 @@ text-shadow:
 
 <div class="team">
 
+<!--
 <video id="elytheraVideo"
 style="
 position:absolute;
@@ -263,9 +297,12 @@ preload="auto">
 <source src="assets/elythera/elythera_intro.mp4" type="video/mp4">
 
 </video>
+-->
+<!--
 <audio id="bgMusic" loop>
   <source src="assets/elythera/elythera_music.mp3" type="audio/mpeg">
 </audio>
+-->
 </div>
 
 <div class="systems" id="systems">
@@ -281,27 +318,27 @@ preload="auto">
 </a>
 
 <a class="card pond" href="pond.html">
-<div class="logo-shell"><img src="assets/elythera/logo_pond_black.png"></div>
-<h3>Algal Pond</h3>
-<p>Algae pond built by members of Elythera.</p>
+<div class="logo-shell"><img src="assets/elythera/logo_image_identifier_black.png"></div>
+<h3>Image Identifier</h3>
+<p>Helps to identify algae using image.</p>
 </a>
 
 <a class="card archive" href="archive.html">
 <div class="logo-shell"><img src="assets/elythera/logo_archive_black.png"></div>
-<h3>Archive</h3>
-<p>Visual encyclopedia of algae.</p>
+<h3>Algae Repository</h3>
+<p>Helps to learn about alage world.</p>
 </a>
 
 <a class="card photohouse" href="photohouse.html">
 <div class="logo-shell"><img src="assets/elythera/logo_camera_black.png"></div>
 <h3>PhotoHouse</h3>
-<p>Enhance your image.</p>
+<p>Enhance your algae image.</p>
 </a>
 
 <a class="card locator" href="locator.html">
-<div class="logo-shell"><img src="assets/elythera/logo_locator_black.png"></div>
-<h3>Locator</h3>
-<p>Geological location and their common algaes.</p>
+<div class="logo-shell"><img src="assets/elythera/logo_virtual_microscope_black.png"></div>
+<h3>Virtual Microscope</h3>
+<p>Helps to get a experience of viewing algae specimen under microscope.</p>
 </a>
 
 </div>
@@ -316,10 +353,10 @@ const text = "WELCOME TO ELYTHERA"
 let i = 0
 
 // ELEMENTS (MUST COME FIRST)
-const video = document.getElementById("elytheraVideo")
+//const video = document.getElementById("elytheraVideo")
 const systems = document.getElementById("systems")
 const tap = document.getElementById("tapStart")
-const music = document.getElementById("bgMusic")
+//const music = document.getElementById("bgMusic")
 const el = document.getElementById("welcomeText")
 
 // TYPE EFFECT
@@ -345,8 +382,8 @@ tap.addEventListener("click", () => {
   document.getElementById("welcome").style.display = "flex"
 
   // start music
-  music.volume = 0.5
-  music.play()
+  //music.volume = 0.5
+ // music.play()
 
   // start typing
   type()
@@ -358,11 +395,7 @@ function startAnimation(){
 
   setTimeout(()=>{
 
-    video.play()
-
-    video.onended = () => {
-      systems.classList.add("show")
-    }
+    systems.classList.add("show")
 
   },500)
 

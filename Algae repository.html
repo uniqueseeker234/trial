@@ -149,33 +149,38 @@ display:flex;
 align-items:center;
 justify-content:center;
 
-min-height:90px;
+height:82px;
+
+/* push downward */
+margin-top:42px;
+margin-bottom:12px;
 
 background:
 linear-gradient(
 90deg,
-rgba(0,255,255,.08),
-rgba(0,255,120,.08),
-rgba(200,120,255,.08)
+rgba(0,255,255,.06),
+rgba(0,255,120,.06),
+rgba(200,120,255,.06)
 );
 
-border:1px solid rgba(0,255,255,.18);
+border:1px solid rgba(0,255,255,.14);
 
 backdrop-filter:blur(8px);
 }
 
 .portal-message:hover{
 box-shadow:
-0 0 18px rgba(0,255,255,.15),
-0 0 30px rgba(180,120,255,.12);
+0 0 14px rgba(0,255,255,.12),
+0 0 22px rgba(180,120,255,.10);
 }
 
 .portal-message h3{
 margin:0;
 
 font-family:'Orbitron',sans-serif;
-font-size:17px;
-letter-spacing:4px;
+font-size:14px;
+
+letter-spacing:3px;
 
 background:
 linear-gradient(
@@ -190,8 +195,8 @@ linear-gradient(
 
 text-align:center;
 
-padding:0 14px;
-line-height:1.6;
+padding:0 16px;
+line-height:1.5;
 }
 
 /* ===== RESPONSIVE ===== */

@@ -1240,6 +1240,60 @@ max="250"
 value="110"
 style="width:100%;">
 </div>
+    <div style="margin-top:14px;">
+Light Panel Horizontal
+<input
+type="range"
+id="lightLeftSlider"
+min="20"
+max="80"
+value="50"
+style="width:100%;">
+</div>
+
+<div style="margin-top:14px;">
+Focus Box Size
+<input
+type="range"
+id="focusScaleSlider"
+min="70"
+max="150"
+value="100"
+style="width:100%;">
+</div>
+
+<div style="margin-top:14px;">
+Move Box Size
+<input
+type="range"
+id="moveScaleSlider"
+min="70"
+max="150"
+value="100"
+style="width:100%;">
+</div>
+
+<div style="margin-top:14px;">
+Focus Box Horizontal
+<input
+type="range"
+id="focusLeftSlider"
+min="-200"
+max="200"
+value="0"
+style="width:100%;">
+</div>
+
+<div style="margin-top:14px;">
+Move Box Horizontal
+<input
+type="range"
+id="moveLeftSlider"
+min="-200"
+max="200"
+value="0"
+style="width:100%;">
+</div>
 
   </div>
 
@@ -1319,7 +1373,7 @@ src="./spirogyra10x.jpg"/>
 
     <div class="controlPanel">
 
-      <div class="controlTitle">
+      <div class="controlTitle" id="focusPanel">
         FOCUS SYSTEM
       </div>
 
@@ -1379,7 +1433,7 @@ src="./spirogyra10x.jpg"/>
 
     <div class="controlPanel">
 
-      <div class="controlTitle">
+      <div class="controlTitle" id="movePanel">
         MOVE SLIDE
       </div>
 
@@ -2314,6 +2368,20 @@ document.getElementById("eyeTopSlider");
 
 const lightTopSlider =
 document.getElementById("lightTopSlider");
+  const lightLeftSlider =
+document.getElementById("lightLeftSlider");
+
+const focusScaleSlider =
+document.getElementById("focusScaleSlider");
+
+const moveScaleSlider =
+document.getElementById("moveScaleSlider");
+
+const focusLeftSlider =
+document.getElementById("focusLeftSlider");
+
+const moveLeftSlider =
+document.getElementById("moveLeftSlider");
 
 function updateDesktopUI(){
 
@@ -2324,6 +2392,11 @@ document.getElementById("scopeEye");
 
 const lightPanel =
 document.getElementById("lightPanel");
+  const focusPanel =
+document.getElementById("focusPanel");
+
+const movePanel =
+document.getElementById("movePanel");
 
 /* eye size */
 
@@ -2342,13 +2415,34 @@ eyeTopSlider.value + "%";
 
 lightPanel.style.top =
 lightTopSlider.value + "px";
+  /* light horizontal */
+
+lightPanel.style.left =
+lightLeftSlider.value + "%";
+
+/* focus size */
+
+focusPanel.style.transform =
+`translateX(${focusLeftSlider.value}px)
+scale(${focusScaleSlider.value / 100})`;
+
+/* move size */
+
+movePanel.style.transform =
+`translateX(${moveLeftSlider.value}px)
+scale(${moveScaleSlider.value / 100})`;
 
 }
 
 [
 eyeSizeSlider,
 eyeTopSlider,
-lightTopSlider
+lightTopSlider,
+lightLeftSlider,
+focusScaleSlider,
+moveScaleSlider,
+focusLeftSlider,
+moveLeftSlider
 ].forEach(slider=>{
 
 slider.addEventListener(

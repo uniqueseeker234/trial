@@ -136,8 +136,6 @@ transition:opacity .9s ease;
 }
 .main-logo{
 opacity:1 !important;
-z-index:2;
-
 width:100%;
 height:100%;
 object-fit:contain;
@@ -157,6 +155,16 @@ transform:translateY(0px) scale(1);
 transform:translateY(-10px) scale(1.015);
 }
 }
+  .logo-mover{
+position:absolute;
+inset:0;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+z-index:2;
+  }
   #logoControls{
 position:fixed;
 top:20px;
@@ -358,10 +366,14 @@ min="-200" max="200" value="0">
 </label>
 
   </div>
-  <img 
+  <div class="logo-mover">
+
+<img 
 src="assets/elythera/elythera_main_logo.png" 
 class="main-logo"
 alt="Elythera Logo">
+
+  </div>
 
 <!--
 <video id="elytheraVideo"
@@ -483,7 +495,7 @@ function startAnimation(){
 
 }
 const logo = document.querySelector(".main-logo")
-
+const mover = document.querySelector(".logo-mover")
 const sizeSlider = document.getElementById("sizeSlider")
 const ySlider = document.getElementById("ySlider")
 const xSlider = document.getElementById("xSlider")
@@ -493,10 +505,8 @@ function updateLogo(){
 logo.style.width = sizeSlider.value + "%"
 logo.style.height = sizeSlider.value + "%"
 
-logo.style.transform =
+mover.style.transform =
 `translate(${xSlider.value}px, ${ySlider.value}px)`
-
-}
 
 sizeSlider.addEventListener("input", updateLogo)
 ySlider.addEventListener("input", updateLogo)

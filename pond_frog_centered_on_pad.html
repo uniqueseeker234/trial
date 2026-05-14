@@ -1644,37 +1644,7 @@ journal.rotation.set(
 
 /* NEW 13MB GLB */
 
-setProgress(82,"Loading specimen slides case...");
 
-const slidesCase = await load(
-"./models/microscope_slides__case.glb"
-);
-
-room.add(slidesCase);
-  slidesCase.userData.type =
-"slides";
-
-clickable.push(slidesCase);
-
-/* TEMP SAME SCALE FEEL AS JOURNAL */
-
-slidesCase.position.set(
-1.75,
-0.37,
--0.75
-);
-
-slidesCase.scale.set(
-0.05,
-0.05,
-0.05
-);
-
-slidesCase.rotation.set(
-0,
--1.5,
-0
-);
 
 setProgress(100,"Scene loaded");
 
@@ -2273,11 +2243,6 @@ e=>{
 
   }
 
-  if(type === "slides"){
-
-    openPopup("slidesPopup");
-
-  }
 
   if(type === "journal"){
 

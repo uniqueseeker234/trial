@@ -214,6 +214,40 @@ max-height:100%;
 .archive h3,.archive p{color:var(--violet)}
 .photohouse h3,.photohouse p{color:var(--orange)}
 .locator h3,.locator p{color:var(--blue)}
+  .portal-message{
+grid-column:1/-1;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+min-height:90px;
+
+background:
+linear-gradient(
+90deg,
+rgba(94,219,255,.08),
+rgba(185,107,255,.08)
+);
+
+border:1px solid rgba(94,219,255,.18);
+
+backdrop-filter:blur(8px);
+}
+
+.portal-message h3{
+margin:0;
+
+font-family:'Orbitron',sans-serif;
+font-size:18px;
+letter-spacing:4px;
+
+background:linear-gradient(90deg,#5edbff,#b96bff);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+
+text-align:center;
+}
 
 .card h3{
 margin:0 0 8px;
@@ -431,6 +465,11 @@ preload="auto">
 <h3>Virtual Microscope</h3>
 <p>Helps to get a experience of viewing algae specimen under microscope.</p>
 </a>
+  <div class="card portal-message">
+
+<h3>CLICK THE MODULE THAT YOU WANT TO VISIT </h3>
+
+  </div>
 
 </div>
 </div>

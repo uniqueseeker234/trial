@@ -165,37 +165,7 @@ justify-content:center;
 
 z-index:2;
   }
-  #logoControls{
-position:fixed;
-top:20px;
-right:20px;
-z-index:99999;
 
-background:rgba(0,0,0,.75);
-padding:14px;
-border-radius:14px;
-border:1px solid rgba(255,255,255,.1);
-
-display:flex;
-flex-direction:column;
-gap:12px;
-
-backdrop-filter:blur(10px);
-
-font-size:13px;
-font-family:Orbitron,sans-serif;
-}
-
-#logoControls label{
-display:flex;
-flex-direction:column;
-gap:4px;
-color:#fff;
-}
-
-#logoControls input{
-width:180px;
-}
 .systems.show{opacity:1}
 
 .systems h2{
@@ -376,27 +346,7 @@ padding:24px 18px;
 <section class="hero">
 
 <div class="team">
-  <div id="logoControls">
 
-<label>
-Size
-<input type="range" id="sizeSlider"
-min="50" max="150" value="108">
-</label>
-
-<label>
-Vertical
-<input type="range" id="ySlider"
-min="-200" max="200" value="0">
-</label>
-
-<label>
-Horizontal
-<input type="range" id="xSlider"
-min="-200" max="200" value="0">
-</label>
-
-  </div>
   <div class="logo-mover">
 
 <img 
@@ -525,27 +475,7 @@ function startAnimation(){
   },500)
 
 }
-const logo = document.querySelector(".main-logo")
-const mover = document.querySelector(".logo-mover")
-const sizeSlider = document.getElementById("sizeSlider")
-const ySlider = document.getElementById("ySlider")
-const xSlider = document.getElementById("xSlider")
 
-function updateLogo(){
-
-logo.style.width = sizeSlider.value + "%"
-logo.style.height = sizeSlider.value + "%"
-
-mover.style.transform =
-`translate(${xSlider.value}px, ${ySlider.value}px)`
-
-}
-
-sizeSlider.addEventListener("input", updateLogo)
-ySlider.addEventListener("input", updateLogo)
-xSlider.addEventListener("input", updateLogo)
-
-updateLogo()
 </script>
 
 </body>

@@ -820,6 +820,88 @@ height:64px;
   }
 
 }
+  @media(min-width:701px){
+
+/* DESKTOP ONLY */
+
+#scopeEye{
+
+width:560px;
+height:560px;
+
+top:46%;
+
+border-width:22px;
+}
+
+.scopeTop{
+
+top:28px;
+
+gap:18px;
+}
+
+#lightPanel{
+
+top:110px;
+
+width:320px;
+
+padding:14px 18px;
+}
+
+#scopeGuide{
+
+top:220px;
+
+width:420px;
+
+font-size:15px;
+}
+
+#scopeGuideBox{
+
+top:330px;
+}
+
+.scopeControls{
+
+width:min(1200px,92vw);
+
+bottom:26px;
+
+gap:24px;
+}
+
+.controlPanel{
+
+padding:18px;
+
+border-radius:24px;
+}
+
+.zoomBtn{
+
+padding:14px 28px;
+
+font-size:15px;
+}
+
+.moveBtn{
+
+width:58px;
+height:58px;
+
+font-size:20px;
+}
+
+.knob{
+
+width:74px;
+height:74px;
+}
+
+  }
 </style>
 </head>
 
@@ -1112,6 +1194,54 @@ Close
 ========================= -->
 
 <div id="scopeUI">
+  <div id="devPanel" style="
+position:absolute;
+left:20px;
+top:20px;
+z-index:9999;
+background:rgba(0,0,0,0.75);
+padding:14px;
+border-radius:18px;
+color:white;
+font-family:Arial;
+width:220px;
+display:none;
+">
+
+<div style="margin-bottom:14px;">
+Eye Size
+<input
+type="range"
+id="eyeSizeSlider"
+min="300"
+max="900"
+value="560"
+style="width:100%;">
+</div>
+
+<div style="margin-bottom:14px;">
+Eye Vertical
+<input
+type="range"
+id="eyeTopSlider"
+min="20"
+max="70"
+value="46"
+style="width:100%;">
+</div>
+
+<div>
+Light Panel Vertical
+<input
+type="range"
+id="lightTopSlider"
+min="20"
+max="250"
+value="110"
+style="width:100%;">
+</div>
+
+  </div>
 
   <button id="closeScope">×</button>
 
@@ -1847,6 +1977,14 @@ document.getElementById("zoom10Btn");
 
 const zoom40Btn =
 document.getElementById("zoom40Btn");
+  const devPanel =
+document.getElementById("devPanel");
+
+if(window.innerWidth > 700){
+
+devPanel.style.display = "block";
+
+}
   const specimens = {
 
   spirogyra:{
@@ -2164,6 +2302,63 @@ const brightness =
 /* first render */
 
 updateMicroscopeView();
+  /* =========================
+   DESKTOP UI LIVE TUNING
+========================= */
+
+const eyeSizeSlider =
+document.getElementById("eyeSizeSlider");
+
+const eyeTopSlider =
+document.getElementById("eyeTopSlider");
+
+const lightTopSlider =
+document.getElementById("lightTopSlider");
+
+function updateDesktopUI(){
+
+if(window.innerWidth <= 700) return;
+
+const eye =
+document.getElementById("scopeEye");
+
+const lightPanel =
+document.getElementById("lightPanel");
+
+/* eye size */
+
+eye.style.width =
+eyeSizeSlider.value + "px";
+
+eye.style.height =
+eyeSizeSlider.value + "px";
+
+/* eye vertical */
+
+eye.style.top =
+eyeTopSlider.value + "%";
+
+/* light panel */
+
+lightPanel.style.top =
+lightTopSlider.value + "px";
+
+}
+
+[
+eyeSizeSlider,
+eyeTopSlider,
+lightTopSlider
+].forEach(slider=>{
+
+slider.addEventListener(
+"input",
+updateDesktopUI
+);
+
+});
+
+updateDesktopUI();
   let lightTouched = false;
 let coarseTouched = false;
 let fineTouched = false;

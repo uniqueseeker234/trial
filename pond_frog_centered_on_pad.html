@@ -2267,21 +2267,20 @@ small precision sharpening
 */
 
 let coarseBlur =
-coarseError * 0.22;
+coarseError * 0.12;
 
 coarseBlur =
-Math.max(0,Math.min(14,coarseBlur));
+Math.max(0,Math.min(8,coarseBlur));
 
 /* fine only works when coarse near correct */
 
 let fineBlur =
-fineError * 0.10;
+fineError * 0.06;
 
 if(coarseError > 18){
 
-  fineBlur += 4;
+  fineBlur += 1.5;
 }
-
 /* final blur */
 
 let blur =

@@ -143,6 +143,56 @@ body {
 .india:hover {
   box-shadow: 0 0 25px cyan, 0 0 50px cyan;
 }
+  .portal-message{
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+min-height:90px;
+
+background:
+linear-gradient(
+90deg,
+rgba(0,255,255,.08),
+rgba(0,255,120,.08),
+rgba(200,120,255,.08)
+);
+
+border:1px solid rgba(0,255,255,.18);
+
+backdrop-filter:blur(8px);
+}
+
+.portal-message:hover{
+box-shadow:
+0 0 18px rgba(0,255,255,.15),
+0 0 30px rgba(180,120,255,.12);
+}
+
+.portal-message h3{
+margin:0;
+
+font-family:'Orbitron',sans-serif;
+font-size:17px;
+letter-spacing:4px;
+
+background:
+linear-gradient(
+90deg,
+#5edbff,
+#4cff79,
+#d896ff
+);
+
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+
+text-align:center;
+
+padding:0 14px;
+line-height:1.6;
+}
 
 /* ===== RESPONSIVE ===== */
 @media (min-width: 768px) {
@@ -188,7 +238,11 @@ body {
     </video>
     <h2>COMMON ALGAE IN INDIA AND KERALA</h2>
   </div>
+<div class="card portal-message">
 
+<h3>CLICK ON THE MODULE TO VISIT THE PAGE</h3>
+
+</div>
 </div>
 
 </body>

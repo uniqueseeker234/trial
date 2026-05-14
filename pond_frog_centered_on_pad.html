@@ -2326,36 +2326,172 @@ document
 .getElementById("downloadJournal")
 .onclick = ()=>{
 
-  const title =
-  document.getElementById(
-  "journalTitle"
-  ).value;
+const title =
+document.getElementById(
+"journalTitle"
+).value || "Specimen";
 
-  const text =
-  document.getElementById(
-  "journalText"
-  ).value;
+const text =
+document.getElementById(
+"journalText"
+).value || "No observations written.";
 
-  const content =
-`Specimen: ${title}
+/* create canvas */
 
-${text}`;
+const canvas =
+document.createElement("canvas");
 
-  const blob =
-  new Blob([content],{
-    type:"text/plain"
-  });
+canvas.width = 1200;
+canvas.height = 1600;
 
-  const a =
-  document.createElement("a");
+const ctx =
+canvas.getContext("2d");
 
-  a.href =
-  URL.createObjectURL(blob);
+/* paper background */
 
-  a.download =
-  `${title || "journal"}.txt`;
+ctx.fillStyle = "#f6f1e8";
+ctx.fillRect(
+0,
+0,
+canvas.width,
+canvas.height
+);
 
-  a.click();
+/* title */
+
+ctx.fillStyle = "#111";
+
+ctx.font = "bold 52px Arial";
+
+ctx.fillText(
+"Biology Observation Journal",
+60,
+90
+);
+
+/* specimen name */
+
+ctx.font = "bold 38px Arial";
+
+ctx.fillText(
+"Specimen: " + title,
+60,
+170
+);
+
+/* algae image */
+
+const img = new Image();
+
+img.crossOrigin = "anonymous";
+
+img.src = scopeImage.src;
+
+img.onload = ()=>{
+
+ctx.drawImage(
+img,
+60,
+230,
+420,
+420
+);
+
+/* observation heading */
+
+ctx.fillStyle = "#111";
+
+ctx.font = "bold 34px Arial";
+
+ctx.fillText(
+"Observations",
+60,
+730
+);
+
+/* handwritten text */
+
+ctx.font = "32px cursive";
+
+ctx.fillStyle = "#222";
+
+/* word wrap */
+
+const maxWidth = 1000;
+
+const lineHeight = 48;
+
+let x = 60;
+let y = 800;
+
+const words =
+text.split(" ");
+
+let line = "";
+
+for(let n = 0; n < words.length; n++){
+
+const testLine =
+line + words[n] + " ";
+
+const metrics =
+ctx.measureText(testLine);
+
+const testWidth =
+metrics.width;
+
+if(testWidth > maxWidth && n > 0){
+
+ctx.fillText(
+line,
+x,
+y
+);
+
+line = words[n] + " ";
+
+y += lineHeight;
+
+}else{
+
+line = testLine;
+
+}
+
+}
+
+ctx.fillText(
+line,
+x,
+y
+);
+
+/* footer */
+
+ctx.font = "24px Arial";
+
+ctx.fillStyle = "#666";
+
+ctx.fillText(
+"Generated from Virtual Microscope Laboratory",
+60,
+1520
+);
+
+/* download image */
+
+const link =
+document.createElement("a");
+
+link.download =
+`${title}.png`;
+
+link.href =
+canvas.toDataURL("image/png");
+
+link.click();
+
+};
 
 };
 animate();

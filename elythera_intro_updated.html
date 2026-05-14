@@ -508,9 +508,13 @@ logo.style.height = sizeSlider.value + "%"
 mover.style.transform =
 `translate(${xSlider.value}px, ${ySlider.value}px)`
 
+}
+
 sizeSlider.addEventListener("input", updateLogo)
 ySlider.addEventListener("input", updateLogo)
 xSlider.addEventListener("input", updateLogo)
+
+updateLogo()
 </script>
 
 </body>

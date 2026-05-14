@@ -844,7 +844,27 @@ Preparing scene...
 <div id="bar">
 <div id="fill"></div>
 </div>
+<div id="liteModeBox" style="
+margin-top:18px;
+display:none;
+">
 
+<button id="liteModeBtn" style="
+width:100%;
+padding:14px;
+border:none;
+border-radius:14px;
+background:linear-gradient(135deg,#5FC2A7,#4AB7FF);
+color:white;
+font-weight:700;
+cursor:pointer;
+">
+
+Open Lite Mode
+
+</button>
+
+</div>
 </div>
 
 </div>
@@ -1009,48 +1029,84 @@ style="margin-top:22px;">
 <!-- =========================
      JOURNAL POPUP
 ========================= -->
-
 <div class="popupOverlay" id="journalPopup">
 
-  <div class="popup">
+<div class="popup">
 
-    <div class="popupTitle">
-      LAB JOURNAL
-    </div>
+<div class="popupTitle">
+Lab Journal
+</div>
 
-    <div class="popupText">
+<div style="
+font-size:13px;
+opacity:.7;
+margin-bottom:14px;
+">
 
-      AI biology journal system
-      coming soon...
-
-      <br><br>
-
-      Future features:
-      <br>
-      • specimen notes
-      <br>
-      • algae theory
-      <br>
-      • AI assistant
-      <br>
-      • practical records
-
-    </div>
-
-    <div class="popupButtons">
-
-      <button
-      class="popupBtn closeBtn popupClose">
-
-      Close
-
-      </button>
-
-    </div>
-
-  </div>
+Write your specimen observations.
 
 </div>
+
+<input
+id="journalTitle"
+type="text"
+placeholder="Specimen Name"
+style="
+width:100%;
+padding:14px;
+border:none;
+border-radius:14px;
+margin-bottom:14px;
+background:#111827;
+color:white;
+font-size:15px;
+box-sizing:border-box;
+">
+
+<textarea
+id="journalText"
+placeholder="Write your observations..."
+style="
+width:100%;
+height:240px;
+padding:18px;
+border:none;
+border-radius:18px;
+background:#f8f5ef;
+color:#111;
+font-size:20px;
+font-family:cursive;
+line-height:1.8;
+resize:none;
+box-sizing:border-box;
+">
+
+</textarea>
+
+<div class="popupButtons"
+style="margin-top:18px;">
+
+<button
+class="popupBtn"
+id="downloadJournal">
+
+Download Notes
+
+</button>
+
+<button
+class="popupBtn closeBtn popupClose">
+
+Close
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
   <!-- =========================
      MICROSCOPE OBSERVATION UI
 ========================= -->
@@ -1252,6 +1308,18 @@ Move the coarse and fine adjustment knobs to get a clear view of the specimen.
 const fill = document.getElementById("fill");
 const statusText = document.getElementById("status");
 const loading = document.getElementById("loading");
+  const liteModeBox =
+document.getElementById("liteModeBox");
+
+setTimeout(()=>{
+
+  if(loading.style.display !== "none"){
+
+    liteModeBox.style.display = "block";
+
+  }
+
+},8000);
 
 function setProgress(p,text){
 
@@ -1910,6 +1978,9 @@ document
 
     currentSpecimen =
     specimens[specimenKey];
+    document.getElementById(
+"journalTitle"
+).value = currentSpecimen.name;
 
     /* default 10x */
 
@@ -2251,8 +2322,54 @@ e=>{
   }
 
 });
+document
+.getElementById("downloadJournal")
+.onclick = ()=>{
 
+  const title =
+  document.getElementById(
+  "journalTitle"
+  ).value;
+
+  const text =
+  document.getElementById(
+  "journalText"
+  ).value;
+
+  const content =
+`Specimen: ${title}
+
+${text}`;
+
+  const blob =
+  new Blob([content],{
+    type:"text/plain"
+  });
+
+  const a =
+  document.createElement("a");
+
+  a.href =
+  URL.createObjectURL(blob);
+
+  a.download =
+  `${title || "journal"}.txt`;
+
+  a.click();
+
+};
 animate();
+  document
+.getElementById("liteModeBtn")
+.onclick = ()=>{
+
+  loading.style.display = "none";
+
+  renderer.domElement.style.display = "none";
+
+  openPopup("slidesPopup");
+
+};
 
 /* =========================
    RESIZE

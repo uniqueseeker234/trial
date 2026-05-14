@@ -2266,20 +2266,36 @@ Fine:
 small precision sharpening
 */
 
+/* =========================
+   IMPROVED 10x FOCUS LOGIC
+========================= */
+
+/*
+Coarse adjustment:
+brings specimen mostly visible
+
+Fine adjustment:
+adds final crispness
+*/
+
 let coarseBlur =
-coarseError * 0.12;
+coarseError * 0.085;
+
+/* coarse now reveals specimen earlier */
 
 coarseBlur =
-Math.max(0,Math.min(8,coarseBlur));
+Math.max(0,Math.min(6,coarseBlur));
 
-/* fine only works when coarse near correct */
+/* fine precision sharpening */
 
 let fineBlur =
-fineError * 0.06;
+fineError * 0.045;
 
-if(coarseError > 18){
+/* fine becomes weaker penalty */
 
-  fineBlur += 1.5;
+if(coarseError > 24){
+
+  fineBlur += 1;
 }
 /* final blur */
 
@@ -2287,7 +2303,7 @@ let blur =
 coarseBlur + fineBlur;
 
 blur =
-Math.max(0,Math.min(18,blur));
+Math.max(0,Math.min(8,blur));
   /* brightness */
 
   /* specimen visibility increases with coarse */

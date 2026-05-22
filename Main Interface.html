@@ -384,6 +384,77 @@ margin-bottom:10px;
 }
 
   }
+  /* DISCLAIMER BUTTON */
+.disclaimer-wrap{
+  grid-column:1/-1;
+  display:flex;
+  justify-content:center;
+  margin-top:4px;
+}
+
+.disclaimer-btn{
+  padding:12px 22px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,0.12);
+  background:rgba(255,255,255,0.05);
+  color:rgba(236,247,255,0.88);
+  font-family:'Orbitron',sans-serif;
+  letter-spacing:2px;
+  cursor:pointer;
+  transition:.25s;
+}
+
+.disclaimer-btn:hover{
+  background:rgba(94,219,255,0.12);
+  border-color:rgba(94,219,255,0.35);
+  transform:translateY(-2px);
+}
+
+/* MODAL */
+.disclaimer-modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.72);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:20000;
+  padding:20px;
+}
+
+.disclaimer-box{
+  width:min(680px,95%);
+  background:#05070d;
+  border:1px solid rgba(255,255,255,0.10);
+  border-radius:18px;
+  padding:24px;
+  color:var(--text);
+  box-shadow:0 0 40px rgba(0,0,0,0.55);
+}
+
+.disclaimer-box h3{
+  margin-top:0;
+  font-family:'Orbitron',sans-serif;
+  letter-spacing:2px;
+  color:#5edbff;
+}
+
+.disclaimer-box p{
+  line-height:1.7;
+  color:rgba(236,247,255,0.82);
+  font-size:14px;
+}
+
+.close-disclaimer{
+  margin-top:18px;
+  padding:10px 18px;
+  border:none;
+  border-radius:12px;
+  background:linear-gradient(90deg,#5edbff,#b96bff);
+  color:#000;
+  font-weight:bold;
+  cursor:pointer;
+}
 </style>
 </head>
 
@@ -472,6 +543,11 @@ preload="auto">
   <div class="card portal-message">
 
 <h3>CLICK THE MODULE THAT YOU WANT TO VISIT </h3>
+    <div class="disclaimer-wrap">
+  <button class="disclaimer-btn" id="openDisclaimer">
+    DISCLAIMER
+  </button>
+    </div>
 
   </div>
 
@@ -534,8 +610,59 @@ function startAnimation(){
   },500)
 
 }
+const disclaimerModal = document.getElementById("disclaimerModal");
 
+document.getElementById("openDisclaimer").addEventListener("click", ()=>{
+  disclaimerModal.style.display = "flex";
+});
+
+document.getElementById("closeDisclaimer").addEventListener("click", ()=>{
+  disclaimerModal.style.display = "none";
+});
+
+disclaimerModal.addEventListener("click", (e)=>{
+  if(e.target === disclaimerModal){
+    disclaimerModal.style.display = "none";
+  }
+});
 </script>
+<div class="disclaimer-modal" id="disclaimerModal">
+  <div class="disclaimer-box">
 
+    <h3>Educational Disclaimer</h3>
+
+    <p>
+      This project is created purely for educational and academic purposes
+      as part of a college learning initiative.
+    </p>
+
+    <p>
+      Some algae images and related visual materials used in this project
+      may belong to their respective owners and original sources,
+      including publicly available educational resources such as Wikimedia Commons.
+    </p>
+
+    <p>
+      This project is completely non-commercial and no copyright infringement
+      is intended.
+    </p>
+
+    <p>
+      If you are the rightful owner of any material used here and have concerns
+      regarding its usage, please contact us at:
+      <br><br>
+      <b>uniqueseekers123@gmail.com</b>
+    </p>
+
+    <p>
+      We will review the request and remove the material promptly if necessary.
+    </p>
+
+    <button class="close-disclaimer" id="closeDisclaimer">
+      CLOSE
+    </button>
+
+  </div>
+</div>
 </body>
 </html>

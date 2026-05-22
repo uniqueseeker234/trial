@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Pond • Page 5 • Mareoj Console</title>
+<title>• Algae identifier • Mareoj Console</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1231,26 +1231,25 @@ async function loadModel(){
   }
 }
 
-function shouldAcceptInbound(){
-  const ref = (document.referrer || "").toLowerCase();
-  const qp = new URLSearchParams(location.search);
-  return ref.includes("photohouse") || qp.get("from")==="photohouse";
-}
-
 function readInboundFromPhotoHouse(){
-  if(!shouldAcceptInbound()) {
-    sessionStorage.removeItem("enhancedImageDataURL");
-    return;
-  }
-  const dataURL = sessionStorage.getItem("enhancedImageDataURL");
-  if(dataURL){
+
+  // Read image sent from PhotoHouse outro
+  const dataURL = localStorage.getItem("archive_in");
+
+  if(dataURL && dataURL.startsWith("data:image")){
     inboundDataURL = dataURL;
-    sessionStorage.removeItem("enhancedImageDataURL"); // prevents cache repeats
+
+    // Load preview
     el("preview").src = inboundDataURL;
+
     updateLogs("> enhanced image received ✓");
+    setTopStatus("Enhanced image received");
+
+  } else {
+
+    updateLogs("> waiting for enhanced image...");
   }
 }
-
 function enableInputs(){
   el("uploadInput").disabled = false;
 }
